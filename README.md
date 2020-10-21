@@ -1,3 +1,5 @@
+22nd of October 2020, Amsterdam The Netherlands
+
 # ICT-Governance-Framework-Application
 The CBA Consult IT Management Framework is a project to optimize companies goverenance framework in a multi cloud environment. One of the reasons the framework and the procedures involved in creating, maintaining and updating the framework is leveraging the IT innovative solutions as in governance and maintaince framework updates and execution of blueprints, policies and ensure compliance to these requirements.
 
