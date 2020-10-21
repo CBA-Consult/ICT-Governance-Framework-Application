@@ -13,3 +13,5 @@ The comparison between your current secure score and a blueprint initiated secur
 One of the great advantages when using the blueprints is the reduced risk set for the company of not automatically offering the extensive services made available upon launch. The services are first reviewed and allow you to make strategic decisions on what you wish to do when integrating / adopting these services within your company. You will not automatically accept each change in possible solutions which extend far beyond what we currently know understand and see as possible.
 
 To ensure these new services do not conflict with current ongoing production they will not automatically be added to the environment. They will first require adjustment to the governance framework and the blueprints which will control which services by which threshold and type of exposed risk.
+
+Part of the applications and tools made available is a mobile application. Please find the mobile application under ICT Governance Framework Application - Projects: CBA Consult Compliance and Security - End User Mobile Assessment Tools - https://xd.adobe.com/view/0ca1c123-cf98-43de-8aab-a71dad328273-59f2/
