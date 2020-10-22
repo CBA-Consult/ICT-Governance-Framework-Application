@@ -41,12 +41,12 @@ jobs:
         # Learn more...
         # https://docs.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#overriding-automatic-language-detection
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.x' #SDK version to use; x will use the latest version of the SDK    
+    #steps:
+    #- name: Checkout repository
+      #uses: actions/checkout@v2
+      #- uses: actions/setup-dotnet@v1
+      #with:
+        #dotnet-version: '3.1.x' #SDK version to use; x will use the latest version of the SDK    
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
