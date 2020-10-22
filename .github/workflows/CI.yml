@@ -32,6 +32,7 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
           
+TODO Please update Jira Login which specfic user and login credentials are used when creating a todo    
     
     - name: Jira Login
       # You may pin to the exact commit or the version.
