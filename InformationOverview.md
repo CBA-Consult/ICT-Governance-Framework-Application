@@ -1,4 +1,4 @@
-Information Governance Overview
+<H1>Information Governance Overview</h1>
 
 Information governance helps you manage the end-to-end lifecycle of all content across your organization's digital estate, including Microsoft 365 Compliance adds value to your overall information goveranance framework.
 
