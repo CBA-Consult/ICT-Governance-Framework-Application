@@ -15,3 +15,5 @@ One of the great advantages when using the blueprints is the reduced risk set fo
 To ensure these new services do not conflict with current ongoing production they will not automatically be added to the environment. They will first require adjustment to the governance framework and the blueprints which will control which services by which threshold and type of exposed risk.
 
 Part of the applications and tools made available is a mobile application. Please find the mobile application under ICT Governance Framework Application - Projects: CBA Consult Compliance and Security - End User Mobile Assessment Tools - https://xd.adobe.com/view/0ca1c123-cf98-43de-8aab-a71dad328273-59f2/
+
+With the integration of contract management into the Azure portal the following article provide a possible better solution to the above named github repo. https://pwc.to/3LBQCzp
