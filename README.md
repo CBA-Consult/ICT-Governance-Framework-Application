@@ -45,28 +45,34 @@ Managing infrastructure as code (IaC) using Bicep and ARM templates in a Git rep
 Git Repository for Bicep Templates:
 Create a Git repository to store your Bicep templates. You can use platforms like GitHub, Azure DevOps, or any other Git provider.
 Organize your templates into folders based on their purpose (e.g., networking, compute, storage).
+
 Branching Strategy:
 Use a branching strategy to manage your templates effectively.
 Consider the following branches:
 Main Branch: This branch contains production-ready templates.
 Feature Branches: Create feature branches for new templates or changes.
 Pull Requests (PRs): Developers create PRs from feature branches to the main branch.
+
 Template Maintenance Workflow:
 Developers work on feature branches, creating or modifying templates.
 When ready, they create a PR to merge their changes into the main branch.
 The PR triggers automated validation (e.g., template linting, policy checks).
 Once approved, the changes are merged into the main branch.
+
 Continuous Integration (CI):
 Set up CI pipelines to validate templates automatically.
 Use tools like GitHub Actions, Azure Pipelines, or GitLab CI/CD.
 Validate syntax, compliance, and best practices during CI.
+
 Deployment Automation:
 Use Azure CLI or Azure PowerShell to deploy templates.
 Authenticate using az login.
 Set the correct Azure subscription using az account set -s <subscriptionId>.
+
 Cleanup Resources:
 When deploying templates for testing, ensure you clean up resources afterward.
 Azure offers free subscriptions for testing purposes.
+
 Regarding the ICT Governance Framework:
 
 Integrate the approval process into your Git repository using pull requests.
