@@ -77,26 +77,37 @@ Remember, Bicep simplifies ARM template creation and provides a more concise syn
 While Bicep and ARM templates are primarily used for defining and deploying infrastructure resources, they are not typically used to directly represent governance frameworks or documentation. However, you can achieve a comparison between the actual infrastructure and the approved governance framework by following these steps:
 
 Infrastructure as Code (IaC) for Governance Framework:
+
 Create a separate set of Bicep or ARM templates specifically for your governance framework.
 Define policies, naming conventions, resource tagging, access controls, and other governance rules within these templates.
 These templates act as a representation of your governance requirements.
+
 Comparison Process:
+
 Periodically compare the actual deployed resources (based on existing Bicep/ARM templates) with the governance framework templates.
 Use tools like Azure Policy, Azure Resource Graph, or custom scripts to identify discrepancies.
 Look for differences in resource names, tags, permissions, and configurations.
+
 Automated Validation:
+
 Set up automated validation during deployment or CI/CD pipelines.
 Validate that the deployed resources adhere to the governance rules defined in your framework.
 If any deviations are detected, trigger alerts or notifications.
+
 Documentation Integration:
+
 While the governance framework itself isn’t directly written in Bicep or ARM templates, you can integrate it with documentation.
 Document the governance rules, policies, and guidelines alongside the templates.
 Explain how each template aligns with specific governance requirements.
+
 Reporting and Remediation:
+
 Generate reports highlighting discrepancies between the actual infrastructure and the governance framework.
 Develop processes to remediate any non-compliance issues.
 Update the governance framework documentation as needed.
-Remember that Bicep and ARM templates are powerful tools for managing infrastructure, but they serve a different purpose than governance documentation. By combining both approaches, you can maintain a consistent and compliant environment.
+Remember that Bicep and ARM templates are powerful tools for managing infrastructure, but they serve a different purpose than governance documentation. 
+
+By combining both approaches, you can maintain a consistent and compliant environment.
 
 To automate the comparison between the actual infrastructure and the governance framework documentation, follow these steps:
 
