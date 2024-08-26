@@ -132,3 +132,5 @@ To automate the comparison between the actual infrastructure and the governance 
 Remember, automation streamlines governance and ensures consistency. If you need further assistance, feel free to ask! 😊
 
 Infrastructure as Code Center (API Center) version control for your comparison current infrastructure and the Infrastructure as a Code in your Governance Framework
+
+Establish your initial setup poicies and configuration and review to discover drift. See more at Sovereign Cloud
