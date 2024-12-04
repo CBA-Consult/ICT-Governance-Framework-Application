@@ -1,0 +1,171 @@
+### YamlMime:Landing
+
+title: Microsoft Cloud App Security documentation
+summary: Microsoft Cloud App Security is a Cloud Access Security Broker (CASB) that operates on multiple clouds. It provides rich visibility, control over data travel, and sophisticated analytics to identify and combat cyberthreats across all your cloud services.
+
+metadata:
+  title: Microsoft Cloud App Security documentation
+  description: Microsoft Cloud App Security is a Cloud Access Security Broker (CASB) that operates on multiple clouds. It provides rich visibility, control over data travel, and sophisticated analytics to identify and combat cyberthreats across all your cloud services.
+  services: na
+  ms.service: cloud-app-security
+  ms.subservice: na
+  ms.topic: landing-page
+  ms.collection: na
+  author: dcurwin
+  ms.author: dacurwin
+  ms.date: 09/24/2019
+
+# linkListType: architecture | concept | deploy | download | get-started | how-to-guide | learn | overview | quickstart | reference | tutorial | video | whats-new
+
+landingContent:
+# Cards and links should be based on top customer tasks or top subjects
+# Start card title with a verb
+  # Card (optional)
+  - title: About Cloud App Security
+    linkLists:
+      - linkListType: overview
+        links:
+          - text: What is Cloud App Security?
+            url: what-is-cloud-app-security.md
+          - text: Top 20 CASB use cases
+            url: https://go.microsoft.com/fwlink/p/?linkid=2099428
+      - linkListType: whats-new
+        links:
+          - text: Releases
+            url: release-notes.md
+      - linkListType: video
+        links:
+          - text: Deployment videos
+            url: https://go.microsoft.com/fwlink/?linkid=2110166
+
+  # Card (optional)
+  - title: Get started
+    linkLists:
+      - linkListType: quickstart
+        links:
+          - text: Get started with Cloud App Security
+            url: getting-started-with-cloud-app-security.md
+      - linkListType: reference
+        links:
+          - text: Using the Cloud App Security REST API
+            url: api-introduction.md
+          - text: Investigate anomaly detection alerts
+            url: investigate-anomaly-alerts.md
+
+  # Card
+  - title: Explore our top use cases
+    linkLists:
+      - linkListType: tutorial
+        links:
+          - text: Detect and manage suspicious activities
+            url: tutorial-suspicious-activity.md
+          - text: Investigate risky users
+            url: tutorial-ueba.md
+          - text: Investigate risky OAuth apps
+            url: investigate-risky-oauth.md
+          - text: Protect any app in your organization in real time
+            url: tutorial-proxy.md
+          - text: Block download of sensitive information
+            url: use-case-proxy-block-session-aad.md
+          - text: Manage cloud platform security
+            url: tutorial-cloud-platform-security.md
+          - text: Protect files with admin quarantine
+            url: use-case-admin-quarantine.md
+          - text: Apply Azure Information Protection classification labels
+            url: use-case-information-protection.md
+          - text: Extend governance to endpoint remediation
+            url: tutorial-flow.md
+
+  # Card
+  - title: Concepts
+    linkLists:
+      - linkListType: concept
+        links:
+          - text: Protect apps with Conditional Access App Control
+            url: proxy-intro-aad.md
+          - text: Working with the dashboard
+            url: daily-activities-to-protect-your-cloud-environment.md
+          - text: Working with App risk scores
+            url: risk-score.md
+          - text: Working with discovered apps
+            url: discovered-apps.md
+          - text: Protect connected apps
+            url: protect-connected-apps.md
+
+  # Card
+  - title: Best practices
+    linkLists:
+      - linkListType: get-started
+        links:
+          - text: Discover and assess cloud apps
+            url: best-practices.md#discover-and-assess-cloud-apps
+          - text: Apply cloud governance policies
+            url: best-practices.md#apply-cloud-governance-policies
+          - text: Limit exposure of shared data and enforce collaboration policies
+            url: best-practices.md#limit-exposure-of-shared-data-and-enforce-collaboration-policies
+          - text: Discover, classify, label, and protect regulated and sensitive data stored in the cloud
+            url: best-practices.md#discover-classify-label-and-protect-regulated-and-sensitive-data-stored-in-the-cloud
+          - text: Enforce DLP and compliance policies for data stored in the cloud
+            url: best-practices.md#enforce-dlp-and-compliance-policies-for-data-stored-in-the-cloud
+          - text: Block and protect download of sensitive data to unmanaged or risky devices
+            url: best-practices.md#block-and-protect-download-of-sensitive-data-to-unmanaged-or-risky-devices
+          - text: Secure collaboration with external users by enforcing real-time session controls
+            url: best-practices.md#secure-collaboration-with-external-users-by-enforcing-real-time-session-controls
+          - text: Detect cloud threats, compromised accounts, malicious insiders, and ransomware
+            url: best-practices.md#detect-cloud-threats-compromised-accounts-malicious-insiders-and-ransomware
+          - text: Use the audit trail of activities for forensic investigations
+            url: best-practices.md#use-the-audit-trail-of-activities-for-forensic-investigations
+          - text: Secure IaaS services and custom apps
+            url: best-practices.md#secure-iaas-services-and-custom-apps
+
+  # Card
+  - title: Discover and control Shadow IT
+    linkLists:
+      - linkListType: tutorial
+        links:
+          - text: Discover and identify Shadow IT
+            url: tutorial-shadow-it.md#phase-1-discover-and-identify-shadow-it
+          - text: Evaluate and analyze
+            url: tutorial-shadow-it.md#phase-2-evaluate-and-analyze
+          - text: Manage your apps
+            url: tutorial-shadow-it.md#phase-3-manage-your-apps
+      - linkListType: concept
+        links:
+          - text: Working with the dashboard
+            url: daily-activities-to-protect-your-cloud-environment.md
+          - text: Working with the discovered apps
+            url: discovered-apps.md
+          - text: Working with App risk scores
+            url: risk-score.md
+      - linkListType: deploy
+        links:
+          - text: Deploy Cloud Discovery
+            url: set-up-cloud-discovery.md
+      - linkListType: how-to-guide
+        links:
+          - text: Integrate with Microsoft Defender for Endpoint
+            url: mde-integration.md
+          - text: Cloud Discovery enrichment
+            url: cloud-discovery-aad-enrichment.md
+      - linkListType: reference
+        links:
+          - text: Discover and assess cloud apps
+            url: best-practices.md#discover-and-assess-cloud-apps
+      - linkListType: video
+        links:
+          - text: Shadow IT discovery beyond the corporate network
+            url: https://www.youtube.com/watch?v=f8hbvbY1Hnc
+
+  # Card
+  - title: Additional resources
+    linkLists:
+      - linkListType: learn
+        links:
+          - text: Read our e-books
+            url: e-books.md
+          - text: Explore Microsoft 365, a complete solution that includes Cloud App Security
+            url: /microsoft-365/
+      - linkListType: video
+        links:
+          - text: Watch our webinars
+            url: webinars.md
