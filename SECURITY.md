@@ -1,4 +1,4 @@
-1. General Approach:
+## 1. General Approach:
 
 Principle of Standards-Based Solutions: Add a guiding principle to your framework stating that you prioritize solutions that adhere to relevant industry standards.
 
@@ -12,17 +12,17 @@ Implementation Guidance: In the "Implementation Guidance" section, list the rele
 
 Monitoring and Auditing: In the "Monitoring and Auditing" section, specify that compliance with the relevant standards should be regularly audited.
 
-2. Specific Examples for OAuth, Identity, and Access Management:
+## 2. Specific Examples for OAuth, Identity, and Access Management:
 
 Here's how you could address OAuth, Azure Entra, Google IAM, AWS IAM, and Okta in a standards-based way within your framework:
 
-(A) Authentication and Authorization (General):
+### (A) Authentication and Authorization (General):
 
 Control Objective: "Implement a secure and standardized authentication and authorization system for all cloud and on-premises resources."
 
 Related Policies: Information Security Policy, Access Control Policy, Data Privacy Policy
 
-Relevant Standards:
+## Relevant Standards:
 
 OAuth 2.0: (IETF RFC 6749) - An authorization framework that enables applications to obtain limited access to user accounts on an HTTP service. This is the core standard for modern delegated authorization.
 
@@ -34,7 +34,7 @@ SCIM 2.0: (System for Cross-domain Identity Management) - An open standard for a
 
 FIDO2: (Fast IDentity Online) - A set of open authentication standards that enable passwordless authentication using security keys and biometrics.
 
-Implementation Guidance:
+## Implementation Guidance:
 
 "Choose an identity provider (IdP) and service providers (SPs) that support OAuth 2.0 and OpenID Connect for modern application authorization and authentication."
 
@@ -46,13 +46,13 @@ Implementation Guidance:
 
 "Consider FIDO2 for passwordless authentication."
 
-Tooling Examples (Mention, but don't endorse):
+## Tooling Examples (Mention, but don't endorse):
 
 Identity Providers (IdPs): Azure Entra, Google Identity Platform, AWS IAM Identity Center (successor to AWS SSO), Okta, Ping Identity, Auth0, Keycloak (open source).
 
 Libraries and SDKs: Numerous open-source libraries and SDKs are available for implementing OAuth 2.0 and OIDC in various programming languages.
 
-Monitoring and Auditing:
+## Monitoring and Auditing:
 
 "Regularly audit IdP and SP configurations to ensure they comply with OAuth 2.0, OIDC, and SAML 2.0 standards."
 
@@ -60,13 +60,13 @@ Monitoring and Auditing:
 
 "Verify that MFA is enforced for all users, especially privileged accounts."
 
-(B) Identity and Access Management (IAM):
+### (B) Identity and Access Management (IAM):
 
 Control Objective: "Implement a robust IAM system that enforces the principle of least privilege and provides centralized management of identities and access across all environments."
 
 Related Policies: Information Security Policy, Access Control Policy
 
-Relevant Standards:
+## Relevant Standards:
 
 NIST SP 800-53: Security and Privacy Controls for Information Systems and Organizations (provides a comprehensive catalog of security controls).
 
@@ -74,7 +74,7 @@ ISO/IEC 27001: Information security management systems — Requirements.
 
 CIS Controls: Center for Internet Security Controls (a prioritized set of security best practices).
 
-Implementation Guidance:
+## Implementation Guidance:
 
 "Use Role-Based Access Control (RBAC) to grant permissions based on job roles."
 
@@ -88,13 +88,13 @@ Implementation Guidance:
 
 "Use Just-In-Time (JIT) access where possible."
 
-Tooling Examples:
+## Tooling Examples:
 
 Cloud-Native IAM Services: Azure Entra, Google Cloud IAM, AWS IAM.
 
 Third-Party IAM Solutions: Okta, Ping Identity, CyberArk, SailPoint.
 
-Monitoring and Auditing:
+## Monitoring and Auditing:
 "Monitor failed login attempts, and review changes to minimize risk."
 
 "Regularly review user access rights and permissions."
