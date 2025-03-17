@@ -133,6 +133,6 @@ Remember, automation streamlines governance and ensures consistency. If you need
 
 Infrastructure as Code Center (API Center) version control for your comparison current infrastructure and the Infrastructure as a Code in your Governance Framework
 
-Establish your initial setup poicies and configuration and review to discover drift. See more at Sovereign Cloud
+Establish your initial setup policies and configuration (Bsseline) and review to discover drift. See more at Sovereign Cloud
 
 https://github.com/CBA-Consult/ICT-Governance-Framework-Application/wiki/Governance-Framework-Best-Practices-and-process-ownership-and-drift-within-the-governance-framework
