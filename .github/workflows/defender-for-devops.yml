@@ -24,7 +24,6 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '21 6 * * 2'
 
 jobs:
   MSDO:
