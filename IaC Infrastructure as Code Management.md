@@ -47,7 +47,6 @@ The following IaC tools are approved for use within [Organization Name]:
 | **Terraform**| Multi-cloud IaC tool from HashiCorp. Uses HashiCorp Configuration Language (HCL).  Mature and widely adopted.                                                           | Multi-cloud deployments, complex infrastructure, large teams, organizations with existing Terraform expertise.                      |
 | **ARM Templates** | Azure Resource Manager templates (JSON).  The underlying technology for Azure deployments.  Bicep is generally preferred for authoring.                           | Legacy deployments, situations where direct ARM template manipulation is required (rare).                                        |
 | **Pulumi**    | Uses general-purpose programming languages (Python, TypeScript, Go, .NET) to define infrastructure.                                                                | Teams with strong programming skills, multi-cloud deployments, complex infrastructure requiring imperative logic.                   |
-|**Dataflows** | Cloud-based data prep in Power BI, enabling Python script execution for transformations. Recommended for orchestrating data movement and preparation for Power BI reports.| Power Bi Development and reporting. Running Python Code for analysis and machine learning.                                           |
 #### IaC Code Management
 
 *   **Version Control:** All IaC code *must* be stored in a version control system (e.g., Git) using the [Organization Name] standard branching strategy.
