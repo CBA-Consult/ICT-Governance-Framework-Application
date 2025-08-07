@@ -78,7 +78,14 @@ Q3 2025 Milestones (Current Quarter):
 ├── Stakeholder Feedback Portal: ✅ Completed (August 15)
 └── Real-Time Dashboard v2.0: 🔄 In Progress (Due: Sept 15)
 
-Q4 2025 Milestones (Next Quarter):
+{{CURRENT_QUARTER}} Milestones (Current Quarter):
+├── Multi-Cloud Policy Framework: ✅ Completed (July 15)
+├── AI Ethics Guidelines: ✅ Completed (August 1)
+├── Automated Compliance Scanning: 🔄 In Progress (Due: Sept 30)
+├── Stakeholder Feedback Portal: ✅ Completed (August 15)
+└── Real-Time Dashboard v2.0: 🔄 In Progress (Due: Sept 15)
+
+{{NEXT_QUARTER}} Milestones (Next Quarter):
 ├── Cross-Platform Integration: 📋 Planned (Oct 15)
 ├── Predictive Analytics Implementation: 📋 Planned (Nov 30)
 ├── Advanced Automation Rules: 📋 Planned (Dec 15)
