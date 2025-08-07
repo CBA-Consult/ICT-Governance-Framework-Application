@@ -224,7 +224,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       keyvaultproperties: {
         keyname: 'iso27001-encryption-key'
         keyvaulturi: keyVault.properties.vaultUri
-      }
+      keySource: 'Microsoft.Storage'
+      // NOTE: To enable customer-managed keys (CMK) with Key Vault, update the storage account after the Key Vault and key are created.
+      // keyvaultproperties block intentionally omitted to avoid circular dependency during initial deployment.
       services: {
         blob: {
           enabled: true
