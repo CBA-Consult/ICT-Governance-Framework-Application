@@ -23,13 +23,49 @@ This framework covers all technology assets, services, and resources:
 
 ### Three-Tiered Structure
 
-**🏛️ ICT Governance Council (IGC)**
+**🏛️ ICT Governance Council (IGC) - Dedicated IT Governance Committee**
 
-* Senior-level cross-functional committee
-* Strategic oversight, policy approval, resource allocation
-* Members: CIO/CTO, Business Unit Leaders, Legal/Compliance, Security, Finance
-* Oversight of application governance and shadow IT policies
-* Review of critical shadow IT findings and compliance exceptions
+The ICT Governance Council serves as the organization's dedicated IT governance committee, providing strategic oversight and decision-making authority for all technology initiatives and governance matters.
+
+**Committee Composition:**
+* **Chair:** Chief Information Officer (CIO) or Chief Technology Officer (CTO)
+* **Members:** 
+  - Business Unit Leaders (representing major business domains)
+  - Chief Security Officer or Security Director
+  - Legal and Compliance Representative
+  - Chief Financial Officer or Finance Representative
+  - Risk Management Representative
+  - Enterprise Architecture Lead
+
+**Primary Responsibilities:**
+* **Strategic Technology Oversight:** Provide strategic direction and oversight for all technology initiatives
+* **Policy Governance:** Approve, review, and update all ICT governance policies and procedures
+* **Resource Allocation:** Make decisions on technology resource allocation and investment priorities
+* **Risk Management:** Oversee technology risk management and approve risk mitigation strategies
+* **Compliance Oversight:** Ensure compliance with regulatory requirements and industry standards
+* **Performance Monitoring:** Review governance metrics, KPIs, and audit findings
+* **Exception Management:** Review and approve exceptions to governance policies and standards
+* **Technology Initiative Approval:** Approve major technology initiatives, projects, and architectural changes
+
+**Meeting Frequency and Structure:**
+* **Regular Meetings:** Monthly meetings (minimum 2 hours)
+* **Quarterly Reviews:** Comprehensive quarterly governance reviews (half-day sessions)
+* **Annual Planning:** Annual strategic planning and framework review (full-day session)
+* **Emergency Sessions:** Ad-hoc meetings for urgent governance decisions
+
+**Decision-Making Authority:**
+* Approve technology strategies and roadmaps
+* Authorize major technology investments and projects
+* Approve governance policy changes and exceptions
+* Make final decisions on technology standard selections
+* Authorize responses to significant compliance or security issues
+* Approve organizational technology governance structure changes
+
+**Reporting and Accountability:**
+* Reports to Executive Leadership and Board of Directors
+* Provides quarterly governance status reports to senior management
+* Maintains governance dashboard and metrics for transparency
+* Ensures accountability for governance decisions and outcomes
 
 **👑 Technology Domain Owners**
 
@@ -86,6 +122,8 @@ This framework covers all technology assets, services, and resources:
 | **Employee Application Handover** | I | A | R | C |
 
 _Legend: R = Responsible, A = Accountable, C = Consulted, I = Informed_
+
+For comprehensive role definitions, detailed responsibilities, expectations, and performance metrics, refer to the [ICT Governance Roles and Responsibilities](ICT-Governance-Roles-Responsibilities.md) document.
 
 ---
 
@@ -206,6 +244,28 @@ The framework ensures compliance with relevant regulations and standards:
 * Surveys of business stakeholders and end users
 * Issue tracking and feedback channels
 * Continuous improvement suggestions
+
+### 🔍 Audit and Compliance Framework
+
+The organization implements a comprehensive audit framework to ensure ongoing compliance with governance policies and procedures:
+
+* **Annual Comprehensive Governance Audits:** Complete evaluation of all governance domains
+* **Semi-Annual Domain-Specific Audits:** Deep dive assessments of specific governance areas
+* **Quarterly Compliance Audits:** Focused verification of regulatory and policy compliance
+* **Monthly Process Audits:** Evaluation of specific governance processes and controls
+
+For detailed audit procedures, methodologies, and requirements, refer to the [ICT Governance Audit Framework](ICT-Governance-Audit-Framework.md).
+
+### 📚 Training and Awareness Program
+
+Regular training sessions ensure all stakeholders understand and can effectively implement governance practices:
+
+* **Quarterly All-Staff Governance Awareness Sessions:** Organization-wide governance updates and training
+* **Monthly Role-Specific Training:** Targeted training for specific governance roles and responsibilities
+* **Annual Comprehensive Governance Training:** In-depth training covering all aspects of the governance framework
+* **Specialized Training Programs:** New employee onboarding, leadership development, and compliance training
+
+For detailed training schedules, content, and delivery methods, refer to the [ICT Governance Training and Communication Plan](ICT-Governance-Training-Communication.md).
 
 ---
 
@@ -444,14 +504,33 @@ For detailed guidance on onboarding new technology components and offboarding de
 
 ## Success Metrics
 
+### Governance Effectiveness Metrics
 * ✅ 95% of technology deployments compliant with architecture standards
 * ✅ 99.9% service availability for critical systems
 * ✅ <24 hour resolution time for high-priority incidents
 * ✅ 90% stakeholder satisfaction with ICT governance
 * ✅ 100% compliance with regulatory requirements
+
+### Training and Awareness Metrics
+* ✅ >95% attendance rate for mandatory governance training sessions
+* ✅ >98% completion rate for e-learning governance modules
+* ✅ >85% pass rate on governance knowledge assessments
+* ✅ >90% governance awareness among all staff (annual survey)
+* ✅ >4.0/5.0 satisfaction scores for training quality
+
+### Audit and Compliance Metrics
+* ✅ 100% completion of scheduled governance audits
+* ✅ >90% of audit findings resolved within agreed timelines
+* ✅ <5% repeat findings from previous audits
+* ✅ >95% compliance rate with governance policies
+* ✅ Level 4 (Managed) governance maturity rating
+
+### Application and Technology Governance Metrics
 * ✅ 95% of applications used on company devices are validated and approved
 * ✅ <48 hour response time for employee application validation requests
 * ✅ 90% reduction in unauthorized application usage
+
+### Employee Lifecycle Technology Metrics
 * ✅ 100% completion rate for employee technology onboarding within 24 hours
 * ✅ 95% data recovery rate for departing employees
 * ✅ <4 hours for complete access termination upon employee departure
