@@ -331,7 +331,7 @@ This analysis evaluates the efficiency of current governance processes, identifi
 - **Year 1:** -$163,000 (investment year)
 - **Year 2:** +$412,000 (full benefits realized)
 - **Year 3:** +$412,000
-- **3-Year ROI:** 143%
+- **3-Year ROI:** 143%  <br>_Note: ROI is calculated on a simple (undiscounted) basis and does not account for the time value of money, inflation, or discount rates. Actual ROI may vary if a discount rate is applied._
 - **Payback Period:** 16 months
 
 ## Implementation Recommendations
