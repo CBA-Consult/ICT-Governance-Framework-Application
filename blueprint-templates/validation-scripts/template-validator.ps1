@@ -467,7 +467,7 @@ function Test-SecurityBestPractices {
     
     $score = $passedChecks / $totalChecks
     
-    if ($score -ge 0.8) {
+    if ($score -ge $Threshold) {
         return @{
             Passed = $true
             Message = "Security best practices implemented"
