@@ -132,7 +132,12 @@ function Connect-ToAzure {
             Connect-AzAccount -Identity | Out-Null
         }
         elseif ($Config.Authentication.ServicePrincipal) {
-            $SecurePassword = ConvertTo-SecureString $Config.Authentication.ClientSecret -AsPlainText -Force
+            $ClientSecret = $env:AZURE_CLIENT_SECRET
+            if (-not $ClientSecret) {
+                Write-Log "Environment variable AZURE_CLIENT_SECRET is not set. Cannot authenticate service principal." "ERROR"
+                throw "Missing required environment variable: AZURE_CLIENT_SECRET"
+            }
+            $SecurePassword = ConvertTo-SecureString $ClientSecret -AsPlainText -Force
             $Credential = New-Object System.Management.Automation.PSCredential($Config.Authentication.ClientId, $SecurePassword)
             Connect-AzAccount -ServicePrincipal -Credential $Credential -TenantId $Config.Authentication.TenantId | Out-Null
         }
