@@ -305,7 +305,7 @@ This analysis evaluates the efficiency of current governance processes, identifi
 #### Technology and Tool Costs
 - **Current Tools:** $150,000 annually
 - **Manual Process Overhead:** $200,000 annually (inefficiency cost)
-- **Compliance Gaps:** $100,000 annually (estimated risk cost)
+- **Compliance Gaps:** $100,000 annually (estimated risk cost; placeholder value based on industry benchmarks and potential regulatory penalties. Refine with organization-specific risk assessment.)
 
 **Total Annual Cost:** $980,000
 
