@@ -455,7 +455,127 @@ function Test-DeviceManagement {
 
 function Test-ApplicationControl {
     # Simulate application control assessment
-    return 50
+# Helper function to get OAuth2 token for Microsoft Defender for Endpoint
+function Get-MDEAuthToken {
+    param(
+        [Parameter(Mandatory = $true)][string]$TenantId,
+        [Parameter(Mandatory = $true)][string]$ClientId,
+        [Parameter(Mandatory = $true)][string]$ClientSecret,
+        [Parameter(Mandatory = $false)][string]$Resource = "https://api.security.microsoft.com"
+    )
+    $body = @{
+        grant_type    = "client_credentials"
+        client_id     = $ClientId
+        client_secret = $ClientSecret
+        scope        = "$Resource/.default"
+    }
+    $response = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token" -Body $body -ContentType "application/x-www-form-urlencoded"
+    return $response.access_token
+}
+
+# Helper function to call Microsoft Defender for Endpoint API
+function Invoke-MDEApi {
+    param(
+        [Parameter(Mandatory = $true)][string]$Uri,
+        [Parameter(Mandatory = $true)][string]$Token
+    )
+    $headers = @{
+        "Authorization" = "Bearer $Token"
+        "Content-Type"  = "application/json"
+    }
+    return Invoke-RestMethod -Uri $Uri -Headers $headers -Method Get
+}
+
+# Set these variables with your Azure AD app registration details
+$MDE_TenantId    = $env:MDE_TenantId    # Or set directly
+$MDE_ClientId    = $env:MDE_ClientId
+$MDE_ClientSecret= $env:MDE_ClientSecret
+$MDE_ApiBase     = "https://api.security.microsoft.com"
+
+function Test-EndpointProtection {
+    # Assess endpoint protection status using Defender for Endpoint API
+    if (-not $MDE_TenantId -or -not $MDE_ClientId -or -not $MDE_ClientSecret) {
+        Write-Warning "MDE API credentials not set. Returning 0."
+        return 0
+    }
+    $token = Get-MDEAuthToken -TenantId $MDE_TenantId -ClientId $MDE_ClientId -ClientSecret $MDE_ClientSecret
+    $uri = "$MDE_ApiBase/api/machines"
+    $machines = Invoke-MDEApi -Uri $uri -Token $token
+    if (-not $machines.value) { return 0 }
+    $total = $machines.value.Count
+    if ($total -eq 0) { return 0 }
+    $protected = ($machines.value | Where-Object { $_.healthStatus -eq "Active" -and $_.osPlatform -ne "Unknown" -and $_.isAzureAdJoined -eq $true }).Count
+    $score = [math]::Round(($protected / $total) * 100)
+    return $score
+}
+
+function Test-DeviceCompliance {
+    # Assess device compliance using Defender for Endpoint API
+    if (-not $MDE_TenantId -or -not $MDE_ClientId -or -not $MDE_ClientSecret) {
+        Write-Warning "MDE API credentials not set. Returning 0."
+        return 0
+    }
+    $token = Get-MDEAuthToken -TenantId $MDE_TenantId -ClientId $MDE_ClientId -ClientSecret $MDE_ClientSecret
+    $uri = "$MDE_ApiBase/api/machines"
+    $machines = Invoke-MDEApi -Uri $uri -Token $token
+    if (-not $machines.value) { return 0 }
+    $total = $machines.value.Count
+    if ($total -eq 0) { return 0 }
+    $compliant = ($machines.value | Where-Object { $_.riskScore -eq "Low" }).Count
+    $score = [math]::Round(($compliant / $total) * 100)
+    return $score
+}
+
+function Test-EDRImplementation {
+    # Assess EDR implementation using Defender for Endpoint API
+    if (-not $MDE_TenantId -or -not $MDE_ClientId -or -not $MDE_ClientSecret) {
+        Write-Warning "MDE API credentials not set. Returning 0."
+        return 0
+    }
+    $token = Get-MDEAuthToken -TenantId $MDE_TenantId -ClientId $MDE_ClientId -ClientSecret $MDE_ClientSecret
+    $uri = "$MDE_ApiBase/api/machines"
+    $machines = Invoke-MDEApi -Uri $uri -Token $token
+    if (-not $machines.value) { return 0 }
+    $total = $machines.value.Count
+    if ($total -eq 0) { return 0 }
+    $edrEnabled = ($machines.value | Where-Object { $_.onboardingStatus -eq "Onboarded" }).Count
+    $score = [math]::Round(($edrEnabled / $total) * 100)
+    return $score
+}
+
+function Test-DeviceManagement {
+    # Assess device management using Defender for Endpoint API
+    if (-not $MDE_TenantId -or -not $MDE_ClientId -or -not $MDE_ClientSecret) {
+        Write-Warning "MDE API credentials not set. Returning 0."
+        return 0
+    }
+    $token = Get-MDEAuthToken -TenantId $MDE_TenantId -ClientId $MDE_ClientId -ClientSecret $MDE_ClientSecret
+    $uri = "$MDE_ApiBase/api/machines"
+    $machines = Invoke-MDEApi -Uri $uri -Token $token
+    if (-not $machines.value) { return 0 }
+    $total = $machines.value.Count
+    if ($total -eq 0) { return 0 }
+    $managed = ($machines.value | Where-Object { $_.managedBy -ne $null -and $_.managedBy -ne "" }).Count
+    $score = [math]::Round(($managed / $total) * 100)
+    return $score
+}
+
+function Test-ApplicationControl {
+    # Assess application control using Defender for Endpoint API
+    if (-not $MDE_TenantId -or -not $MDE_ClientId -or -not $MDE_ClientSecret) {
+        Write-Warning "MDE API credentials not set. Returning 0."
+        return 0
+    }
+    $token = Get-MDEAuthToken -TenantId $MDE_TenantId -ClientId $MDE_ClientId -ClientSecret $MDE_ClientSecret
+    $uri = "$MDE_ApiBase/api/machines"
+    $machines = Invoke-MDEApi -Uri $uri -Token $token
+    if (-not $machines.value) { return 0 }
+    $total = $machines.value.Count
+    if ($total -eq 0) { return 0 }
+    # For demo, count machines with applicationControlType set (requires custom logic per org)
+    $appControl = ($machines.value | Where-Object { $_.applicationControlType -ne $null -and $_.applicationControlType -ne "" }).Count
+    $score = [math]::Round(($appControl / $total) * 100)
+    return $score
 }
 
 function Get-MaturityLevel {
