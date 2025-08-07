@@ -1,0 +1,716 @@
+{
+  "assessmentMetadata": {
+    "version": "1.0.0",
+    "framework": "Zero Trust Maturity Model",
+    "lastUpdated": "2024-12-19",
+    "description": "Configuration for Zero Trust Maturity Assessment across six pillars"
+  },
+  "pillars": {
+    "Identities": {
+      "description": "Secure identity verification and management for all users and services",
+      "weight": 20,
+      "assessments": [
+        {
+          "name": "Multi-Factor Authentication",
+          "description": "Implementation of MFA across all user accounts and applications",
+          "weight": 20,
+          "type": "AzureAD",
+          "criteria": {
+            "level1": "Basic password policies in place",
+            "level2": "MFA enabled for privileged accounts",
+            "level3": "MFA enabled for all users with risk-based policies",
+            "level4": "Continuous authentication with risk assessment",
+            "level5": "AI-powered adaptive authentication"
+          },
+          "automatedChecks": [
+            "Check MFA enablement rate",
+            "Verify conditional access policies",
+            "Assess authentication methods diversity",
+            "Review sign-in risk policies"
+          ]
+        },
+        {
+          "name": "Privileged Access Management",
+          "description": "Management and governance of privileged accounts and access",
+          "weight": 25,
+          "type": "AzureAD",
+          "criteria": {
+            "level1": "Basic admin account management",
+            "level2": "Privileged access workstations implemented",
+            "level3": "Just-in-time access with approval workflows",
+            "level4": "Zero standing privileges with automated provisioning",
+            "level5": "AI-driven privilege optimization"
+          },
+          "automatedChecks": [
+            "Check PIM configuration",
+            "Verify just-in-time access policies",
+            "Assess privileged account inventory",
+            "Review access review completion rates"
+          ]
+        },
+        {
+          "name": "Identity Governance",
+          "description": "Automated identity lifecycle management and governance",
+          "weight": 20,
+          "type": "AzureAD",
+          "criteria": {
+            "level1": "Manual user provisioning and deprovisioning",
+            "level2": "Automated user lifecycle with basic workflows",
+            "level3": "Comprehensive identity governance with regular reviews",
+            "level4": "AI-powered identity analytics and risk assessment",
+            "level5": "Fully autonomous identity governance"
+          },
+          "automatedChecks": [
+            "Check automated provisioning configuration",
+            "Verify identity governance policies",
+            "Assess access review processes",
+            "Review identity analytics insights"
+          ]
+        },
+        {
+          "name": "Conditional Access",
+          "description": "Risk-based access control policies and enforcement",
+          "weight": 20,
+          "type": "AzureAD",
+          "criteria": {
+            "level1": "Basic location-based access controls",
+            "level2": "Device-based conditional access policies",
+            "level3": "Risk-based conditional access with multiple factors",
+            "level4": "Continuous access evaluation with real-time risk assessment",
+            "level5": "AI-powered adaptive access control"
+          },
+          "automatedChecks": [
+            "Check conditional access policy coverage",
+            "Verify risk-based policies",
+            "Assess policy effectiveness metrics",
+            "Review continuous access evaluation"
+          ]
+        },
+        {
+          "name": "Identity Protection",
+          "description": "Advanced threat detection and response for identities",
+          "weight": 15,
+          "type": "AzureAD",
+          "criteria": {
+            "level1": "Basic identity monitoring and alerting",
+            "level2": "Identity protection policies with manual response",
+            "level3": "Automated identity threat response",
+            "level4": "AI-powered identity threat detection and prediction",
+            "level5": "Autonomous identity protection with self-healing"
+          },
+          "automatedChecks": [
+            "Check identity protection policy configuration",
+            "Verify automated response actions",
+            "Assess threat detection accuracy",
+            "Review identity risk scores"
+          ]
+        }
+      ]
+    },
+    "Endpoints": {
+      "description": "Comprehensive endpoint security and management",
+      "weight": 18,
+      "assessments": [
+        {
+          "name": "Endpoint Protection",
+          "description": "Advanced endpoint protection and threat detection",
+          "weight": 25,
+          "type": "Defender",
+          "criteria": {
+            "level1": "Basic antivirus protection",
+            "level2": "Centralized endpoint protection with real-time scanning",
+            "level3": "Advanced threat protection with behavioral analysis",
+            "level4": "AI-powered threat detection and automated response",
+            "level5": "Autonomous endpoint protection with predictive capabilities"
+          },
+          "automatedChecks": [
+            "Check endpoint protection deployment coverage",
+            "Verify real-time protection status",
+            "Assess threat detection rates",
+            "Review automated response effectiveness"
+          ]
+        },
+        {
+          "name": "Device Compliance",
+          "description": "Device compliance policies and enforcement",
+          "weight": 20,
+          "type": "Intune",
+          "criteria": {
+            "level1": "Basic device inventory and manual compliance checking",
+            "level2": "Automated compliance policies with basic enforcement",
+            "level3": "Comprehensive compliance framework with conditional access",
+            "level4": "Continuous compliance monitoring with automated remediation",
+            "level5": "Predictive compliance management with self-healing"
+          },
+          "automatedChecks": [
+            "Check device compliance policy coverage",
+            "Verify compliance enforcement mechanisms",
+            "Assess compliance rates across device types",
+            "Review automated remediation actions"
+          ]
+        },
+        {
+          "name": "Endpoint Detection Response",
+          "description": "Advanced endpoint detection and response capabilities",
+          "weight": 25,
+          "type": "Defender",
+          "criteria": {
+            "level1": "Basic endpoint monitoring and manual investigation",
+            "level2": "Automated threat detection with manual response",
+            "level3": "Advanced EDR with automated investigation and response",
+            "level4": "AI-powered threat hunting and predictive analysis",
+            "level5": "Autonomous threat response with self-healing capabilities"
+          },
+          "automatedChecks": [
+            "Check EDR deployment and configuration",
+            "Verify automated response capabilities",
+            "Assess threat detection accuracy and speed",
+            "Review investigation automation effectiveness"
+          ]
+        },
+        {
+          "name": "Device Management",
+          "description": "Comprehensive device lifecycle management",
+          "weight": 20,
+          "type": "Intune",
+          "criteria": {
+            "level1": "Manual device provisioning and management",
+            "level2": "Automated device enrollment and basic management",
+            "level3": "Comprehensive device lifecycle management with policies",
+            "level4": "AI-powered device optimization and predictive maintenance",
+            "level5": "Autonomous device management with self-optimization"
+          },
+          "automatedChecks": [
+            "Check device enrollment automation",
+            "Verify device management policy coverage",
+            "Assess device lifecycle management processes",
+            "Review device optimization metrics"
+          ]
+        },
+        {
+          "name": "Application Control",
+          "description": "Application control and allowlisting policies",
+          "weight": 10,
+          "type": "Defender",
+          "criteria": {
+            "level1": "Basic application inventory and manual control",
+            "level2": "Application allowlisting with basic policies",
+            "level3": "Comprehensive application control with behavioral monitoring",
+            "level4": "AI-powered application risk assessment and control",
+            "level5": "Autonomous application control with adaptive policies"
+          },
+          "automatedChecks": [
+            "Check application control policy deployment",
+            "Verify allowlist effectiveness",
+            "Assess application risk scoring",
+            "Review policy adaptation mechanisms"
+          ]
+        }
+      ]
+    },
+    "Apps": {
+      "description": "Secure application development, deployment, and management",
+      "weight": 17,
+      "assessments": [
+        {
+          "name": "Application Security",
+          "description": "Security integration throughout application lifecycle",
+          "weight": 25,
+          "type": "DevSecOps",
+          "criteria": {
+            "level1": "Basic security testing in development",
+            "level2": "Automated security testing in CI/CD pipelines",
+            "level3": "Comprehensive DevSecOps with security gates",
+            "level4": "AI-powered security testing and vulnerability management",
+            "level5": "Autonomous application security with self-healing"
+          },
+          "automatedChecks": [
+            "Check security testing integration in pipelines",
+            "Verify security gate effectiveness",
+            "Assess vulnerability remediation times",
+            "Review security automation coverage"
+          ]
+        },
+        {
+          "name": "API Security",
+          "description": "Comprehensive API security and management",
+          "weight": 20,
+          "type": "APIM",
+          "criteria": {
+            "level1": "Basic API inventory and manual security",
+            "level2": "API gateway with basic security policies",
+            "level3": "Comprehensive API security with threat protection",
+            "level4": "AI-powered API threat detection and response",
+            "level5": "Autonomous API security with adaptive protection"
+          },
+          "automatedChecks": [
+            "Check API security policy coverage",
+            "Verify API threat protection mechanisms",
+            "Assess API security monitoring effectiveness",
+            "Review API access control implementation"
+          ]
+        },
+        {
+          "name": "Runtime Protection",
+          "description": "Runtime application self-protection capabilities",
+          "weight": 20,
+          "type": "Defender",
+          "criteria": {
+            "level1": "Basic runtime monitoring and alerting",
+            "level2": "Runtime application self-protection with basic policies",
+            "level3": "Advanced RASP with behavioral analysis",
+            "level4": "AI-powered runtime threat detection and response",
+            "level5": "Autonomous runtime protection with self-adaptation"
+          },
+          "automatedChecks": [
+            "Check RASP deployment coverage",
+            "Verify runtime protection effectiveness",
+            "Assess threat detection accuracy",
+            "Review automated response capabilities"
+          ]
+        },
+        {
+          "name": "CI/CD Security",
+          "description": "Security integration in continuous integration and deployment",
+          "weight": 25,
+          "type": "DevOps",
+          "criteria": {
+            "level1": "Manual security checks in deployment process",
+            "level2": "Automated security scanning in CI/CD pipelines",
+            "level3": "Comprehensive security gates with policy enforcement",
+            "level4": "AI-powered security optimization in pipelines",
+            "level5": "Autonomous security management in CI/CD"
+          },
+          "automatedChecks": [
+            "Check security integration in CI/CD pipelines",
+            "Verify security gate configuration",
+            "Assess pipeline security effectiveness",
+            "Review automated security remediation"
+          ]
+        },
+        {
+          "name": "Application Monitoring",
+          "description": "Comprehensive application performance and security monitoring",
+          "weight": 10,
+          "type": "Monitor",
+          "criteria": {
+            "level1": "Basic application monitoring and manual analysis",
+            "level2": "Automated monitoring with basic alerting",
+            "level3": "Comprehensive monitoring with security analytics",
+            "level4": "AI-powered monitoring with predictive insights",
+            "level5": "Autonomous monitoring with self-optimization"
+          },
+          "automatedChecks": [
+            "Check application monitoring coverage",
+            "Verify security monitoring integration",
+            "Assess monitoring effectiveness and accuracy",
+            "Review automated response to monitoring alerts"
+          ]
+        }
+      ]
+    },
+    "Infrastructure": {
+      "description": "Secure infrastructure management and orchestration",
+      "weight": 16,
+      "assessments": [
+        {
+          "name": "Network Segmentation",
+          "description": "Micro-segmentation and network isolation",
+          "weight": 25,
+          "type": "Network",
+          "criteria": {
+            "level1": "Basic network segmentation with VLANs",
+            "level2": "Software-defined network segmentation",
+            "level3": "Micro-segmentation with policy enforcement",
+            "level4": "AI-powered dynamic segmentation",
+            "level5": "Autonomous network segmentation with self-optimization"
+          },
+          "automatedChecks": [
+            "Check network segmentation implementation",
+            "Verify micro-segmentation policies",
+            "Assess segmentation effectiveness",
+            "Review dynamic segmentation capabilities"
+          ]
+        },
+        {
+          "name": "Infrastructure as Code",
+          "description": "Automated infrastructure provisioning and management",
+          "weight": 20,
+          "type": "ARM",
+          "criteria": {
+            "level1": "Manual infrastructure provisioning",
+            "level2": "Basic Infrastructure as Code with templates",
+            "level3": "Comprehensive IaC with security and compliance",
+            "level4": "AI-powered infrastructure optimization",
+            "level5": "Autonomous infrastructure management"
+          },
+          "automatedChecks": [
+            "Check IaC implementation coverage",
+            "Verify security integration in IaC",
+            "Assess infrastructure automation effectiveness",
+            "Review compliance automation in IaC"
+          ]
+        },
+        {
+          "name": "Security Policies",
+          "description": "Automated security policy enforcement",
+          "weight": 20,
+          "type": "Policy",
+          "criteria": {
+            "level1": "Manual security policy management",
+            "level2": "Automated policy deployment with basic enforcement",
+            "level3": "Comprehensive policy framework with continuous compliance",
+            "level4": "AI-powered policy optimization and adaptation",
+            "level5": "Autonomous policy management with self-healing"
+          },
+          "automatedChecks": [
+            "Check security policy coverage",
+            "Verify policy enforcement mechanisms",
+            "Assess policy compliance rates",
+            "Review policy automation effectiveness"
+          ]
+        },
+        {
+          "name": "Monitoring and Alerting",
+          "description": "Comprehensive infrastructure monitoring and alerting",
+          "weight": 20,
+          "type": "Monitor",
+          "criteria": {
+            "level1": "Basic infrastructure monitoring with manual analysis",
+            "level2": "Automated monitoring with basic alerting",
+            "level3": "Comprehensive monitoring with security integration",
+            "level4": "AI-powered monitoring with predictive analytics",
+            "level5": "Autonomous monitoring with self-optimization"
+          },
+          "automatedChecks": [
+            "Check monitoring coverage across infrastructure",
+            "Verify alerting effectiveness and accuracy",
+            "Assess monitoring integration with security tools",
+            "Review automated response to monitoring events"
+          ]
+        },
+        {
+          "name": "Compliance Management",
+          "description": "Automated compliance monitoring and reporting",
+          "weight": 15,
+          "type": "Security",
+          "criteria": {
+            "level1": "Manual compliance checking and reporting",
+            "level2": "Automated compliance scanning with basic reporting",
+            "level3": "Comprehensive compliance framework with continuous monitoring",
+            "level4": "AI-powered compliance optimization and prediction",
+            "level5": "Autonomous compliance management with self-remediation"
+          },
+          "automatedChecks": [
+            "Check compliance monitoring coverage",
+            "Verify automated compliance reporting",
+            "Assess compliance remediation effectiveness",
+            "Review compliance trend analysis"
+          ]
+        }
+      ]
+    },
+    "Data": {
+      "description": "Comprehensive data protection and governance",
+      "weight": 15,
+      "assessments": [
+        {
+          "name": "Data Classification",
+          "description": "Automated data discovery and classification",
+          "weight": 25,
+          "type": "Purview",
+          "criteria": {
+            "level1": "Manual data classification with basic labels",
+            "level2": "Automated data discovery with basic classification",
+            "level3": "Comprehensive data classification with policy enforcement",
+            "level4": "AI-powered data classification with sensitivity detection",
+            "level5": "Autonomous data classification with adaptive policies"
+          },
+          "automatedChecks": [
+            "Check data classification coverage",
+            "Verify automated classification accuracy",
+            "Assess classification policy enforcement",
+            "Review data sensitivity detection effectiveness"
+          ]
+        },
+        {
+          "name": "Data Loss Prevention",
+          "description": "Comprehensive data loss prevention and protection",
+          "weight": 25,
+          "type": "Purview",
+          "criteria": {
+            "level1": "Basic DLP policies with manual monitoring",
+            "level2": "Automated DLP with basic policy enforcement",
+            "level3": "Comprehensive DLP with advanced threat protection",
+            "level4": "AI-powered DLP with behavioral analysis",
+            "level5": "Autonomous DLP with adaptive protection"
+          },
+          "automatedChecks": [
+            "Check DLP policy coverage",
+            "Verify DLP enforcement effectiveness",
+            "Assess DLP incident response",
+            "Review DLP policy adaptation"
+          ]
+        },
+        {
+          "name": "Encryption at Rest",
+          "description": "Comprehensive encryption for data at rest",
+          "weight": 20,
+          "type": "KeyVault",
+          "criteria": {
+            "level1": "Basic encryption for sensitive data",
+            "level2": "Comprehensive encryption with key management",
+            "level3": "Advanced encryption with automated key rotation",
+            "level4": "AI-powered encryption optimization",
+            "level5": "Autonomous encryption management"
+          },
+          "automatedChecks": [
+            "Check encryption coverage for data at rest",
+            "Verify key management implementation",
+            "Assess encryption key rotation",
+            "Review encryption performance optimization"
+          ]
+        },
+        {
+          "name": "Encryption in Transit",
+          "description": "Comprehensive encryption for data in transit",
+          "weight": 20,
+          "type": "Network",
+          "criteria": {
+            "level1": "Basic TLS encryption for web traffic",
+            "level2": "Comprehensive encryption for all network traffic",
+            "level3": "Advanced encryption with certificate management",
+            "level4": "AI-powered encryption optimization",
+            "level5": "Autonomous encryption management"
+          },
+          "automatedChecks": [
+            "Check encryption coverage for data in transit",
+            "Verify certificate management implementation",
+            "Assess encryption protocol effectiveness",
+            "Review encryption performance optimization"
+          ]
+        },
+        {
+          "name": "Data Governance",
+          "description": "Comprehensive data governance and lifecycle management",
+          "weight": 10,
+          "type": "Purview",
+          "criteria": {
+            "level1": "Basic data governance with manual processes",
+            "level2": "Automated data governance with basic workflows",
+            "level3": "Comprehensive data governance with policy enforcement",
+            "level4": "AI-powered data governance with optimization",
+            "level5": "Autonomous data governance with self-management"
+          },
+          "automatedChecks": [
+            "Check data governance policy coverage",
+            "Verify data lifecycle management",
+            "Assess data governance automation",
+            "Review data governance effectiveness"
+          ]
+        }
+      ]
+    },
+    "Network": {
+      "description": "Secure network architecture and management",
+      "weight": 14,
+      "assessments": [
+        {
+          "name": "Zero Trust Network Access",
+          "description": "Implementation of Zero Trust Network Access principles",
+          "weight": 30,
+          "type": "Network",
+          "criteria": {
+            "level1": "Traditional VPN-based remote access",
+            "level2": "Software-defined perimeter with basic ZTNA",
+            "level3": "Comprehensive ZTNA with identity-based access",
+            "level4": "AI-powered ZTNA with adaptive access control",
+            "level5": "Autonomous ZTNA with self-optimizing access"
+          },
+          "automatedChecks": [
+            "Check ZTNA implementation coverage",
+            "Verify identity-based access control",
+            "Assess ZTNA policy effectiveness",
+            "Review adaptive access mechanisms"
+          ]
+        },
+        {
+          "name": "Micro-segmentation",
+          "description": "Network micro-segmentation and isolation",
+          "weight": 25,
+          "type": "Network",
+          "criteria": {
+            "level1": "Basic network segmentation with firewalls",
+            "level2": "Software-defined micro-segmentation",
+            "level3": "Comprehensive micro-segmentation with policy automation",
+            "level4": "AI-powered dynamic micro-segmentation",
+            "level5": "Autonomous micro-segmentation with self-optimization"
+          },
+          "automatedChecks": [
+            "Check micro-segmentation implementation",
+            "Verify segmentation policy enforcement",
+            "Assess segmentation effectiveness",
+            "Review dynamic segmentation capabilities"
+          ]
+        },
+        {
+          "name": "Network Monitoring",
+          "description": "Comprehensive network monitoring and analytics",
+          "weight": 20,
+          "type": "Monitor",
+          "criteria": {
+            "level1": "Basic network monitoring with manual analysis",
+            "level2": "Automated network monitoring with basic analytics",
+            "level3": "Comprehensive network monitoring with security integration",
+            "level4": "AI-powered network analytics with threat detection",
+            "level5": "Autonomous network monitoring with self-optimization"
+          },
+          "automatedChecks": [
+            "Check network monitoring coverage",
+            "Verify network analytics effectiveness",
+            "Assess threat detection accuracy",
+            "Review automated response capabilities"
+          ]
+        },
+        {
+          "name": "Firewall Policies",
+          "description": "Advanced firewall policies and management",
+          "weight": 15,
+          "type": "Firewall",
+          "criteria": {
+            "level1": "Basic firewall rules with manual management",
+            "level2": "Automated firewall policy management",
+            "level3": "Advanced firewall policies with threat intelligence",
+            "level4": "AI-powered firewall optimization",
+            "level5": "Autonomous firewall management"
+          },
+          "automatedChecks": [
+            "Check firewall policy coverage",
+            "Verify policy automation effectiveness",
+            "Assess threat intelligence integration",
+            "Review firewall performance optimization"
+          ]
+        },
+        {
+          "name": "VPN Replacement",
+          "description": "Migration from traditional VPN to Zero Trust access",
+          "weight": 10,
+          "type": "Network",
+          "criteria": {
+            "level1": "Traditional VPN-only remote access",
+            "level2": "Hybrid VPN and ZTNA implementation",
+            "level3": "Comprehensive ZTNA with minimal VPN usage",
+            "level4": "Advanced ZTNA with VPN elimination",
+            "level5": "Complete Zero Trust access without VPN dependency"
+          },
+          "automatedChecks": [
+            "Check VPN usage reduction",
+            "Verify ZTNA adoption rates",
+            "Assess access security improvement",
+            "Review user experience optimization"
+          ]
+        }
+      ]
+    }
+  },
+  "maturityLevels": {
+    "1": {
+      "name": "Traditional",
+      "threshold": 0,
+      "description": "Basic security controls in place with manual processes",
+      "characteristics": [
+        "Manual security processes",
+        "Basic monitoring and alerting",
+        "Reactive security approach",
+        "Limited automation"
+      ],
+      "serviceReleaseCapability": "Manual deployment with basic security checks"
+    },
+    "2": {
+      "name": "Managed",
+      "threshold": 25,
+      "description": "Managed security processes with basic automation",
+      "characteristics": [
+        "Automated security processes",
+        "Centralized management",
+        "Basic policy enforcement",
+        "Structured workflows"
+      ],
+      "serviceReleaseCapability": "Automated deployment with security integration"
+    },
+    "3": {
+      "name": "Defined",
+      "threshold": 50,
+      "description": "Comprehensive security framework with advanced automation",
+      "characteristics": [
+        "Comprehensive security policies",
+        "Advanced automation",
+        "Integrated security tools",
+        "Continuous monitoring"
+      ],
+      "serviceReleaseCapability": "Continuous deployment with comprehensive security validation"
+    },
+    "4": {
+      "name": "Quantitatively Managed",
+      "threshold": 75,
+      "description": "Advanced automation with AI-powered analytics",
+      "characteristics": [
+        "AI-powered security analytics",
+        "Predictive capabilities",
+        "Automated optimization",
+        "Real-time adaptation"
+      ],
+      "serviceReleaseCapability": "Intelligent automated deployment with predictive security"
+    },
+    "5": {
+      "name": "Optimizing",
+      "threshold": 90,
+      "description": "Continuous optimization with autonomous security management",
+      "characteristics": [
+        "Autonomous security operations",
+        "Self-healing capabilities",
+        "Continuous optimization",
+        "Predictive maintenance"
+      ],
+      "serviceReleaseCapability": "Fully autonomous deployment with self-optimizing security"
+    }
+  },
+  "serviceReleaseAutomation": {
+    "description": "Assessment of automated service release capabilities based on Zero Trust maturity",
+    "weightings": {
+      "Identities": 0.25,
+      "Endpoints": 0.15,
+      "Apps": 0.30,
+      "Infrastructure": 0.20,
+      "Data": 0.05,
+      "Network": 0.05
+    },
+    "readinessLevels": {
+      "0-20": "Not Ready - Manual processes with significant security gaps",
+      "21-40": "Partially Ready - Basic automation with security integration",
+      "41-60": "Mostly Ready - Comprehensive automation with advanced security",
+      "61-80": "Fully Ready - Advanced automation with AI-powered security",
+      "81-100": "Optimized - Autonomous deployment with self-healing security"
+    }
+  },
+  "reportingConfiguration": {
+    "executiveSummary": {
+      "includeOverallScore": true,
+      "includeMaturityLevel": true,
+      "includeServiceReleaseReadiness": true,
+      "includeTopRecommendations": 5
+    },
+    "detailedAnalysis": {
+      "includePillarBreakdown": true,
+      "includeAssessmentDetails": true,
+      "includeComplianceMapping": true,
+      "includeTrendAnalysis": true
+    },
+    "actionPlan": {
+      "includePriorityMatrix": true,
+      "includeImplementationRoadmap": true,
+      "includeResourceRequirements": true,
+      "includeRiskAssessment": true
+    }
+  }
+}
