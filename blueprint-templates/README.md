@@ -16,10 +16,21 @@ This addresses **Task 3** from the CBA Consult IT Management Framework smart tas
 ```
 blueprint-templates/
 ├── infrastructure-blueprints/     # Cloud infrastructure templates
+│   └── multi-cloud-infrastructure.bicep
 ├── security-blueprints/          # Security configuration templates
+│   ├── zero-trust-architecture.bicep
+│   └── identity-access-management.bicep
 ├── compliance-blueprints/        # Compliance framework templates
+│   ├── gdpr-compliance.bicep
+│   └── iso27001-compliance.bicep
 ├── policy-templates/             # Governance policy templates
+│   ├── data-privacy-policy.md
+│   ├── technology-selection-policy.md
+│   ├── access-control-policy.md
+│   └── incident-response-policy.md
 └── validation-scripts/           # Template validation tools
+    ├── template-validator.ps1
+    └── validation-config.json
 ```
 
 ## Blueprint Categories
