@@ -683,7 +683,12 @@
       "Apps": 0.30,
       "Infrastructure": 0.20,
       "Data": 0.05,
-      "Network": 0.05
+      "Identities": 0.20,
+      "Endpoints": 0.15,
+      "Apps": 0.25,
+      "Infrastructure": 0.15,
+      "Data": 0.15,
+      "Network": 0.10
     },
     "readinessLevels": {
       "0-20": "Not Ready - Manual processes with significant security gaps",
