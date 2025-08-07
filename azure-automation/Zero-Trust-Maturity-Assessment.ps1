@@ -24,7 +24,16 @@ param(
 Import-Module Az.Accounts -Force
 Import-Module Az.Resources -Force
 Import-Module Az.Security -Force
-Import-Module Az.Monitor -Force
+try {
+    Import-Module Az.Accounts -ErrorAction Stop
+    Import-Module Az.Resources -ErrorAction Stop
+    Import-Module Az.Security -ErrorAction Stop
+    Import-Module Az.Monitor -ErrorAction Stop
+    Write-Log "All required Az modules imported successfully."
+} catch {
+    Write-Log "Failed to import required Az module: $($_.Exception.Message)" "ERROR"
+    throw
+}
 
 # Initialize logging
 $LogFile = "zero-trust-assessment-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
