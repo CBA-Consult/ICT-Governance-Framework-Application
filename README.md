@@ -1,42 +1,93 @@
-22nd of October 2020, Amsterdam The Netherlands
+# ICT Governance Framework Application
 
-# ICT-Governance-Framework-Application
-The CBA Consult IT Management Framework is a project to optimize companies goverenance framework in a multi cloud environment. One of the reasons the framework and the procedures involved in creating, maintaining and updating the framework is leveraging the IT innovative solutions as in governance and maintaince framework updates and execution of blueprints, policies and ensure compliance to these requirements.
+## Overview
 
-Introduction
-The IT Governance framework has evolved drastically with the introduction of numerous cloud services. Some of which allow for a governance framework which is partly automated based on the business requirements and the exposed compliance requirements these services have on the business.
+The CBA Consult IT Management Framework is a comprehensive solution to optimize companies' governance frameworks in a multi-cloud environment. This repository contains a structured set of documents, policies, and guidelines that form the ICT Governance Framework.
 
-The reason for this project is to ensure your governance framework is updated, the infrastructure which it supports updated with the relevant adjustments in policy, compliance and blueprints. To ensure these updates are processed into Governance Framework Update notification automation to meet business requirements.
+Last Updated: August 7, 2025 | Original Creation: October 22, 2020, Amsterdam, The Netherlands
 
-The comparison between your current secure score and a blueprint (currently in preview not to be sold) initiated secure score and any differences between the two was created in May 2019. This results in possible integration based on the blueprints and the allowed score in your business/company set requirements. A secure implementation of cloud services.
+## Framework Components
 
-One of the great advantages when using the blueprints is the reduced risk set for the company of not automatically offering the extensive services made available upon launch. When new innovation is added to the Azure portal they will prior to being an active part of your goverance framework have to be activated and configured for your Tenant. The Blueprint will require to be adjusted to set the boundaries for regions of activation and the size of the services it will render in your tenant. Greater allignment to location based compliance regulations and future automate the comparisson between your goverrnance framework and the difference between the blueprint and active services in your tenant which produce a difference and a paragraph for approval in your governance framework documentation. The services are first reviewed and allow you to make strategic decisions on what you wish to do when integrating / adopting these services within your company. Exposing the services into your Tenant but due to the blueprint restrictiosn will not allow for an architect or engineer to activate withoiut the blueprint allowing these services to be created in the regions you define in the these policies. You will not automatically accept each change in possible solutions which extend far beyond what we currently know understand and see as possible.
+The ICT Governance Framework consists of the following core components:
 
-To ensure these new services do not conflict with current ongoing production they will not automatically be added to the environment. They will first require adjustment to the governance framework and the blueprints which will control which services by which threshold and type of exposed risk.
+1. **[ICT Governance Framework](ICT-Governance-Framework.md)** - The foundational document defining the governance structure, roles, responsibilities, and operating model.
 
-Part of the applications and tools made available is a mobile application. Please find the mobile application under ICT Governance Framework Application - Projects: CBA Consult Compliance and Security - End User Mobile Assessment Tools - https://xd.adobe.com/view/0ca1c123-cf98-43de-8aab-a71dad328273-59f2 
-This includes the Apps from the compliance App Catalog to include the end user with a clear overview applications and webapplications used together with the current known compliance score.
+2. **[ICT Governance Policies](ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
 
-Both the amount of new services and the amount of blueprint new combinations to make are a constant stream of both version controls. Versions for the applications and versioning for the guiding blueprints governanceframework and the diffrences between them. The latest compliance score was by selecting several high priority iso standards, policies and sox or soc measures to mitigate risks they showed an exponential amount of growth. Fit gap analyses between each governing framework. The fit gap between two iso standards as well as the overlap from a sox policy as and soc policy could overlap. As well as the privacy shield in as the US Privacy Shield could overlap in main areas with the European GDPR policy a fit gap analyses between both policies should highlight the overlap between the standards in governance.
+3. **[IaC and Version Control Integration](ICT-Governance-IaC-Integration.md)** - Guidelines for integrating the governance framework with Infrastructure as Code and version control systems.
 
-With the integration of contract management into the Azure portal the following article provide a possible better solution to the above named github repo. https://pwc.to/3LBQCzp
+4. **[Metrics and Reporting](ICT-Governance-Metrics.md)** - Key performance indicators, dashboards, and reporting mechanisms for evaluating governance effectiveness.
 
-It sounds like you're discussing a comprehensive IT management framework designed for optimizing governance in a multi-cloud environment. The CBA Consult IT Management Framework aims to leverage innovative IT solutions to maintain and update governance frameworks, ensuring compliance with business and regulatory requirements.
+5. **[Training and Communication Plan](ICT-Governance-Training-Communication.md)** - Approach for creating awareness, providing training, and establishing communication about the governance framework.
 
-**Key Points of the CBA Consult IT Management Framework:**
-- **Automation:** Partly automates the governance framework based on business and compliance requirements.
-- **Updates:** Ensures the governance framework and supporting infrastructure are updated with relevant policy, compliance, and blueprint adjustments.
-- **Secure Score Comparison:** Compares the current secure score with a blueprint-initiated secure score to guide integration and policy adjustments.
-- **Risk Management:** Utilizes blueprints to manage risks by controlling the activation and configuration of new services within the Azure portal.
-- **Compliance Alignment:** Aligns with location-based compliance regulations and automates the comparison between governance frameworks and service implementations.
-- **Strategic Control:** Provides strategic control over service integration and adoption, with blueprint restrictions guiding the activation of services.
-- **Non-Automatic Integration:** New services are not automatically added to the production environment; they require governance framework and blueprint adjustments first.
-- **Mobile Application:** Offers a mobile application for end-user assessment of compliance and security ([ICT Governance Framework Application](https://xd.adobe.com/view/0ca1c123-cf98-43de-8aab-a71dad328273-59f2)).
-- **Version Control:** Manages a constant stream of new services and blueprint combinations, with version control for applications and governance frameworks.
-- **Compliance Scoring:** Utilizes high-priority ISO standards, policies, and SOX or SOC measures for compliance scoring and risk mitigation.
-- **Fit Gap Analysis:** Conducts fit gap analyses between governance frameworks, ISO standards, and policies like SOX, SOC, US Privacy Shield, and GDPR to identify overlaps and gaps.
+## Key Features
 
-The integration of contract management into the Azure portal, as mentioned in the provided article, seems to offer a solution that enhances the governance framework by streamlining contract management processes.
+- **Governance Structure**: Three-tiered governance model with clear roles and responsibilities
+- **Policy Framework**: Comprehensive policies aligned with industry standards (COBIT, ITIL, ISO/IEC 38500)
+- **IaC Integration**: "Governance as Code" approach with automated validation and enforcement
+- **Compliance Management**: Alignment with regulatory requirements and standards
+- **Metrics and Reporting**: KPIs and dashboards for governance effectiveness
+- **Continuous Improvement**: Framework for ongoing assessment and enhancement
+
+## Additional Resources
+
+- **[Infrastructure as Code Management](IaC%20Infrastructure%20as%20Code%20Management.md)**: Guidelines for managing infrastructure as code
+- **[Microsoft365DSC Integration](Integrating%20Microsoft365DSC.md)**: Extension of governance to Microsoft 365 services
+- **[API Center Version Controls](Methodology%20API%20Center%20on%20Governance%20Framework%20Version%20Controls.md)**: API governance and versioning
+- **[Information Governance Overview](InformationOverview.md)**: Information governance principles and approaches
+
+## Implementation Approach
+
+To implement this framework:
+
+1. **Foundation**: Establish the governance structure and core policies
+2. **Integration**: Connect governance with existing processes and tools
+3. **Automation**: Implement automated validation and compliance checking
+4. **Measurement**: Set up metrics and reporting
+5. **Training**: Develop awareness and capabilities
+
+## Continuous Improvement
+
+The governance framework is designed as a living system that evolves with organizational needs and technology changes. Regular reviews and updates ensure it remains effective and aligned with business objectives.
+
+## Contribution Guidelines
+
+We welcome contributions to enhance this framework. Please follow these steps:
+1. Create a feature branch from the main branch
+2. Make your changes following the established document structure
+3. Submit a pull request with a clear description of your changes
+4. Ensure all documentation is updated appropriately
+
+## License
+
+[Specify License Information]
+
+## Background and Original Vision
+
+The IT Governance framework has evolved drastically with the introduction of numerous cloud services. This framework builds on the original vision of optimizing governance in multi-cloud environments while adding structure and comprehensive coverage across all ICT domains.
+
+Key aspects of the original vision include:
+
+- **Blueprint-Based Governance**: Using blueprints to define and enforce governance boundaries
+- **Secure Score Comparison**: Comparing current secure scores with blueprint-initiated scores
+- **Risk Management**: Controlling service activation and configuration through governance
+- **Compliance Alignment**: Aligning with location-based compliance regulations
+- **Version Control**: Managing versions for applications and governance frameworks
+- **Infrastructure as Code**: Maintaining infrastructure definitions in version-controlled repositories
+
+The framework extends these concepts into a comprehensive governance approach covering all aspects of information and communication technology.
+
+## Mobile Application Integration
+
+Part of the application ecosystem is a mobile application for end-user assessment of compliance and security: 
+- [ICT Governance Framework Mobile App](https://xd.adobe.com/view/0ca1c123-cf98-43de-8aab-a71dad328273-59f2)
+
+This mobile app provides end users with a clear overview of applications and web applications used together with their current compliance scores.
+
+## Related Links
+
+- [Governance Framework Best Practices](https://github.com/CBA-Consult/ICT-Governance-Framework-Application/wiki/Governance-Framework-Best-Practices-and-process-ownership-and-drift-within-the-governance-framework)
+- [Contract Management Integration](https://pwc.to/3LBQCzp)
 
 Infrastructure as code and the mandatory Bicep ARM templates being administered in a git repository to ensure any bicep arm templates written maintained by a main branch and only updated by a pull request.
 

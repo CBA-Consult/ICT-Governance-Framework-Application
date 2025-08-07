@@ -1,0 +1,14 @@
+{
+  "api": {
+    "authEnabled": false,
+    "apiKeys": [
+      {
+        "key": "test-api-key",
+        "name": "Test API Key",
+        "roles": ["admin"]
+      }
+    ],
+    "jwtSecret": "local-development-jwt-secret-key",
+    "tokenExpiration": "24h"
+  }
+}
