@@ -235,7 +235,7 @@
 ### Technology Investments
 - **Multi-Cloud Governance Platform:** $150K-$300K annually
 - **Real-Time Monitoring Tools:** $75K-$150K annually
-- **AI Governance Platform:** $100K-$200K annually
+- **AI Governance Platform:** $100K-$200K annually (order-of-magnitude estimate based on typical vendor pricing; actual costs may vary)
 - **Automation and Integration Tools:** $50K-$100K annually
 - **Analytics and Reporting Platform:** $75K-$150K annually
 
