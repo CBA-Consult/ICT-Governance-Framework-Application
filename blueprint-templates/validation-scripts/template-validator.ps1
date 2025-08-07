@@ -173,7 +173,7 @@ function Test-BlueprintTemplate {
             $ValidationResults.Checks += $securityCheck
         } else {
             $ValidationResults.Warnings += $securityCheck.Message
-            $score += [math]::Floor($securityCheck.PartialScore * 20)
+            $score += [math]::Floor((if ($null -ne $securityCheck.PartialScore) { $securityCheck.PartialScore } elseif ($null -ne $securityCheck.Score) { $securityCheck.Score } else { 0 }) * 20)
         }
         
         # Test 6: Compliance framework alignment
