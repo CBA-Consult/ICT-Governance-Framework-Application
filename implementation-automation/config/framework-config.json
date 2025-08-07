@@ -16,7 +16,7 @@
     "servicePrincipal": true,
     "tenantId": "your-tenant-id",
     "clientId": "your-client-id",
-    "clientSecret": "your-client-secret"
+    "clientSecret": "env:AZURE_CLIENT_SECRET"
   },
   "environments": {
     "Dev": {
