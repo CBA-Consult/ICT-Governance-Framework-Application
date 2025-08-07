@@ -6,7 +6,7 @@ This document provides comprehensive definitions of roles, responsibilities, and
 
 ## Governance Role Hierarchy
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │        ICT Governance Council           │
 │      (Strategic Oversight)              │
