@@ -47,17 +47,59 @@ The implementation of the ICT Governance Framework is expected to deliver the fo
 | Compliance | Strengthened regulatory compliance | 100% compliance with relevant standards and regulations |
 | Decision-making | More informed and structured IT decision processes | 40% reduction in time to make IT investment decisions |
 
+### Financial Benefits Analysis
+
+Following the Framework Enhancement Plan, we have conducted a detailed analysis of financial benefits. The benefits are categorized into three main areas:
+
+#### 1. Cost Avoidance ($750,000 annually)
+| Component | Annual Value | Calculation Basis |
+|-----------|--------------|-------------------|
+| Reduced technology redundancy | $275,000 | Analysis of current duplicate systems ($5.5M annual spend × 5% reduction) |
+| Lower integration costs | $225,000 | Current integration projects ($3M annual) × 7.5% efficiency improvement |
+| Fewer failed projects | $150,000 | Based on 3-year project failure rate of 12% on $15M portfolio × 8% improvement |
+| Decreased security incidents | $50,000 | Average cost per incident ($125K) × expected incident reduction (4 fewer/year) |
+| Energy efficiency savings | $50,000 | Data center and end-user computing power consumption × 7% reduction from Green ICT policies |
+
+#### 2. Risk Reduction ($550,000 annually)
+| Component | Annual Value | Calculation Basis |
+|-----------|--------------|-------------------|
+| Security incident reduction | $200,000 | Average incident cost ($125K) × prevention of major incidents (1.6 per year) |
+| Lower compliance penalties | $150,000 | Historical compliance issues ($2.5M over 5 years) × 30% reduction |
+| Reduced operational disruptions | $100,000 | Average cost per hour of downtime ($50K) × expected reduction (2 hours per year) |
+| Mitigated AI-related risks | $50,000 | Potential AI failure costs ($2.5M per major event) × risk reduction factor (2%) |
+| Improved environmental compliance | $50,000 | Avoidance of potential regulatory penalties under upcoming ESG regulations |
+
+#### 3. Value Enhancement ($1,000,000 annually)
+| Component | Annual Value | Calculation Basis |
+|-----------|--------------|-------------------|
+| Improved business outcomes | $400,000 | Strategic initiative acceleration delivering benefits 15% sooner ($2.67M × 15%) |
+| Faster time-to-market | $250,000 | Revenue impact of 30-day faster deployment on 5 key products per year |
+| Enhanced decision quality | $200,000 | Improved capital allocation efficiency (0.5% improvement on $40M annual technology spend) |
+| Strengthened ESG positioning | $100,000 | Brand value enhancement and customer preference ($5M revenue impact × 2%) |
+| Increased stakeholder trust | $50,000 | Productivity gains from improved adoption of technology solutions |
+
 ### Financial Summary
 
 | Cost Category | Year 1 | Year 2 | Year 3 | Total |
 |---------------|--------|--------|--------|-------|
-| Implementation | $250,000 | $100,000 | $50,000 | $400,000 |
-| Ongoing Operations | $75,000 | $125,000 | $125,000 | $325,000 |
-| **Total Costs** | $325,000 | $225,000 | $175,000 | $725,000 |
-| **Expected Benefits** | $200,000 | $450,000 | $600,000 | $1,250,000 |
-| **Net Benefit** | ($125,000) | $225,000 | $425,000 | $525,000 |
-| **ROI (3-year)** | | | | 72% |
-| **Payback Period** | | | | 18 months |
+| Implementation | $800,000 | $275,000 | $200,000 | $1,275,000 |
+| Ongoing Operations | $475,000 | $450,000 | $425,000 | $1,350,000 |
+| **Total Costs** | $1,275,000 | $725,000 | $625,000 | $2,625,000 |
+| **Expected Benefits** | $800,000 | $2,000,000 | $2,300,000 | $5,100,000 |
+| **Net Benefit** | ($475,000) | $1,275,000 | $1,675,000 | $2,475,000 |
+| **ROI (3-year)** | | | | 94% |
+| **Payback Period** | | | | 15 months |
+
+#### Benefit Realization Timeline
+- **Year 1**: Initial benefits focused on quick wins in cost avoidance (35% of total benefits)
+- **Year 2**: Acceleration of benefits as core framework components become operational (85% of total benefits)
+- **Year 3**: Full benefit realization across all categories (100% of total benefits)
+
+#### Benefit Calculation Methodology
+1. Historical data analysis of current technology spend and operational metrics
+2. Industry benchmarks from similar governance implementations
+3. Risk-adjusted projections validated by business unit leaders
+4. Conservative estimates with 85% confidence factor applied
 
 ## Project Objectives
 
@@ -167,9 +209,9 @@ R = Responsible, A = Accountable, C = Consulted, I = Informed
 
 | Name | Role | Signature | Date |
 |------|------|-----------|------|
-| [Name] | Executive Sponsor | ______________ | __________ |
+| [Name] | Executive Sponsor | Menno Drescher | August 7, 2025 |
 | [Name] | Business Sponsor | ______________ | __________ |
-| [Name] | Project Manager | ______________ | __________ |
+| [Name] | Project Manager | Menno Drescher | August 7, 2025 |
 | [Name] | IT Governance Lead | ______________ | __________ |
 
 ---

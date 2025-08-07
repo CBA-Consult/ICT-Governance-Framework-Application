@@ -242,8 +242,8 @@ Lessons learned related to scope management will be documented and used to impro
 
 | Name | Role | Signature | Date |
 |------|------|-----------|------|
-| [Name] | Project Sponsor | ______________ | __________ |
-| [Name] | Project Manager | ______________ | __________ |
+| [Name] | Project Sponsor | Menno Drescher | 07/08/2025 |
+| [Name] | Project Manager | Menno Drescher | 07/08/2025 |
 | [Name] | Technical Lead | ______________ | __________ |
 
 ---
