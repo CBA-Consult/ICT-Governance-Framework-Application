@@ -11,7 +11,7 @@ This ICT Governance Framework establishes a comprehensive structure for managing
 This framework covers all technology assets, services, and resources:
 
 * **🖥️ Infrastructure:** Networks, servers, cloud resources, endpoint devices
-* **🔐 Security:** Identity management, access controls, threat protection, shadow IT detection
+* **🔐 Security:** Identity management, access controls, threat protection, shadow IT detection, Zero Trust architecture implementation
 * **💻 Applications:** Enterprise applications, custom software, SaaS solutions, employee-requested applications
 * **📊 Data:** Structured and unstructured data, analytics platforms
 * **📱 End-user Computing:** Productivity tools, collaboration platforms, mobile devices, application compliance
@@ -140,6 +140,8 @@ For comprehensive role definitions, detailed responsibilities, expectations, and
 * Defense-in-depth approach with multiple security layers
 * Identity and access management based on least privilege principle
 * Regular security assessments and vulnerability management
+* Zero Trust architecture implementation following the [Zero Trust Maturity Model](Zero-Trust-Maturity-Model.md)
+* Automated service release capabilities with integrated security validation
 
 ### 🏗️ Architecture Review Policy
 
