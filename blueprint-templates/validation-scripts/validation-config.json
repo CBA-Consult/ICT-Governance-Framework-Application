@@ -1,0 +1,290 @@
+{
+  "validationConfig": {
+    "version": "1.0.0",
+    "lastUpdated": "2025-08-07",
+    "framework": "ICT Governance Framework v3.2.0",
+    "blueprint": {
+      "requiredMetadata": [
+        "name",
+        "version", 
+        "description",
+        "author",
+        "framework",
+        "compliance",
+        "lastUpdated"
+      ],
+      "requiredSections": [
+        "parameters",
+        "variables", 
+        "resources",
+        "outputs"
+      ],
+      "complianceFrameworks": [
+        "ISO 27001",
+        "NIST",
+        "COBIT",
+        "GDPR",
+        "SOC 2",
+        "HIPAA",
+        "PCI DSS"
+      ],
+      "namingConventions": {
+        "resources": "^[a-z][a-z0-9-]*[a-z0-9]$",
+        "parameters": "^[a-z][a-zA-Z0-9]*$",
+        "variables": "^[a-z][a-zA-Z0-9]*$"
+      },
+      "governanceParameters": [
+        "environmentName",
+        "organizationCode",
+        "costCenter",
+        "dataClassification",
+        "owner"
+      ],
+      "securityResources": [
+        "Microsoft.KeyVault",
+        "Microsoft.Security",
+        "Microsoft.OperationalInsights",
+        "Microsoft.Network/networkSecurityGroups",
+        "Microsoft.Insights/diagnosticSettings"
+      ],
+      "governanceTags": [
+        "Environment",
+        "Organization", 
+        "CostCenter",
+        "Owner",
+        "DataClassification",
+        "Framework",
+        "CreatedDate"
+      ],
+      "securityBestPractices": {
+        "encryption": {
+          "patterns": ["encryption", "encrypt", "keyVault", "tls", "ssl"],
+          "weight": 20
+        },
+        "authentication": {
+          "patterns": ["authentication", "auth", "identity", "rbac"],
+          "weight": 15
+        },
+        "monitoring": {
+          "patterns": ["monitoring", "diagnostic", "log", "audit"],
+          "weight": 15
+        },
+        "accessControl": {
+          "patterns": ["access", "permission", "role", "policy"],
+          "weight": 15
+        },
+        "networkSecurity": {
+          "patterns": ["firewall", "nsg", "subnet", "vnet"],
+          "weight": 10
+        }
+      },
+      "outputRequirements": [
+        "compliance",
+        "endpoints",
+        "resourceIds"
+      ]
+    },
+    "policy": {
+      "requiredSections": [
+        "Purpose",
+        "Scope", 
+        "Policy Statement",
+        "Roles and Responsibilities",
+        "Compliance",
+        "Related Documents"
+      ],
+      "requiredMetadata": [
+        "Policy Name",
+        "Policy ID",
+        "Version",
+        "Effective Date",
+        "Owner",
+        "Approved By"
+      ],
+      "complianceFrameworks": [
+        "GDPR",
+        "ISO 27001",
+        "NIST",
+        "SOC 2",
+        "HIPAA",
+        "PCI DSS",
+        "COBIT"
+      ],
+      "documentStructure": {
+        "minSections": 8,
+        "maxSectionDepth": 4,
+        "minWordCount": 2000,
+        "requiredElements": [
+          "tables",
+          "lists", 
+          "headers",
+          "appendices"
+        ]
+      },
+      "roleDefinitions": {
+        "minRoles": 3,
+        "requiredRoleTypes": [
+          "management",
+          "technical",
+          "compliance"
+        ]
+      }
+    },
+    "general": {
+      "maxFileSize": 10485760,
+      "allowedExtensions": [
+        ".bicep",
+        ".json",
+        ".md",
+        ".yaml",
+        ".yml"
+      ],
+      "encodingRequirement": "UTF-8",
+      "lineEndingRequirement": "LF"
+    },
+    "scoring": {
+      "blueprint": {
+        "metadata": 10,
+        "parameters": 15,
+        "resources": 20,
+        "governanceTags": 15,
+        "security": 20,
+        "compliance": 10,
+        "outputs": 10
+      },
+      "policy": {
+        "structure": 20,
+        "sections": 25,
+        "metadata": 15,
+        "compliance": 15,
+        "roles": 15,
+        "formatting": 10
+      },
+      "thresholds": {
+        "excellent": 90,
+        "good": 80,
+        "acceptable": 70,
+        "needsImprovement": 60,
+        "poor": 0
+      }
+    },
+    "validation": {
+      "strictMode": false,
+      "warningsAsErrors": false,
+      "customRules": [],
+      "excludePatterns": [
+        "*.test.*",
+        "*.example.*",
+        "*.draft.*"
+      ]
+    }
+  },
+  "customValidationRules": {
+    "blueprint": [
+      {
+        "name": "ResourceNamingConvention",
+        "description": "Validates resource naming follows organizational standards",
+        "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
+        "severity": "warning",
+        "enabled": true
+      },
+      {
+        "name": "ParameterDescriptions",
+        "description": "Ensures all parameters have descriptions",
+        "pattern": "@description\\([^)]+\\)\\s*param",
+        "severity": "error",
+        "enabled": true
+      },
+      {
+        "name": "SecurityResourcePresence",
+        "description": "Validates presence of security-related resources",
+        "requiredResources": [
+          "Microsoft.KeyVault",
+          "Microsoft.OperationalInsights"
+        ],
+        "severity": "warning",
+        "enabled": true
+      }
+    ],
+    "policy": [
+      {
+        "name": "SectionHeaderFormat",
+        "description": "Validates section headers follow markdown standards",
+        "pattern": "^#+\\s+[A-Z]",
+        "severity": "warning",
+        "enabled": true
+      },
+      {
+        "name": "ComplianceReferences",
+        "description": "Ensures compliance frameworks are properly referenced",
+        "requiredFrameworks": ["GDPR", "ISO 27001"],
+        "severity": "error",
+        "enabled": true
+      },
+      {
+        "name": "DocumentMetadata",
+        "description": "Validates document metadata completeness",
+        "requiredFields": [
+          "Policy Name",
+          "Version",
+          "Effective Date"
+        ],
+        "severity": "error",
+        "enabled": true
+      }
+    ]
+  },
+  "reportingConfig": {
+    "formats": {
+      "console": {
+        "enabled": true,
+        "colorOutput": true,
+        "verboseMode": false
+      },
+      "json": {
+        "enabled": true,
+        "prettyPrint": true,
+        "includeDetails": true
+      },
+      "xml": {
+        "enabled": true,
+        "includeSchema": true
+      },
+      "html": {
+        "enabled": false,
+        "templatePath": "report-template.html",
+        "includeCharts": true
+      }
+    },
+    "outputPaths": {
+      "reports": "./validation-reports/",
+      "logs": "./validation-logs/",
+      "archives": "./validation-archives/"
+    },
+    "retention": {
+      "reports": 90,
+      "logs": 30,
+      "archives": 365
+    }
+  },
+  "integrationConfig": {
+    "cicd": {
+      "enabled": true,
+      "failOnError": true,
+      "failOnWarnings": false,
+      "generateArtifacts": true
+    },
+    "governance": {
+      "enabled": true,
+      "trackCompliance": true,
+      "generateMetrics": true,
+      "notifyStakeholders": true
+    },
+    "monitoring": {
+      "enabled": true,
+      "alertOnFailures": true,
+      "dashboardIntegration": true,
+      "metricsCollection": true
+    }
+  }
+}
