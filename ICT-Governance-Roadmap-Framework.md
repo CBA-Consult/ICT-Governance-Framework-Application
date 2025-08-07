@@ -141,7 +141,10 @@ Gap Assessment Matrix:
 - **Phase 3: Optimization (18-36 months)**: Advanced capabilities and innovation
 - **Phase 4: Excellence (36+ months)**: Continuous improvement and leadership
 
-**3.1.2 Initiative Planning**
+- **Phase 1: Foundation ({PHASE_1_DURATION})**: Critical gaps and immediate improvements
+- **Phase 2: Enhancement ({PHASE_2_DURATION})**: Major capability improvements
+- **Phase 3: Optimization ({PHASE_3_DURATION})**: Advanced capabilities and innovation
+- **Phase 4: Excellence ({PHASE_4_DURATION})**: Continuous improvement and leadership
 For each roadmap initiative:
 - **Initiative Description**: Clear definition of scope and objectives
 - **Business Justification**: Value proposition and expected benefits
