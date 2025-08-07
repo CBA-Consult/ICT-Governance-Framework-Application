@@ -193,7 +193,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       requireInfrastructureEncryption: enableEncryptionAtRest
       keySource: 'Microsoft.Keyvault'
       keyvaultproperties: {
-        keyname: 'gdpr-encryption-key'
+        keyname: keyVaultKey.name
         keyvaulturi: keyVault.properties.vaultUri
       }
       services: {
