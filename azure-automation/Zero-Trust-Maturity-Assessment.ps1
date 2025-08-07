@@ -254,7 +254,49 @@ function Test-PAMImplementation {
         if ($context) {
             # Simulate PAM assessment
             $pamScore = 60  # Placeholder score
-            Write-Log "    PAM implementation assessed: $pamScore%" "DEBUG"
+            # Ensure Microsoft Graph module is installed and imported
+            if (-not (Get-Module -ListAvailable -Name Microsoft.Graph)) {
+                Write-Log "    Microsoft.Graph PowerShell module not found. Please install it for full PAM assessment." "WARNING"
+                return 0
+            }
+            Import-Module Microsoft.Graph -ErrorAction SilentlyContinue
+
+            # Connect to Microsoft Graph if not already connected
+            if (-not (Get-MgContext)) {
+                try {
+                    Connect-MgGraph -Scopes "PrivilegedAccess.Read.AzureAD" -ErrorAction Stop | Out-Null
+                } catch {
+                    Write-Log "    Failed to connect to Microsoft Graph: $($_.Exception.Message)" "ERROR"
+                    return 0
+                }
+            }
+
+            # Define privileged roles to check
+            $privilegedRoles = @(
+                "Global Administrator",
+                "Privileged Role Administrator",
+                "Security Administrator",
+                "User Administrator"
+            )
+
+            # Get all directory roles
+            $allRoles = Get-MgDirectoryRole | Where-Object { $_.DisplayName -in $privilegedRoles }
+            if (-not $allRoles) {
+                Write-Log "    No privileged roles found in directory." "WARNING"
+                return 0
+            }
+
+            $rolesWithPIM = 0
+            foreach ($role in $allRoles) {
+                # Check if there are eligible assignments (PIM) for the role
+                $eligibleAssignments = Get-MgRoleManagementDirectoryRoleEligibilityScheduleInstance -Filter "roleDefinitionId eq '$($role.Id)'" -ErrorAction SilentlyContinue
+                if ($eligibleAssignments -and $eligibleAssignments.Count -gt 0) {
+                    $rolesWithPIM++
+                }
+            }
+
+            $pamScore = [math]::Round(($rolesWithPIM / $allRoles.Count) * 100)
+            Write-Log "    PAM implementation assessed: $pamScore% ($rolesWithPIM of $($allRoles.Count) privileged roles protected by PIM)" "DEBUG"
         } else {
             Write-Log "    Azure context not available for PAM assessment" "WARNING"
             $pamScore = 0
