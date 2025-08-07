@@ -247,39 +247,172 @@ This document outlines the approach for creating awareness, providing training, 
    - Adjust approach based on results
    - Document lessons learned
 
-## 4. Implementation Timeline
+## 4. Regular Training Session Schedule
+
+### Mandatory Training Sessions
+
+#### Quarterly All-Staff Governance Awareness Sessions
+**Frequency:** Every 3 months
+**Duration:** 1 hour
+**Format:** Virtual or in-person presentation
+**Audience:** All employees
+
+**Content:**
+- Governance framework updates and changes
+- Recent policy updates and clarifications
+- Success stories and lessons learned
+- Compliance reminders and best practices
+- Q&A session with governance team
+
+#### Monthly Role-Specific Training
+**Frequency:** Monthly (rotating focus)
+**Duration:** 2 hours
+**Format:** Interactive workshops
+**Audience:** Role-specific groups
+
+**Monthly Schedule:**
+- **January/July:** ICT Governance Council and Domain Owners
+- **February/August:** Technology Stewards
+- **March/September:** Technology Custodians
+- **April/October:** General IT Staff
+- **May/November:** Business Stakeholders
+- **June/December:** New Employee Orientation
+
+#### Annual Comprehensive Governance Training
+**Frequency:** Annually
+**Duration:** Full day (8 hours)
+**Format:** Comprehensive workshop with hands-on exercises
+**Audience:** All governance stakeholders
+
+**Content:**
+- Complete governance framework review
+- Policy deep-dive sessions
+- Case study analysis and problem-solving
+- Governance tool training
+- Compliance requirements update
+- Certification and assessment
+
+### Specialized Training Programs
+
+#### New Employee Governance Onboarding
+**Trigger:** Within 30 days of hire
+**Duration:** 4 hours (spread over 2 weeks)
+**Format:** Self-paced e-learning + mentor session
+
+**Week 1:** Governance Foundation (2 hours)
+- Introduction to ICT governance
+- Organizational governance structure
+- Basic policies and procedures
+- Individual responsibilities
+
+**Week 2:** Role-Specific Training (2 hours)
+- Detailed role responsibilities
+- Relevant policies and procedures
+- Governance tools and systems
+- Mentor session and Q&A
+
+#### Governance Leadership Development
+**Frequency:** Semi-annually
+**Duration:** 2 days
+**Audience:** Current and potential governance leaders
+
+**Content:**
+- Advanced governance concepts
+- Leadership in governance contexts
+- Decision-making frameworks
+- Change management in governance
+- Strategic governance planning
+
+#### Compliance and Audit Readiness Training
+**Frequency:** Quarterly
+**Duration:** 3 hours
+**Audience:** All staff involved in audit processes
+
+**Content:**
+- Audit preparation and participation
+- Documentation requirements
+- Evidence collection and presentation
+- Compliance verification processes
+- Remediation planning and execution
+
+### Training Delivery Methods and Resources
+
+#### E-Learning Platform
+- **Self-paced modules** available 24/7
+- **Interactive simulations** for hands-on practice
+- **Knowledge assessments** with immediate feedback
+- **Progress tracking** and completion certificates
+- **Mobile-friendly** access for remote learning
+
+#### Instructor-Led Training
+- **Expert facilitators** with governance expertise
+- **Interactive workshops** with group exercises
+- **Real-world case studies** and scenarios
+- **Hands-on practice** with governance tools
+- **Immediate Q&A** and clarification
+
+#### Blended Learning Approach
+- **Pre-work:** E-learning modules for foundation knowledge
+- **Workshop:** Interactive session for application and practice
+- **Follow-up:** Additional resources and ongoing support
+- **Assessment:** Knowledge verification and certification
+
+### Training Effectiveness Measurement
+
+#### Training Metrics
+- **Attendance Rate:** Target >95% for mandatory sessions
+- **Completion Rate:** Target >98% for e-learning modules
+- **Assessment Scores:** Target >85% pass rate on knowledge assessments
+- **Satisfaction Scores:** Target >4.0/5.0 for training quality
+- **Knowledge Retention:** Target >80% retention after 6 months
+
+#### Feedback Collection
+- **Post-training surveys** for immediate feedback
+- **Follow-up assessments** to measure knowledge retention
+- **Manager feedback** on employee performance improvement
+- **Governance metrics** to measure training impact
+- **Annual training effectiveness review**
+
+## 5. Implementation Timeline
 
 ### Phase 1: Foundation (Months 1-3)
 
-- Develop core training materials
-- Create governance portal
-- Establish key communication channels
-- Conduct executive briefings
-- Launch initial awareness campaign
+- Develop core training materials and e-learning modules
+- Create governance portal and learning management system
+- Establish key communication channels and feedback mechanisms
+- Conduct executive briefings and leadership alignment
+- Launch initial awareness campaign and communication plan
+- **Implement quarterly all-staff awareness sessions**
+- **Begin monthly role-specific training rotation**
 
 ### Phase 2: Rollout (Months 4-6)
 
-- Deliver role-based training
-- Implement regular communication cadence
-- Publish comprehensive documentation
-- Establish feedback mechanisms
-- Launch governance dashboard
+- Deliver comprehensive role-based training to all stakeholders
+- Implement regular communication cadence and feedback loops
+- Publish comprehensive documentation and reference materials
+- Establish governance dashboard and metrics tracking
+- **Launch annual comprehensive governance training program**
+- **Implement new employee governance onboarding process**
 
 ### Phase 3: Reinforcement (Months 7-12)
 
-- Conduct refresher training
-- Share success stories and best practices
-- Implement advanced training modules
-- Refine communication based on feedback
-- Develop governance community of practice
+- Conduct refresher training and advanced skill development
+- Share success stories, best practices, and lessons learned
+- Implement specialized training modules and certification programs
+- Refine communication and training based on feedback and metrics
+- Develop governance community of practice and peer learning
+- **Begin governance leadership development program**
+- **Implement compliance and audit readiness training**
 
 ### Phase 4: Optimization (Ongoing)
 
-- Conduct regular training reviews and updates
-- Optimize communication effectiveness
-- Implement continuous improvement initiatives
-- Develop advanced governance capabilities
-- Integrate with broader organizational learning
+- Conduct regular training reviews and continuous updates
+- Optimize communication effectiveness and stakeholder engagement
+- Implement continuous improvement initiatives and innovation
+- Develop advanced governance capabilities and expertise
+- Integrate with broader organizational learning and development
+- **Maintain regular training schedule with continuous improvement**
+- **Expand training programs based on organizational needs**
 
 ## 5. Success Metrics
 
