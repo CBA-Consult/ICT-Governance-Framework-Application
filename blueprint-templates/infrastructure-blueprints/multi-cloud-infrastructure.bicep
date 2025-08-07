@@ -324,7 +324,7 @@ resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
   tags: governanceTags
   properties: {
     administratorLogin: 'sqladmin'
-    administratorLoginPassword: 'P@ssw0rd123!' // In production, use Key Vault reference
+    administratorLoginPassword: sqlAdminPassword
     version: '12.0'
     minimalTlsVersion: securityConfig[dataClassification].tlsVersion
     publicNetworkAccess: dataClassification == 'Public' ? 'Enabled' : 'Disabled'
