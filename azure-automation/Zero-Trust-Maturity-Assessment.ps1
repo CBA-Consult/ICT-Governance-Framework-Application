@@ -188,7 +188,50 @@ function Test-MFAImplementation {
         if ($context) {
             # Simulate MFA assessment - in real implementation, this would query Azure AD
             $mfaScore = 75  # Placeholder score
-            Write-Log "    MFA implementation assessed: $mfaScore%" "DEBUG"
+            # Ensure Microsoft Graph module is available
+            if (-not (Get-Module -ListAvailable -Name Microsoft.Graph.Users)) {
+                try {
+                    Import-Module Microsoft.Graph.Users -ErrorAction Stop
+                } catch {
+                    Write-Log "    Microsoft.Graph.Users module not found. Please install it to assess MFA." "ERROR"
+                    return 0
+                }
+            }
+
+            # Connect to Microsoft Graph if not already connected
+            if (-not (Get-MgContext)) {
+                try {
+                    Connect-MgGraph -Scopes "User.Read.All","Directory.Read.All" -ErrorAction Stop
+                } catch {
+                    Write-Log "    Failed to connect to Microsoft Graph: $($_.Exception.Message)" "ERROR"
+                    return 0
+                }
+            }
+
+            # Get all users (excluding guests and disabled accounts)
+            $users = Get-MgUser -All -Filter "accountEnabled eq true and userType eq 'Member'" -Property Id,DisplayName,UserPrincipalName
+            if (-not $users) {
+                Write-Log "    No users found in Azure AD." "WARNING"
+                return 0
+            }
+
+            # Get MFA registration details
+            $mfaDetails = Get-MgReportAuthenticationMethodsUserRegistrationDetail -All
+            if (-not $mfaDetails) {
+                Write-Log "    Could not retrieve MFA registration details." "WARNING"
+                return 0
+            }
+
+            $totalUsers = $users.Count
+            $mfaUsers = ($mfaDetails | Where-Object { $_.IsMfaRegistered -eq $true }).Count
+
+            if ($totalUsers -eq 0) {
+                $mfaScore = 0
+            } else {
+                $mfaScore = [math]::Round(($mfaUsers / $totalUsers) * 100, 2)
+            }
+
+            Write-Log "    MFA implementation assessed: $mfaScore% ($mfaUsers of $totalUsers users registered for MFA)" "DEBUG"
         } else {
             Write-Log "    Azure context not available for MFA assessment" "WARNING"
             $mfaScore = 0
