@@ -550,4 +550,14 @@ This comprehensive roles and responsibilities framework ensures clear expectatio
 *Document Version: 1.0*  
 *Prepared: [Current Date]*  
 *Next Review: [6 months from preparation date]*  
-*Framework Owner: Strategic Governance Council*
+---
+
+## Document Control
+
+| Version   | Date         | Author/Owner                  | Description/Change Summary           |
+|-----------|--------------|-------------------------------|--------------------------------------|
+| 1.0.0     | [YYYY-MM-DD] | Strategic Governance Council  | Initial release                      |
+
+**Next Review:** [6 months from preparation date]  
+
+---
