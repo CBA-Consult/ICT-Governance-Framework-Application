@@ -165,7 +165,7 @@ This document provides a comprehensive summary of the implementation of the **CB
 
 ### Generated Project Documentation
 - [Project Charter](generated-documents/project-charter/project-charter.md)
-- [Requirements Specification](generated-documents/requirements/requirements-specification.md)
+- [Requirements Specification](generated-documents/core-analysis/requirements-specification.md)
 - [Management Plans](generated-documents/management-plans/)
 - [Stakeholder Register](generated-documents/stakeholder-management/stakeholder-register.md)
 
