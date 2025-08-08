@@ -20,13 +20,17 @@ The ICT Governance Framework consists of the following core components:
 
 5. **[Training and Communication Plan](ICT-Governance-Training-Communication.md)** - Approach for creating awareness, providing training, and establishing communication about the governance framework.
 
+6. **[Zero Trust Maturity Model](Zero-Trust-Maturity-Model.md)** - Comprehensive framework for assessing and implementing Zero Trust architecture across six pillars (Identities, Endpoints, Apps, Infrastructure, Data, Network) with automated service release capabilities.
+
 ## Key Features
 
 - **Governance Structure**: Three-tiered governance model with clear roles and responsibilities
 - **Policy Framework**: Comprehensive policies aligned with industry standards (COBIT, ITIL, ISO/IEC 38500)
+- **Zero Trust Maturity Model**: Comprehensive framework for implementing Zero Trust architecture with automated service releases
 - **IaC Integration**: "Governance as Code" approach with automated validation and enforcement
 - **Compliance Management**: Alignment with regulatory requirements and standards
 - **Metrics and Reporting**: KPIs and dashboards for governance effectiveness
+- **Automated Service Releases**: Security-first automation enabling continuous deployment with comprehensive validation
 - **Continuous Improvement**: Framework for ongoing assessment and enhancement
 
 ## Additional Resources
@@ -35,6 +39,8 @@ The ICT Governance Framework consists of the following core components:
 - **[Microsoft365DSC Integration](Integrating%20Microsoft365DSC.md)**: Extension of governance to Microsoft 365 services
 - **[API Center Version Controls](Methodology%20API%20Center%20on%20Governance%20Framework%20Version%20Controls.md)**: API governance and versioning
 - **[Information Governance Overview](InformationOverview.md)**: Information governance principles and approaches
+- **[Zero Trust Assessment Automation](azure-automation/Zero-Trust-Maturity-Assessment.ps1)**: Automated assessment tools for Zero Trust maturity evaluation
+- **[Zero Trust Configuration](azure-automation/zero-trust-assessment-config.json)**: Configuration file for Zero Trust maturity assessments
 
 ## Implementation Approach
 

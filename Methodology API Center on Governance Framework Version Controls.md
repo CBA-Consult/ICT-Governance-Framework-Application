@@ -1,3 +1,17 @@
+The document outlines the following principles for using Azure API Center and similar technologies to detect drift within infrastructure as code (IaC) approved infrastructure:
+
+Version Control APIs: Azure API Center enables you to version control API updates using the "Api Versions - Create Or Update" REST API. This practice ensures that each API change is tracked and managed as part of the IaC workflow.
+
+Automated Change Detection: By leveraging version control for APIs, you can programmatically compare deployed API versions with the approved versions defined in your IaC repositories. This helps detect drift—unauthorized or unexpected changes—from the approved infrastructure state.
+
+Lifecycle Management: Each API version includes properties such as lifecycleStage (e.g., production, preview) and title. Managing these attributes ensures consistent deployment and helps track the intended state of infrastructure components.
+
+Auditable Change History: The API Center records metadata like creation and last modified timestamps, which supports traceability and auditability for compliance and governance.
+
+Integration with Automation: The REST API endpoints and versioning model are designed for integration into CI/CD pipelines and automated drift detection tools, supporting a modern, governed approach to infrastructure management.
+
+In summary, the methodology emphasizes automated, version-controlled, and auditable management of APIs and infrastructure, enabling early detection of drift and supporting robust governance in a multi-cloud environment.
+
 In Azure API Center, you can version control API updates using the "Api Versions - Create Or Update" REST API¹. This allows you to create new API versions or update existing ones. Here's how it works:
 
 1. **HTTP Request:**
