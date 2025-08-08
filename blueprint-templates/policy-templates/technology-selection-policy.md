@@ -48,12 +48,19 @@ This policy aligns with the following framework components:
 
 ### 1. Business Alignment Criteria
 
-#### Strategic Fit (Weight: 25%)
+#### Strategic Fit (Weight: 20%)
 - [ ] Supports current business objectives
 - [ ] Aligns with long-term strategic goals
 - [ ] Enables business process improvement
 - [ ] Provides competitive advantage
 - [ ] Supports digital transformation initiatives
+
+#### Learning and Development Alignment (Weight: 15%)
+- [ ] Supports employee learning and skill development
+- [ ] Enhances job performance and contribution quality
+- [ ] Enables employee autonomy in application choices
+- [ ] Aligns with organizational learning objectives
+- [ ] Provides measurable learning outcomes
 
 #### Functional Requirements (Weight: 20%)
 - [ ] Meets all mandatory functional requirements
@@ -174,17 +181,20 @@ This policy aligns with the following framework components:
 
 ## Approval Authority Matrix
 
-| Technology Category | Investment Range | Approval Authority | Review Board |
-|---------------------|------------------|-------------------|--------------|
-| Software Applications | < $10,000 | Department Head | Technology Steward |
-| Software Applications | $10,000 - $50,000 | Domain Owner | Technology Review Board |
-| Software Applications | > $50,000 | ICT Governance Council | Executive Committee |
-| Infrastructure | < $25,000 | Infrastructure Manager | Technology Steward |
-| Infrastructure | $25,000 - $100,000 | Domain Owner | Technology Review Board |
-| Infrastructure | > $100,000 | ICT Governance Council | Executive Committee |
-| Cloud Services | < $15,000 annually | Cloud Architect | Technology Steward |
-| Cloud Services | $15,000 - $75,000 annually | Domain Owner | Technology Review Board |
-| Cloud Services | > $75,000 annually | ICT Governance Council | Executive Committee |
+| Technology Category | Investment Range | Approval Authority | Review Board | L&D Consideration |
+|---------------------|------------------|-------------------|--------------|-------------------|
+| Learning Applications | < $5,000 | Employee Self-Approval | L&D Manager | Fast-track for learning tools |
+| Learning Applications | $5,000 - $25,000 | Department Head + L&D | Technology Steward | L&D requirements priority |
+| Learning Applications | > $25,000 | Domain Owner + L&D | Technology Review Board | Learning ROI assessment |
+| Software Applications | < $10,000 | Department Head | Technology Steward | L&D impact evaluation |
+| Software Applications | $10,000 - $50,000 | Domain Owner | Technology Review Board | L&D requirements review |
+| Software Applications | > $50,000 | ICT Governance Council | Executive Committee | L&D strategic alignment |
+| Infrastructure | < $25,000 | Infrastructure Manager | Technology Steward | Learning platform support |
+| Infrastructure | $25,000 - $100,000 | Domain Owner | Technology Review Board | L&D infrastructure needs |
+| Infrastructure | > $100,000 | ICT Governance Council | Executive Committee | Learning strategy alignment |
+| Cloud Services | < $15,000 annually | Cloud Architect | Technology Steward | Learning platform compatibility |
+| Cloud Services | $15,000 - $75,000 annually | Domain Owner | Technology Review Board | L&D cloud requirements |
+| Cloud Services | > $75,000 annually | ICT Governance Council | Executive Committee | Learning strategy integration |
 
 ## Technology Categories and Standards
 
