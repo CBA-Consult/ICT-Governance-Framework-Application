@@ -977,3 +977,106 @@ Notes:
 - A168 (FS A167) — Acceptance: Lessons learned published with owners/dates. Risk: no adoption → PMO portal.
 - A169 (FS A164) — Acceptance: KT delivered; ops runbooks in place. Risk: knowledge loss → Recording.
 - A170 (FS A169) — Acceptance: Handover complete; access transferred. Risk: dangling access → Access review.
+
+---
+
+## Per-Activity Summary, Context, Acceptance, Other (Tables)
+
+### Phase 1 — Initiation (A001–A020)
+
+| Activity | Summary | Context | Acceptance Criteria | Other Information |
+|---|---|---|---|---|
+| A001 | Define scope and objectives | Project start; feeds Charter (../project-charter/project-charter.md) | Scope statement approved; exclusions baselined | Risk: scope creep; enforce change control |
+| A002 | Build business case & value | After A001; aligns to ../core-analysis/business-case.md | Sponsor/Finance approve ROI/NPV | Link benefits to KPI docs; assumptions logged |
+| A003 | Identify stakeholders/sponsors | After A001; create ../stakeholder-management/stakeholder-register.md | >95% coverage; governance bodies noted | Protect PII; version register |
+| A004 | Define success criteria & KPIs | After A002; use ../../Target-Governance-Framework-KPIs-Metrics.md | KPI set baselined with owners/sources | Dashboard mapping in ../../ICT-Governance-Transparency-Dashboard.md |
+| A005 | Analyze org strategic objectives | After A003; cross-check strategic statements | Alignment analysis approved | Conflicts escalated to Sponsor |
+| A006 | Map governance to business goals | After A005; create mapping matrix | Mapping signed off; RTM entries added | Trace to requirements and controls |
+| A007 | Identify regulatory & compliance | After A005; compile matrix | Legal sign-off on applicability | Watchlist for regulatory change |
+| A008 | Validate strategic fit & priority | After A006/A007; stage gate | Exec approval minute recorded | Budget/resources confirmed |
+| A009 | Identify all stakeholders | After A003; broaden discovery | PMO validates list completeness | Add discovery method notes |
+| A010 | Analyze influence & interest | After A009; build grid | Grid approved by PM & Sponsor | Mitigate bias via peer review |
+| A011 | Develop engagement strategies | After A010; per persona/group | Strategies approved by Sponsor | Include cadence and channels |
+| A012 | Create register & comms plan | After A011; comms plan in ../management-plans/communication-management-plan.md | Plan baselined; roles set | Include feedback loop |
+| A013 | Establish comms protocols | After A012; define SLAs & escalation | Protocols published | Security and retention requirements |
+| A014 | Set up collaboration tools | After A013; configure M365/DevOps | Platforms configured; access audited | Audit logging enabled |
+| A015 | Create comms templates/standards | After A013; use ../templates/document-template.md | Templates adopted org-wide | Enforce via linting/PR checks |
+| A016 | Implement feedback/escalation | After A014; enable intake | System operational; SLAs defined | Runbooks for triage and escalation |
+| A017 | Recruit & assign core team | After A008; staff project | Roster filled; access provisioned | Plan for backfills |
+| A018 | Define roles & RACI | After A017; publish RACI | RACI approved; decision rights documented | Add DACI notes if used |
+| A019 | Establish team agreements | After A018; team charter | Charter signed by team | Quarterly refresh scheduled |
+| A020 | Conduct orientation/training | After A019; onboarding | Attendance complete; competency checks passed | Record training evidence |
+
+### Phase 2 — Analysis & Design (A021–A040)
+
+| Activity | Summary | Context | Acceptance Criteria | Other Information |
+|---|---|---|---|---|
+| A021 | Assess current governance | After A020; baseline maturity | Assessment report approved | Include process inventory |
+| A022 | Score against frameworks | After A021; COBIT/ITIL/ISO | Maturity scores baselined | Scoring rubric attached |
+| A023 | Identify gaps & opportunities | After A022; prioritize | Gap list prioritized; heatmap produced | Feed risk register |
+| A024 | Document current architecture | After A021; C4/BPMN/flows | Diagrams published & versioned | Include trust boundaries |
+| A025 | Inventory tech assets | After A020; CMDB et al. | ≥95% coverage of tier‑1 | Reconcile discrepancies |
+| A026 | Assess IT architecture | After A025; non-functionals | Constraints documented & approved | Link to system-design-specification.md |
+| A027 | Evaluate integration reqs | After A026; interfaces | Integration requirements approved | Contract-first, OpenAPI |
+| A028 | Analyze performance & scale | After A026; capacity | Perf targets & capacity plan approved | Link to performance-requirements.md |
+| A029 | Elicit stakeholder requirements | After A012; interviews/workshops | Elicitation artifacts complete; sign-offs | Retain raw notes policy |
+| A030 | Define F/NFR requirements | After A029; SRS | F/NFRs testable and reviewed | Single SRS source of truth |
+| A031 | Prioritize & resolve conflicts | After A030; MoSCoW | Prioritized backlog; conflicts resolved | Decisions logged |
+| A032 | Compile requirements docs | After A031; RTM | SRS complete; RTM updated | Acceptance criteria included |
+| A033 | Identify regulatory frameworks | After A007; inventory | Regulatory inventory signed-off | Cite sources & jurisdictions |
+| A034 | Map compliance to features | After A033/A032; mapping | Mapping approved; verification steps defined | Add control tests |
+| A035 | Design target operating model | After A023/A032; TOM | TOM approved | Capability targets set |
+| A036 | Define governance processes | After A035; BPMN | Processes/workflows approved | Decision matrices/thresholds |
+| A037 | Create roles & responsibility | After A035; org model | Roles/RACI ratified | Align to Entra ID roles |
+| A038 | Develop policies & procedures | After A036/A037; manuals | Policies/procedures approved | Exceptions/waivers process |
+| A039 | Design system architecture | After A027/A032; C4/ADRs | System architecture baselined | Interface contracts defined |
+| A040 | Define data model & IA | After A032; DMBOK | Data model & governance plan approved | Data classification & lineage |
+
+### Phase 3 — Development & Implementation (A061–A068)
+
+| Activity | Summary | Context | Acceptance Criteria | Other Information |
+|---|---|---|---|---|
+| A061 | Build workflow engine | After A036/A039; core engine | Meets throughput/SLA; DOR/DOD set | Config-as-code; profiling |
+| A062 | Implement RBAC & user mgmt | After A037/A039; security | RBAC enforced; audit logs enabled | Map to Entra ID |
+| A063 | Document/policy management | After A038/A061; DMS | Versioning, approvals, retention functional | Audit trails |
+| A064 | Notifications & comms | After A062; alerts | Reliable delivery; escalation rules | Throttling & idempotency |
+| A065 | Data collection & processing | After A040; pipelines | DQ checks pass; processing stable | PII controls |
+| A066 | Dashboards & visualization | After A065; exec/ops views | Performance/accessibility met; sign-off | Align to transparency dashboard |
+| A067 | Reporting functions | After A065; catalog | Standard/custom reports delivered; RLS | Report catalog maintained |
+| A068 | Predictive analytics engine | After A065; ML | Drift monitoring enabled; insights validated | Explainability & MLOps |
+
+### Phase 3 — Integration & Connectivity (A069–A072)
+
+| Activity | Summary | Context | Acceptance Criteria | Other Information |
+|---|---|---|---|---|
+| A069 | API & integration framework | After A039; standards | Framework documented; security tested | OpenAPI, versioning, OAuth2/MTLS |
+| A070 | Enterprise connectors | After A069/A027; adapters | Connectors meet SLAs | Retry/circuit breaker |
+| A071 | Data sync & MDM | After A070; golden record | Sync correctness; MDM rules validated | Conflict resolution rules |
+| A072 | Monitoring & health checks | After A071; observability | SLOs defined; runbooks in place | OpenTelemetry, alert routing |
+
+### Phase 4 — Deployment & Rollout (A121–A127)
+
+| Activity | Summary | Context | Acceptance Criteria | Other Information |
+|---|---|---|---|---|
+| A121 | Provision production infra | After A072; IaC | Infra provisioned; baselines applied | Tagging/cost governance |
+| A122 | Install/config software | After A121; release | Deployed; config externalized | Key Vault; back-out plan |
+| A123 | Security controls & monitoring | After A122; controls | Controls operational; SIEM integrated | Map to NIST/ISO |
+| A124 | Infra testing & validation | After A123; perf/chaos | SLOs met under load | Tuning captured |
+| A125 | Prepare data migration | After A124; procedures | Rehearsal passed; rollback tested | Data mapping controlled |
+| A126 | Execute migration | After A125; execution | Migration executed; logs complete | Handling long-running jobs |
+| A127 | Validate data integrity | After A126; QC | Integrity verified; business sign-off | Sampling plan |
+
+### Phase 5 — Project Closure (A161–A170)
+
+| Activity | Summary | Context | Acceptance Criteria | Other Information |
+|---|---|---|---|---|
+| A161 | Validate deliverables/outcomes | After A160; QA | All deliverables validated; defects closed | Quality checklist |
+| A162 | Formal acceptance | After A161; sign-offs | Stakeholder sign-offs recorded | Audit trail |
+| A163 | Final testing & QA | After A161; final suite | No P1/P2 open; tests pass | Security regression |
+| A164 | Final status & metrics | After A162/A163; report | Variance/EVM documented | Benefits, schedule, cost |
+| A165 | Measure success vs KPIs | After A164; verify | KPI achievement verified | Baselines/data lineage |
+| A166 | Validate business value/ROI | After A165; finance | ROI realized; CFO sign-off | Sensitivity analysis |
+| A167 | Stakeholder satisfaction | After A162; survey | Results analyzed; actions logged | Response rate target |
+| A168 | Lessons learned | After A167; retrospective | LL published with owners/dates | Knowledge base entry |
+| A169 | Knowledge transfer to Ops | After A164; KT | Runbooks; on-call ready | Hypercare period |
+| A170 | Handover & documentation | After A169; closure | Handover complete; access transferred | Access reviews |
