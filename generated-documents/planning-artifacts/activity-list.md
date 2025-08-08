@@ -31,6 +31,30 @@ Activities are organized by WBS hierarchy and include:
 
 ---
 
+## Global Defaults and Field Definitions
+
+To reduce repetition and improve scheduling quality, the following defaults apply unless an activity explicitly overrides them.
+
+- Dependency Type: Finish-to-Start (FS)
+- Workweek Assumption: 40 hours/week per 1.0 FTE
+- Entry Preconditions: All listed predecessors are complete and approved; required inputs available
+- Acceptance Criteria: Defined in the appendix per activity; must be met for completion
+- Risks & Mitigations: Track in the Risk Register; high-impact items are noted in the appendix
+
+Field definitions (for consistency across tools):
+- ID, Name, WBS, Description, Deliverables (with repo link), Effort (hours), Duration (elapsed), Dependency Type (FS/SS/FF), Dependencies (IDs), Resources (roles/FTE), Entry Preconditions, Acceptance Criteria, Risks & Mitigations.
+
+Deliverable links cross-reference (key examples):
+- A002 Business Case → ../core-analysis/business-case.md
+- A003 Stakeholder Register → ../stakeholder-management/stakeholder-register.md
+- A004 KPI Framework → ../../Target-Governance-Framework-KPIs-Metrics.md; ../../ICT-Governance-Metrics.md; ../../ICT-Governance-Transparency-Dashboard.md
+- A012 Communication Plan → ../management-plans/communication-management-plan.md
+- A015 Templates/Style Guide → ../templates/document-template.md; ../DOCUMENTATION-STYLE-GUIDE.md
+- A028 Performance Requirements → ../technical-design/performance-requirements.md
+- A039 System Design Spec → ../technical-design/system-design-specification.md; Architecture → ../technical-design/architecture-design-document.md
+- A066 Transparency Dashboard → ../../ICT-Governance-Transparency-Dashboard.md
+- A121 Azure Automation context → ../../azure-automation/README.md
+
 ## PHASE 1: PROJECT INITIATION (Activities 1-20)
 
 ### **Project Charter and Foundation Activities**
@@ -770,7 +794,8 @@ Activities are organized by WBS hierarchy and include:
 ## Activity Summary Statistics
 
 ### **Total Project Activities**
-- **Total Activities:** 180 detailed activities
+ **Enumerated Activities in this document:** 69 (of planned 180)
+ **Planned Total Activities (program baseline):** 180
 - **Estimated Total Effort:** 16,000 hours
 - **Project Duration:** 65 weeks (15 months)
 - **Average Activity Duration:** 1.8 weeks
@@ -863,3 +888,92 @@ This comprehensive Activity List provides the detailed foundation for project sc
 ---
 
 *This Activity List enables detailed project planning and control, supporting successful delivery of the ICT Governance Framework transformation initiative within planned time, budget, and quality parameters.*
+
+---
+
+## Acceptance Criteria, Dependency Types, and Risks (Appendix)
+
+Notes:
+- Dependency Type defaults to FS unless specified; SS/FF noted explicitly below.
+- Only enumerated activities (A001–A040, A061–A072, A121–A127, A161–A170) are listed. Remaining planned activities will be appended in future revisions.
+
+### Phase 1 — Initiation (A001–A020)
+- A001 (FS, none) — Acceptance: Scope statement approved; boundaries/exclusions documented; change control defined. Risk: scope creep → Mitigate via change control and baseline freeze.
+- A002 (FS A001) — Acceptance: Business case approved by Sponsor & Finance; ROI/NPV included; assumptions logged. Risk: benefits overstatement → Independent review.
+- A003 (FS A001) — Acceptance: Stakeholder register completed (>95% coverage); governance bodies identified. Risk: missed stakeholders → Cross-verify with org charts.
+- A004 (FS A002) — Acceptance: KPI set baselined; data sources/owners defined; review cadence scheduled. Risk: unmeasurable KPIs → Align to metrics doc.
+- A005 (FS A003) — Acceptance: Alignment matrix produced and approved. Risk: conflicting objectives → Escalate to Sponsor.
+- A006 (FS A005) — Acceptance: Governance-to-business mapping signed off; RTM entries created. Risk: weak traceability → RTM audit.
+- A007 (FS A005) — Acceptance: Regulatory matrix complete; legal review sign-off. Risk: late regulatory change → Watchlist with triggers.
+- A008 (FS A006,A007) — Acceptance: Executive decision minute recorded; budget/resources confirmed. Risk: delayed gate → Timebox gate reviews.
+- A009 (FS A003) — Acceptance: Stakeholder list validated by PMO. Risk: stakeholder churn → Maintain register versioning.
+- A010 (FS A009) — Acceptance: Influence/interest grid approved. Risk: bias → Peer review.
+- A011 (FS A010) — Acceptance: Engagement strategies approved by Sponsor. Risk: low engagement → Add incentives/cadence.
+- A012 (FS A011) — Acceptance: Communication plan baselined; R&Rs set. Risk: channel fragmentation → Standardize.
+- A013 (FS A012) — Acceptance: Protocols published incl. escalation SLAs. Risk: unclear escalation → Runbook.
+- A014 (FS A013) — Acceptance: Platforms configured; access audited. Risk: access gaps → Access review.
+- A015 (FS A013) — Acceptance: Templates/style guide adopted. Risk: noncompliance → Docs linting.
+- A016 (FS A014) — Acceptance: Feedback/escalation system operational; SLAs set. Risk: backlog → Triage policy.
+- A017 (FS A008) — Acceptance: Core team roster filled; access provisioned. Risk: hiring delays → Backup candidates.
+- A018 (FS A017) — Acceptance: RACI approved; decision rights documented. Risk: ambiguity → DACI addendum.
+- A019 (FS A018) — Acceptance: Team charter signed. Risk: norm drift → Quarterly refresh.
+- A020 (FS A019) — Acceptance: Orientation completed; competency checks passed. Risk: training gaps → Make-up sessions.
+
+### Phase 2 — Analysis & Design (A021–A040)
+- A021 (FS A020) — Acceptance: Current state assessment report approved. Risk: incomplete scope → Checklist.
+- A022 (FS A021) — Acceptance: Maturity scores for COBIT/ITIL/ISO baselined. Risk: inconsistent scoring → Scoring rubric.
+- A023 (FS A022) — Acceptance: Gap list prioritized; heatmap produced. Risk: boiling the ocean → Top 10 focus.
+- A024 (FS A021) — Acceptance: Architecture docs (C4/BPMN) published. Risk: stale diagrams → Version control.
+- A025 (FS A020) — Acceptance: Inventory coverage ≥95% tier‑1. Risk: missing assets → CMDB reconciliation.
+- A026 (FS A025) — Acceptance: Architecture constraints documented. Risk: hidden constraints → Tech deep dives.
+- A027 (FS A026) — Acceptance: Integration requirements approved. Risk: brittle integrations → Contract-first.
+- A028 (FS A026) — Acceptance: Perf targets & capacity plan approved. Risk: under-sizing → Load tests.
+- A029 (FS A012) — Acceptance: Elicitation artifacts complete; stakeholders sign-off. Risk: requirement drift → Versioning.
+- A030 (FS A029) — Acceptance: F/NFRs testable and reviewed. Risk: ambiguity → Acceptance criteria.
+- A031 (FS A030) — Acceptance: Prioritized backlog; conflicts resolved. Risk: deadlock → Sponsor decision.
+- A032 (FS A031) — Acceptance: SRS complete; RTM updated. Risk: missing criteria → QA review.
+- A033 (FS A007) — Acceptance: Regulatory inventory signed-off. Risk: misinterpretation → Legal counsel.
+- A034 (FS A033,A032) — Acceptance: Compliance mapping approved; verification steps defined. Risk: compliance gaps → Early audits.
+- A035 (FS A023,A032) — Acceptance: Target operating model approved. Risk: change resistance → Change plan.
+- A036 (FS A035) — Acceptance: Processes/workflows approved; decision matrices defined. Risk: bottlenecks → Simulation.
+- A037 (FS A035) — Acceptance: Roles/responsibilities ratified. Risk: RACI overlap → Clarify.
+- A038 (FS A036,A037) — Acceptance: Policies/procedures approved; exceptions process defined. Risk: over‑policy → Pragmatic guidelines.
+- A039 (FS A027,A032) — Acceptance: System architecture baselined. Risk: integration risks → ADRs.
+- A040 (FS A032) — Acceptance: Data model and governance plan approved. Risk: data risks → DQ controls.
+
+### Phase 3 — Dev & Implementation (A061–A072)
+- A061 (FS A036,A039) — Acceptance: Workflow engine meets throughput/SLA; DOR/DOD defined. Risk: perf shortfalls → Profiling.
+- A062 (FS A037,A039) — Acceptance: RBAC implemented; audit logs enabled. Risk: privilege escalation → Pen test.
+- A063 (FS A038,A061) — Acceptance: DMS supports versioning/approvals/retention. Risk: content sprawl → Governance.
+- A064 (FS A062) — Acceptance: Notifications reliable with escalation; rate limits applied. Risk: noise → Throttling.
+- A065 (FS A040) — Acceptance: Data pipelines validated incl. DQ checks. Risk: PII leaks → Privacy by design.
+- A066 (FS A065) — Acceptance: Dashboards meet perf/accessibility; stakeholder sign-off. Risk: misaligned metrics → Review.
+- A067 (FS A065) — Acceptance: Reports cataloged; RLS enforced. Risk: sensitive exposure → RLS tests.
+- A068 (FS A065) — Acceptance: ML outputs monitored; drift alerts. Risk: model bias → Explainability.
+
+### Phase 3 — Integration (A069–A072)
+- A069 (FS A039) — Acceptance: API framework documented; security tested. Risk: versioning → Semantic versioning.
+- A070 (FS A069,A027) — Acceptance: Connectors meet SLAs; retries/circuit breakers. Risk: upstream instability → Backoff.
+- A071 (FS A070) — Acceptance: Sync correctness; MDM rules validated. Risk: conflicts → Resolution rules.
+- A072 (FS A071) — Acceptance: Monitoring SLOs defined; runbooks in place. Risk: blind spots → OTEL.
+
+### Phase 4 — Deployment (A121–A127)
+- A121 (FS A072) — Acceptance: Infra provisioned via IaC; security baselines applied. Risk: drift → Policy as code.
+- A122 (FS A121) — Acceptance: Software deployed; config externalized. Risk: config errors → Validation.
+- A123 (FS A122) — Acceptance: Controls operational; SIEM integration. Risk: alert fatigue → Tuning.
+- A124 (FS A123) — Acceptance: Perf SLOs met under load/chaos. Risk: instability → Rollback plan.
+- A125 (FS A124) — Acceptance: Migration rehearsal passed; rollback tested. Risk: data loss → Backups.
+- A126 (FS A125) — Acceptance: Migration executed; reconciliation logs complete. Risk: window overruns → Chunking.
+- A127 (FS A126) — Acceptance: Integrity verified; business sign-off. Risk: residual errors → Sampling.
+
+### Phase 5 — Closure (A161–A170)
+- A161 (FS A160) — Acceptance: All deliverables validated; defects closed. Risk: hidden defects → Warranty period.
+- A162 (FS A161) — Acceptance: Formal sign-offs received. Risk: delayed approvals → Escalation.
+- A163 (FS A161) — Acceptance: Final QA passed; no P1/P2 open. Risk: regressions → Regression suite.
+- A164 (FS A162,A163) — Acceptance: Final metrics and variance reported. Risk: data gaps → Reconstruct.
+- A165 (FS A164) — Acceptance: KPI achievement verified vs baselines. Risk: measurement error → Audit.
+- A166 (FS A165) — Acceptance: ROI realized; CFO sign-off. Risk: benefit delay → Phased tracking.
+- A167 (FS A162) — Acceptance: Satisfaction results analyzed; actions logged. Risk: low response rate → Follow-up.
+- A168 (FS A167) — Acceptance: Lessons learned published with owners/dates. Risk: no adoption → PMO portal.
+- A169 (FS A164) — Acceptance: KT delivered; ops runbooks in place. Risk: knowledge loss → Recording.
+- A170 (FS A169) — Acceptance: Handover complete; access transferred. Risk: dangling access → Access review.
