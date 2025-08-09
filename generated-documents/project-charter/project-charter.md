@@ -103,6 +103,8 @@ Following the Framework Enhancement Plan, we have conducted a detailed analysis 
 
 ## Project Objectives
 
+**Note:** For detailed SMART objectives with specific success criteria, KPIs, and value realization targets, refer to the comprehensive [Project Objectives Document](project-charter/project-objectives-document.md).
+
 | # | Objective | Success Criteria | Priority |
 |---|-----------|-----------------|----------|
 | 1 | Establish a comprehensive IT governance structure with clear roles and responsibilities | Approved RACI matrix for all IT governance functions | High |
@@ -115,6 +117,8 @@ Following the Framework Enhancement Plan, we have conducted a detailed analysis 
 | 8 | Deploy automated tools for governance monitoring and reporting | Governance dashboard implemented and operational | Low |
 
 ## Project Scope
+
+**Note:** For detailed scope boundaries, deliverables, exclusions, and change control procedures, refer to the comprehensive [Project Scope Statement](project-charter/project-scope-statement.md).
 
 ### In Scope
 
@@ -194,6 +198,8 @@ Following the Framework Enhancement Plan, we have conducted a detailed analysis 
 - stakeholder-management/stakeholder-register.md
 - management-plans/communication-management-plan.md
 - planning-artifacts/schedule-development-input.md
+- project-charter/project-scope-statement.md
+- project-charter/project-objectives-document.md
 
 ## High-Level Risks
 
