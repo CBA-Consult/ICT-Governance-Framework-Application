@@ -1,33 +1,80 @@
-# ICT Governance Framework Application
+# Multi-Cloud Multi-Tenant ICT Governance Framework
 
 ## Overview
 
-The CBA Consult IT Management Framework is a comprehensive solution to optimize companies' governance frameworks in a multi-cloud environment. This repository contains a structured set of documents, policies, and guidelines that form the ICT Governance Framework.
+The Multi-Cloud Multi-Tenant ICT Governance Framework is a comprehensive solution designed to optimize governance across complex multi-tenant environments spanning multiple cloud platforms. Building upon the proven CBA Consult IT Management Framework, this enhanced framework addresses the unique challenges of managing diverse tenant communities with varying security, compliance, and service requirements across AWS, Azure, Google Cloud Platform, and emerging cloud technologies.
 
-Last Updated: August 7, 2025 | Original Creation: October 22, 2020, Amsterdam, The Netherlands
+**Key Capabilities:**
+- **Multi-Tenant Architecture Governance**: Complete tenant isolation and resource segregation
+- **Cross-Cloud Management**: Unified governance across all major cloud platforms
+- **Automated Lifecycle Management**: Streamlined tenant onboarding, management, and offboarding
+- **Compliance Automation**: Tenant-specific regulatory compliance and monitoring
+- **Cost Optimization**: Advanced multi-tenant cost allocation and optimization
+- **Security by Design**: Zero-trust security with comprehensive tenant isolation
+
+Last Updated: January 15, 2024 | Original Creation: October 22, 2020, Amsterdam, The Netherlands
 
 ## Framework Components
 
-The ICT Governance Framework consists of the following core components:
+The Multi-Cloud Multi-Tenant ICT Governance Framework consists of the following core components:
 
-1. **[ICT Governance Framework](ICT-Governance-Framework.md)** - The foundational document defining the governance structure, roles, responsibilities, and operating model.
+### Core Framework Documents
 
-2. **[ICT Governance Policies](ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
+1. **[Multi-Cloud Multi-Tenant ICT Governance Framework](Multi-Cloud-Multi-Tenant-ICT-Governance-Framework.md)** - The comprehensive framework document defining multi-tenant governance structure, tenant lifecycle management, and cross-cloud operations.
 
-3. **[IaC and Version Control Integration](ICT-Governance-IaC-Integration.md)** - Guidelines for integrating the governance framework with Infrastructure as Code and version control systems.
+2. **[ICT Governance Framework](ICT-Governance-Framework.md)** - The foundational document defining the governance structure, roles, responsibilities, and operating model.
 
-4. **[Metrics and Reporting](ICT-Governance-Metrics.md)** - Key performance indicators, dashboards, and reporting mechanisms for evaluating governance effectiveness.
+3. **[Target Governance Framework](Target-Governance-Framework.md)** - Enhanced governance framework with industry-leading practices from ISO/IEC 38500, ITIL 4, COBIT 2019, CMMI, and FAIR frameworks.
 
-5. **[Training and Communication Plan](ICT-Governance-Training-Communication.md)** - Approach for creating awareness, providing training, and establishing communication about the governance framework.
+4. **[ICT Governance Policies](ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
+
+### Multi-Tenant Infrastructure and Automation
+
+5. **[Multi-Tenant Infrastructure Blueprint](blueprint-templates/infrastructure-blueprints/multi-tenant-infrastructure.bicep)** - Comprehensive Bicep template for deploying tenant-isolated infrastructure with security and compliance controls.
+
+6. **[Tenant Lifecycle Management Automation](implementation-automation/tenant-lifecycle-management.ps1)** - PowerShell automation for complete tenant lifecycle including onboarding, management, and secure offboarding.
+
+7. **[Multi-Tenant Configuration](implementation-automation/config/multi-tenant-config.json)** - Comprehensive configuration file defining tenant classifications, service tiers, compliance requirements, and operational parameters.
+
+### Integration and Monitoring
+
+8. **[IaC and Version Control Integration](ICT-Governance-IaC-Integration.md)** - Guidelines for integrating the governance framework with Infrastructure as Code and version control systems.
+
+9. **[Metrics and Reporting](ICT-Governance-Metrics.md)** - Key performance indicators, dashboards, and reporting mechanisms for evaluating governance effectiveness.
+
+10. **[Zero Trust Maturity Model](Zero-Trust-Maturity-Model.md)** - Comprehensive framework for assessing and implementing Zero Trust architecture across six pillars with automated service release capabilities.
 
 ## Key Features
 
-- **Governance Structure**: Three-tiered governance model with clear roles and responsibilities
-- **Policy Framework**: Comprehensive policies aligned with industry standards (COBIT, ITIL, ISO/IEC 38500)
-- **IaC Integration**: "Governance as Code" approach with automated validation and enforcement
-- **Compliance Management**: Alignment with regulatory requirements and standards
-- **Metrics and Reporting**: KPIs and dashboards for governance effectiveness
-- **Continuous Improvement**: Framework for ongoing assessment and enhancement
+### Multi-Tenant Governance
+- **Four-Tiered Governance Structure**: Enhanced governance model with Strategic Governance Council, Tenant Domain Owners, Cloud Platform Stewards, and Tenant Service Managers
+- **Tenant Classification System**: Enterprise, Government, Healthcare, Financial, and Standard tenant classifications with tailored governance
+- **Isolation Models**: Silo, Pool, and Hybrid isolation models for different security and compliance requirements
+- **Service Tiers**: Premium, Standard, and Basic service tiers with differentiated SLAs and features
+
+### Cross-Cloud Operations
+- **Multi-Cloud Support**: Unified governance across AWS, Azure, Google Cloud Platform, and emerging platforms
+- **Platform-Agnostic Policies**: Consistent governance with cloud-specific implementation guidance
+- **Cross-Cloud Integration**: Standardized patterns for multi-cloud tenant distribution and management
+- **Vendor-Neutral Architecture**: Cloud-agnostic design principles with platform-specific optimizations
+
+### Automated Lifecycle Management
+- **Tenant Onboarding**: Automated 15-day onboarding process with infrastructure provisioning and validation
+- **Lifecycle Automation**: Complete tenant lifecycle management from onboarding to secure offboarding
+- **Infrastructure as Code**: Comprehensive Bicep templates for multi-tenant infrastructure deployment
+- **Compliance Automation**: Automated compliance monitoring and reporting per tenant requirements
+
+### Security and Compliance
+- **Zero Trust Architecture**: Comprehensive tenant isolation with zero-trust security principles
+- **Tenant-Specific Security**: Customizable security controls based on tenant classification and requirements
+- **Regulatory Compliance**: Support for GDPR, HIPAA, SOX, PCI-DSS, FedRAMP, and ISO27001
+- **Automated Remediation**: Proactive security monitoring with automated incident response
+
+### Cost Management and Optimization
+- **Tenant-Based Cost Allocation**: Accurate cost allocation and chargeback per tenant
+- **Multi-Cloud Cost Optimization**: Cross-platform cost optimization and resource management
+- **Budget Management**: Tenant-specific budgets with automated controls and alerts
+- **ROI Tracking**: Comprehensive value realization tracking and reporting
 
 ## Additional Resources
 
@@ -35,6 +82,8 @@ The ICT Governance Framework consists of the following core components:
 - **[Microsoft365DSC Integration](Integrating%20Microsoft365DSC.md)**: Extension of governance to Microsoft 365 services
 - **[API Center Version Controls](Methodology%20API%20Center%20on%20Governance%20Framework%20Version%20Controls.md)**: API governance and versioning
 - **[Information Governance Overview](InformationOverview.md)**: Information governance principles and approaches
+- **[Zero Trust Assessment Automation](azure-automation/Zero-Trust-Maturity-Assessment.ps1)**: Automated assessment tools for Zero Trust maturity evaluation
+- **[Zero Trust Configuration](azure-automation/zero-trust-assessment-config.json)**: Configuration file for Zero Trust maturity assessments
 
 ## Implementation Approach
 

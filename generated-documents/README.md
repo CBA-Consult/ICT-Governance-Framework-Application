@@ -22,7 +22,8 @@ This directory contains comprehensive documentation for the ICT Governance Frame
 
 ### Requirements Management
 
-- [Requirements Specification](requirements/requirements-specification.md) - Comprehensive requirements documentation for the ICT Governance Framework Application
+- [Requirements Specification (Canonical)](core-analysis/requirements-specification.md) - Comprehensive requirements documentation for the ICT Governance Framework Application
+	- Note: An earlier draft exists at `requirements/requirements-specification.md`. The canonical, up-to-date version is under `core-analysis/requirements-specification.md`.
 
 ### Management Plans
 

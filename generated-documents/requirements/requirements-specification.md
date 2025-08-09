@@ -1,4 +1,12 @@
-# ICT Governance Framework Application - Requirements Specification
+# ICT Governance Framework Application - Requirements Specification (Archived Draft)
+
+This file has been archived to avoid duplication.
+
+Canonical, up-to-date specification:
+- `../core-analysis/requirements-specification.md`
+
+Archived stub:
+- `../archived/requirements/requirements-specification.md`
 
 ## Document Information
 - **Document Title:** Requirements Specification

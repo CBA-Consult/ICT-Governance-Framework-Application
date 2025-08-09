@@ -414,7 +414,7 @@ This document outlines the approach for creating awareness, providing training, 
 - **Maintain regular training schedule with continuous improvement**
 - **Expand training programs based on organizational needs**
 
-## 5. Success Metrics
+## 6. Success Metrics
 
 | Metric | Target | Measurement Method |
 |--------|--------|-------------------|

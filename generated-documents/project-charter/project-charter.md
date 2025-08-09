@@ -137,6 +137,24 @@ Following the Framework Enhancement Plan, we have conducted a detailed analysis 
 - Implementation of IT infrastructure changes
 - Replacement of existing project management methodologies
 
+## Assumptions & Constraints
+
+### Assumptions
+- Executive sponsorship remains active throughout the project.
+- Required SMEs (security, architecture, operations) are available for workshops.
+- Existing systems provide sufficient data for baseline assessments.
+
+### Constraints
+- Budget and timeline per Financial Summary and Project Timeline.
+- Regulatory deadlines for compliance improvements in Year 2.
+- Change-freeze windows during critical business periods.
+
+## Dependencies
+- Availability of stakeholder register and engagement plan.
+- Integration with ITSM, Identity, and Cloud governance systems.
+- Delivery of enabling platforms (APIM, AKS, Data Platform) per roadmap.
+
+
 ## Project Deliverables
 
 | Deliverable | Description | Acceptance Criteria |
@@ -162,6 +180,20 @@ Following the Framework Enhancement Plan, we have conducted a detailed analysis 
 | Implementation (Phase 2) | 2026-04-01 | 2026-06-30 | Reporting mechanisms implemented, Tools deployed |
 | Training & Transition | 2026-07-01 | 2026-08-31 | Training completed, Framework operational |
 | Closeout | 2026-09-01 | 2026-09-30 | Project review complete, Transition to operations |
+
+## Communication Plan
+
+| Audience                | Purpose                           | Channel              | Cadence        | Artifacts                          |
+|-------------------------|-----------------------------------|----------------------|----------------|------------------------------------|
+| Executive Sponsors      | Status, risks, decisions          | Executive report, mtg| Monthly / ad hoc| Exec status deck; decision log     |
+| Steering Committee      | Governance and scope decisions    | Committee meeting    | Monthly         | Decision log; milestone status     |
+| PMO / Project Team      | Delivery coordination             | ADO boards, standups | Weekly          | Sprint board; burn-up; RAID log    |
+| Stakeholders/Business   | Adoption and change readiness     | Town halls, email    | Major milestones| FAQs; training plan; release notes |
+
+## References
+- stakeholder-management/stakeholder-register.md
+- management-plans/communication-management-plan.md
+- planning-artifacts/schedule-development-input.md
 
 ## High-Level Risks
 

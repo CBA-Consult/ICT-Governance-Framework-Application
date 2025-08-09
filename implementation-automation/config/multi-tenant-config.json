@@ -1,0 +1,676 @@
+{
+  "version": "1.0.0",
+  "framework": {
+    "name": "Multi-Cloud Multi-Tenant ICT Governance Framework",
+    "version": "1.0.0",
+    "description": "Comprehensive multi-cloud, multi-tenant governance framework with automated lifecycle management"
+  },
+  "organization": {
+    "name": "CBA Consult",
+    "domain": "cbaconsult.com",
+    "defaultRegion": "East US",
+    "defaultTimeZone": "UTC",
+    "supportEmail": "support@cbaconsult.com",
+    "governanceEmail": "governance@cbaconsult.com"
+  },
+  "tenantClassifications": {
+    "enterprise": {
+      "description": "Large enterprise tenants with complex requirements",
+      "defaultIsolationModel": "silo",
+      "defaultServiceTier": "premium",
+      "securityRequirements": {
+        "enableWAF": true,
+        "enableDDoSProtection": true,
+        "enablePrivateEndpoints": true,
+        "enableNetworkWatcher": true,
+        "enableJustInTimeAccess": true,
+        "requireMFA": true,
+        "requireEncryptionAtRest": true,
+        "requireEncryptionInTransit": true
+      },
+      "complianceRequirements": ["ISO27001", "SOX"],
+      "monitoringLevel": "advanced",
+      "backupRetention": 2555,
+      "supportLevel": "24x7"
+    },
+    "government": {
+      "description": "Government and public sector tenants",
+      "defaultIsolationModel": "silo",
+      "defaultServiceTier": "premium",
+      "securityRequirements": {
+        "enableWAF": true,
+        "enableDDoSProtection": true,
+        "enablePrivateEndpoints": true,
+        "enableNetworkWatcher": true,
+        "enableJustInTimeAccess": true,
+        "requireMFA": true,
+        "requireEncryptionAtRest": true,
+        "requireEncryptionInTransit": true,
+        "requireFedRAMP": true
+      },
+      "complianceRequirements": ["FedRAMP", "ISO27001"],
+      "monitoringLevel": "advanced",
+      "backupRetention": 2555,
+      "supportLevel": "24x7",
+      "dataResidency": "required"
+    },
+    "healthcare": {
+      "description": "Healthcare and medical tenants",
+      "defaultIsolationModel": "silo",
+      "defaultServiceTier": "premium",
+      "securityRequirements": {
+        "enableWAF": true,
+        "enableDDoSProtection": true,
+        "enablePrivateEndpoints": true,
+        "enableNetworkWatcher": true,
+        "enableJustInTimeAccess": true,
+        "requireMFA": true,
+        "requireEncryptionAtRest": true,
+        "requireEncryptionInTransit": true,
+        "requireHIPAA": true
+      },
+      "complianceRequirements": ["HIPAA", "ISO27001"],
+      "monitoringLevel": "advanced",
+      "backupRetention": 2555,
+      "supportLevel": "24x7",
+      "dataResidency": "required"
+    },
+    "financial": {
+      "description": "Financial services tenants",
+      "defaultIsolationModel": "silo",
+      "defaultServiceTier": "premium",
+      "securityRequirements": {
+        "enableWAF": true,
+        "enableDDoSProtection": true,
+        "enablePrivateEndpoints": true,
+        "enableNetworkWatcher": true,
+        "enableJustInTimeAccess": true,
+        "requireMFA": true,
+        "requireEncryptionAtRest": true,
+        "requireEncryptionInTransit": true,
+        "requirePCIDSS": true
+      },
+      "complianceRequirements": ["PCI-DSS", "SOX", "ISO27001"],
+      "monitoringLevel": "advanced",
+      "backupRetention": 2555,
+      "supportLevel": "24x7",
+      "dataResidency": "required"
+    },
+    "standard": {
+      "description": "Standard business tenants",
+      "defaultIsolationModel": "hybrid",
+      "defaultServiceTier": "standard",
+      "securityRequirements": {
+        "enableWAF": false,
+        "enableDDoSProtection": true,
+        "enablePrivateEndpoints": false,
+        "enableNetworkWatcher": true,
+        "enableJustInTimeAccess": true,
+        "requireMFA": true,
+        "requireEncryptionAtRest": true,
+        "requireEncryptionInTransit": true
+      },
+      "complianceRequirements": ["ISO27001"],
+      "monitoringLevel": "standard",
+      "backupRetention": 365,
+      "supportLevel": "business-hours"
+    }
+  },
+  "isolationModels": {
+    "silo": {
+      "description": "Complete tenant isolation with dedicated infrastructure",
+      "networkIsolation": "complete",
+      "resourceSharing": "none",
+      "securityBoundary": "tenant-specific",
+      "costModel": "dedicated",
+      "scalingModel": "independent",
+      "suitableFor": ["enterprise", "government", "healthcare", "financial"]
+    },
+    "pool": {
+      "description": "Shared infrastructure with logical isolation",
+      "networkIsolation": "logical",
+      "resourceSharing": "shared",
+      "securityBoundary": "namespace-based",
+      "costModel": "shared",
+      "scalingModel": "shared",
+      "suitableFor": ["standard", "development"]
+    },
+    "hybrid": {
+      "description": "Combination of silo and pool based on tenant classification",
+      "networkIsolation": "classification-based",
+      "resourceSharing": "selective",
+      "securityBoundary": "adaptive",
+      "costModel": "hybrid",
+      "scalingModel": "adaptive",
+      "suitableFor": ["enterprise", "standard"]
+    }
+  },
+  "serviceTiers": {
+    "premium": {
+      "description": "Premium service tier with highest SLAs",
+      "availability": 99.99,
+      "responseTime": 100,
+      "supportLevel": "24x7",
+      "backupFrequency": "hourly",
+      "monitoringLevel": "advanced",
+      "features": {
+        "advancedAnalytics": true,
+        "aiPoweredOptimization": true,
+        "dedicatedSupport": true,
+        "customDashboards": true,
+        "advancedSecurity": true,
+        "disasterRecovery": true
+      },
+      "costs": {
+        "baseRate": 1000,
+        "computeMultiplier": 1.5,
+        "storageMultiplier": 1.3,
+        "networkMultiplier": 1.2
+      }
+    },
+    "standard": {
+      "description": "Standard service tier with balanced features and cost",
+      "availability": 99.9,
+      "responseTime": 500,
+      "supportLevel": "business-hours",
+      "backupFrequency": "daily",
+      "monitoringLevel": "standard",
+      "features": {
+        "advancedAnalytics": false,
+        "aiPoweredOptimization": false,
+        "dedicatedSupport": false,
+        "customDashboards": true,
+        "advancedSecurity": false,
+        "disasterRecovery": true
+      },
+      "costs": {
+        "baseRate": 500,
+        "computeMultiplier": 1.0,
+        "storageMultiplier": 1.0,
+        "networkMultiplier": 1.0
+      }
+    },
+    "basic": {
+      "description": "Basic service tier for development and testing",
+      "availability": 99.5,
+      "responseTime": 2000,
+      "supportLevel": "best-effort",
+      "backupFrequency": "weekly",
+      "monitoringLevel": "basic",
+      "features": {
+        "advancedAnalytics": false,
+        "aiPoweredOptimization": false,
+        "dedicatedSupport": false,
+        "customDashboards": false,
+        "advancedSecurity": false,
+        "disasterRecovery": false
+      },
+      "costs": {
+        "baseRate": 100,
+        "computeMultiplier": 0.7,
+        "storageMultiplier": 0.8,
+        "networkMultiplier": 0.9
+      }
+    }
+  },
+  "cloudPlatforms": {
+    "Azure": {
+      "enabled": true,
+      "primary": true,
+      "regions": [
+        "East US",
+        "West US 2",
+        "Central US",
+        "East US 2",
+        "West Europe",
+        "North Europe",
+        "Southeast Asia",
+        "East Asia"
+      ],
+      "services": {
+        "compute": "Azure Virtual Machines",
+        "storage": "Azure Storage",
+        "database": "Azure SQL Database",
+        "networking": "Azure Virtual Network",
+        "security": "Azure Security Center",
+        "monitoring": "Azure Monitor",
+        "backup": "Azure Backup"
+      },
+      "governance": {
+        "policyEngine": "Azure Policy",
+        "costManagement": "Azure Cost Management",
+        "compliance": "Azure Compliance Manager"
+      }
+    },
+    "AWS": {
+      "enabled": true,
+      "primary": false,
+      "regions": [
+        "us-east-1",
+        "us-west-2",
+        "eu-west-1",
+        "eu-central-1",
+        "ap-southeast-1",
+        "ap-northeast-1"
+      ],
+      "services": {
+        "compute": "Amazon EC2",
+        "storage": "Amazon S3",
+        "database": "Amazon RDS",
+        "networking": "Amazon VPC",
+        "security": "AWS Security Hub",
+        "monitoring": "Amazon CloudWatch",
+        "backup": "AWS Backup"
+      },
+      "governance": {
+        "policyEngine": "AWS Config",
+        "costManagement": "AWS Cost Explorer",
+        "compliance": "AWS Compliance Center"
+      }
+    },
+    "GCP": {
+      "enabled": true,
+      "primary": false,
+      "regions": [
+        "us-central1",
+        "us-east1",
+        "europe-west1",
+        "europe-west4",
+        "asia-southeast1",
+        "asia-northeast1"
+      ],
+      "services": {
+        "compute": "Google Compute Engine",
+        "storage": "Google Cloud Storage",
+        "database": "Google Cloud SQL",
+        "networking": "Google VPC",
+        "security": "Google Security Command Center",
+        "monitoring": "Google Cloud Monitoring",
+        "backup": "Google Cloud Backup"
+      },
+      "governance": {
+        "policyEngine": "Google Cloud Asset Inventory",
+        "costManagement": "Google Cloud Billing",
+        "compliance": "Google Cloud Compliance"
+      }
+    }
+  },
+  "environments": {
+    "dev": {
+      "description": "Development environment",
+      "defaultServiceTier": "basic",
+      "defaultIsolationModel": "pool",
+      "autoShutdown": true,
+      "backupRetention": 7,
+      "monitoringLevel": "basic",
+      "costLimits": {
+        "daily": 50,
+        "monthly": 1000
+      }
+    },
+    "test": {
+      "description": "Testing environment",
+      "defaultServiceTier": "standard",
+      "defaultIsolationModel": "hybrid",
+      "autoShutdown": false,
+      "backupRetention": 30,
+      "monitoringLevel": "standard",
+      "costLimits": {
+        "daily": 100,
+        "monthly": 2000
+      }
+    },
+    "prod": {
+      "description": "Production environment",
+      "defaultServiceTier": "premium",
+      "defaultIsolationModel": "silo",
+      "autoShutdown": false,
+      "backupRetention": 365,
+      "monitoringLevel": "advanced",
+      "costLimits": {
+        "daily": 1000,
+        "monthly": 20000
+      }
+    }
+  },
+  "complianceFrameworks": {
+    "GDPR": {
+      "description": "General Data Protection Regulation",
+      "applicableRegions": ["EU", "EEA"],
+      "requirements": {
+        "dataResidency": true,
+        "rightToErasure": true,
+        "dataPortability": true,
+        "consentManagement": true,
+        "breachNotification": true
+      },
+      "controls": [
+        "data-encryption",
+        "access-logging",
+        "consent-tracking",
+        "data-minimization"
+      ]
+    },
+    "HIPAA": {
+      "description": "Health Insurance Portability and Accountability Act",
+      "applicableRegions": ["US"],
+      "requirements": {
+        "phiProtection": true,
+        "accessControls": true,
+        "auditLogging": true,
+        "encryptionAtRest": true,
+        "encryptionInTransit": true
+      },
+      "controls": [
+        "phi-encryption",
+        "access-controls",
+        "audit-logging",
+        "risk-assessment"
+      ]
+    },
+    "SOX": {
+      "description": "Sarbanes-Oxley Act",
+      "applicableRegions": ["US"],
+      "requirements": {
+        "financialControls": true,
+        "auditTrails": true,
+        "changeManagement": true,
+        "accessControls": true,
+        "dataIntegrity": true
+      },
+      "controls": [
+        "financial-controls",
+        "audit-trails",
+        "change-management",
+        "segregation-of-duties"
+      ]
+    },
+    "PCI-DSS": {
+      "description": "Payment Card Industry Data Security Standard",
+      "applicableRegions": ["Global"],
+      "requirements": {
+        "cardholderDataProtection": true,
+        "networkSecurity": true,
+        "accessControls": true,
+        "monitoring": true,
+        "vulnerabilityManagement": true
+      },
+      "controls": [
+        "cardholder-data-encryption",
+        "network-segmentation",
+        "access-controls",
+        "vulnerability-scanning"
+      ]
+    },
+    "FedRAMP": {
+      "description": "Federal Risk and Authorization Management Program",
+      "applicableRegions": ["US"],
+      "requirements": {
+        "federalSecurityControls": true,
+        "continuousMonitoring": true,
+        "incidentResponse": true,
+        "riskAssessment": true,
+        "securityAssessment": true
+      },
+      "controls": [
+        "federal-security-controls",
+        "continuous-monitoring",
+        "incident-response",
+        "risk-assessment"
+      ]
+    },
+    "ISO27001": {
+      "description": "Information Security Management System",
+      "applicableRegions": ["Global"],
+      "requirements": {
+        "informationSecurity": true,
+        "riskManagement": true,
+        "securityPolicies": true,
+        "incidentManagement": true,
+        "businessContinuity": true
+      },
+      "controls": [
+        "information-security-policy",
+        "risk-management",
+        "access-control",
+        "incident-management"
+      ]
+    }
+  },
+  "monitoring": {
+    "levels": {
+      "basic": {
+        "metrics": ["availability", "performance", "errors"],
+        "alerting": "email",
+        "retention": 30,
+        "frequency": "hourly"
+      },
+      "standard": {
+        "metrics": ["availability", "performance", "errors", "security", "compliance"],
+        "alerting": "email+sms",
+        "retention": 90,
+        "frequency": "15-minutes"
+      },
+      "advanced": {
+        "metrics": ["availability", "performance", "errors", "security", "compliance", "cost", "usage"],
+        "alerting": "email+sms+webhook",
+        "retention": 365,
+        "frequency": "5-minutes"
+      }
+    },
+    "dashboards": {
+      "tenant": {
+        "widgets": ["status", "performance", "costs", "compliance", "alerts"],
+        "refreshRate": "real-time",
+        "customizable": true
+      },
+      "governance": {
+        "widgets": ["tenant-overview", "compliance-status", "cost-trends", "security-posture"],
+        "refreshRate": "5-minutes",
+        "customizable": false
+      },
+      "executive": {
+        "widgets": ["kpi-summary", "cost-overview", "risk-dashboard", "innovation-metrics"],
+        "refreshRate": "hourly",
+        "customizable": true
+      }
+    }
+  },
+  "automation": {
+    "tenantLifecycle": {
+      "onboarding": {
+        "automated": true,
+        "approvalRequired": true,
+        "timeoutMinutes": 60,
+        "rollbackOnFailure": true
+      },
+      "scaling": {
+        "automated": true,
+        "approvalRequired": false,
+        "timeoutMinutes": 30,
+        "rollbackOnFailure": true
+      },
+      "offboarding": {
+        "automated": false,
+        "approvalRequired": true,
+        "timeoutMinutes": 120,
+        "secureDataDestruction": true
+      }
+    },
+    "compliance": {
+      "scanning": {
+        "frequency": "daily",
+        "automated": true,
+        "remediationEnabled": true
+      },
+      "reporting": {
+        "frequency": "weekly",
+        "automated": true,
+        "distribution": ["governance-team", "tenant-admins"]
+      }
+    },
+    "costOptimization": {
+      "scanning": {
+        "frequency": "daily",
+        "automated": true,
+        "recommendationsEnabled": true
+      },
+      "implementation": {
+        "automated": false,
+        "approvalRequired": true,
+        "savingsThreshold": 100
+      }
+    }
+  },
+  "security": {
+    "defaultPolicies": {
+      "encryption": {
+        "atRest": "required",
+        "inTransit": "required",
+        "keyManagement": "tenant-specific"
+      },
+      "access": {
+        "mfa": "required",
+        "rbac": "enabled",
+        "justInTime": "enabled"
+      },
+      "network": {
+        "isolation": "tenant-specific",
+        "monitoring": "enabled",
+        "intrusion-detection": "enabled"
+      }
+    },
+    "threatDetection": {
+      "enabled": true,
+      "aiPowered": true,
+      "realTimeAlerts": true,
+      "automaticResponse": true
+    },
+    "incidentResponse": {
+      "automated": true,
+      "escalationMatrix": true,
+      "forensicsEnabled": true,
+      "communicationPlan": true
+    }
+  },
+  "costManagement": {
+    "allocation": {
+      "method": "usage-based",
+      "granularity": "resource-level",
+      "frequency": "daily",
+      "chargebackEnabled": true
+    },
+    "optimization": {
+      "rightSizing": true,
+      "reservedInstances": true,
+      "spotInstances": true,
+      "storageOptimization": true
+    },
+    "budgets": {
+      "tenantLevel": true,
+      "alertThresholds": [50, 75, 90, 100],
+      "automaticActions": true,
+      "approvalWorkflows": true
+    }
+  },
+  "backup": {
+    "policies": {
+      "premium": {
+        "frequency": "hourly",
+        "retention": 2555,
+        "crossRegion": true,
+        "encryption": true
+      },
+      "standard": {
+        "frequency": "daily",
+        "retention": 365,
+        "crossRegion": false,
+        "encryption": true
+      },
+      "basic": {
+        "frequency": "weekly",
+        "retention": 30,
+        "crossRegion": false,
+        "encryption": false
+      }
+    },
+    "testing": {
+      "frequency": "monthly",
+      "automated": true,
+      "reportingEnabled": true
+    }
+  },
+  "notifications": {
+    "channels": {
+      "email": {
+        "enabled": true,
+        "templates": ["onboarding", "alerts", "reports", "offboarding"]
+      },
+      "sms": {
+        "enabled": true,
+        "templates": ["critical-alerts", "security-incidents"]
+      },
+      "webhook": {
+        "enabled": true,
+        "templates": ["all"]
+      },
+      "teams": {
+        "enabled": true,
+        "templates": ["governance-updates", "compliance-reports"]
+      }
+    },
+    "escalation": {
+      "levels": 3,
+      "timeouts": [15, 30, 60],
+      "automated": true
+    }
+  },
+  "integration": {
+    "apis": {
+      "tenant-management": {
+        "version": "v1",
+        "authentication": "oauth2",
+        "rateLimit": 1000,
+        "documentation": "https://api.cbaconsult.com/tenant-management/docs"
+      },
+      "governance": {
+        "version": "v1",
+        "authentication": "oauth2",
+        "rateLimit": 500,
+        "documentation": "https://api.cbaconsult.com/governance/docs"
+      },
+      "monitoring": {
+        "version": "v1",
+        "authentication": "oauth2",
+        "rateLimit": 2000,
+        "documentation": "https://api.cbaconsult.com/monitoring/docs"
+      }
+    },
+    "webhooks": {
+      "tenant-events": {
+        "events": ["onboarded", "scaled", "offboarded", "alert"],
+        "authentication": "hmac-sha256",
+        "retryPolicy": "exponential-backoff"
+      },
+      "compliance-events": {
+        "events": ["violation", "remediation", "assessment"],
+        "authentication": "hmac-sha256",
+        "retryPolicy": "exponential-backoff"
+      }
+    }
+  },
+  "reporting": {
+    "schedules": {
+      "daily": ["cost-summary", "security-alerts", "performance-metrics"],
+      "weekly": ["compliance-status", "tenant-health", "optimization-recommendations"],
+      "monthly": ["executive-summary", "governance-metrics", "trend-analysis"],
+      "quarterly": ["strategic-review", "roi-analysis", "roadmap-updates"]
+    },
+    "formats": ["pdf", "excel", "json", "dashboard"],
+    "distribution": {
+      "governance-team": ["all"],
+      "tenant-admins": ["tenant-specific"],
+      "executives": ["executive-summary", "strategic-review"]
+    }
+  }
+}
