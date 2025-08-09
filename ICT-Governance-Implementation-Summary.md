@@ -117,7 +117,7 @@ This document provides a comprehensive summary of the implemented IT Governance 
 **Implementation Status:** COMPLETE
 
 **Governance Role Hierarchy:**
-```text
+
 ICT Governance Council (Strategic Oversight)
     ↓
 Technology Domain Owners (Domain Leadership)
