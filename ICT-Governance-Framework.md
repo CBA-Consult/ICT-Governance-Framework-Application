@@ -200,6 +200,16 @@ For comprehensive role definitions, detailed responsibilities, expectations, and
 * Secure handover processes for role changes and departures
 * Data residency and recovery procedures for employee-managed applications
 
+### 🏢 Centralized Application Procurement and Registration Policy
+
+* **Mandatory Central Procurement**: All business applications must be procured through central procurement department
+* **Application Registry Requirements**: All applications used for business purposes must be registered with ICT Department
+* **Entra ID/Active Directory Integration**: Applications must integrate with corporate identity management systems where technically feasible
+* **Individual Registration Prohibition**: New individual application registrations are prohibited without explicit approval
+* **Vendor Assessment Requirements**: All application vendors must undergo security and compliance assessment
+* **Standard Operating Procedures**: Comprehensive SOPs required for all business-critical applications
+* **Extended Notice Period Framework**: Critical applications may require extended notice periods (up to 6 months) for proper handover
+
 ### 🚀 Innovation and Emerging Technology Policy
 
 * **Innovation Governance Framework:** Structured approach to evaluating and adopting innovative solutions
@@ -486,11 +496,16 @@ For detailed guidance on onboarding new technology components and offboarding de
 ### 📤 Employee Offboarding Technology Process
 
 #### Pre-Departure Preparation (2-4 weeks before departure)
-1. **Comprehensive Technology Asset Inventory**
+1. **Comprehensive Technology Asset and Application Inventory**
    * Complete inventory of assigned devices, applications, and access rights
    * Documentation of Employee App Store application usage and data locations
    * Identification of applications where employee has administrative access
    * Mapping of company data stored in employee-managed cloud services
+   * **Individual Application Registration Discovery**:
+     - Comprehensive scan for applications with individual employee registrations
+     - Identification of applications not linked to Entra ID or Active Directory
+     - Documentation of vendor-provided applications with separate user management
+     - Assessment of applications procured outside central procurement processes
 
 2. **Data Location Assessment and Recovery Planning**
    * **Company-Managed Applications**: Inventory of data in corporate systems
@@ -505,17 +520,32 @@ For detailed guidance on onboarding new technology components and offboarding de
      - Analytics and reporting data in approved business intelligence tools
      - Customer data in approved sales and marketing tools
    
+   * **Individual Registration Applications**: Critical assessment of non-centralized applications
+     - Applications with employee-specific accounts not linked to corporate identity
+     - Vendor-provided documentation and support applications
+     - Third-party tools used for role-specific functions
+     - Cloud services with individual licensing and data storage
+   
    * **Shadow IT and Personal Applications**: Discovery and assessment
      - SIEM and Cloud App Security scan for unauthorized application usage
      - Data loss prevention system review for company data in personal accounts
      - Network analysis for unusual data transfer patterns
      - Employee disclosure requirements for personal application usage
 
-3. **Handover Planning and Documentation**
-   * Manager-approved handover plan for critical applications and data
-   * Documentation of shared accounts, licenses, and administrative access
-   * Identification of succession requirements for ongoing projects
-   * Legal and compliance review for data retention requirements
+3. **Application Registry and Handover Documentation**
+   * **Application Registry Creation**: Comprehensive documentation of all applications used
+     - Application name, vendor, purpose, and business criticality
+     - User account details, access credentials, and administrative rights
+     - Data locations, backup procedures, and recovery requirements
+     - Compliance status and industry standard adherence
+     - Standard Operating Procedures (SOPs) for each critical application
+   
+   * **Handover Planning and Documentation**
+     - Manager-approved handover plan for critical applications and data
+     - Documentation of shared accounts, licenses, and administrative access
+     - Identification of succession requirements for ongoing projects
+     - Legal and compliance review for data retention requirements
+     - **Extended Notice Period Assessment**: Evaluation of critical applications requiring extended handover period (up to 6 months)
 
 #### Active Departure Period (Last 1-2 weeks)
 1. **Structured Data Handover Process**
@@ -523,12 +553,14 @@ For detailed guidance on onboarding new technology components and offboarding de
    * **Shared Access Transfer**: Migrate shared accounts and administrative rights
    * **Project Handover**: Transfer ownership of documents, projects, and workflows
    * **Customer/Client Data**: Ensure continuity of customer-facing applications and data
+   * **Individual Application Account Transfer**: Execute handover of applications with individual registrations
 
 2. **Data Migration and Backup**
    * Export employee-specific data from company-managed applications
    * Backup of critical emails, documents, and application data
    * Migration of shared resources to appropriate team members
    * Archive creation for legal and compliance purposes
+   * **Individual Application Data Recovery**: Extract company data from individually registered applications
 
 3. **Application-Specific Handover Procedures**
    * **Email and Calendar**: Delegate access or convert to shared mailbox
@@ -536,6 +568,18 @@ For detailed guidance on onboarding new technology components and offboarding de
    * **Business Applications**: Update user records and transfer licenses
    * **Collaborative Tools**: Transfer team ownership and administrative rights
    * **Customer-Facing Systems**: Update contact information and access rights
+   * **Individual Registration Applications**: Execute comprehensive handover procedures
+     - Transfer account ownership to designated successor or convert to shared account
+     - Update contact information and billing details with vendors
+     - Migrate critical data and configurations to successor accounts
+     - Document access credentials and administrative procedures in SOPs
+     - Verify compliance with vendor terms of service for account transfers
+
+4. **Vendor Coordination and Communication**
+   * **Vendor Notification**: Inform application vendors of account ownership changes
+   * **License Transfer**: Execute license transfers according to vendor agreements
+   * **Support Continuity**: Ensure continued access to vendor support and documentation
+   * **Compliance Verification**: Confirm account transfers meet regulatory requirements
 
 #### Final Day and Post-Departure (Last day and following weeks)
 1. **Access Termination and Device Recovery**
@@ -543,6 +587,7 @@ For detailed guidance on onboarding new technology components and offboarding de
    * Remote wipe of mobile devices and removal from MDM/MAM systems
    * Collection of company-issued devices, accessories, and security tokens
    * Revocation of VPN access, certificates, and security credentials
+   * **Individual Application Access Verification**: Confirm termination of access to individually registered applications
 
 2. **Comprehensive Data Recovery and Verification**
    * **Personal Cloud Applications**: Ensure company data retrieval or deletion
@@ -550,10 +595,17 @@ For detailed guidance on onboarding new technology components and offboarding de
      - Verify deletion of company data from personal applications
      - Document any unrecoverable data and assess business impact
    
+   * **Individual Registration Applications**: Execute comprehensive data recovery procedures
+     - Verify successful account transfers and data migration
+     - Confirm access credentials have been updated and documented
+     - Validate that company data remains accessible to successors
+     - Document any applications where data recovery was not possible
+   
    * **Third-Party Applications**: Contact vendors for data recovery if needed
      - Review application vendor agreements for data recovery procedures
      - Execute data recovery procedures for critical business information
      - Document compliance with data protection regulations
+     - Verify vendor cooperation with account transfer procedures
    
    * **Device Data Sanitization**: Secure wiping of all storage media
      - Full encryption key destruction for encrypted devices
@@ -561,10 +613,22 @@ For detailed guidance on onboarding new technology components and offboarding de
      - Certification of data destruction for compliance purposes
 
 3. **Compliance and Legal Verification**
-   * Completion of data recovery and destruction checklist
+   * Completion of comprehensive data recovery and destruction checklist
    * Legal review of data retention and destruction requirements
    * Documentation of any data that remains in third-party systems
    * Employee certification of data return and confidentiality obligations
+   * **Application Registry Compliance Verification**:
+     - Confirm all applications meet company industry standards and compliance regulations
+     - Document any non-compliant applications and remediation actions taken
+     - Verify that successor has access to all critical applications and data
+     - Complete application handover certification process
+
+4. **Post-Departure Monitoring and Validation (1-4 weeks after departure)**
+   * **Application Access Monitoring**: Verify no unauthorized access to transferred applications
+   * **Data Integrity Verification**: Confirm company data remains secure and accessible
+   * **Successor Validation**: Ensure successor can effectively use transferred applications
+   * **Vendor Relationship Continuity**: Verify ongoing vendor support and service delivery
+   * **Compliance Audit Trail**: Maintain comprehensive documentation for audit purposes
 
 ### 📊 Employee Technology Data Tracking and Reporting
 
@@ -652,9 +716,14 @@ For detailed guidance on onboarding new technology components and offboarding de
 
 ### Employee Lifecycle Technology Metrics
 * ✅ 100% completion rate for employee technology onboarding within 24 hours
-* ✅ 95% data recovery rate for departing employees
+* ✅ 100% completion rate for individual application registry documentation within 2 weeks of departure notice
+* ✅ 95% successful application handover rate for individually registered applications
+* ✅ 100% compliance verification rate for transferred applications within 4 weeks post-departure
+* ✅ 95% data recovery rate for departing employees (including individual application data)
 * ✅ <4 hours for complete access termination upon employee departure
 * ✅ 90% employee satisfaction with technology handover processes during role changes
+* ✅ Zero security incidents related to incomplete individual application offboarding procedures
+* ✅ Zero data loss incidents from individual application account transfers
 
 ### Innovation and Emerging Technology Metrics
 * ✅ 25% increase in successful technology innovation initiatives year-over-year
