@@ -38,7 +38,9 @@ This framework applies to:
 ### Key Principles
 - **Shared Responsibility:** Clear delineation of responsibilities between Employee Responsible Owners and IT Self Service
 - **Business Alignment:** All application decisions align with business objectives and user needs
-- **Governance Compliance:** Adherence to established ICT governance policies and procedures
+- **Learning and Development Priority:** Ensuring application choices support employee learning, development, and job performance effectiveness
+- **Employee Empowerment:** Enable employees to have ownership of application choices that enhance their ability to contribute to their roles
+- **Governance Compliance:** Adherence to established ICT governance policies while prioritizing L&D requirements
 - **User Empowerment:** Enable employees to participate in application selection while maintaining control
 - **Continuous Improvement:** Regular assessment and optimization of processes and outcomes
 
@@ -134,20 +136,51 @@ This framework applies to:
 - Quality standards and acceptance criteria
 - Project scope and change management
 
+#### Learning and Development Manager (L&D Responsible Owner)
+**Primary Responsibilities:**
+- Ensure application choices align with learning and development objectives
+- Evaluate applications for learning effectiveness and employee development impact
+- Advocate for employee autonomy in learning tool selection
+- Assess learning ROI and skill development outcomes
+- Coordinate with HR and business units on learning requirements
+- Monitor learning application usage and effectiveness
+- Ensure accessibility and inclusivity in learning tool selection
+- Support onboarding application access for new employees
+
+**Key Activities:**
+- Define learning and development criteria for application evaluation
+- Participate in application assessment and approval processes
+- Monitor learning outcomes and skill development metrics
+- Provide input on employee learning tool preferences and needs
+- Coordinate learning application integration with LMS and HR systems
+- Support fast-track approval processes for learning tools
+- Evaluate learning application vendor capabilities and roadmaps
+- Facilitate employee feedback on learning tool effectiveness
+
+**Decision Authority:**
+- Learning and development requirements approval
+- Learning tool effectiveness assessment
+- Employee learning budget allocation recommendations
+- Learning application accessibility compliance
+- L&D integration strategy and priorities
+
 ### Collaborative Responsibilities Matrix
 
-| Activity | IT Manager | Procurement Officer | Department Head | Project Manager | Employee Self Service |
-|----------|------------|-------------------|-----------------|-----------------|---------------------|
-| Needs Assessment | Support | Support | **Lead** | Support | **Execute** |
-| Market Research | Support | **Lead** | Input | Support | **Execute** |
-| Technical Evaluation | **Lead** | Support | Input | Support | Support |
-| Commercial Evaluation | Support | **Lead** | Input | Support | Support |
-| Vendor Negotiation | Support | **Lead** | Input | Support | Coordinate |
-| Trial Implementation | **Lead** | Support | **Lead** | **Lead** | **Execute** |
-| Final Selection | Input | Input | **Approve** | Support | Recommend |
-| Deployment | **Lead** | Support | Support | **Lead** | **Execute** |
-| Training & Support | Support | Support | **Lead** | Support | **Execute** |
-| Performance Monitoring | **Lead** | Support | **Lead** | Support | **Execute** |
+| Activity | IT Manager | Procurement Officer | Department Head | Project Manager | L&D Manager | Employee Self Service |
+|----------|------------|-------------------|-----------------|-----------------|-------------|---------------------|
+| Needs Assessment | Support | Support | **Lead** | Support | **Lead** | **Execute** |
+| L&D Requirements Assessment | Support | Support | Input | Support | **Lead** | Input |
+| Market Research | Support | **Lead** | Input | Support | Input | **Execute** |
+| Technical Evaluation | **Lead** | Support | Input | Support | Support | Support |
+| Learning Effectiveness Evaluation | Support | Support | Input | Support | **Lead** | Input |
+| Commercial Evaluation | Support | **Lead** | Input | Support | Support | Support |
+| Vendor Negotiation | Support | **Lead** | Input | Support | Input | Coordinate |
+| Trial Implementation | **Lead** | Support | **Lead** | **Lead** | Support | **Execute** |
+| Learning Impact Assessment | Support | Support | Input | Support | **Lead** | Input |
+| Final Selection | Input | Input | **Approve** | Support | Input | Recommend |
+| Deployment | **Lead** | Support | Support | **Lead** | Support | **Execute** |
+| Training & Support | Support | Support | **Lead** | Support | **Lead** | **Execute** |
+| Performance Monitoring | **Lead** | Support | **Lead** | Support | **Lead** | **Execute** |
 
 ## Collaboration Framework
 
