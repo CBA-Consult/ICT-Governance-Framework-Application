@@ -1,0 +1,45 @@
+{
+  "processors": {
+    "default": {
+      "type": "azure",
+      "config": {
+        "model": "gpt-4.1",
+        "endpoint": "https://adpa-rga-westeu-resource.openai.azure.com/",
+        "apiVersion": "2024-04-01-preview",
+        "useEntraId": true
+      }
+    },
+    "fallback": {
+      "type": "google",
+      "config": {
+        "model": "gemini-pro"
+      }
+    },
+    "local": {
+      "type": "ollama",
+      "config": {
+        "model": "llama3"
+      }
+    }
+  },
+  "activeProcessor": "default",
+  "templates": {
+    "project-summary": { "processor": "default" },
+    "user-stories": { "processor": "default" },
+    "user-personas": { "processor": "default" },
+    "key-roles-and-needs": { "processor": "default" },
+    "project-statement-of-work": { "processor": "default" },
+    "business-case": { "processor": "default" },
+    "stakeholder-register": { "processor": "default" },
+    "project-management-plan": { "processor": "default" },
+    "plan-scope-management": { "processor": "default" },
+    "define-scope": { "processor": "default" },
+    "project-scope-statement": { "processor": "default" },
+    "scope-baseline": { "processor": "default" },
+    "validate-scope": { "processor": "default" },
+    "control-scope": { "processor": "default" },
+    "scope-statement": { "processor": "default" },
+    "risk-register": { "processor": "default" },
+    "project-charter": { "processor": "default" }
+  }
+}

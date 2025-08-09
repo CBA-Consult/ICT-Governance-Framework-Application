@@ -1,0 +1,103 @@
+Summary,Issue Type,Project Key,Description,Priority,Labels,Components,Assignee,Reporter,Due Date,Original Estimate,Environment,Linked Issues,Issue ID,Custom field (WBS Code),Custom field (Dependencies),Custom field (Dependency Type),Custom field (Effort Hours),Custom field (Duration Weeks),Custom field (Resources),Custom field (Deliverables),Custom field (Acceptance Criteria),Custom field (Risks),Custom field (Context)
+A001 - Define Project Scope and Objectives,Task,PROJ,"WBS: 1.1.1.1.1
+Description: Establish clear project boundaries, objectives, deliverables, and exclusions for the ICT Governance Framework project.
+Deliverables: Project scope statement; objectives document.
+Acceptance: Scope statement approved; boundaries/exclusions documented; change control defined.
+Context: Project start; feeds Charter (generated-documents/project-charter/project-charter.md).",Medium,"activity-list phase-initiation",Initiation,,, , , , ,A001,1.1.1.1.1,,FS,40,1,"Project Manager (0.5 FTE); Business Analyst (0.5 FTE)","Project scope statement; objectives document","Scope statement approved; boundaries/exclusions documented; change control defined","Scope creep → Mitigate via change control and baseline freeze","Project start; feeds Charter (generated-documents/project-charter/project-charter.md)"
+A002 - Develop Business Case and Value Proposition,Task,PROJ,"WBS: 1.1.1.1.2
+Description: Create comprehensive business case demonstrating ROI, cost-benefit analysis, and value realization plan.
+Deliverables: Business case document; ROI calculation; value realization plan.
+Acceptance: Business case approved by Sponsor & Finance; ROI/NPV included; assumptions logged.
+Context: After A001; aligns to generated-documents/core-analysis/business-case.md.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A001",,A002,1.1.1.1.2,A001,FS,60,1.5,"Business Analyst (0.7 FTE); Finance Analyst (0.3 FTE)","Business case; ROI calc; value plan","Sponsor/Finance approve ROI/NPV; assumptions logged","Benefits overstatement → Independent review","Aligns to core-analysis/business-case.md"
+A003 - Identify Key Stakeholders and Sponsors,Task,PROJ,"WBS: 1.1.1.1.3
+Description: Comprehensive identification and analysis of all project stakeholders, sponsors, and governance bodies.
+Deliverables: Stakeholder register; sponsor identification; governance structure.
+Acceptance: Stakeholder register completed (>95% coverage); governance bodies identified.
+Context: After A001; creates generated-documents/stakeholder-management/stakeholder-register.md.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A001",,A003,1.1.1.1.3,A001,FS,32,1,"Project Manager (0.5 FTE); Business Analyst (0.3 FTE)","Stakeholder register; sponsor list; governance structure","Register >95% coverage; governance bodies identified","Missed stakeholders → Cross-verify with org charts","Creates stakeholder-register.md"
+A004 - Define Success Criteria and KPIs,Task,PROJ,"WBS: 1.1.1.1.4
+Description: Establish measurable success criteria, key performance indicators, and project success metrics.
+Deliverables: Success criteria document; KPI framework; measurement plan.
+Acceptance: KPI set baselined; data sources/owners defined; review cadence scheduled.
+Context: After A002; references Target-Governance-Framework-KPIs-Metrics.md; ICT-Governance-Metrics.md; ICT-Governance-Transparency-Dashboard.md.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A002",,A004,1.1.1.1.4,A002,FS,48,1.5,"Business Analyst (0.6 FTE); Performance Manager (0.2 FTE)","Success criteria; KPI framework; measurement plan","KPI set baselined; owners/sources defined; cadence set","Unmeasurable KPIs → Align to metrics doc","References KPI and dashboard docs"
+A005 - Analyze Organizational Strategic Objectives,Task,PROJ,"WBS: 1.1.1.2.1
+Description: Review and analyze organizational strategic plan, goals, and objectives to ensure project alignment.
+Deliverables: Strategic alignment analysis; organizational context assessment.
+Acceptance: Alignment matrix produced and approved.
+Context: After A003; cross-check strategic business case.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A003",,A005,1.1.1.2.1,A003,FS,56,1.5,"Business Analyst (0.7 FTE); Strategy Consultant (0.3 FTE)","Alignment analysis; context assessment","Alignment matrix approved","Conflicting objectives → Escalate to Sponsor","Cross-check strategic business case"
+A006 - Map Governance Requirements to Business Goals,Task,PROJ,"WBS: 1.1.1.2.2
+Description: Establish linkages between governance requirements and organizational business objectives.
+Deliverables: Governance-to-business mapping; requirement justification.
+Acceptance: Governance-to-business mapping signed off; RTM entries created.
+Context: After A005; trace to requirements and controls.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A005",,A006,1.1.1.2.2,A005,FS,64,2,"Business Analyst (0.5 FTE); Governance Consultant (0.5 FTE)","Gov-to-business mapping; justification","Mapping signed off; RTM entries created","Weak traceability → RTM audit","Trace to requirements/controls"
+A007 - Identify Regulatory and Compliance Requirements,Task,PROJ,"WBS: 1.1.1.2.3
+Description: Identification of applicable regulatory, compliance, and audit requirements.
+Deliverables: Regulatory requirements matrix; compliance assessment.
+Acceptance: Regulatory matrix complete; legal review sign-off.
+Context: After A005; reference scope-management/compliance-considerations.md.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A005",,A007,1.1.1.2.3,A005,FS,72,2,"Compliance Officer (0.8 FTE); Legal Counsel (0.2 FTE)","Regulatory matrix; compliance assessment","Legal sign-off on applicability","Late regulatory change → Watchlist with triggers","Reference compliance considerations"
+A008 - Validate Strategic Fit and Priority,Task,PROJ,"WBS: 1.1.1.2.4
+Description: Executive validation of project strategic fit, priority level, and resource allocation approval.
+Deliverables: Strategic fit validation; executive approval; priority confirmation.
+Acceptance: Executive decision minute recorded; budget/resources confirmed.
+Context: After A006, A007; stage gate entry.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A006; is blocked by: A007",,A008,1.1.1.2.4,A006;A007,FS,24,1,"Executive Sponsor (0.3 FTE); Project Manager (0.3 FTE)","Fit validation; approval; priority","Decision minute recorded; budget/resources confirmed","Delayed gate → Timebox gate reviews","Stage gate entry"
+A009 - Identify All Project Stakeholders,Task,PROJ,"WBS: 1.1.2.1.1
+Description: Systematic identification of all internal and external stakeholders.
+Deliverables: Complete stakeholder list; stakeholder categorization.
+Acceptance: Stakeholder list validated by PMO.
+Context: After A003.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A003",,A009,1.1.2.1.1,A003,FS,40,1,"Project Manager (0.4 FTE); Business Analyst (0.6 FTE)","Stakeholder list; categorization","List validated by PMO","Stakeholder churn → Maintain register versioning","—"
+A010 - Analyze Stakeholder Influence and Interest,Task,PROJ,"WBS: 1.1.2.1.2
+Description: Analysis of stakeholder influence, interest, expectations, and potential impact.
+Deliverables: Influence/interest matrix; stakeholder profiles.
+Acceptance: Grid approved by PM & Sponsor.
+Context: After A009.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A009",,A010,1.1.2.1.2,A009,FS,48,1.5,"Business Analyst (0.6 FTE); Change Manager (0.4 FTE)","Influence/interest matrix; profiles","Grid approved by PM & Sponsor","Bias → Peer review","—"
+A011 - Develop Stakeholder Engagement Strategies,Task,PROJ,"WBS: 1.1.2.1.3
+Description: Create tailored engagement strategies for different stakeholder groups.
+Deliverables: Engagement strategy document; engagement tactics.
+Acceptance: Strategies approved by Sponsor.
+Context: After A010.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A010",,A011,1.1.2.1.3,A010,FS,56,1.5,"Change Manager (0.7 FTE); Communications Specialist (0.3 FTE)","Engagement strategy; tactics","Strategies approved by Sponsor","Low engagement → Add incentives/cadence","—"
+A012 - Create Stakeholder Register and Communication Plan,Task,PROJ,"WBS: 1.1.2.1.4
+Description: Develop stakeholder register and detailed communication plan with schedules and responsibilities.
+Deliverables: Stakeholder register; communication plan; communication schedule.
+Acceptance: Communication plan baselined; roles/responsibilities set.
+Context: After A011; plan in generated-documents/management-plans/communication-management-plan.md.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A011",,A012,1.1.2.1.4,A011,FS,40,1,"Communications Specialist (0.5 FTE); Project Manager (0.5 FTE)","Register; comms plan; schedule","Plan baselined; roles set","Channel fragmentation → Standardize","Plan in management-plans/communication-management-plan.md"
+A013 - Establish Communication Channels and Protocols,Task,PROJ,"WBS: 1.1.2.2.1
+Description: Set up communication channels, protocols, and escalation procedures.
+Deliverables: Communication protocols; channel definitions; escalation procedures.
+Acceptance: Protocols published incl. escalation SLAs.
+Context: After A012.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A012",,A013,1.1.2.2.1,A012,FS,32,1,"Communications Specialist (0.8 FTE); Project Manager (0.2 FTE)","Protocols; channels; escalation","Protocols published with SLAs","Unclear escalation → Runbook","—"
+A014 - Set Up Collaboration Platforms and Tools,Task,PROJ,"WBS: 1.1.2.2.2
+Description: Configure and deploy collaboration platforms, project management tools, and communication systems.
+Deliverables: Configured platforms; user access; training materials.
+Acceptance: Platforms configured; access audited; audit logging enabled.
+Context: After A013.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A013",,A014,1.1.2.2.2,A013,FS,48,1.5,"IT Support (0.6 FTE); Communications Specialist (0.4 FTE)","Configured platforms; access; training","Configured; access audited; logging enabled","Access gaps → Access review","—"
+A015 - Create Communication Templates and Standards,Task,PROJ,"WBS: 1.1.2.2.3
+Description: Develop standardized templates, formats, and guidelines for project communications.
+Deliverables: Communication templates; style guide; standards document.
+Acceptance: Templates adopted org-wide; linting in place.
+Context: After A013; use generated-documents/templates/document-template.md; DOCUMENTATION-STYLE-GUIDE.md.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A013",,A015,1.1.2.2.3,A013,FS,24,1,"Communications Specialist (0.6 FTE); Technical Writer (0.4 FTE)","Templates; style guide; standards","Templates adopted; linting/PR checks","Noncompliance → Docs linting","Use document-template.md and style guide"
+A016 - Implement Feedback and Escalation Mechanisms,Task,PROJ,"WBS: 1.1.2.2.4
+Description: Establish processes and systems for collecting feedback and managing escalations.
+Deliverables: Feedback collection system; escalation procedures; response protocols.
+Acceptance: System operational; response SLAs defined.
+Context: After A014.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A014",,A016,1.1.2.2.4,A014,FS,32,1,"Communications Specialist (0.4 FTE); Process Analyst (0.6 FTE)","Feedback system; escalation; protocols","Operational; SLAs defined","Backlog growth → Triage policy","—"
+A017 - Recruit and Assign Core Team Members,Task,PROJ,"WBS: 1.1.3.1.1
+Description: Identify, recruit, and assign core project team members with required skills and availability.
+Deliverables: Core team roster; role assignments; commitments.
+Acceptance: Roster filled; access provisioned.
+Context: After A008.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A008",,A017,1.1.3.1.1,A008,FS,60,2,"Project Manager (0.4 FTE); HR Manager (0.3 FTE); Resource Manager (0.3 FTE)","Roster; roles; commitments","Roster filled; access validated","Hiring delays → Backup candidates","—"
+A018 - Define Roles, Responsibilities, and RACI,Task,PROJ,"WBS: 1.1.3.1.2
+Description: Create detailed role definitions, responsibility assignments, and RACI matrix.
+Deliverables: Role descriptions; responsibility matrix; RACI chart.
+Acceptance: RACI approved; decision rights documented.
+Context: After A017.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A017",,A018,1.1.3.1.2,A017,FS,32,1,"Project Manager (0.8 FTE); Organizational Analyst (0.2 FTE)","Role descriptions; responsibility matrix; RACI","RACI approved; decision rights documented","Ambiguity → DACI addendum","—"
+A019 - Establish Team Working Agreements and Protocols,Task,PROJ,"WBS: 1.1.3.1.3
+Description: Develop team charter, working agreements, collaboration protocols, and team norms.
+Deliverables: Team charter; working agreements; collaboration protocols.
+Acceptance: Charter signed by team; quarterly refresh scheduled.
+Context: After A018.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A018",,A019,1.1.3.1.3,A018,FS,24,1,"Project Manager (0.6 FTE); Team Members (0.4 FTE)","Team charter; agreements; protocols","Charter signed; refresh scheduled","Norm drift → Quarterly refresh","—"
+A020 - Conduct Team Orientation and Training,Task,PROJ,"WBS: 1.1.3.1.4
+Description: Provide comprehensive orientation and training for all team members on project objectives, processes, and tools.
+Deliverables: Training materials; orientation sessions; competency validation.
+Acceptance: Attendance complete; competency checks passed; evidence recorded.
+Context: After A019.",Medium,"activity-list phase-initiation",Initiation,,, , ,"is blocked by: A019",,A020,1.1.3.1.4,A019,FS,40,1,"Training Coordinator (0.5 FTE); Subject Matter Experts (0.5 FTE)","Training materials; sessions; competency validation","Attendance complete; competency checks passed","Training gaps → Make-up sessions","—"
+
+...TRUNCATED FOR BREVITY...
