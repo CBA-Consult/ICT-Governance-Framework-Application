@@ -219,6 +219,14 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
   * Monitors AI systems for ethics compliance and fairness
   * Coordinates with AI Ethics Review Board on technical assessments
   * Provides AI ethics training and guidance to development teams
+
+* **Stakeholder Engagement Manager:** Manages comprehensive stakeholder engagement and communication
+  * Develops and implements stakeholder engagement strategies and plans
+  * Manages multi-directional communication channels and feedback mechanisms
+  * Coordinates stakeholder advisory committees and working groups
+  * Analyzes stakeholder feedback and develops actionable insights
+  * Reports on stakeholder engagement performance and effectiveness
+
 * **IoT Technology Steward:** Manages IoT device standards and operations
   * Oversees IoT device lifecycle management and security
   * Coordinates IoT data processing and analytics implementation
@@ -234,6 +242,7 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
   * Coordinates digital asset management and custody
   * Manages blockchain security and cryptographic operations
   * Ensures blockchain compliance and regulatory adherence
+
 
 **🔧 Technology Custodians (IT Operations)**
 
@@ -278,6 +287,12 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
 | **AI Ethics Compliance Monitoring** | I | A | R | R |
 | **AI Ethics Training and Awareness** | A | R | R | I |
 | **AI Ethics Incident Response** | A | R | R | C |
+| **Stakeholder Engagement Strategy** | A | R | C | I |
+| **Multi-Directional Communication Management** | I | A | R | C |
+| **Stakeholder Feedback Collection and Analysis** | I | A | R | C |
+| **Stakeholder Advisory Committee Coordination** | A | R | R | I |
+| **Cross-Functional Working Group Management** | I | A | R | C |
+| **Stakeholder Satisfaction Monitoring** | A | R | R | I |
 | **IoT Device Lifecycle Management** | I | A | R | R |
 | **IoT Security Policy Implementation** | A | R | R | I |
 | **IoT Data Governance and Privacy** | A | R | R | I |
@@ -293,6 +308,7 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
 | **Digital Asset Management** | A | R | R | I |
 | **Blockchain Security and Compliance** | A | R | R | I |
 | **Blockchain Innovation and DLT Evaluation** | A | R | C | I |
+
 
 _Legend: R = Responsible, A = Accountable, C = Consulted, I = Informed_
 
@@ -862,11 +878,60 @@ The framework ensures compliance with relevant regulations and standards:
 * Shadow IT findings reviewed monthly
 * Application validation policies reviewed quarterly
 
-### 📢 Feedback Mechanisms
+### 📢 Stakeholder-Centric Engagement and Feedback Mechanisms
 
-* Surveys of business stakeholders and end users
-* Issue tracking and feedback channels
-* Continuous improvement suggestions
+The ICT Governance Framework incorporates comprehensive multi-directional communication and feedback mechanisms to ensure all stakeholders have meaningful opportunities to contribute to and influence governance decisions.
+
+#### Multi-Directional Communication Architecture
+
+**Upward Communication Channels:**
+* **Stakeholder Advisory Committees:** Technology Innovation, Business Value, and Risk & Compliance advisory committees providing structured pathways for operational teams to influence strategic decisions
+* **Innovation Suggestion Platform:** Digital platform enabling all stakeholders to propose technology innovations with structured evaluation and recognition processes
+* **Escalation and Voice Mechanisms:** Governance ombudsman, anonymous feedback channels, and skip-level communication for critical concerns
+
+**Downward Communication Channels:**
+* **Stakeholder-Specific Communication Streams:** Targeted information delivery through executive dashboards, operational updates, business impact reports, and compliance bulletins
+* **Interactive Communication Platforms:** Governance town halls, virtual office hours, webinar series, and digital collaboration spaces for two-way dialogue
+
+**Horizontal Communication Channels:**
+* **Cross-Functional Working Groups:** Cross-domain integration, business-IT alignment, and innovation collaboration networks
+* **Peer Learning and Knowledge Sharing:** Communities of practice, peer mentoring programs, and cross-training initiatives
+
+**External Stakeholder Communication:**
+* **Vendor and Partner Engagement:** Vendor governance forums, partner advisory councils, and industry collaboration networks
+* **Customer and Community Engagement:** Customer advisory panels, community feedback programs, and public transparency reports
+
+#### Comprehensive Feedback Mechanisms
+
+**Real-Time Feedback Systems:**
+* **Continuous Pulse Surveys:** Weekly to quarterly micro-surveys for different stakeholder groups with sentiment tracking and trend analysis
+* **Digital Feedback Platforms:** Real-time feedback on governance processes, decisions, and service quality with suggestion integration
+* **Communication Monitoring:** Real-time tracking of communication reach, engagement rates, response times, and sentiment analysis
+
+**Periodic Comprehensive Feedback:**
+* **Stakeholder Journey Mapping:** Annual comprehensive mapping of stakeholder experiences with quarterly updates
+* **Governance Maturity Assessments:** Stakeholder-perspective evaluation of governance effectiveness across process, communication, decision quality, and value delivery
+* **Annual Stakeholder Conference:** Comprehensive engagement event with governance review, feedback sessions, innovation showcase, and strategic planning input
+
+**Feedback Integration and Response Framework:**
+* **Structured Processing Workflow:** Eight-step process from collection through monitoring with defined timeframes
+* **Response Standards:** 24-hour acknowledgment, 5-day initial response, 15-day action plans, and 30-day progress updates
+* **Impact Tracking:** Comprehensive metrics on feedback volume, response rates, implementation rates, and stakeholder satisfaction
+
+#### Stakeholder Engagement Strategy
+
+**Stakeholder Segmentation:**
+* **Primary Groups (Manage Closely):** ICT Governance Council, Domain Owners, Business Leaders, Executive Team
+* **Secondary Groups (Keep Satisfied):** Board of Directors, Regulatory Bodies, External Auditors, Key Vendors
+* **Supporting Groups (Keep Informed):** Technology Stewards, Custodians, Process Owners, End Users
+* **Monitoring Groups:** General IT Staff, Administrative Support, Inactive Vendors
+
+**Engagement Lifecycle Management:**
+* **Stakeholder Onboarding:** Identification, role clarification, orientation, relationship establishment, and engagement planning
+* **Ongoing Relationship Management:** Regular check-ins, needs assessment, value demonstration, issue resolution, and relationship optimization
+* **Transition Management:** Planning, knowledge transfer, relationship handover, continuity assurance, and exit feedback
+
+For detailed implementation guidance, processes, and metrics, refer to the [ICT Governance Stakeholder-Centric Engagement Framework](ICT-Governance-Stakeholder-Engagement-Framework.md).
 
 ### 🔍 Audit and Compliance Framework
 
@@ -1335,6 +1400,20 @@ For detailed guidance on onboarding new technology components and offboarding de
 * ✅ 100% of innovation initiatives aligned with strategic objectives
 * ✅ 70% of innovation partnerships delivering measurable value
 
+### Stakeholder Engagement and Communication Metrics
+* ✅ >95% communication reach rate for target stakeholders
+* ✅ >70% active participation in communication channels
+* ✅ >60% response rate to feedback requests and surveys
+* ✅ >4.0/5.0 stakeholder satisfaction with governance communication
+* ✅ >50% of stakeholders providing feedback annually
+* ✅ 100% of feedback acknowledged within 24 hours
+* ✅ >40% of actionable feedback resulting in implemented improvements
+* ✅ >4.0/5.0 stakeholder trust rating in governance processes
+* ✅ >80% of stakeholders perceive value from governance engagement
+* ✅ 15% improvement in governance process efficiency through stakeholder input
+* ✅ 25% increase in governance innovations from stakeholder suggestions
+* ✅ 10% increase in employee engagement with governance processes
+
 ### Zero Trust Security Architecture Metrics
 * ✅ Zero Trust maturity Level 4+ achieved across all six pillars (Identities, Endpoints, Applications, Infrastructure, Data, Network)
 * ✅ 100% of Tier 1 critical systems protected by Zero Trust controls
@@ -1398,6 +1477,7 @@ The benchmarking framework evaluates alignment with leading industry standards:
 The framework includes comprehensive metrics for measuring benchmarking effectiveness, performance improvement, and business value realization. Regular monitoring ensures continuous improvement and alignment with strategic objectives.
 
 For detailed methodology, metrics, and implementation guidance, refer to the [ICT Governance Annual Benchmarking Framework](ICT-Governance-Annual-Benchmarking-Framework.md).
+
 
 ---
 
