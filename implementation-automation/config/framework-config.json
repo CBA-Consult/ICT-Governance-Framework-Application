@@ -211,6 +211,13 @@
         "schedule": "Daily"
       },
       {
+        "name": "automated-remediation",
+        "description": "Automated remediation of compliance violations",
+        "type": "PowerShell",
+        "schedule": "Daily",
+        "script": "./azure-automation/Automated-Remediation-Framework.ps1"
+      },
+      {
         "name": "resource-cleanup",
         "description": "Cleanup unused resources",
         "type": "PowerShell",
@@ -229,6 +236,12 @@
         "frequency": "Daily",
         "startTime": "02:00",
         "runbook": "compliance-check"
+      },
+      {
+        "name": "daily-automated-remediation",
+        "frequency": "Daily",
+        "startTime": "03:00",
+        "runbook": "automated-remediation"
       },
       {
         "name": "weekly-cleanup",
@@ -390,7 +403,37 @@
     "autoRemediation": {
       "enabled": true,
       "approvalRequired": true,
-      "maxActions": 10
+      "maxActions": 50,
+      "configPath": "./azure-automation/remediation-config.json",
+      "supportedViolationTypes": [
+        "MissingTags",
+        "SecurityConfiguration",
+        "BackupConfiguration",
+        "CostOptimization",
+        "NamingConvention"
+      ],
+      "expansionPhases": {
+        "phase1": {
+          "description": "Low-risk violations only",
+          "violationTypes": ["MissingTags"],
+          "autoRemediable": true
+        },
+        "phase2": {
+          "description": "Security configurations",
+          "violationTypes": ["MissingTags", "SecurityConfiguration"],
+          "autoRemediable": true
+        },
+        "phase3": {
+          "description": "Backup and cost optimization",
+          "violationTypes": ["MissingTags", "SecurityConfiguration", "BackupConfiguration", "CostOptimization"],
+          "autoRemediable": false
+        },
+        "phase4": {
+          "description": "Full coverage",
+          "violationTypes": ["All"],
+          "autoRemediable": false
+        }
+      }
     },
     "costOptimization": {
       "enabled": true,
