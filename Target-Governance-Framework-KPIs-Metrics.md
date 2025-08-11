@@ -189,15 +189,74 @@ This document defines the comprehensive Key Performance Indicators (KPIs), metri
 
 ## 8. Stakeholder and Communication KPIs
 
-### 8.1 Stakeholder Engagement
+### 8.1 Stakeholder Engagement Excellence
 
-#### Communication Effectiveness
+#### Stakeholder Satisfaction and Value Delivery
 | Metric | Description | Target | Measurement Method | Frequency | Owner |
 |--------|-------------|--------|-------------------|-----------|-------|
-| **Stakeholder Engagement Score** | Level of stakeholder engagement in governance | >85% | Engagement assessment | Quarterly | Strategic Governance Council |
-| **Communication Effectiveness** | Effectiveness of governance communications | >80% | Communication survey | Quarterly | Strategic Governance Council |
-| **Governance Awareness** | Staff awareness of governance policies and procedures | >90% | Awareness survey | Semi-annual | Strategic Governance Council |
-| **Feedback Response Rate** | Rate of response to stakeholder feedback | >95% | Feedback tracking system | Monthly | Domain Owners |
+| **Stakeholder Satisfaction Score** | Overall satisfaction with governance services and processes | >90% | Comprehensive stakeholder survey | Quarterly | Strategic Governance Council |
+| **Stakeholder Net Promoter Score (NPS)** | Likelihood of stakeholders to recommend governance services | >70 | NPS survey and analysis | Quarterly | Strategic Governance Council |
+| **Stakeholder Value Realization** | Percentage of committed stakeholder value delivered | >95% | Value tracking and assessment | Quarterly | Strategic Governance Council |
+| **Stakeholder Engagement Maturity** | Maturity level of stakeholder engagement processes | Level 4 (Optimized) | Stakeholder engagement maturity assessment | Semi-annual | Strategic Governance Council |
+| **Stakeholder Trust Index** | Level of stakeholder trust in governance decisions and processes | >85% | Trust assessment survey | Quarterly | Strategic Governance Council |
+
+#### Communication Effectiveness and Transparency
+| Metric | Description | Target | Measurement Method | Frequency | Owner |
+|--------|-------------|--------|-------------------|-----------|-------|
+| **Communication Effectiveness Score** | Effectiveness of governance communications across all channels | >92% | Multi-channel communication survey | Quarterly | Strategic Governance Council |
+| **Governance Transparency Index** | Transparency of governance decisions, processes, and outcomes | >95% | Transparency assessment framework | Quarterly | Strategic Governance Council |
+| **Proactive Communication Rate** | Percentage of communications that are proactive vs. reactive | 100% | Communication tracking and categorization | Monthly | Domain Owners |
+| **Communication Response Time** | Average time to respond to stakeholder communications | <24 hours | Communication response tracking | Weekly | Domain Owners |
+| **Multi-Channel Communication Effectiveness** | Effectiveness across all communication channels (email, portal, meetings, etc.) | >85% per channel | Channel-specific effectiveness metrics | Monthly | Strategic Governance Council |
+
+#### Stakeholder Participation and Co-Creation
+| Metric | Description | Target | Measurement Method | Frequency | Owner |
+|--------|-------------|--------|-------------------|-----------|-------|
+| **Stakeholder Participation Rate** | Active participation in governance processes and decisions | >80% | Participation tracking across governance activities | Monthly | Domain Owners |
+| **Stakeholder Co-Creation Index** | Level of stakeholder involvement in governance improvement initiatives | >50% | Co-creation activity tracking and assessment | Quarterly | CDO |
+| **Stakeholder Feedback Quality** | Quality and actionability of stakeholder feedback received | >85% | Feedback quality assessment framework | Monthly | Domain Owners |
+| **Stakeholder Innovation Contribution** | Number of stakeholder-driven innovations implemented | >12 annually | Innovation tracking and attribution | Quarterly | CDO |
+| **Governance Decision Participation** | Stakeholder participation in governance decision-making processes | >75% | Decision participation tracking | Monthly | Strategic Governance Council |
+
+### 8.2 Stakeholder Relationship Management
+
+#### Relationship Quality and Strength
+| Metric | Description | Target | Measurement Method | Frequency | Owner |
+|--------|-------------|--------|-------------------|-----------|-------|
+| **Stakeholder Relationship Strength** | Overall strength of stakeholder relationships | >85% | Relationship assessment framework | Quarterly | Strategic Governance Council |
+| **Stakeholder Retention Rate** | Retention of key stakeholders in governance processes | >95% | Stakeholder retention tracking | Quarterly | Strategic Governance Council |
+| **Stakeholder Advocacy Score** | Level of stakeholder advocacy for governance initiatives | >80% | Advocacy assessment and tracking | Quarterly | Strategic Governance Council |
+| **Conflict Resolution Effectiveness** | Effectiveness in resolving stakeholder conflicts and issues | >90% | Conflict resolution tracking and assessment | Monthly | Domain Owners |
+| **Stakeholder Onboarding Success** | Success rate of new stakeholder onboarding processes | >95% | Onboarding completion and satisfaction tracking | Monthly | Domain Owners |
+
+#### Stakeholder Service Excellence
+| Metric | Description | Target | Measurement Method | Frequency | Owner |
+|--------|-------------|--------|-------------------|-----------|-------|
+| **Stakeholder Service Level Achievement** | Achievement of stakeholder service level agreements | >98% | SLA monitoring and tracking | Weekly | Cloud Operations Domain Owner |
+| **Stakeholder Request Resolution Time** | Average time to resolve stakeholder requests and issues | <48 hours | Request resolution tracking system | Weekly | Platform Stewards |
+| **Stakeholder Self-Service Adoption** | Adoption rate of stakeholder self-service capabilities | >80% | Self-service platform analytics | Monthly | Application Governance Domain Owner |
+| **Stakeholder Support Quality** | Quality of support provided to stakeholders | >90% | Support quality assessment and feedback | Monthly | Platform Stewards |
+| **Stakeholder Experience Consistency** | Consistency of stakeholder experience across all touchpoints | >85% | Experience consistency measurement | Monthly | Strategic Governance Council |
+
+### 8.3 Stakeholder Communication and Awareness
+
+#### Governance Awareness and Understanding
+| Metric | Description | Target | Measurement Method | Frequency | Owner |
+|--------|-------------|--------|-------------------|-----------|-------|
+| **Governance Awareness Score** | Stakeholder awareness of governance policies and procedures | >95% | Comprehensive awareness survey | Semi-annual | Strategic Governance Council |
+| **Policy Understanding Rate** | Stakeholder understanding of governance policies and their impact | >90% | Policy understanding assessment | Quarterly | Strategic Governance Council |
+| **Governance Training Completion** | Completion rate of governance training by stakeholders | >95% | Training completion tracking | Quarterly | Strategic Governance Council |
+| **Governance Communication Reach** | Percentage of stakeholders reached by governance communications | 100% | Communication reach tracking and analysis | Monthly | Strategic Governance Council |
+| **Stakeholder Knowledge Retention** | Retention of governance knowledge by stakeholders over time | >85% | Knowledge retention assessment | Semi-annual | Strategic Governance Council |
+
+#### Feedback and Continuous Improvement
+| Metric | Description | Target | Measurement Method | Frequency | Owner |
+|--------|-------------|--------|-------------------|-----------|-------|
+| **Stakeholder Feedback Response Rate** | Rate of response to stakeholder feedback and suggestions | >98% | Feedback response tracking system | Weekly | Domain Owners |
+| **Feedback Implementation Rate** | Percentage of stakeholder feedback implemented as improvements | >70% | Feedback implementation tracking | Monthly | Domain Owners |
+| **Stakeholder Suggestion Quality** | Quality and value of stakeholder suggestions for improvement | >80% | Suggestion quality assessment | Monthly | Strategic Governance Council |
+| **Continuous Improvement Participation** | Stakeholder participation in continuous improvement initiatives | >60% | Improvement initiative participation tracking | Quarterly | Strategic Governance Council |
+| **Stakeholder-Driven Process Improvements** | Number of process improvements initiated by stakeholder feedback | >24 annually | Process improvement tracking and attribution | Quarterly | Domain Owners |
 
 ---
 
@@ -278,7 +337,10 @@ This document defines the comprehensive Key Performance Indicators (KPIs), metri
 - **Risk Management:** <$2M annual quantified risk exposure
 - **Operational Excellence:** >99.9% service availability across platforms
 - **Cost Optimization:** 15% annual reduction in multi-cloud costs
-- **Stakeholder Satisfaction:** >85% satisfaction with governance services
+- **Stakeholder Governance Excellence:** >90% stakeholder satisfaction with >70 NPS score
+- **Stakeholder Engagement Maturity:** Level 4 (Optimized) stakeholder engagement processes
+- **Governance Transparency:** >95% governance transparency index
+- **Stakeholder Value Delivery:** >95% stakeholder value realization rate
 
 #### Secondary Success Indicators
 - **Innovation Enablement:** >70% success rate for innovation initiatives
