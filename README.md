@@ -24,9 +24,11 @@ The Multi-Cloud Multi-Tenant ICT Governance Framework consists of the following 
 
 2. **[ICT Governance Framework](ICT-Governance-Framework.md)** - The foundational document defining the governance structure, roles, responsibilities, and operating model.
 
-3. **[Target Governance Framework](Target-Governance-Framework.md)** - Enhanced governance framework with industry-leading practices from ISO/IEC 38500, ITIL 4, COBIT 2019, CMMI, and FAIR frameworks.
+3. **[Strategic and Tactical IT Governance Overview](Strategic-Tactical-IT-Governance-Overview.md)** - Comprehensive overview of strategic vs tactical governance tasks and responsibilities with clear role definitions and escalation frameworks.
 
-4. **[ICT Governance Policies](ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
+4. **[Target Governance Framework](Target-Governance-Framework.md)** - Enhanced governance framework with industry-leading practices from ISO/IEC 38500, ITIL 4, COBIT 2019, CMMI, and FAIR frameworks.
+
+5. **[ICT Governance Policies](ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
 
 ### Multi-Tenant Infrastructure and Automation
 

@@ -1,9 +1,48 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "framework": {
-    "name": "CBA Consult IT Management Framework",
-    "version": "3.2.0",
-    "description": "Comprehensive ICT governance framework for multi-cloud environments"
+    "name": "CBA Consult Unified Governance Platform",
+    "version": "4.0.0",
+    "description": "Unified governance platform integrating all governance tools and systems"
+  },
+  "unifiedPlatform": {
+    "enabled": true,
+    "apiGateway": {
+      "endpoint": "https://governance-api.company.com/v2",
+      "authentication": {
+        "type": "AzureAD",
+        "tenantId": "your-tenant-id",
+        "clientId": "your-client-id",
+        "scopes": ["governance.read", "governance.write", "governance.admin"]
+      }
+    },
+    "domains": {
+      "ictGovernance": {
+        "enabled": true,
+        "endpoint": "/ict-governance",
+        "integration": "native"
+      },
+      "azureGovernance": {
+        "enabled": true,
+        "endpoint": "/azure",
+        "integration": "native"
+      },
+      "multiCloudGovernance": {
+        "enabled": true,
+        "endpoint": "/multi-cloud",
+        "integration": "api"
+      },
+      "applicationGovernance": {
+        "enabled": true,
+        "endpoint": "/applications",
+        "integration": "api"
+      },
+      "securityGovernance": {
+        "enabled": true,
+        "endpoint": "/security",
+        "integration": "api"
+      }
+    }
   },
   "organization": {
     "name": "CBA Consult",
@@ -300,26 +339,51 @@
     }
   },
   "integration": {
+    "unifiedPlatform": {
+      "enabled": true,
+      "apiEndpoint": "https://governance-api.company.com/v2",
+      "authentication": "ManagedIdentity",
+      "dataSync": {
+        "enabled": true,
+        "frequency": "real-time",
+        "batchSize": 100
+      }
+    },
     "servicenow": {
-      "enabled": false,
+      "enabled": true,
       "endpoint": "https://company.service-now.com",
-      "username": "integration-user",
-      "password": "integration-password"
+      "authentication": "OAuth2",
+      "integration": "unified-api"
     },
     "jira": {
-      "enabled": false,
+      "enabled": true,
       "endpoint": "https://company.atlassian.net",
-      "username": "integration-user",
-      "apiToken": "api-token"
+      "authentication": "ApiToken",
+      "integration": "unified-api"
     },
     "slack": {
-      "enabled": false,
+      "enabled": true,
       "webhookUrl": "https://hooks.slack.com/services/...",
+      "integration": "unified-api",
       "channels": {
         "governance": "#governance",
         "security": "#security",
         "operations": "#operations"
       }
+    },
+    "siem": {
+      "enabled": true,
+      "type": "Microsoft Sentinel",
+      "endpoint": "https://sentinel.azure.com",
+      "authentication": "ManagedIdentity",
+      "integration": "unified-api"
+    },
+    "cloudAppSecurity": {
+      "enabled": true,
+      "type": "Microsoft Defender for Cloud Apps",
+      "endpoint": "https://portal.cloudappsecurity.com",
+      "authentication": "ApiKey",
+      "integration": "unified-api"
     }
   },
   "features": {
