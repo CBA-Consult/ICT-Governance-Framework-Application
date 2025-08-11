@@ -91,6 +91,11 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
   * Administers Employee App Store and application validation process
   * Reviews and categorizes discovered applications
 * **Data Steward:** Ensures data management and governance
+* **AI Ethics Steward:** Manages AI ethics compliance and responsible AI governance
+  * Conducts AI ethics impact assessments and bias testing
+  * Monitors AI systems for ethics compliance and fairness
+  * Coordinates with AI Ethics Review Board on technical assessments
+  * Provides AI ethics training and guidance to development teams
 
 **🔧 Technology Custodians (IT Operations)**
 
@@ -129,6 +134,12 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
 | **Out-of-the-Box Solution Evaluation** | A | R | R | I |
 | **Innovation Partnership Management** | A | R | C | I |
 | **Innovation Risk Assessment** | A | R | R | I |
+| **AI Ethics Impact Assessment** | A | R | R | I |
+| **AI Ethics Review and Approval** | A | R | R | I |
+| **AI Bias Testing and Mitigation** | I | A | R | C |
+| **AI Ethics Compliance Monitoring** | I | A | R | R |
+| **AI Ethics Training and Awareness** | A | R | R | I |
+| **AI Ethics Incident Response** | A | R | R | C |
 
 _Legend: R = Responsible, A = Accountable, C = Consulted, I = Informed_
 
@@ -623,6 +634,9 @@ The FAIR risk assessment framework integrates with the Business Value Quantifica
 10. **📊 Employee Technology Compliance Violations:** Technology Stewards → Domain Owners → ICT Governance Council for significant policy violations
 11. **🎯 High-Risk FAIR Assessments:** Risk Management Specialist → Domain Owners → ICT Governance Council for risks exceeding organizational risk appetite
 12. **📈 Risk Exposure Threshold Breaches:** Domain Owners → ICT Governance Council for domain risk exposure exceeding $500,000 annually
+13. **🤖 AI Ethics Violations:** AI Ethics Steward → AI Ethics Review Board → AI Ethics Council for significant ethics violations
+14. **🧠 High-Risk AI System Deployments:** AI Ethics Steward → AI Ethics Review Board → AI Ethics Council for high-risk AI system approvals
+15. **⚖️ AI Bias Detection:** AI Ethics Steward → Domain Owners → AI Ethics Council for significant bias incidents
 
 ---
 
