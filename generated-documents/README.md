@@ -15,6 +15,8 @@ This directory contains comprehensive documentation for the ICT Governance Frame
 ### Stakeholder Management
 
 - [Stakeholder Register](stakeholder-management/stakeholder-register.md) - PMBOK Stakeholder Register documenting all project stakeholders and their interests
+- [Stakeholder Influence/Interest Matrix](stakeholder-management/stakeholder-influence-interest-matrix.md) - Detailed analysis of stakeholder influence and interest levels (Activity A010)
+- [Stakeholder Profiles](stakeholder-management/stakeholder-profiles.md) - Comprehensive stakeholder profiles with engagement strategies (Activity A010)
 
 ### Scope Management
 
