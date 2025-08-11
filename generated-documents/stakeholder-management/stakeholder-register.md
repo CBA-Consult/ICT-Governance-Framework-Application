@@ -126,6 +126,10 @@ This Stakeholder Register identifies all individuals, groups, or organizations t
 
 ![Power Interest Grid](./stakeholder-power-interest.png)
 
+**Note:** For detailed stakeholder influence/interest analysis and comprehensive stakeholder profiles, refer to:
+- [Stakeholder Influence/Interest Matrix](./stakeholder-influence-interest-matrix.md) - Detailed analysis completed in Activity A010
+- [Stakeholder Profiles](./stakeholder-profiles.md) - Comprehensive stakeholder profiles completed in Activity A010
+
 **Key Management Strategies by Quadrant:**
 
 - **High Power, High Interest (Manage Closely):** IS1, IS2, IS3, IS4, IS7, IS13, IS14, IS15, IS17
