@@ -1,0 +1,403 @@
+{
+  "DataSources": {
+    "Azure": {
+      "SubscriptionId": "your-subscription-id",
+      "TenantId": "your-tenant-id",
+      "ResourceGroups": [
+        "rg-governance-prod",
+        "rg-governance-dev"
+      ],
+      "LogAnalyticsWorkspace": "law-governance-monitoring",
+      "ApplicationInsights": "ai-governance-metrics"
+    },
+    "ServiceNow": {
+      "BaseUrl": "https://your-instance.service-now.com",
+      "Username": "governance-api-user",
+      "Password": "encrypted-password",
+      "Tables": {
+        "Incidents": "incident",
+        "Changes": "change_request",
+        "Problems": "problem",
+        "Assets": "cmdb_ci"
+      }
+    },
+    "SIEM": {
+      "Type": "Sentinel",
+      "WorkspaceId": "your-workspace-id",
+      "SharedKey": "your-shared-key",
+      "Queries": {
+        "SecurityIncidents": "SecurityIncident | where TimeGenerated >= ago(90d)",
+        "Vulnerabilities": "SecurityAlert | where AlertType contains 'Vulnerability'"
+      }
+    },
+    "Financial": {
+      "Type": "SAP",
+      "Server": "sap-finance-server",
+      "Database": "finance_db",
+      "CostCenters": [
+        "IT-001",
+        "IT-002",
+        "IT-003"
+      ]
+    },
+    "Survey": {
+      "Platform": "Microsoft Forms",
+      "TenantId": "your-tenant-id",
+      "SurveyIds": {
+        "ExecutiveSatisfaction": "survey-id-1",
+        "BusinessUserSatisfaction": "survey-id-2",
+        "ITStaffSatisfaction": "survey-id-3"
+      }
+    },
+    "ProjectManagement": {
+      "Platform": "Azure DevOps",
+      "Organization": "your-organization",
+      "Projects": [
+        "governance-initiatives",
+        "infrastructure-projects"
+      ]
+    },
+    "Monitoring": {
+      "Platform": "Azure Monitor",
+      "Metrics": [
+        "Availability",
+        "Performance",
+        "Capacity"
+      ]
+    }
+  },
+  "Metrics": {
+    "Weights": {
+      "BusinessValue": 0.25,
+      "OperationalExcellence": 0.20,
+      "RiskManagement": 0.18,
+      "StrategicAlignment": 0.15,
+      "StakeholderSatisfaction": 0.12,
+      "InnovationEnablement": 0.10
+    },
+    "Categories": {
+      "BusinessValue": {
+        "TechnologyROI": {
+          "Weight": 0.30,
+          "DataSource": "Financial",
+          "CalculationMethod": "ROI"
+        },
+        "BusinessValueRealization": {
+          "Weight": 0.25,
+          "DataSource": "ProjectManagement",
+          "CalculationMethod": "BenefitTracking"
+        },
+        "CostOptimization": {
+          "Weight": 0.20,
+          "DataSource": "Financial",
+          "CalculationMethod": "CostSavings"
+        },
+        "TimeToMarket": {
+          "Weight": 0.15,
+          "DataSource": "ProjectManagement",
+          "CalculationMethod": "DeliveryTime"
+        },
+        "InnovationSuccessRate": {
+          "Weight": 0.10,
+          "DataSource": "ProjectManagement",
+          "CalculationMethod": "SuccessRate"
+        }
+      },
+      "OperationalExcellence": {
+        "SystemAvailability": {
+          "Weight": 0.30,
+          "DataSource": "Monitoring",
+          "CalculationMethod": "Uptime"
+        },
+        "IncidentResolutionTime": {
+          "Weight": 0.25,
+          "DataSource": "ServiceNow",
+          "CalculationMethod": "MTTR"
+        },
+        "ChangeSuccessRate": {
+          "Weight": 0.20,
+          "DataSource": "ServiceNow",
+          "CalculationMethod": "SuccessRate"
+        },
+        "SLAAchievement": {
+          "Weight": 0.15,
+          "DataSource": "ServiceNow",
+          "CalculationMethod": "SLACompliance"
+        },
+        "CapacityUtilization": {
+          "Weight": 0.10,
+          "DataSource": "Monitoring",
+          "CalculationMethod": "ResourceUtilization"
+        }
+      },
+      "RiskManagement": {
+        "RiskAssessmentCoverage": {
+          "Weight": 0.25,
+          "DataSource": "GRC",
+          "CalculationMethod": "Coverage"
+        },
+        "SecurityIncidentFrequency": {
+          "Weight": 0.25,
+          "DataSource": "SIEM",
+          "CalculationMethod": "IncidentCount"
+        },
+        "ComplianceScore": {
+          "Weight": 0.20,
+          "DataSource": "GRC",
+          "CalculationMethod": "ComplianceRate"
+        },
+        "VulnerabilityRemediationTime": {
+          "Weight": 0.20,
+          "DataSource": "SIEM",
+          "CalculationMethod": "RemediationTime"
+        },
+        "BusinessContinuityReadiness": {
+          "Weight": 0.10,
+          "DataSource": "GRC",
+          "CalculationMethod": "DRCoverage"
+        }
+      },
+      "StakeholderSatisfaction": {
+        "BusinessUserSatisfaction": {
+          "Weight": 0.40,
+          "DataSource": "Survey",
+          "CalculationMethod": "SurveyAverage"
+        },
+        "ExecutiveSatisfaction": {
+          "Weight": 0.30,
+          "DataSource": "Survey",
+          "CalculationMethod": "SurveyAverage"
+        },
+        "ITStaffSatisfaction": {
+          "Weight": 0.20,
+          "DataSource": "Survey",
+          "CalculationMethod": "SurveyAverage"
+        },
+        "ServiceDeskSatisfaction": {
+          "Weight": 0.10,
+          "DataSource": "ServiceNow",
+          "CalculationMethod": "SatisfactionRating"
+        }
+      }
+    }
+  },
+  "Thresholds": {
+    "TechnologyROI": 20.0,
+    "BusinessValueRealization": 90.0,
+    "CostOptimization": 15.0,
+    "TimeToMarket": 30.0,
+    "InnovationSuccessRate": 75.0,
+    "SystemAvailability": 99.9,
+    "IncidentResolutionTime": 2.0,
+    "ChangeSuccessRate": 98.0,
+    "SLAAchievement": 95.0,
+    "CapacityUtilization": 85.0,
+    "RiskAssessmentCoverage": 95.0,
+    "SecurityIncidentFrequency": 2.0,
+    "ComplianceScore": 98.0,
+    "VulnerabilityRemediationTime": 72.0,
+    "BusinessContinuityReadiness": 90.0,
+    "BusinessUserSatisfaction": 4.0,
+    "ExecutiveSatisfaction": 4.2,
+    "ITStaffSatisfaction": 3.8,
+    "ServiceDeskSatisfaction": 4.0
+  },
+  "Benchmarks": {
+    "Industry": {
+      "TechnologyROI": 15.0,
+      "SystemAvailability": 99.5,
+      "SecurityIncidentFrequency": 5.0,
+      "ChangeSuccessRate": 85.0,
+      "UserSatisfaction": 3.5
+    },
+    "TopQuartile": {
+      "TechnologyROI": 25.0,
+      "SystemAvailability": 99.95,
+      "SecurityIncidentFrequency": 1.0,
+      "ChangeSuccessRate": 95.0,
+      "UserSatisfaction": 4.2
+    }
+  },
+  "Reporting": {
+    "OutputFormats": [
+      "Excel",
+      "PDF",
+      "JSON",
+      "Dashboard"
+    ],
+    "Recipients": [
+      {
+        "Type": "Executive",
+        "Email": "cio@organization.com",
+        "ReportLevel": "Summary"
+      },
+      {
+        "Type": "GovernanceCouncil",
+        "Email": "governance-council@organization.com",
+        "ReportLevel": "Detailed"
+      },
+      {
+        "Type": "ITManagement",
+        "Email": "it-management@organization.com",
+        "ReportLevel": "Operational"
+      },
+      {
+        "Type": "DomainOwners",
+        "Email": "domain-owners@organization.com",
+        "ReportLevel": "Domain"
+      }
+    ],
+    "Schedule": {
+      "Quarterly": {
+        "Day": 15,
+        "Recipients": ["Executive", "GovernanceCouncil"]
+      },
+      "Monthly": {
+        "Day": 5,
+        "Recipients": ["ITManagement", "DomainOwners"]
+      }
+    },
+    "Templates": {
+      "ExecutiveSummary": "executive-summary-template.html",
+      "DetailedReport": "detailed-report-template.html",
+      "Dashboard": "dashboard-template.json"
+    }
+  },
+  "Analysis": {
+    "TrendAnalysis": {
+      "Enabled": true,
+      "HistoricalPeriods": 12,
+      "ForecastPeriods": 3,
+      "SeasonalAdjustment": true
+    },
+    "BenchmarkAnalysis": {
+      "Enabled": true,
+      "IndustryComparison": true,
+      "PeerComparison": false,
+      "HistoricalComparison": true
+    },
+    "CorrelationAnalysis": {
+      "Enabled": true,
+      "MinimumCorrelation": 0.7,
+      "StatisticalSignificance": 0.05
+    },
+    "RootCauseAnalysis": {
+      "Enabled": true,
+      "AutomaticTriggers": [
+        "PerformanceDecline",
+        "ThresholdBreach",
+        "NegativeTrend"
+      ]
+    }
+  },
+  "ImprovementTracking": {
+    "Enabled": true,
+    "PrioritizationCriteria": {
+      "BusinessImpact": 0.40,
+      "ImplementationEffort": 0.25,
+      "SuccessProbability": 0.20,
+      "StrategicAlignment": 0.15
+    },
+    "Categories": [
+      "QuickWins",
+      "StrategicProjects",
+      "MajorInitiatives",
+      "OperationalImprovements"
+    ],
+    "ApprovalWorkflow": {
+      "QuickWins": ["DomainOwner"],
+      "StrategicProjects": ["GovernanceCouncil"],
+      "MajorInitiatives": ["Executive", "GovernanceCouncil"]
+    }
+  },
+  "DataQuality": {
+    "MinimumCompleteness": 95.0,
+    "MaximumErrorRate": 2.0,
+    "ValidationRules": [
+      "RangeCheck",
+      "ConsistencyCheck",
+      "TimelinessCheck",
+      "CompletenessCheck"
+    ],
+    "OutlierDetection": {
+      "Enabled": true,
+      "Method": "IQR",
+      "Threshold": 1.5
+    }
+  },
+  "Security": {
+    "DataEncryption": true,
+    "AccessControl": {
+      "Enabled": true,
+      "Roles": [
+        "Administrator",
+        "Analyst",
+        "Viewer"
+      ]
+    },
+    "AuditLogging": {
+      "Enabled": true,
+      "RetentionPeriod": 365,
+      "LogLevel": "Detailed"
+    }
+  },
+  "Performance": {
+    "CacheSettings": {
+      "Enabled": true,
+      "TTL": 3600,
+      "MaxSize": "100MB"
+    },
+    "ParallelProcessing": {
+      "Enabled": true,
+      "MaxThreads": 8
+    },
+    "TimeoutSettings": {
+      "DataCollection": 300,
+      "Analysis": 600,
+      "Reporting": 180
+    }
+  },
+  "Notifications": {
+    "Enabled": true,
+    "Channels": [
+      "Email",
+      "Teams",
+      "Dashboard"
+    ],
+    "Triggers": [
+      "EvaluationComplete",
+      "ThresholdBreach",
+      "DataQualityIssue",
+      "SystemError"
+    ],
+    "Recipients": {
+      "EvaluationComplete": ["GovernanceCouncil"],
+      "ThresholdBreach": ["DomainOwners", "ITManagement"],
+      "DataQualityIssue": ["DataStewards"],
+      "SystemError": ["Administrators"]
+    }
+  },
+  "Maintenance": {
+    "DataRetention": {
+      "RawData": 730,
+      "ProcessedData": 1095,
+      "Reports": 2190,
+      "Logs": 365
+    },
+    "BackupSettings": {
+      "Enabled": true,
+      "Frequency": "Daily",
+      "RetentionPeriod": 90,
+      "Location": "Azure Blob Storage"
+    },
+    "HealthChecks": {
+      "Enabled": true,
+      "Frequency": "Hourly",
+      "Endpoints": [
+        "DataSources",
+        "AnalysisEngine",
+        "ReportingService"
+      ]
+    }
+  }
+}
