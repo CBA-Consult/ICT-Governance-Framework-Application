@@ -10,8 +10,6 @@ The framework has evolved from siloed governance tools to an integrated platform
 - **Enhanced Automation**: Cross-domain workflow automation and policy enforcement
 - **Improved Efficiency**: Streamlined processes and reduced operational overhead
 
----
-
 ## Scope
 
 This framework covers all technology assets, services, and resources:
@@ -21,9 +19,13 @@ This framework covers all technology assets, services, and resources:
 * **💻 Applications:** Enterprise applications, custom software, SaaS solutions, employee-requested applications
 * **📊 Data:** Structured and unstructured data, analytics platforms
 * **📱 End-user Computing:** Productivity tools, collaboration platforms, mobile devices, application compliance
-* **🔄 Integration:** Unified API ecosystem, middleware, data exchange mechanisms, security information exchange, cross-domain workflow automation
 
----
+* **🔄 Integration:** APIs, middleware, data exchange mechanisms, security information exchange
+* **🌐 IoT (Internet of Things):** IoT devices, sensors, edge processing, IoT data governance, device lifecycle management
+* **⚡ Edge Computing:** Edge infrastructure, distributed processing, real-time analytics, edge-cloud integration
+* **🔗 Blockchain:** Distributed ledger technologies, smart contracts, cryptocurrency, digital assets, decentralized applications
+=======
+* **🔄 Integration:** Unified API ecosystem, middleware, data exchange mechanisms, security information exchange, cross-domain workflow automation
 
 ## Unified Governance Platform
 
@@ -139,6 +141,9 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
   - Chief Financial Officer or Finance Representative
   - Risk Management Representative
   - Enterprise Architecture Lead
+  - IoT Strategy Lead (for IoT governance oversight)
+  - Edge Computing Strategy Lead (for edge computing governance)
+  - Blockchain Strategy Lead (for blockchain and DLT governance)
 
 **Primary Responsibilities:**
 * **Strategic Technology Oversight:** Provide strategic direction and oversight for all technology initiatives
@@ -181,6 +186,21 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
   * Oversees the Employee App Store and validation workflows
   * Manages application compliance metrics
   * Coordinates with Security Owner on shadow IT detection
+* **IoT Domain Owner**
+  * Responsible for IoT strategy, device governance, and data management
+  * Oversees IoT security policies and device lifecycle management
+  * Manages IoT compliance and regulatory requirements
+  * Coordinates IoT innovation and emerging technology adoption
+* **Edge Computing Domain Owner**
+  * Responsible for edge computing strategy and infrastructure governance
+  * Oversees edge-cloud integration and performance optimization
+  * Manages edge security and distributed operations
+  * Coordinates edge innovation and technology evaluation
+* **Blockchain Domain Owner**
+  * Responsible for blockchain strategy and platform governance
+  * Oversees smart contract development and digital asset management
+  * Manages blockchain compliance and regulatory requirements
+  * Coordinates blockchain innovation and emerging DLT technologies
 
 **🛡️ Technology Stewards**
 
@@ -199,6 +219,21 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
   * Monitors AI systems for ethics compliance and fairness
   * Coordinates with AI Ethics Review Board on technical assessments
   * Provides AI ethics training and guidance to development teams
+* **IoT Technology Steward:** Manages IoT device standards and operations
+  * Oversees IoT device lifecycle management and security
+  * Coordinates IoT data processing and analytics implementation
+  * Manages IoT platform integration and monitoring
+  * Ensures IoT compliance with security and privacy standards
+* **Edge Computing Steward:** Manages edge infrastructure and operations
+  * Oversees edge deployment and configuration management
+  * Coordinates edge-cloud integration and data synchronization
+  * Manages edge security implementation and monitoring
+  * Ensures edge performance optimization and resource management
+* **Blockchain Technology Steward:** Manages blockchain platforms and operations
+  * Oversees smart contract development and deployment
+  * Coordinates digital asset management and custody
+  * Manages blockchain security and cryptographic operations
+  * Ensures blockchain compliance and regulatory adherence
 
 **🔧 Technology Custodians (IT Operations)**
 
@@ -243,6 +278,21 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
 | **AI Ethics Compliance Monitoring** | I | A | R | R |
 | **AI Ethics Training and Awareness** | A | R | R | I |
 | **AI Ethics Incident Response** | A | R | R | C |
+| **IoT Device Lifecycle Management** | I | A | R | R |
+| **IoT Security Policy Implementation** | A | R | R | I |
+| **IoT Data Governance and Privacy** | A | R | R | I |
+| **IoT Platform Selection and Management** | A | R | R | I |
+| **IoT Innovation and Pilot Programs** | A | R | C | I |
+| **Edge Computing Infrastructure Management** | I | A | R | R |
+| **Edge-Cloud Integration** | A | R | R | I |
+| **Edge Security Implementation** | A | R | R | I |
+| **Edge Performance Optimization** | I | A | R | R |
+| **Edge Innovation and Technology Evaluation** | A | R | C | I |
+| **Blockchain Platform Governance** | A | R | R | I |
+| **Smart Contract Development and Deployment** | A | R | R | I |
+| **Digital Asset Management** | A | R | R | I |
+| **Blockchain Security and Compliance** | A | R | R | I |
+| **Blockchain Innovation and DLT Evaluation** | A | R | C | I |
 
 _Legend: R = Responsible, A = Accountable, C = Consulted, I = Informed_
 
@@ -767,6 +817,16 @@ The FAIR risk assessment framework integrates with the Business Value Quantifica
 13. **🤖 AI Ethics Violations:** AI Ethics Steward → AI Ethics Review Board → AI Ethics Council for significant ethics violations
 14. **🧠 High-Risk AI System Deployments:** AI Ethics Steward → AI Ethics Review Board → AI Ethics Council for high-risk AI system approvals
 15. **⚖️ AI Bias Detection:** AI Ethics Steward → Domain Owners → AI Ethics Council for significant bias incidents
+16. **🌐 IoT Security Incidents:** IoT Technology Steward → IoT Domain Owner → ICT Governance Council for major IoT security breaches
+17. **📡 IoT Device Compliance Violations:** IoT Technology Steward → IoT Domain Owner → ICT Governance Council for significant compliance issues
+18. **🔗 IoT Data Privacy Breaches:** IoT Technology Steward → Data Domain Owner → ICT Governance Council for personal data incidents
+19. **⚡ Edge Computing Performance Issues:** Edge Computing Steward → Edge Computing Domain Owner → ICT Governance Council for critical performance degradation
+20. **🌍 Edge Security Incidents:** Edge Computing Steward → Security Domain Owner → ICT Governance Council for edge security breaches
+21. **📊 Edge-Cloud Integration Failures:** Edge Computing Steward → Infrastructure Domain Owner → ICT Governance Council for major integration issues
+22. **🔗 Blockchain Security Incidents:** Blockchain Technology Steward → Blockchain Domain Owner → ICT Governance Council for blockchain security breaches
+23. **💰 Digital Asset Management Issues:** Blockchain Technology Steward → Blockchain Domain Owner → ICT Governance Council for cryptocurrency/token incidents
+24. **📜 Smart Contract Vulnerabilities:** Blockchain Technology Steward → Security Domain Owner → ICT Governance Council for critical smart contract flaws
+25. **⚖️ Blockchain Regulatory Compliance:** Blockchain Technology Steward → Legal and Compliance → ICT Governance Council for regulatory violations
 
 ---
 
