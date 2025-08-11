@@ -1,4 +1,52 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+# ICT Governance & IT Management Framework Dashboard
+
+This project is an interactive dashboard designed to visualize, navigate, and operationalize the comprehensive ICT Governance and IT Management Framework developed in this repository.
+
+## Project Purpose
+
+The dashboard aims to:
+- Provide a user-friendly interface for exploring the detailed governance, compliance, and management processes documented in the Markdown (.md) files.
+- Serve as a central portal for stakeholders to access, understand, and implement the framework's policies, procedures, and best practices.
+- Enable future integration of reporting, benchmarking, and workflow automation features aligned with the framework.
+
+## Current Status
+
+- **First Draft:** The current dashboard is a prototype and does not yet reflect the depth, structure, or content of the full ICT Governance & IT Management Framework.
+- **Placeholder Pages:** Most pages are placeholders and do not display meaningful or actionable information.
+- **Documentation Source:** All authoritative content is maintained in the Markdown files at the root of this repository.
+
+## Next Steps / Roadmap
+
+To upgrade the dashboard to production quality and align it with the framework:
+
+1. **Content Integration:**
+	- Parse and render the Markdown documentation within the dashboard.
+	- Organize content by framework domains, processes, and compliance requirements.
+
+2. **UI/UX Enhancements:**
+	- Design navigation and dashboards that reflect the structure of the framework.
+	- Add search, filtering, and cross-referencing capabilities.
+
+3. **Compliance & Reporting:**
+	- Integrate compliance checklists, reporting tools, and benchmarking features.
+
+4. **Automation & Workflows:**
+	- Enable workflow automation for governance processes (e.g., registration, offboarding, audits).
+
+5. **Stakeholder Feedback:**
+	- Gather input from users to refine features and prioritize enhancements.
+
+## Contributing
+
+Contributions are welcome! Please see the main repository documentation for guidelines and priorities. Focus areas include:
+- Upgrading page content to reflect the framework
+- Improving UI/UX
+- Integrating documentation and compliance tools
+
+---
+
+**Note:** This dashboard is under active development. For authoritative framework content, refer to the Markdown files in the repository root.
 
 ## Getting Started
 

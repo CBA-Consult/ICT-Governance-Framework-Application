@@ -46,14 +46,20 @@ export default function Home() {
               <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                 Dashboard
               </Link>
+              <Link href="/employee-app-store" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                App Store
+              </Link>
+              <Link href="/application-procurement" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                Procurement
+              </Link>
+              <Link href="/compliance-dashboard" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                Compliance
+              </Link>
               <Link href="/policies" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                 Policies
               </Link>
               <Link href="/blueprints" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                 Blueprints
-              </Link>
-              <Link href="/compliance" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                Compliance
               </Link>
             </nav>
           </div>

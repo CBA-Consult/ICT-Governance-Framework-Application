@@ -1,9 +1,48 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "framework": {
-    "name": "CBA Consult IT Management Framework",
-    "version": "3.2.0",
-    "description": "Comprehensive ICT governance framework for multi-cloud environments"
+    "name": "CBA Consult Unified Governance Platform",
+    "version": "4.0.0",
+    "description": "Unified governance platform integrating all governance tools and systems"
+  },
+  "unifiedPlatform": {
+    "enabled": true,
+    "apiGateway": {
+      "endpoint": "https://governance-api.company.com/v2",
+      "authentication": {
+        "type": "AzureAD",
+        "tenantId": "your-tenant-id",
+        "clientId": "your-client-id",
+        "scopes": ["governance.read", "governance.write", "governance.admin"]
+      }
+    },
+    "domains": {
+      "ictGovernance": {
+        "enabled": true,
+        "endpoint": "/ict-governance",
+        "integration": "native"
+      },
+      "azureGovernance": {
+        "enabled": true,
+        "endpoint": "/azure",
+        "integration": "native"
+      },
+      "multiCloudGovernance": {
+        "enabled": true,
+        "endpoint": "/multi-cloud",
+        "integration": "api"
+      },
+      "applicationGovernance": {
+        "enabled": true,
+        "endpoint": "/applications",
+        "integration": "api"
+      },
+      "securityGovernance": {
+        "enabled": true,
+        "endpoint": "/security",
+        "integration": "api"
+      }
+    }
   },
   "organization": {
     "name": "CBA Consult",
@@ -172,6 +211,13 @@
         "schedule": "Daily"
       },
       {
+        "name": "automated-remediation",
+        "description": "Automated remediation of compliance violations",
+        "type": "PowerShell",
+        "schedule": "Daily",
+        "script": "./azure-automation/Automated-Remediation-Framework.ps1"
+      },
+      {
         "name": "resource-cleanup",
         "description": "Cleanup unused resources",
         "type": "PowerShell",
@@ -190,6 +236,12 @@
         "frequency": "Daily",
         "startTime": "02:00",
         "runbook": "compliance-check"
+      },
+      {
+        "name": "daily-automated-remediation",
+        "frequency": "Daily",
+        "startTime": "03:00",
+        "runbook": "automated-remediation"
       },
       {
         "name": "weekly-cleanup",
@@ -300,33 +352,88 @@
     }
   },
   "integration": {
+    "unifiedPlatform": {
+      "enabled": true,
+      "apiEndpoint": "https://governance-api.company.com/v2",
+      "authentication": "ManagedIdentity",
+      "dataSync": {
+        "enabled": true,
+        "frequency": "real-time",
+        "batchSize": 100
+      }
+    },
     "servicenow": {
-      "enabled": false,
+      "enabled": true,
       "endpoint": "https://company.service-now.com",
-      "username": "integration-user",
-      "password": "integration-password"
+      "authentication": "OAuth2",
+      "integration": "unified-api"
     },
     "jira": {
-      "enabled": false,
+      "enabled": true,
       "endpoint": "https://company.atlassian.net",
-      "username": "integration-user",
-      "apiToken": "api-token"
+      "authentication": "ApiToken",
+      "integration": "unified-api"
     },
     "slack": {
-      "enabled": false,
+      "enabled": true,
       "webhookUrl": "https://hooks.slack.com/services/...",
+      "integration": "unified-api",
       "channels": {
         "governance": "#governance",
         "security": "#security",
         "operations": "#operations"
       }
+    },
+    "siem": {
+      "enabled": true,
+      "type": "Microsoft Sentinel",
+      "endpoint": "https://sentinel.azure.com",
+      "authentication": "ManagedIdentity",
+      "integration": "unified-api"
+    },
+    "cloudAppSecurity": {
+      "enabled": true,
+      "type": "Microsoft Defender for Cloud Apps",
+      "endpoint": "https://portal.cloudappsecurity.com",
+      "authentication": "ApiKey",
+      "integration": "unified-api"
     }
   },
   "features": {
     "autoRemediation": {
       "enabled": true,
       "approvalRequired": true,
-      "maxActions": 10
+      "maxActions": 50,
+      "configPath": "./azure-automation/remediation-config.json",
+      "supportedViolationTypes": [
+        "MissingTags",
+        "SecurityConfiguration",
+        "BackupConfiguration",
+        "CostOptimization",
+        "NamingConvention"
+      ],
+      "expansionPhases": {
+        "phase1": {
+          "description": "Low-risk violations only",
+          "violationTypes": ["MissingTags"],
+          "autoRemediable": true
+        },
+        "phase2": {
+          "description": "Security configurations",
+          "violationTypes": ["MissingTags", "SecurityConfiguration"],
+          "autoRemediable": true
+        },
+        "phase3": {
+          "description": "Backup and cost optimization",
+          "violationTypes": ["MissingTags", "SecurityConfiguration", "BackupConfiguration", "CostOptimization"],
+          "autoRemediable": false
+        },
+        "phase4": {
+          "description": "Full coverage",
+          "violationTypes": ["All"],
+          "autoRemediable": false
+        }
+      }
     },
     "costOptimization": {
       "enabled": true,

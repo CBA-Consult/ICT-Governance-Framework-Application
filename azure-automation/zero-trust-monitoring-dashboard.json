@@ -1,0 +1,467 @@
+{
+  "dashboardMetadata": {
+    "name": "Zero Trust Security Architecture Monitoring Dashboard",
+    "description": "Comprehensive monitoring dashboard for Zero Trust implementation across critical systems and data",
+    "version": "1.0.0",
+    "lastUpdated": "2024-12-19",
+    "owner": "Chief Information Security Officer",
+    "tags": ["zero-trust", "security", "governance", "monitoring"]
+  },
+  "dashboardConfiguration": {
+    "refreshInterval": "5m",
+    "timeRange": "24h",
+    "autoRefresh": true,
+    "theme": "dark",
+    "layout": "grid"
+  },
+  "dataSources": {
+    "logAnalytics": {
+      "workspaceName": "law-zerotrust-{environment}",
+      "subscriptionId": "{subscriptionId}",
+      "resourceGroup": "rg-zerotrust-{environment}"
+    },
+    "securityCenter": {
+      "subscriptionId": "{subscriptionId}",
+      "resourceGroup": "rg-zerotrust-{environment}"
+    },
+    "azureAD": {
+      "tenantId": "{tenantId}"
+    }
+  },
+  "panels": [
+    {
+      "id": "executive-summary",
+      "title": "Zero Trust Executive Summary",
+      "type": "stat",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "width": 24,
+        "height": 4
+      },
+      "metrics": [
+        {
+          "name": "Overall Zero Trust Maturity",
+          "query": "ZeroTrustMaturityAssessment_CL | summarize avg(MaturityScore_d) by bin(TimeGenerated, 1d) | order by TimeGenerated desc | take 1",
+          "target": 4.0,
+          "unit": "Level",
+          "color": "green"
+        },
+        {
+          "name": "Critical Systems Protected",
+          "query": "ZeroTrustCompliance_CL | where SystemTier_s == 'Tier1' | summarize ProtectedSystems = countif(ComplianceStatus_s == 'Compliant'), TotalSystems = count() | extend ProtectionRate = (ProtectedSystems * 100.0) / TotalSystems",
+          "target": 100,
+          "unit": "%",
+          "color": "blue"
+        },
+        {
+          "name": "Security Incidents (24h)",
+          "query": "SecurityIncident | where TimeGenerated > ago(24h) | where Severity in ('High', 'Medium') | count",
+          "target": 0,
+          "unit": "count",
+          "color": "red"
+        },
+        {
+          "name": "Mean Time to Detection",
+          "query": "SecurityIncident | where TimeGenerated > ago(7d) | extend DetectionTime = datetime_diff('minute', FirstActivityTime, CreatedTime) | summarize avg(DetectionTime)",
+          "target": 15,
+          "unit": "min",
+          "color": "orange"
+        }
+      ]
+    },
+    {
+      "id": "identity-pillar",
+      "title": "Identity Pillar Metrics",
+      "type": "graph",
+      "position": {
+        "x": 0,
+        "y": 4,
+        "width": 12,
+        "height": 8
+      },
+      "queries": [
+        {
+          "name": "MFA Adoption Rate",
+          "query": "SigninLogs | where TimeGenerated > ago(24h) | summarize MFASuccess = countif(AuthenticationRequirement == 'multiFactorAuthentication' and ResultType == 0), TotalSignins = count() | extend MFARate = (MFASuccess * 100.0) / TotalSignins",
+          "legend": "MFA Adoption %",
+          "color": "green"
+        },
+        {
+          "name": "High Risk Sign-ins",
+          "query": "SigninLogs | where TimeGenerated > ago(24h) | where RiskLevelDuringSignIn == 'high' | count",
+          "legend": "High Risk Sign-ins",
+          "color": "red"
+        },
+        {
+          "name": "Privileged Access Events",
+          "query": "AuditLogs | where TimeGenerated > ago(24h) | where Category == 'RoleManagement' | count",
+          "legend": "Privileged Access Events",
+          "color": "blue"
+        }
+      ]
+    },
+    {
+      "id": "endpoint-pillar",
+      "title": "Endpoint Pillar Metrics",
+      "type": "graph",
+      "position": {
+        "x": 12,
+        "y": 4,
+        "width": 12,
+        "height": 8
+      },
+      "queries": [
+        {
+          "name": "Device Compliance Rate",
+          "query": "DeviceComplianceOrg | summarize CompliantDevices = countif(ComplianceState == 'Compliant'), TotalDevices = count() | extend ComplianceRate = (CompliantDevices * 100.0) / TotalDevices",
+          "legend": "Device Compliance %",
+          "color": "green"
+        },
+        {
+          "name": "Endpoint Threats Detected",
+          "query": "DeviceEvents | where TimeGenerated > ago(24h) | where ActionType in ('AntivirusDetection', 'SmartScreenUrlWarning', 'SmartScreenUserOverride') | count",
+          "legend": "Threats Detected",
+          "color": "red"
+        },
+        {
+          "name": "Device Trust Score",
+          "query": "DeviceInfo | summarize avg(OSVersion), avg(IsAzureADJoined), avg(IsCompliant) | extend TrustScore = (avg_IsAzureADJoined + avg_IsCompliant) * 50",
+          "legend": "Device Trust Score",
+          "color": "blue"
+        }
+      ]
+    },
+    {
+      "id": "application-pillar",
+      "title": "Application Pillar Metrics",
+      "type": "table",
+      "position": {
+        "x": 0,
+        "y": 12,
+        "width": 12,
+        "height": 8
+      },
+      "query": "CloudAppEvents | where TimeGenerated > ago(24h) | summarize Events = count(), UniqueUsers = dcount(AccountObjectId), RiskScore = avg(RiskScore) by Application | order by Events desc | take 10",
+      "columns": [
+        {
+          "name": "Application",
+          "type": "string"
+        },
+        {
+          "name": "Events",
+          "type": "number"
+        },
+        {
+          "name": "Unique Users",
+          "type": "number"
+        },
+        {
+          "name": "Risk Score",
+          "type": "number",
+          "format": "decimal"
+        }
+      ]
+    },
+    {
+      "id": "data-pillar",
+      "title": "Data Protection Metrics",
+      "type": "graph",
+      "position": {
+        "x": 12,
+        "y": 12,
+        "width": 12,
+        "height": 8
+      },
+      "queries": [
+        {
+          "name": "Data Classification Coverage",
+          "query": "InformationProtectionLogs_CL | summarize ClassifiedFiles = countif(SensitivityLabel_s != ''), TotalFiles = count() | extend ClassificationRate = (ClassifiedFiles * 100.0) / TotalFiles",
+          "legend": "Classification Coverage %",
+          "color": "green"
+        },
+        {
+          "name": "DLP Policy Violations",
+          "query": "DlpComplianceEvent | where TimeGenerated > ago(24h) | where EventType == 'PolicyViolation' | count",
+          "legend": "DLP Violations",
+          "color": "red"
+        },
+        {
+          "name": "Encryption Coverage",
+          "query": "StorageFileLogs | summarize EncryptedFiles = countif(IsEncrypted == true), TotalFiles = count() | extend EncryptionRate = (EncryptedFiles * 100.0) / TotalFiles",
+          "legend": "Encryption Coverage %",
+          "color": "blue"
+        }
+      ]
+    },
+    {
+      "id": "network-pillar",
+      "title": "Network Security Metrics",
+      "type": "heatmap",
+      "position": {
+        "x": 0,
+        "y": 20,
+        "width": 24,
+        "height": 8
+      },
+      "query": "AzureNetworkAnalytics_CL | where TimeGenerated > ago(24h) | summarize FlowCount = count(), BytesTransferred = sum(FlowCount_d) by SourceIP = SrcIP_s, DestinationIP = DestIP_s | where FlowCount > 100",
+      "xAxis": "SourceIP",
+      "yAxis": "DestinationIP",
+      "value": "FlowCount"
+    },
+    {
+      "id": "infrastructure-pillar",
+      "title": "Infrastructure Security Status",
+      "type": "stat",
+      "position": {
+        "x": 0,
+        "y": 28,
+        "width": 12,
+        "height": 6
+      },
+      "metrics": [
+        {
+          "name": "Security Center Score",
+          "query": "SecurityRecommendation | summarize avg(RecommendationWeight) | extend Score = avg_RecommendationWeight * 20",
+          "target": 80,
+          "unit": "score",
+          "color": "green"
+        },
+        {
+          "name": "Vulnerability Count",
+          "query": "SecurityRecommendation | where RecommendationState == 'Active' | where RecommendationSeverity in ('High', 'Medium') | count",
+          "target": 10,
+          "unit": "count",
+          "color": "red"
+        },
+        {
+          "name": "Configuration Compliance",
+          "query": "ConfigurationData | summarize CompliantConfigs = countif(ConfigDataType == 'Compliant'), TotalConfigs = count() | extend ComplianceRate = (CompliantConfigs * 100.0) / TotalConfigs",
+          "target": 95,
+          "unit": "%",
+          "color": "blue"
+        }
+      ]
+    },
+    {
+      "id": "threat-intelligence",
+      "title": "Threat Intelligence and Response",
+      "type": "graph",
+      "position": {
+        "x": 12,
+        "y": 28,
+        "width": 12,
+        "height": 6
+      },
+      "queries": [
+        {
+          "name": "Threat Indicators",
+          "query": "ThreatIntelligenceIndicator | where TimeGenerated > ago(24h) | where Active == true | count",
+          "legend": "Active Threat Indicators",
+          "color": "red"
+        },
+        {
+          "name": "Blocked Threats",
+          "query": "CommonSecurityLog | where TimeGenerated > ago(24h) | where DeviceAction == 'Blocked' | count",
+          "legend": "Blocked Threats",
+          "color": "green"
+        },
+        {
+          "name": "Response Time",
+          "query": "SecurityIncident | where TimeGenerated > ago(7d) | extend ResponseTime = datetime_diff('minute', FirstActivityTime, LastActivityTime) | summarize avg(ResponseTime)",
+          "legend": "Avg Response Time (min)",
+          "color": "blue"
+        }
+      ]
+    },
+    {
+      "id": "compliance-status",
+      "title": "Zero Trust Compliance Status",
+      "type": "pie",
+      "position": {
+        "x": 0,
+        "y": 34,
+        "width": 12,
+        "height": 6
+      },
+      "query": "ZeroTrustCompliance_CL | summarize count() by ComplianceStatus_s",
+      "legend": "Compliance Status Distribution"
+    },
+    {
+      "id": "user-behavior",
+      "title": "User Behavior Analytics",
+      "type": "graph",
+      "position": {
+        "x": 12,
+        "y": 34,
+        "width": 12,
+        "height": 6
+      },
+      "queries": [
+        {
+          "name": "Anomalous User Activity",
+          "query": "BehaviorAnalytics | where TimeGenerated > ago(24h) | where ActivityType == 'Anomalous' | count",
+          "legend": "Anomalous Activities",
+          "color": "red"
+        },
+        {
+          "name": "Risk Score Trend",
+          "query": "BehaviorAnalytics | where TimeGenerated > ago(7d) | summarize avg(RiskScore) by bin(TimeGenerated, 1h)",
+          "legend": "Average Risk Score",
+          "color": "orange"
+        },
+        {
+          "name": "Investigation Priority",
+          "query": "BehaviorAnalytics | where TimeGenerated > ago(24h) | where InvestigationPriority in ('High', 'Medium') | count",
+          "legend": "High Priority Investigations",
+          "color": "blue"
+        }
+      ]
+    }
+  ],
+  "alerts": [
+    {
+      "name": "Critical System Access Violation",
+      "description": "Unauthorized access attempt to Tier 1 critical system",
+      "query": "SigninLogs | where TimeGenerated > ago(5m) | where AppDisplayName in (dynamic(['ERP System', 'Financial Management', 'HR System'])) | where ResultType != 0",
+      "severity": "Critical",
+      "frequency": "5m",
+      "threshold": 1,
+      "actions": [
+        {
+          "type": "email",
+          "recipients": ["security-team@cbagroup.com", "ciso@cbagroup.com"]
+        },
+        {
+          "type": "webhook",
+          "url": "https://security-automation.cbagroup.com/api/alerts"
+        }
+      ]
+    },
+    {
+      "name": "Zero Trust Maturity Degradation",
+      "description": "Zero Trust maturity score has decreased below threshold",
+      "query": "ZeroTrustMaturityAssessment_CL | summarize CurrentScore = avg(MaturityScore_d) by bin(TimeGenerated, 1h) | order by TimeGenerated desc | take 2 | extend PreviousScore = prev(CurrentScore) | where CurrentScore < PreviousScore - 0.5",
+      "severity": "High",
+      "frequency": "1h",
+      "threshold": 1,
+      "actions": [
+        {
+          "type": "email",
+          "recipients": ["security-team@cbagroup.com"]
+        }
+      ]
+    },
+    {
+      "name": "High Volume of Failed MFA Attempts",
+      "description": "Potential brute force attack detected",
+      "query": "SigninLogs | where TimeGenerated > ago(15m) | where AuthenticationRequirement == 'multiFactorAuthentication' | where ResultType != 0 | summarize FailedAttempts = count() by UserPrincipalName | where FailedAttempts > 10",
+      "severity": "High",
+      "frequency": "15m",
+      "threshold": 1,
+      "actions": [
+        {
+          "type": "email",
+          "recipients": ["security-team@cbagroup.com"]
+        },
+        {
+          "type": "automation",
+          "runbook": "Block-SuspiciousUser"
+        }
+      ]
+    },
+    {
+      "name": "Data Exfiltration Detected",
+      "description": "Potential data exfiltration activity detected",
+      "query": "CloudAppEvents | where TimeGenerated > ago(10m) | where ActionType == 'FileDownloaded' | summarize DownloadCount = count(), DataVolume = sum(ObjectSize) by AccountObjectId | where DownloadCount > 50 or DataVolume > 1000000000",
+      "severity": "Critical",
+      "frequency": "10m",
+      "threshold": 1,
+      "actions": [
+        {
+          "type": "email",
+          "recipients": ["security-team@cbagroup.com", "data-protection@cbagroup.com"]
+        },
+        {
+          "type": "automation",
+          "runbook": "Investigate-DataExfiltration"
+        }
+      ]
+    },
+    {
+      "name": "Device Compliance Violation",
+      "description": "Non-compliant device accessing critical systems",
+      "query": "SigninLogs | where TimeGenerated > ago(5m) | where AppDisplayName in (dynamic(['ERP System', 'Financial Management', 'HR System'])) | where DeviceDetail.isCompliant == false | where ResultType == 0",
+      "severity": "Medium",
+      "frequency": "5m",
+      "threshold": 1,
+      "actions": [
+        {
+          "type": "email",
+          "recipients": ["security-team@cbagroup.com"]
+        }
+      ]
+    }
+  ],
+  "automationRunbooks": [
+    {
+      "name": "Block-SuspiciousUser",
+      "description": "Automatically block user account showing suspicious activity",
+      "trigger": "High Volume of Failed MFA Attempts",
+      "actions": [
+        "Disable user account",
+        "Revoke all active sessions",
+        "Notify security team",
+        "Create incident ticket"
+      ]
+    },
+    {
+      "name": "Investigate-DataExfiltration",
+      "description": "Initiate automated investigation for potential data exfiltration",
+      "trigger": "Data Exfiltration Detected",
+      "actions": [
+        "Collect user activity logs",
+        "Analyze file access patterns",
+        "Check for policy violations",
+        "Generate investigation report",
+        "Escalate to security analyst"
+      ]
+    }
+  ],
+  "reportingSchedule": {
+    "executiveSummary": {
+      "frequency": "weekly",
+      "day": "Monday",
+      "time": "08:00",
+      "recipients": ["ciso@cbagroup.com", "cto@cbagroup.com", "governance-council@cbagroup.com"]
+    },
+    "operationalReport": {
+      "frequency": "daily",
+      "time": "06:00",
+      "recipients": ["security-team@cbagroup.com", "it-operations@cbagroup.com"]
+    },
+    "complianceReport": {
+      "frequency": "monthly",
+      "day": "1",
+      "time": "09:00",
+      "recipients": ["compliance-team@cbagroup.com", "audit-committee@cbagroup.com"]
+    }
+  },
+  "integrations": {
+    "ictGovernanceFramework": {
+      "enabled": true,
+      "metricsEndpoint": "https://governance.cbagroup.com/api/metrics",
+      "reportingEndpoint": "https://governance.cbagroup.com/api/reports"
+    },
+    "siem": {
+      "enabled": true,
+      "platform": "Microsoft Sentinel",
+      "workspace": "law-zerotrust-{environment}"
+    },
+    "soar": {
+      "enabled": true,
+      "platform": "Microsoft Logic Apps",
+      "automationAccount": "aa-zerotrust-{environment}"
+    }
+  }
+}

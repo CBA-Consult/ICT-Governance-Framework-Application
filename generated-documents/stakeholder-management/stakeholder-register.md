@@ -6,12 +6,16 @@
 |----------------------|----------------------------------|
 | Document Title       | Stakeholder Register             |
 | Project Name         | ICT Governance Framework         |
-| Document Version     | 2.0                              |
-| Document Status      | Complete                         |
+| Document Version     | 2.1                              |
+| Document Status      | Baselined                        |
 | Created Date         | August 7, 2025                   |
-| Last Updated         | August 7, 2025                   |
+| Last Updated         | August 11, 2025                  |
 | Document Owner       | CBA Consult                      |
 | Prepared By          | ADPA Enterprise Framework        |
+| **WBS Code**         | **1.1.2.1.4**                   |
+| **Activity ID**      | **A012**                         |
+| **Approved By**      | **Project Sponsor**              |
+| **Baseline Date**    | **August 11, 2025**             |
 
 ## Introduction
 
@@ -125,6 +129,11 @@ This Stakeholder Register identifies all individuals, groups, or organizations t
 ### Power/Interest Grid
 
 ![Power Interest Grid](./stakeholder-power-interest.png)
+
+**Note:** For detailed stakeholder influence/interest analysis and comprehensive stakeholder profiles, refer to:
+- [Stakeholder Influence/Interest Matrix](./stakeholder-influence-interest-matrix.md) - Detailed analysis completed in Activity A010
+- [Stakeholder Profiles](./stakeholder-profiles.md) - Comprehensive stakeholder profiles completed in Activity A010
+- [Communication Schedule](../management-plans/communication-schedule.md) - Detailed communication timeline and R&Rs completed in Activity A012
 
 **Key Management Strategies by Quadrant:**
 

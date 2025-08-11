@@ -181,7 +181,7 @@ Deliverable links cross-reference (key examples):
 - **Dependencies:** A011
 - **Resources:** Communications Specialist (0.5 FTE), Project Manager (0.5 FTE)
 
-**Activity ID: A013**
+**Activity ID: A013** ✅ **COMPLETED**
 - **Activity Name:** Establish Communication Channels and Protocols
 - **WBS Code:** 1.1.2.2.1
 - **Description:** Set up formal and informal communication channels, protocols, and escalation procedures
@@ -190,6 +190,7 @@ Deliverable links cross-reference (key examples):
 - **Duration:** 1 week
 - **Dependencies:** A012
 - **Resources:** Communications Specialist (0.8 FTE), Project Manager (0.2 FTE)
+- **Status:** COMPLETED - Deliverable: [ICT Governance Communication Channels and Protocols](../../ICT-Governance-Communication-Channels-Protocols.md)
 
 **Activity ID: A014**
 - **Activity Name:** Set Up Collaboration Platforms and Tools

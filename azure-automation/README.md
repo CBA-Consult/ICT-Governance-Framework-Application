@@ -140,6 +140,70 @@ The framework creates the following directory structure:
 4. **Custom Policies**: Develop custom policies to enforce organization-specific requirements
 5. **Automated Remediation**: Implement automated remediation for common compliance issues
 
+## Automated Remediation Framework
+
+The ICT Governance Framework now includes comprehensive automated remediation capabilities to address compliance violations automatically, reducing manual intervention and response times.
+
+### Key Features
+
+- **Configurable Remediation Rules**: Define which violations can be automatically remediated
+- **Phased Implementation**: Gradual expansion of automation coverage over time
+- **Environment-Specific Controls**: Different remediation limits and approval requirements per environment
+- **Comprehensive Logging**: Full audit trail of all remediation actions
+- **Integration Ready**: Built-in support for ServiceNow, JIRA, and Azure DevOps integration
+
+### Supported Violation Types
+
+1. **Missing Tags** (Auto-remediable)
+   - Automatically adds required tags to resources
+   - Configurable default tag values
+   - Excludes sensitive resource types
+
+2. **Security Configuration** (Auto-remediable)
+   - Enables HTTPS-only for storage accounts
+   - Configures Key Vault security features
+   - Applies encryption requirements
+
+3. **Backup Configuration** (Manual review)
+   - Flags resources missing backup configuration
+   - Creates tickets for manual review
+   - Tracks backup compliance
+
+4. **Cost Optimization** (Manual review)
+   - Identifies unused or oversized resources
+   - Flags cost optimization opportunities
+   - Generates cost reports
+
+5. **Naming Convention** (Manual review)
+   - Detects naming standard violations
+   - Flags for manual remediation
+   - Tracks naming compliance
+
+### Quick Start
+
+1. **Deploy Infrastructure**:
+   ```powershell
+   .\Deploy-AutomatedRemediation.ps1 -ResourceGroupName "rg-governance-automation" -Location "East US" -Environment "Development"
+   ```
+
+2. **Run Remediation**:
+   ```powershell
+   .\Automated-Remediation-Framework.ps1 -ConfigPath ".\remediation-config.json" -Environment "Development" -DryRun
+   ```
+
+3. **Monitor Results**:
+   - Check generated reports in `governance-reports/`
+   - Review logs in `governance-logs/`
+   - Monitor Azure Automation Account for scheduled runs
+
+### Configuration Files
+
+- `remediation-config.json`: Main configuration for remediation rules and settings
+- `Automated-Remediation-Framework.ps1`: Core remediation engine
+- `Deploy-AutomatedRemediation.ps1`: Infrastructure deployment script
+
+For detailed implementation guidance, see [Automated-Remediation-Implementation-Guide.md](../Automated-Remediation-Implementation-Guide.md)
+
 ## Contributing
 
 Contributions to improve the ICT Governance Framework Automation are welcome. Please follow these steps:
