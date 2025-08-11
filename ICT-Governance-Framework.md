@@ -40,12 +40,13 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
 **Primary Responsibilities:**
 * **Strategic Technology Oversight:** Provide strategic direction and oversight for all technology initiatives
 * **Policy Governance:** Approve, review, and update all ICT governance policies and procedures
-* **Resource Allocation:** Make decisions on technology resource allocation and investment priorities
+* **Resource Allocation:** Make decisions on technology resource allocation and investment priorities based on quantified business value
+* **Value Governance:** Oversee business value quantification process and approve value methodologies for technology initiatives
 * **Risk Management:** Oversee technology risk management and approve risk mitigation strategies
 * **Compliance Oversight:** Ensure compliance with regulatory requirements and industry standards
-* **Performance Monitoring:** Review governance metrics, KPIs, and audit findings
+* **Performance Monitoring:** Review governance metrics, KPIs, value realization performance, and audit findings
 * **Exception Management:** Review and approve exceptions to governance policies and standards
-* **Technology Initiative Approval:** Approve major technology initiatives, projects, and architectural changes
+* **Technology Initiative Approval:** Approve major technology initiatives, projects, and architectural changes based on comprehensive business value assessment
 
 **Meeting Frequency and Structure:**
 * **Regular Meetings:** Monthly meetings (minimum 2 hours)
@@ -226,6 +227,121 @@ For comprehensive role definitions, detailed responsibilities, expectations, and
 * **Value-Driven Innovation:** All innovation initiatives must demonstrate clear business value proposition
 * **Scalability by Design:** Innovation solutions must consider enterprise scalability from inception
 * **Ethical Innovation:** All innovative solutions must align with organizational values and ethical technology principles
+
+---
+
+## 💰 Business Value Quantification Process
+
+### Purpose and Scope
+
+The Business Value Quantification Process ensures that every technology decision creates measurable business value, supporting the strategic principle of Value-Driven Technology Leadership. This systematic process applies to all technology initiatives with investment ≥$10,000 or strategic significance.
+
+### Value Quantification Framework
+
+#### Multi-Dimensional Value Assessment
+All technology initiatives are evaluated across four key value dimensions:
+
+1. **Financial Value:** Revenue impact, cost reduction, cost avoidance, investment efficiency
+2. **Operational Value:** Process efficiency, quality improvements, capacity enhancement, reliability
+3. **Strategic Value:** Competitive advantage, business enablement, stakeholder value, future optionality
+4. **Risk Value:** Security risk reduction, operational risk mitigation, regulatory compliance, strategic risk management
+
+#### Value Quantification Requirements
+
+**Mandatory Comprehensive Assessment (Investment ≥$50,000):**
+- Complete multi-dimensional value analysis
+- Financial modeling (NPV, ROI, IRR, Payback Period)
+- Risk-adjusted value calculations
+- Sensitivity and scenario analysis
+- Stakeholder validation and approval
+
+**Simplified Assessment (Investment $10,000-$49,999):**
+- Basic value proposition and benefit identification
+- Simple ROI calculation
+- Risk assessment summary
+- Business sponsor validation
+
+### Value Quantification Workflow
+
+#### Phase 1: Initiative Scoping and Value Hypothesis (Days 1-3)
+- Initiative registration and scope determination
+- Stakeholder identification and engagement
+- Initial value hypothesis development
+- Value quantification approach selection
+
+#### Phase 2: Comprehensive Value Assessment (Days 4-14)
+- Current state baseline establishment
+- Future state definition and target setting
+- Comprehensive benefit identification and quantification
+- Total cost of ownership analysis
+- Risk assessment and mitigation planning
+- Financial analysis and modeling
+- Stakeholder validation and approval
+
+#### Phase 3: Investment Decision Support (Days 15-21)
+- Business case development
+- Portfolio impact analysis
+- Alternative solution comparison
+- Implementation and value realization planning
+- Governance review and approval
+
+#### Phase 4: Value Realization Tracking (Ongoing)
+- Baseline measurement and monitoring
+- Implementation progress tracking
+- Value realization measurement and reporting
+- Variance analysis and optimization
+- Lessons learned capture and application
+
+### Governance and Roles
+
+#### ICT Governance Council Responsibilities
+- Approve value quantification methodology and standards
+- Review and approve high-value initiatives (>$500,000)
+- Monitor portfolio-level value realization performance
+- Resolve value quantification disputes and exceptions
+
+#### Domain Owner Responsibilities
+- Approve value quantification for domain initiatives ($50,000-$500,000)
+- Ensure domain-specific value quantification quality
+- Monitor domain value realization performance
+- Provide domain expertise for value assessments
+
+#### Value Analyst Role (New)
+- Conduct comprehensive value quantification analyses
+- Apply appropriate methodologies and tools
+- Facilitate stakeholder validation sessions
+- Monitor value realization and variance analysis
+- Maintain value quantification knowledge base
+
+#### Business Sponsor Responsibilities
+- Define business requirements and success criteria
+- Validate value assumptions and benefit projections
+- Commit to value realization accountability
+- Support value measurement and tracking activities
+
+### Integration with Governance Processes
+
+The value quantification process is embedded within existing governance approval workflows:
+
+- **Project Initiation Gate:** Initial value hypothesis and scoping assessment required
+- **Business Case Approval Gate:** Comprehensive value quantification and business case required
+- **Implementation Planning Gate:** Value realization plan and measurement framework required
+- **Go-Live Gate:** Baseline measurement and value tracking initiation required
+- **Post-Implementation Review Gate:** Value realization assessment and lessons learned required
+
+### Performance Metrics
+
+#### Value Quantification Quality
+- **Accuracy Rate:** >80% of value projections within ±20% of actual results
+- **Completeness Rate:** 100% of applicable initiatives with complete value quantification
+- **Timeliness Rate:** >95% of value assessments completed within target timeframes
+
+#### Value Realization Performance
+- **Portfolio Value Realization Rate:** >90% of projected portfolio value delivered
+- **Initiative Success Rate:** >85% of initiatives achieving >80% of projected value
+- **Investment ROI Improvement:** 15% improvement in average portfolio ROI
+
+For detailed process documentation, tools, and templates, refer to the [Technology Initiative Business Value Quantification Process](Technology-Initiative-Business-Value-Quantification-Process.md).
 
 ---
 
