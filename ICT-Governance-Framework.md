@@ -145,6 +145,8 @@ _Legend: R = Responsible, A = Accountable, C = Consulted, I = Informed_
 
 For comprehensive role definitions, detailed responsibilities, expectations, and performance metrics, refer to the [ICT Governance Roles and Responsibilities](ICT-Governance-Roles-Responsibilities.md) document.
 
+For a structured overview of strategic versus tactical governance tasks and responsibilities, refer to the [Strategic and Tactical IT Governance Overview](Strategic-Tactical-IT-Governance-Overview.md) document.
+
 ---
 
 ## Policies and Standards
