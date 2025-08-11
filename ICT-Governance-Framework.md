@@ -150,6 +150,10 @@ The ICT Governance Council serves as the organization's dedicated IT governance 
 * **Policy Governance:** Approve, review, and update all ICT governance policies and procedures
 * **Resource Allocation:** Make decisions on technology resource allocation and investment priorities based on quantified business value
 * **Value Governance:** Oversee business value quantification process and approve value methodologies for technology initiatives
+
+* **Risk Management:** Oversee technology risk management and approve risk mitigation strategies
+* **Compliance Oversight:** Ensure compliance with regulatory requirements and industry standards
+* **Performance Monitoring:** Review governance metrics, KPIs, value realization performance, and audit findings
 * **Risk Management:** Oversee technology risk management using FAIR-based quantitative risk assessment and approve risk mitigation strategies
 * **Compliance Oversight:** Ensure compliance with regulatory requirements and industry standards
 * **Performance Monitoring:** Review governance metrics, KPIs, value realization performance, annual benchmarking results, and audit findings
@@ -815,7 +819,6 @@ The FAIR risk assessment framework integrates with the Business Value Quantifica
 4. **Risk Capability Development:** Enhance organizational risk management capabilities
 
 ---
-
 ## Decision Rights and Escalation
 
 1. **🔧 Operational Issues:** Technology Stewards → Domain Owners → ICT Governance Council

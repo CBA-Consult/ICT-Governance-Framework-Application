@@ -53,6 +53,37 @@ Our ICT Governance Framework already demonstrates several strengths aligned with
 * AI-enhanced value optimization recommendations
 * Real-time portfolio value optimization capabilities
 
+
+### 2. Risk Management Framework
+
+**Gap**: While security risks are addressed, broader IT risk management (operational, financial, reputational) is underdeveloped.
+
+**Implementation Plan**:
+
+1. **Comprehensive IT Risk Framework** (Q3 2025)
+   * Adopt FAIR (Factor Analysis of Information Risk) methodology for risk quantification
+   * Integrate with NIST Cybersecurity Framework for security risk management
+   * Develop risk appetites and thresholds for each technology domain
+   * Create a centralized IT risk register with clear ownership and remediation plans
+
+2. **Risk Governance Structure Enhancement** (Q4 2025)
+   * Establish a formal Risk Management Committee reporting to the ICT Governance Council
+   * Develop domain-specific risk management plans with quantifiable metrics
+   * Implement quarterly risk review cycles with formal escalation procedures
+   * Create a risk dashboard for real-time visibility into the enterprise risk posture
+
+3. **Operational Risk Management Process** (Q1 2026)
+   * Develop detailed operational risk assessment procedures
+   * Implement incident-to-risk mapping to identify systemic issues
+   * Create operational risk heat maps for key technology services
+   * Establish cross-functional risk response teams for major risk categories
+
+**Expected Outcomes**:
+* 95% of IT risks identified with quantified business impact and likelihood
+* 30% reduction in risk incidents through proactive management
+* Enhanced decision-making through risk-adjusted value assessments
+* Improved regulatory compliance and audit readiness
+
 ### 2. Risk Management Framework ✅ IMPLEMENTED
 
 **Status**: COMPLETED - Comprehensive FAIR-based quantitative risk assessment framework implemented across all ICT domains
