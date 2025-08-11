@@ -1484,7 +1484,6 @@ The framework includes comprehensive metrics for measuring benchmarking effectiv
 
 For detailed methodology, metrics, and implementation guidance, refer to the [ICT Governance Annual Benchmarking Framework](ICT-Governance-Annual-Benchmarking-Framework.md).
 
-
 ---
 
 _This ICT Governance Framework provides a robust structure for managing technology assets and services across the organization, ensuring alignment with business objectives, security, compliance, and operational excellence. Its success depends on the active involvement and commitment of all stakeholders._

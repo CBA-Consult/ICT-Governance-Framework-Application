@@ -44,7 +44,6 @@ This document defines the key performance indicators (KPIs), metrics, and report
 | **Cost Optimization** | Cost savings from standardization and governance | >5% annual reduction | Financial analysis | Annual |
 | **Time-to-Market** | Impact of governance on time-to-market for new initiatives | No negative impact | Project analysis | Quarterly |
 
-
 ### Annual Benchmarking KPIs
 
 | KPI | Description | Target | Measurement Method | Frequency |
@@ -55,7 +54,7 @@ This document defines the key performance indicators (KPIs), metrics, and report
 | **Best Practice Adoption Rate** | Percentage of identified best practices implemented | >80% adoption | Best practice tracking | Annual |
 | **Benchmarking Process Effectiveness** | Stakeholder satisfaction with benchmarking process | >85% satisfaction | Benchmarking survey | Annual |
 | **Peer Organization Comparison** | Performance ranking against peer organizations | Top 25% | Peer benchmarking | Annual |
-=======
+
 ### Automation Progress KPIs
 
 | KPI | Description | Target | Measurement Method | Frequency |
