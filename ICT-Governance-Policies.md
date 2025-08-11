@@ -189,4 +189,48 @@ To establish a structured approach for managing relationships with technology ve
 
 ---
 
-These policies provide a comprehensive framework for governing technology within the organization. Each policy should be further developed with detailed procedures, templates, and guidelines to support implementation.
+## 7. AI Ethics and Responsible AI Policy
+
+### Purpose
+To establish comprehensive ethical guidelines and governance processes for artificial intelligence technologies, ensuring responsible AI development, deployment, and management aligned with global standards and organizational values.
+
+### Policy Statements
+1. **AI Ethics Framework Compliance:** All AI systems must comply with the organization's AI Ethics Framework aligned with global standards (EU AI Act, IEEE, UNESCO, NIST).
+2. **Human-Centric AI:** AI systems must enhance human capabilities while maintaining meaningful human oversight and control.
+3. **Fairness and Non-Discrimination:** AI systems must be designed, tested, and monitored to prevent discriminatory outcomes and ensure equitable treatment.
+4. **Transparency and Explainability:** AI systems must provide clear explanations for their decisions and maintain transparent documentation.
+5. **Privacy and Data Protection:** AI systems must implement privacy-by-design principles and protect personal data throughout the AI lifecycle.
+6. **Safety and Security:** AI systems must undergo comprehensive safety and security testing before deployment and continuous monitoring during operation.
+7. **Accountability:** Clear accountability structures must be established for AI system outcomes and impacts.
+
+### Roles and Responsibilities
+- **AI Ethics Council:** Strategic oversight and policy governance for AI ethics
+- **AI Ethics Review Board:** Technical review and assessment of AI systems for ethics compliance
+- **AI Ethics Officer:** Overall coordination and compliance monitoring for AI ethics
+- **AI Development Teams:** Implement AI ethics requirements in system design and development
+- **Business Stakeholders:** Define ethical requirements and participate in AI ethics assessments
+
+### Procedures
+1. **AI Ethics Impact Assessment:** Conduct comprehensive ethics assessment for all AI systems based on risk classification
+2. **Ethics Review Process:** Submit AI systems for ethics review by AI Ethics Review Board
+3. **Approval Process:** Obtain required approvals from AI Ethics Council for high-risk AI systems
+4. **Monitoring and Compliance:** Implement continuous monitoring for AI ethics compliance
+5. **Incident Response:** Follow defined procedures for AI ethics violations and incidents
+6. **Training and Awareness:** Complete mandatory AI ethics training for all AI development personnel
+
+### AI Risk Classification
+- **High-Risk AI Systems:** Require comprehensive ethics review, AI Ethics Council approval, and continuous monitoring
+- **Medium-Risk AI Systems:** Require standard ethics assessment, Review Board approval, and periodic monitoring
+- **Low-Risk AI Systems:** Require basic ethics self-assessment and standard documentation
+
+### Compliance Requirements
+- **Global Standards Alignment:** Compliance with EU AI Act, IEEE Ethically Aligned Design, UNESCO AI Ethics, and NIST AI RMF
+- **Bias Testing:** Mandatory bias detection and mitigation testing for all AI systems
+- **Transparency Documentation:** Comprehensive documentation of AI system capabilities, limitations, and decision-making processes
+- **Privacy Protection:** Implementation of privacy-by-design principles and data protection measures
+- **Safety Validation:** Comprehensive safety and security testing before deployment
+- **Continuous Monitoring:** Ongoing monitoring for ethics compliance, bias, and performance
+
+---
+
+These policies provide a comprehensive framework for governing technology within the organization, including specific provisions for ethical AI governance. Each policy should be further developed with detailed procedures, templates, and guidelines to support implementation.

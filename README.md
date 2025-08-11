@@ -24,9 +24,11 @@ The Multi-Cloud Multi-Tenant ICT Governance Framework consists of the following 
 
 2. **[ICT Governance Framework](ICT-Governance-Framework.md)** - The foundational document defining the governance structure, roles, responsibilities, and operating model.
 
-3. **[Target Governance Framework](Target-Governance-Framework.md)** - Enhanced governance framework with industry-leading practices from ISO/IEC 38500, ITIL 4, COBIT 2019, CMMI, and FAIR frameworks.
+3. **[Strategic and Tactical IT Governance Overview](Strategic-Tactical-IT-Governance-Overview.md)** - Comprehensive overview of strategic vs tactical governance tasks and responsibilities with clear role definitions and escalation frameworks.
 
-4. **[ICT Governance Policies](ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
+4. **[Target Governance Framework](Target-Governance-Framework.md)** - Enhanced governance framework with industry-leading practices from ISO/IEC 38500, ITIL 4, COBIT 2019, CMMI, and FAIR frameworks.
+
+5. **[ICT Governance Policies](ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
 
 ### Multi-Tenant Infrastructure and Automation
 
@@ -107,9 +109,53 @@ We welcome contributions to enhance this framework. Please follow these steps:
 3. Submit a pull request with a clear description of your changes
 4. Ensure all documentation is updated appropriately
 
-## License
+## License and Usage
 
-[Specify License Information]
+### Open Source License
+
+This Multi-Cloud Multi-Tenant ICT Governance Framework is released under the **MIT License**, ensuring maximum flexibility for adoption, modification, and distribution. The framework is designed to be:
+
+- **Freely usable** in commercial and non-commercial environments
+- **Modifiable** to meet specific organizational requirements
+- **Distributable** with or without modifications
+- **Integrable** with proprietary and third-party systems
+
+### Usage Rights
+
+#### Multi-Tenant Usage
+- Deploy across unlimited tenant environments
+- Customize governance policies per tenant
+- Implement tenant-specific compliance frameworks
+- Scale to support any tenant population size
+
+#### Multi-Cloud Usage
+- Deploy across any cloud platform (AWS, Azure, GCP, others)
+- Implement hybrid and multi-cloud architectures
+- Adapt to emerging cloud technologies
+- Integrate with cloud-native services
+
+#### Commercial Usage
+- No licensing fees or royalties required
+- Consulting and professional services permitted
+- Managed service provider implementations allowed
+- Software vendor integration encouraged
+
+### Documentation
+
+- **[LICENSE](LICENSE)** - Full MIT License text
+- **[Usage Agreement](USAGE-AGREEMENT.md)** - Comprehensive open usage terms and conditions
+- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community participation guidelines
+- **[Security Policy](SECURITY.md)** - Security standards and reporting procedures
+
+### Compliance and Responsibility
+
+While the framework provides comprehensive governance guidance, organizations implementing the framework are responsible for:
+- Ensuring compliance with applicable laws and regulations
+- Adapting the framework to meet specific regulatory requirements
+- Maintaining appropriate security and privacy standards
+- Conducting proper risk assessments and due diligence
+
+The framework supports but does not guarantee compliance with GDPR, HIPAA, SOX, ISO 27001, and other regulatory standards.
 
 ## Background and Original Vision
 
