@@ -1,0 +1,226 @@
+{
+  "DataSource": {
+    "Type": "PowerPlatform",
+    "PowerPlatform": {
+      "Enabled": true,
+      "Environment": "https://yourtenant.crm.dynamics.com/",
+      "ClientId": "your-client-id",
+      "ClientSecret": "your-client-secret",
+      "TenantId": "your-tenant-id"
+    },
+    "SharePoint": {
+      "Enabled": false,
+      "SiteUrl": "https://yourtenant.sharepoint.com/sites/ICTGovernanceFeedback",
+      "ListName": "Feedback"
+    },
+    "Graph": {
+      "Enabled": true,
+      "Scopes": [
+        "Mail.Send",
+        "User.Read.All",
+        "Group.Read.All"
+      ]
+    },
+    "Azure": {
+      "Enabled": true,
+      "TenantId": "your-tenant-id",
+      "SubscriptionId": "your-subscription-id"
+    }
+  },
+  "SLAThresholds": [
+    {
+      "Priority": "Critical",
+      "AcknowledgmentTime": 15,
+      "FirstResponseTime": 2,
+      "ResolutionTime": 8,
+      "EscalationTrigger": 2
+    },
+    {
+      "Priority": "High",
+      "AcknowledgmentTime": 15,
+      "FirstResponseTime": 8,
+      "ResolutionTime": 24,
+      "EscalationTrigger": 8
+    },
+    {
+      "Priority": "Medium",
+      "AcknowledgmentTime": 15,
+      "FirstResponseTime": 24,
+      "ResolutionTime": 120,
+      "EscalationTrigger": 24
+    },
+    {
+      "Priority": "Low",
+      "AcknowledgmentTime": 15,
+      "FirstResponseTime": 72,
+      "ResolutionTime": 240,
+      "EscalationTrigger": 72
+    }
+  ],
+  "EscalationMatrix": [
+    {
+      "Level": 1,
+      "Role": "Technology Custodian",
+      "SLA": 24,
+      "DefaultAssignee": "custodian@company.com",
+      "AssignmentRules": [
+        {
+          "Category": "Policy",
+          "Assignee": "policy-custodian@company.com"
+        },
+        {
+          "Category": "Process",
+          "Assignee": "process-custodian@company.com"
+        },
+        {
+          "Category": "Technology",
+          "Assignee": "tech-custodian@company.com"
+        },
+        {
+          "Category": "Service",
+          "Assignee": "service-custodian@company.com"
+        }
+      ]
+    },
+    {
+      "Level": 2,
+      "Role": "Technology Steward",
+      "SLA": 48,
+      "DefaultAssignee": "steward@company.com",
+      "AssignmentRules": [
+        {
+          "Category": "Policy",
+          "Assignee": "policy-steward@company.com"
+        },
+        {
+          "Category": "Process",
+          "Assignee": "process-steward@company.com"
+        },
+        {
+          "Category": "Technology",
+          "Assignee": "tech-steward@company.com"
+        },
+        {
+          "Category": "Service",
+          "Assignee": "service-steward@company.com"
+        }
+      ]
+    },
+    {
+      "Level": 3,
+      "Role": "Domain Owner",
+      "SLA": 72,
+      "DefaultAssignee": "domain-owner@company.com",
+      "AssignmentRules": [
+        {
+          "Category": "All",
+          "Assignee": "domain-owner@company.com"
+        }
+      ]
+    },
+    {
+      "Level": 4,
+      "Role": "ICT Governance Council",
+      "SLA": 120,
+      "DefaultAssignee": "governance-council@company.com",
+      "AssignmentRules": [
+        {
+          "Category": "All",
+          "Assignee": "governance-council@company.com"
+        }
+      ]
+    },
+    {
+      "Level": 5,
+      "Role": "Executive Leadership",
+      "SLA": 168,
+      "DefaultAssignee": "executives@company.com",
+      "AssignmentRules": [
+        {
+          "Category": "All",
+          "Assignee": "executives@company.com"
+        }
+      ]
+    }
+  ],
+  "Notifications": {
+    "FromAddress": "ict-governance@company.com",
+    "Escalation": {
+      "Subject": "ESCALATION ALERT - Feedback #{{FeedbackId}}",
+      "Body": "<html><body><h2>Escalation Alert</h2><p>Feedback ID: {{FeedbackId}}</p><p>Priority: {{Priority}}</p><p>Escalation Level: {{EscalationLevel}}</p><p>Reason: {{EscalationReason}}</p><p>Assigned To: {{AssignedTo}}</p><p>Please take immediate action to resolve this issue.</p></body></html>",
+      "Methods": [
+        {
+          "Type": "Email",
+          "Enabled": true
+        },
+        {
+          "Type": "Teams",
+          "Enabled": true,
+          "Channel": "ICT-Governance-Alerts"
+        }
+      ]
+    },
+    "SLABreach": {
+      "Subject": "SLA BREACH ALERT - Feedback #{{FeedbackId}}",
+      "Body": "<html><body><h2>SLA Breach Alert</h2><p>Feedback ID: {{FeedbackId}}</p><p>Priority: {{Priority}}</p><p>Breach Type: {{BreachType}}</p><p>This feedback item has breached its SLA and requires immediate attention.</p></body></html>",
+      "Recipients": [
+        {
+          "Priority": "Critical",
+          "EmailAddresses": [
+            "on-call@company.com",
+            "domain-owner@company.com"
+          ]
+        },
+        {
+          "Priority": "High",
+          "EmailAddresses": [
+            "steward@company.com",
+            "domain-owner@company.com"
+          ]
+        },
+        {
+          "Priority": "Medium",
+          "EmailAddresses": [
+            "custodian@company.com",
+            "steward@company.com"
+          ]
+        },
+        {
+          "Priority": "Low",
+          "EmailAddresses": [
+            "custodian@company.com"
+          ]
+        }
+      ]
+    }
+  },
+  "Monitoring": {
+    "Enabled": true,
+    "Endpoint": "https://monitoring.company.com/api/metrics",
+    "ApiKey": "your-monitoring-api-key",
+    "MetricsToSend": [
+      "EscalationCount",
+      "SLABreachCount",
+      "ErrorCount",
+      "ProcessedCount"
+    ]
+  },
+  "Automation": {
+    "RunInterval": "00:15:00",
+    "MaxRetries": 3,
+    "RetryDelay": "00:05:00",
+    "EnabledFeatures": [
+      "SLAMonitoring",
+      "AutoEscalation",
+      "NotificationSending",
+      "ReportGeneration"
+    ]
+  },
+  "Logging": {
+    "Level": "Info",
+    "RetentionDays": 30,
+    "MaxLogFileSize": "10MB",
+    "LogToFile": true,
+    "LogToEventLog": false
+  }
+}
