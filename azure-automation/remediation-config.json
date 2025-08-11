@@ -1,0 +1,327 @@
+{
+  "version": "1.0.0",
+  "description": "Automated Remediation Configuration for ICT Governance Framework",
+  "lastUpdated": "2025-01-27",
+  "authentication": {
+    "useManagedIdentity": false,
+    "tenantId": null
+  },
+  "environments": {
+    "Development": {
+      "subscriptionId": "dev-subscription-id",
+      "resourceGroups": ["rg-dev-governance", "rg-dev-apps"],
+      "maxRemediationActions": 100,
+      "approvalRequired": false
+    },
+    "Staging": {
+      "subscriptionId": "staging-subscription-id", 
+      "resourceGroups": ["rg-staging-governance", "rg-staging-apps"],
+      "maxRemediationActions": 50,
+      "approvalRequired": true
+    },
+    "Production": {
+      "subscriptionId": "prod-subscription-id",
+      "resourceGroups": ["rg-prod-governance", "rg-prod-apps"],
+      "maxRemediationActions": 25,
+      "approvalRequired": true
+    }
+  },
+  "remediation": {
+    "enabled": true,
+    "globalSettings": {
+      "maxConcurrentActions": 5,
+      "retryAttempts": 3,
+      "delayBetweenActions": 2,
+      "timeoutMinutes": 30
+    },
+    "types": [
+      {
+        "type": "MissingTags",
+        "description": "Automatically add missing required tags to resources",
+        "enabled": true,
+        "autoRemediable": true,
+        "severity": "Low",
+        "policyPattern": "require-tag",
+        "defaultTags": {
+          "Owner": "Unknown",
+          "CostCenter": "IT-General",
+          "Environment": "Unknown",
+          "CreatedBy": "AutoRemediation",
+          "CreatedDate": "{{current_date}}"
+        },
+        "excludedResourceTypes": [
+          "Microsoft.Resources/resourceGroups"
+        ]
+      },
+      {
+        "type": "SecurityConfiguration",
+        "description": "Fix common security configuration issues",
+        "enabled": true,
+        "autoRemediable": true,
+        "severity": "High",
+        "policyPattern": "require-https|require-encryption",
+        "actions": [
+          {
+            "resourceType": "Microsoft.Storage/storageAccounts",
+            "action": "EnableHttpsOnly",
+            "description": "Enable HTTPS-only traffic for storage accounts"
+          },
+          {
+            "resourceType": "Microsoft.KeyVault/vaults",
+            "action": "EnableSoftDelete",
+            "description": "Enable soft delete and purge protection for Key Vaults"
+          }
+        ]
+      },
+      {
+        "type": "BackupConfiguration",
+        "description": "Configure backup for critical resources",
+        "enabled": true,
+        "autoRemediable": false,
+        "severity": "Medium",
+        "policyPattern": "require-backup",
+        "actions": [
+          {
+            "resourceType": "Microsoft.Compute/virtualMachines",
+            "action": "LogForManualReview",
+            "description": "Log VM backup configuration requirement for manual review"
+          },
+          {
+            "resourceType": "Microsoft.Sql/servers/databases",
+            "action": "LogForManualReview", 
+            "description": "Log database backup configuration requirement for manual review"
+          }
+        ]
+      },
+      {
+        "type": "CostOptimization",
+        "description": "Identify cost optimization opportunities",
+        "enabled": true,
+        "autoRemediable": false,
+        "severity": "Low",
+        "policyPattern": "cost-management|unused-resources",
+        "actions": [
+          {
+            "resourceType": "*",
+            "action": "LogForManualReview",
+            "description": "Log cost optimization opportunity for manual review"
+          }
+        ]
+      },
+      {
+        "type": "NamingConvention",
+        "description": "Flag naming convention violations",
+        "enabled": true,
+        "autoRemediable": false,
+        "severity": "Low",
+        "policyPattern": "naming-convention",
+        "actions": [
+          {
+            "resourceType": "*",
+            "action": "LogForManualReview",
+            "description": "Log naming convention violation for manual review"
+          }
+        ]
+      },
+      {
+        "type": "InvalidLocation",
+        "description": "Resources deployed in non-approved locations",
+        "enabled": true,
+        "autoRemediable": false,
+        "severity": "Medium",
+        "policyPattern": "allowed-locations",
+        "actions": [
+          {
+            "resourceType": "*",
+            "action": "LogForManualReview",
+            "description": "Log location violation for manual review - may require resource migration"
+          }
+        ]
+      },
+      {
+        "type": "InvalidResourceType",
+        "description": "Non-approved resource types",
+        "enabled": true,
+        "autoRemediable": false,
+        "severity": "High",
+        "policyPattern": "allowed-resource-types",
+        "actions": [
+          {
+            "resourceType": "*",
+            "action": "LogForManualReview",
+            "description": "Log resource type violation for manual review - may require resource removal"
+          }
+        ]
+      }
+    ],
+    "severityMappings": [
+      {
+        "policyPattern": "security",
+        "severity": "High"
+      },
+      {
+        "policyPattern": "compliance",
+        "severity": "High"
+      },
+      {
+        "policyPattern": "cost",
+        "severity": "Low"
+      },
+      {
+        "policyPattern": "tag",
+        "severity": "Low"
+      }
+    ],
+    "expansionPlan": {
+      "phase1": {
+        "description": "Initial implementation - low-risk violations only",
+        "targetViolationTypes": ["MissingTags"],
+        "estimatedTimeframe": "Month 1-2"
+      },
+      "phase2": {
+        "description": "Expand to security configurations",
+        "targetViolationTypes": ["MissingTags", "SecurityConfiguration"],
+        "estimatedTimeframe": "Month 3-4"
+      },
+      "phase3": {
+        "description": "Add backup and cost optimization detection",
+        "targetViolationTypes": ["MissingTags", "SecurityConfiguration", "BackupConfiguration", "CostOptimization"],
+        "estimatedTimeframe": "Month 5-6"
+      },
+      "phase4": {
+        "description": "Full coverage with advanced remediation",
+        "targetViolationTypes": ["All"],
+        "estimatedTimeframe": "Month 7+"
+      }
+    }
+  },
+  "notifications": {
+    "email": {
+      "enabled": true,
+      "smtpServer": "smtp.company.com",
+      "fromAddress": "governance-automation@company.com",
+      "recipients": {
+        "governance": ["governance-team@company.com"],
+        "security": ["security-team@company.com"],
+        "operations": ["operations-team@company.com"]
+      }
+    },
+    "teams": {
+      "enabled": true,
+      "webhookUrl": "https://company.webhook.office.com/webhookb2/...",
+      "channels": {
+        "governance": "governance-alerts",
+        "security": "security-alerts", 
+        "operations": "operations-alerts"
+      }
+    },
+    "triggers": {
+      "onSuccess": true,
+      "onFailure": true,
+      "onHighSeverity": true,
+      "dailySummary": true
+    }
+  },
+  "reporting": {
+    "enabled": true,
+    "formats": ["JSON", "CSV", "HTML"],
+    "retention": {
+      "days": 90,
+      "archiveAfterDays": 30
+    },
+    "dashboards": {
+      "enabled": true,
+      "refreshInterval": "1h",
+      "metrics": [
+        "totalViolations",
+        "remediatedViolations", 
+        "pendingViolations",
+        "violationsByType",
+        "violationsBySeverity",
+        "remediationSuccessRate"
+      ]
+    }
+  },
+  "compliance": {
+    "standards": [
+      {
+        "name": "ISO 27001",
+        "controls": ["A.12.1.2", "A.12.6.1", "A.14.2.2"],
+        "mappings": {
+          "SecurityConfiguration": ["A.12.1.2", "A.14.2.2"],
+          "BackupConfiguration": ["A.12.6.1"]
+        }
+      },
+      {
+        "name": "NIST Cybersecurity Framework",
+        "controls": ["ID.AM-1", "PR.AC-1", "DE.CM-1"],
+        "mappings": {
+          "MissingTags": ["ID.AM-1"],
+          "SecurityConfiguration": ["PR.AC-1"],
+          "BackupConfiguration": ["DE.CM-1"]
+        }
+      },
+      {
+        "name": "COBIT 2019",
+        "controls": ["APO01", "APO03", "DSS05"],
+        "mappings": {
+          "CostOptimization": ["APO01"],
+          "SecurityConfiguration": ["APO03"],
+          "BackupConfiguration": ["DSS05"]
+        }
+      }
+    ]
+  },
+  "integration": {
+    "serviceNow": {
+      "enabled": false,
+      "endpoint": "https://company.service-now.com",
+      "createIncidents": true,
+      "incidentPriority": {
+        "High": 1,
+        "Medium": 2,
+        "Low": 3
+      }
+    },
+    "jira": {
+      "enabled": false,
+      "endpoint": "https://company.atlassian.net",
+      "createTasks": true,
+      "projectKey": "GOV"
+    },
+    "azureDevOps": {
+      "enabled": false,
+      "organization": "company",
+      "project": "governance",
+      "createWorkItems": true
+    }
+  },
+  "monitoring": {
+    "healthChecks": {
+      "enabled": true,
+      "interval": "5m",
+      "endpoints": [
+        {
+          "name": "Azure Policy Service",
+          "type": "AzureService",
+          "service": "Microsoft.PolicyInsights"
+        },
+        {
+          "name": "Azure Resource Manager",
+          "type": "AzureService", 
+          "service": "Microsoft.Resources"
+        }
+      ]
+    },
+    "metrics": {
+      "enabled": true,
+      "logAnalyticsWorkspace": "law-governance-monitoring",
+      "customMetrics": [
+        "RemediationActionsPerHour",
+        "ViolationDetectionRate",
+        "RemediationSuccessRate",
+        "AverageRemediationTime"
+      ]
+    }
+  }
+}
