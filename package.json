@@ -1,5 +1,10 @@
 {
   "dependencies": {
     "adpa-enterprise-framework-automation": "^3.2.0"
-  }
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^24.2.1"
+  },
+  "scripts": {}
 }
