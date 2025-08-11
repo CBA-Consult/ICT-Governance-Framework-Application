@@ -1,0 +1,535 @@
+{
+  "monitoringConfiguration": {
+    "name": "ICT Governance Continuous Compliance Monitoring",
+    "version": "1.0.0",
+    "description": "Real-time compliance monitoring configuration for ICT governance framework",
+    "lastUpdated": "2024-12-19",
+    "owner": "ICT Governance Office"
+  },
+  "monitoringRules": [
+    {
+      "name": "critical_system_access_violation",
+      "description": "Unauthorized access attempts to Tier 1 critical systems",
+      "severity": "Critical",
+      "category": "Access Control",
+      "query": "SigninLogs | where TimeGenerated > ago(5m) and AppDisplayName in ('ERP System', 'Financial Management System', 'HR Management System', 'Customer Database') and ResultType != 0 | extend FailureReason = case(ResultType == 50126, 'Invalid credentials', ResultType == 50053, 'Account locked', ResultType == 50057, 'User disabled', 'Other failure')",
+      "threshold": 1,
+      "timeWindow": "5m",
+      "slaTarget": "2m",
+      "actions": ["immediate_alert", "account_investigation", "ciso_notification", "session_analysis"],
+      "automatedResponse": true,
+      "escalationRequired": true
+    },
+    {
+      "name": "bulk_data_download",
+      "description": "Potential data exfiltration - bulk file downloads detected",
+      "severity": "Critical",
+      "category": "Data Protection",
+      "query": "CloudAppEvents | where TimeGenerated > ago(10m) and ActionType == 'FileDownloaded' | summarize DownloadCount = count(), TotalSize = sum(ObjectSize) by AccountObjectId, UserPrincipalName | where DownloadCount > 50 or TotalSize > 1000000000",
+      "threshold": 1,
+      "timeWindow": "10m",
+      "slaTarget": "3m",
+      "actions": ["session_termination", "data_protection_alert", "investigation_trigger", "preserve_logs"],
+      "automatedResponse": true,
+      "escalationRequired": true
+    },
+    {
+      "name": "policy_exception_threshold_breach",
+      "description": "Policy exception threshold exceeded - potential policy abuse",
+      "severity": "High",
+      "category": "Policy Compliance",
+      "query": "PolicyExceptions_CL | where TimeGenerated > ago(1h) | summarize ExceptionCount = count() by PolicyName_s, RequestedBy_s | where ExceptionCount > 3",
+      "threshold": 1,
+      "timeWindow": "1h",
+      "slaTarget": "15m",
+      "actions": ["governance_team_alert", "exception_review_trigger", "policy_owner_notification"],
+      "automatedResponse": false,
+      "escalationRequired": false
+    },
+    {
+      "name": "privileged_access_misuse",
+      "description": "Privileged access used outside normal business hours or patterns",
+      "severity": "High",
+      "category": "Privileged Access",
+      "query": "AuditLogs | where TimeGenerated > ago(15m) and Category == 'RoleManagement' and ActivityDisplayName contains 'Add' | extend Hour = datetime_part('hour', TimeGenerated) | where Hour < 6 or Hour > 22 | project TimeGenerated, InitiatedBy, TargetResources, ActivityDisplayName",
+      "threshold": 1,
+      "timeWindow": "15m",
+      "slaTarget": "5m",
+      "actions": ["security_team_alert", "privileged_access_review", "activity_analysis"],
+      "automatedResponse": true,
+      "escalationRequired": true
+    },
+    {
+      "name": "security_control_failure",
+      "description": "Multiple security control failures indicating potential compromise",
+      "severity": "High",
+      "category": "Security Controls",
+      "query": "SecurityRecommendation | where TimeGenerated > ago(15m) and RecommendationState == 'Active' and RecommendationSeverity in ('High', 'Medium') | summarize FailureCount = count() by RecommendationName | where FailureCount > 10",
+      "threshold": 1,
+      "timeWindow": "15m",
+      "slaTarget": "10m",
+      "actions": ["security_team_alert", "control_remediation", "vulnerability_assessment"],
+      "automatedResponse": true,
+      "escalationRequired": false
+    },
+    {
+      "name": "compliance_drift_detection",
+      "description": "Significant compliance score degradation detected",
+      "severity": "Medium",
+      "category": "Compliance Monitoring",
+      "query": "ComplianceScore_CL | where TimeGenerated > ago(30m) | summarize CurrentScore = avg(Score_d) by Domain_s | join (ComplianceScore_CL | where TimeGenerated between (ago(2h) .. ago(90m)) | summarize PreviousScore = avg(Score_d) by Domain_s) on Domain_s | where CurrentScore < PreviousScore - 5 | extend DriftPercentage = ((PreviousScore - CurrentScore) / PreviousScore) * 100",
+      "threshold": 1,
+      "timeWindow": "30m",
+      "slaTarget": "30m",
+      "actions": ["compliance_team_alert", "drift_analysis", "remediation_planning"],
+      "automatedResponse": false,
+      "escalationRequired": false
+    },
+    {
+      "name": "shadow_it_detection",
+      "description": "Unauthorized cloud applications or services detected",
+      "severity": "Medium",
+      "category": "Shadow IT",
+      "query": "CloudAppEvents | where TimeGenerated > ago(20m) and Application !in (dynamic(['Microsoft 365', 'Azure', 'Salesforce', 'ServiceNow'])) | summarize UniqueUsers = dcount(AccountObjectId), EventCount = count() by Application | where UniqueUsers > 5 or EventCount > 100",
+      "threshold": 1,
+      "timeWindow": "20m",
+      "slaTarget": "1h",
+      "actions": ["it_team_alert", "application_assessment", "risk_evaluation"],
+      "automatedResponse": false,
+      "escalationRequired": false
+    },
+    {
+      "name": "configuration_drift",
+      "description": "Critical infrastructure configuration changes outside change windows",
+      "severity": "Medium",
+      "category": "Configuration Management",
+      "query": "AzureActivity | where TimeGenerated > ago(10m) and CategoryValue == 'Administrative' and OperationNameValue contains 'write' and ResourceGroup in ('rg-prod-critical', 'rg-prod-database') | extend Hour = datetime_part('hour', TimeGenerated) | where Hour < 8 or Hour > 18",
+      "threshold": 1,
+      "timeWindow": "10m",
+      "slaTarget": "20m",
+      "actions": ["infrastructure_team_alert", "change_verification", "rollback_assessment"],
+      "automatedResponse": false,
+      "escalationRequired": false
+    },
+    {
+      "name": "anomalous_user_behavior",
+      "description": "User behavior patterns indicating potential account compromise",
+      "severity": "Medium",
+      "category": "User Behavior",
+      "query": "BehaviorAnalytics | where TimeGenerated > ago(30m) and ActivityType == 'Anomalous' and InvestigationPriority in ('High', 'Medium') | summarize AnomalousActivities = count() by UserPrincipalName | where AnomalousActivities > 3",
+      "threshold": 1,
+      "timeWindow": "30m",
+      "slaTarget": "45m",
+      "actions": ["security_team_alert", "user_investigation", "risk_scoring_update"],
+      "automatedResponse": false,
+      "escalationRequired": false
+    },
+    {
+      "name": "regulatory_compliance_breach",
+      "description": "Potential regulatory compliance violation detected",
+      "severity": "Critical",
+      "category": "Regulatory Compliance",
+      "query": "ComplianceEvents_CL | where TimeGenerated > ago(5m) and ComplianceFramework_s in ('GDPR', 'SOX', 'HIPAA', 'PCI-DSS') and ViolationType_s in ('Data Breach', 'Access Violation', 'Retention Violation') | project TimeGenerated, ComplianceFramework_s, ViolationType_s, AffectedData_s, UserPrincipalName_s",
+      "threshold": 1,
+      "timeWindow": "5m",
+      "slaTarget": "2m",
+      "actions": ["compliance_team_alert", "legal_notification", "breach_assessment", "regulatory_reporting"],
+      "automatedResponse": true,
+      "escalationRequired": true
+    }
+  ],
+  "alertChannels": {
+    "email": {
+      "enabled": true,
+      "smtpServer": "smtp.cbagroup.com",
+      "smtpPort": 587,
+      "useSSL": true,
+      "authentication": true,
+      "fromAddress": "governance-alerts@cbagroup.com",
+      "recipients": {
+        "critical": [
+          "ciso@cbagroup.com",
+          "security-team@cbagroup.com",
+          "governance-council@cbagroup.com"
+        ],
+        "high": [
+          "governance-team@cbagroup.com",
+          "security-team@cbagroup.com",
+          "domain-owners@cbagroup.com"
+        ],
+        "medium": [
+          "governance-team@cbagroup.com",
+          "operations-team@cbagroup.com"
+        ],
+        "low": [
+          "operations-team@cbagroup.com",
+          "support-team@cbagroup.com"
+        ]
+      },
+      "templates": {
+        "critical": {
+          "subject": "🚨 CRITICAL: Compliance Violation - Immediate Action Required",
+          "priority": "High"
+        },
+        "high": {
+          "subject": "⚠️ HIGH: Compliance Violation - Urgent Response Needed",
+          "priority": "High"
+        },
+        "medium": {
+          "subject": "📋 MEDIUM: Compliance Issue - Review Required",
+          "priority": "Normal"
+        },
+        "low": {
+          "subject": "ℹ️ LOW: Compliance Notice - For Information",
+          "priority": "Low"
+        }
+      }
+    },
+    "teams": {
+      "enabled": true,
+      "webhookUrl": "https://outlook.office.com/webhook/a1b2c3d4-e5f6-7890-abcd-ef1234567890@tenant-id/IncomingWebhook/channel-id/connector-id",
+      "channels": {
+        "critical": "ICT-Governance-Critical-Alerts",
+        "high": "ICT-Governance-High-Alerts",
+        "medium": "ICT-Governance-Medium-Alerts",
+        "low": "ICT-Governance-Low-Alerts"
+      },
+      "mentionGroups": {
+        "critical": ["@security-team", "@governance-council"],
+        "high": ["@governance-team", "@security-team"],
+        "medium": ["@governance-team"],
+        "low": []
+      }
+    },
+    "sms": {
+      "enabled": true,
+      "provider": "azure-communication-services",
+      "connectionString": "{ACS_CONNECTION_STRING}",
+      "fromNumber": "+1234567890",
+      "recipients": {
+        "critical": [
+          {
+            "name": "CISO",
+            "number": "+1234567891",
+            "role": "Chief Information Security Officer"
+          },
+          {
+            "name": "Governance Lead",
+            "number": "+1234567892",
+            "role": "ICT Governance Lead"
+          }
+        ]
+      },
+      "messageTemplates": {
+        "critical": "CRITICAL ALERT: {ruleName} - {violationCount} violations detected. Check dashboard immediately. Time: {detectionTime}",
+        "high": "HIGH ALERT: {ruleName} - Review required. Check governance dashboard."
+      }
+    },
+    "webhook": {
+      "enabled": true,
+      "endpoints": [
+        {
+          "name": "governance-automation",
+          "url": "https://automation.cbagroup.com/api/compliance-alerts",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {API_TOKEN}",
+            "Content-Type": "application/json",
+            "X-Source": "ICT-Governance-Monitoring"
+          },
+          "severityFilter": ["Critical", "High"]
+        },
+        {
+          "name": "siem-integration",
+          "url": "https://siem.cbagroup.com/api/events",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {SIEM_TOKEN}",
+            "Content-Type": "application/json"
+          },
+          "severityFilter": ["Critical", "High", "Medium"]
+        }
+      ]
+    },
+    "mobileApp": {
+      "enabled": true,
+      "platform": "azure-notification-hubs",
+      "connectionString": "{ANH_CONNECTION_STRING}",
+      "hubName": "governance-alerts",
+      "deviceGroups": {
+        "executives": ["ciso-device", "cto-device", "governance-lead-device"],
+        "security-team": ["security-analyst-1", "security-analyst-2"],
+        "governance-team": ["governance-analyst-1", "governance-analyst-2"]
+      }
+    }
+  },
+  "automatedResponses": {
+    "enabled": true,
+    "responseTimeout": "30s",
+    "maxRetries": 3,
+    "playbooks": {
+      "critical-access-violation": {
+        "description": "Automated response for critical system access violations",
+        "triggers": ["critical_system_access_violation"],
+        "actions": [
+          {
+            "name": "suspend_account",
+            "description": "Temporarily suspend the user account",
+            "timeout": "10s",
+            "retryOnFailure": true
+          },
+          {
+            "name": "revoke_sessions",
+            "description": "Revoke all active user sessions",
+            "timeout": "15s",
+            "retryOnFailure": true
+          },
+          {
+            "name": "notify_security",
+            "description": "Send immediate notification to security team",
+            "timeout": "5s",
+            "retryOnFailure": false
+          },
+          {
+            "name": "create_incident",
+            "description": "Create high-priority incident ticket",
+            "timeout": "20s",
+            "retryOnFailure": true
+          },
+          {
+            "name": "collect_forensics",
+            "description": "Collect forensic data for investigation",
+            "timeout": "30s",
+            "retryOnFailure": false
+          }
+        ]
+      },
+      "data-exfiltration": {
+        "description": "Automated response for potential data exfiltration",
+        "triggers": ["bulk_data_download"],
+        "actions": [
+          {
+            "name": "terminate_session",
+            "description": "Immediately terminate user session",
+            "timeout": "5s",
+            "retryOnFailure": true
+          },
+          {
+            "name": "block_downloads",
+            "description": "Block further file downloads for the user",
+            "timeout": "10s",
+            "retryOnFailure": true
+          },
+          {
+            "name": "notify_dpo",
+            "description": "Notify Data Protection Officer",
+            "timeout": "5s",
+            "retryOnFailure": false
+          },
+          {
+            "name": "preserve_logs",
+            "description": "Preserve audit logs for investigation",
+            "timeout": "15s",
+            "retryOnFailure": true
+          },
+          {
+            "name": "initiate_investigation",
+            "description": "Start automated investigation workflow",
+            "timeout": "20s",
+            "retryOnFailure": false
+          }
+        ]
+      },
+      "privileged-access-misuse": {
+        "description": "Response for privileged access violations",
+        "triggers": ["privileged_access_misuse"],
+        "actions": [
+          {
+            "name": "escalate_monitoring",
+            "description": "Increase monitoring for the user account",
+            "timeout": "10s",
+            "retryOnFailure": false
+          },
+          {
+            "name": "notify_security",
+            "description": "Alert security team for review",
+            "timeout": "5s",
+            "retryOnFailure": false
+          },
+          {
+            "name": "require_justification",
+            "description": "Require justification for privileged access",
+            "timeout": "15s",
+            "retryOnFailure": false
+          }
+        ]
+      },
+      "regulatory-compliance-breach": {
+        "description": "Response for regulatory compliance violations",
+        "triggers": ["regulatory_compliance_breach"],
+        "actions": [
+          {
+            "name": "immediate_containment",
+            "description": "Implement immediate containment measures",
+            "timeout": "10s",
+            "retryOnFailure": true
+          },
+          {
+            "name": "notify_compliance",
+            "description": "Notify compliance team immediately",
+            "timeout": "5s",
+            "retryOnFailure": false
+          },
+          {
+            "name": "notify_legal",
+            "description": "Notify legal team for regulatory assessment",
+            "timeout": "5s",
+            "retryOnFailure": false
+          },
+          {
+            "name": "preserve_evidence",
+            "description": "Preserve all relevant evidence",
+            "timeout": "20s",
+            "retryOnFailure": true
+          },
+          {
+            "name": "assess_breach_scope",
+            "description": "Assess the scope of the potential breach",
+            "timeout": "30s",
+            "retryOnFailure": false
+          }
+        ]
+      }
+    }
+  },
+  "slaConfiguration": {
+    "detectionSLAs": {
+      "Critical": "2m",
+      "High": "5m",
+      "Medium": "15m",
+      "Low": "1h"
+    },
+    "responseSLAs": {
+      "Critical": "5m",
+      "High": "15m",
+      "Medium": "1h",
+      "Low": "4h"
+    },
+    "resolutionSLAs": {
+      "Critical": "2h",
+      "High": "8h",
+      "Medium": "24h",
+      "Low": "72h"
+    },
+    "escalationTriggers": {
+      "Critical": "15m",
+      "High": "1h",
+      "Medium": "4h",
+      "Low": "24h"
+    }
+  },
+  "reportingConfiguration": {
+    "realTimeReports": {
+      "enabled": true,
+      "refreshInterval": "30s",
+      "recipients": ["governance-team@cbagroup.com"]
+    },
+    "hourlyDigest": {
+      "enabled": true,
+      "schedule": "0 * * * *",
+      "recipients": ["operations-team@cbagroup.com"]
+    },
+    "dailySummary": {
+      "enabled": true,
+      "schedule": "0 6 * * *",
+      "recipients": ["management-team@cbagroup.com", "governance-council@cbagroup.com"]
+    },
+    "weeklyExecutiveSummary": {
+      "enabled": true,
+      "schedule": "0 8 * * 1",
+      "recipients": ["executive-team@cbagroup.com", "board-members@cbagroup.com"]
+    },
+    "monthlyComplianceReport": {
+      "enabled": true,
+      "schedule": "0 9 1 * *",
+      "recipients": ["compliance-committee@cbagroup.com", "audit-committee@cbagroup.com"]
+    }
+  },
+  "integrationConfiguration": {
+    "logAnalytics": {
+      "workspaceName": "law-governance-prod",
+      "resourceGroup": "rg-governance-prod",
+      "subscriptionId": "{SUBSCRIPTION_ID}",
+      "customTables": [
+        "ComplianceViolations_CL",
+        "ComplianceScore_CL",
+        "PolicyExceptions_CL",
+        "ComplianceEvents_CL"
+      ]
+    },
+    "azureSentinel": {
+      "enabled": true,
+      "workspaceName": "law-governance-prod",
+      "resourceGroup": "rg-governance-prod",
+      "analyticsRules": true,
+      "playbooks": true
+    },
+    "azureSecurityCenter": {
+      "enabled": true,
+      "subscriptionId": "{SUBSCRIPTION_ID}",
+      "securityContacts": ["security-team@cbagroup.com"]
+    },
+    "microsoftDefender": {
+      "enabled": true,
+      "tenantId": "{TENANT_ID}",
+      "alertIntegration": true
+    },
+    "powerBI": {
+      "enabled": true,
+      "workspaceId": "{POWERBI_WORKSPACE_ID}",
+      "datasetId": "{POWERBI_DATASET_ID}",
+      "reportId": "{POWERBI_REPORT_ID}"
+    },
+    "serviceNow": {
+      "enabled": true,
+      "instanceUrl": "https://cbagroup.service-now.com",
+      "apiEndpoint": "/api/now/table/incident",
+      "authentication": "oauth2"
+    }
+  },
+  "performanceConfiguration": {
+    "monitoringInterval": "60s",
+    "queryTimeout": "30s",
+    "maxConcurrentQueries": 10,
+    "retryPolicy": {
+      "maxRetries": 3,
+      "retryDelay": "5s",
+      "exponentialBackoff": true
+    },
+    "caching": {
+      "enabled": true,
+      "cacheDuration": "5m",
+      "maxCacheSize": "100MB"
+    }
+  },
+  "securityConfiguration": {
+    "encryption": {
+      "enabled": true,
+      "algorithm": "AES-256",
+      "keyVault": "kv-governance-prod"
+    },
+    "authentication": {
+      "method": "managed-identity",
+      "fallback": "service-principal"
+    },
+    "authorization": {
+      "rbac": true,
+      "minimumPermissions": true
+    },
+    "auditLogging": {
+      "enabled": true,
+      "logLevel": "INFO",
+      "retentionDays": 365
+    }
+  }
+}

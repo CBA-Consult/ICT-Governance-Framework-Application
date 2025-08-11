@@ -1,0 +1,609 @@
+{
+  "dashboardMetadata": {
+    "name": "Real-Time Critical Violations Dashboard",
+    "description": "Real-time monitoring dashboard for critical compliance violations and security incidents",
+    "version": "1.0.0",
+    "lastUpdated": "2024-12-19",
+    "owner": "ICT Governance Office",
+    "tags": ["real-time", "compliance", "violations", "critical", "monitoring"]
+  },
+  "dashboardConfiguration": {
+    "refreshInterval": "10s",
+    "timeRange": "24h",
+    "autoRefresh": true,
+    "theme": "dark",
+    "layout": "grid",
+    "alertsEnabled": true,
+    "soundAlerts": true
+  },
+  "dataSources": {
+    "logAnalytics": {
+      "workspaceName": "law-governance-{environment}",
+      "subscriptionId": "{subscriptionId}",
+      "resourceGroup": "rg-governance-{environment}"
+    },
+    "securityCenter": {
+      "subscriptionId": "{subscriptionId}",
+      "resourceGroup": "rg-governance-{environment}"
+    },
+    "azureAD": {
+      "tenantId": "{tenantId}"
+    },
+    "complianceEngine": {
+      "endpoint": "https://compliance.cbagroup.com/api/violations",
+      "apiKey": "{complianceApiKey}"
+    }
+  },
+  "panels": [
+    {
+      "id": "critical-violations-summary",
+      "title": "Critical Violations - Live Status",
+      "type": "stat",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "width": 24,
+        "height": 4
+      },
+      "refreshInterval": "5s",
+      "metrics": [
+        {
+          "name": "Active Critical Violations",
+          "query": "ComplianceViolations_CL | where Severity_s == 'Critical' and Status_s == 'Active' | count",
+          "target": 0,
+          "unit": "count",
+          "color": "red",
+          "alertThreshold": 1,
+          "alertMessage": "Critical violation detected - immediate action required"
+        },
+        {
+          "name": "Mean Time to Detection",
+          "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) and Severity_s == 'Critical' | extend DetectionTime = datetime_diff('second', ViolationTime_t, DetectionTime_t) | summarize avg(DetectionTime)",
+          "target": 120,
+          "unit": "seconds",
+          "color": "orange",
+          "alertThreshold": 300,
+          "alertMessage": "Detection time exceeding SLA"
+        },
+        {
+          "name": "Mean Time to Response",
+          "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) and Severity_s == 'Critical' | extend ResponseTime = datetime_diff('second', DetectionTime_t, ResponseTime_t) | summarize avg(ResponseTime)",
+          "target": 300,
+          "unit": "seconds",
+          "color": "blue",
+          "alertThreshold": 600,
+          "alertMessage": "Response time exceeding SLA"
+        },
+        {
+          "name": "SLA Compliance Rate",
+          "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) and Severity_s == 'Critical' | summarize SLAMet = countif(SLACompliant_b == true), Total = count() | extend ComplianceRate = (SLAMet * 100.0) / Total",
+          "target": 95,
+          "unit": "%",
+          "color": "green",
+          "alertThreshold": 90,
+          "alertMessage": "SLA compliance below target"
+        }
+      ]
+    },
+    {
+      "id": "live-violations-stream",
+      "title": "Live Violations Stream",
+      "type": "table",
+      "position": {
+        "x": 0,
+        "y": 4,
+        "width": 24,
+        "height": 8
+      },
+      "refreshInterval": "5s",
+      "query": "ComplianceViolations_CL | where TimeGenerated > ago(1h) | order by TimeGenerated desc | take 50",
+      "columns": [
+        {
+          "name": "TimeGenerated",
+          "type": "datetime",
+          "format": "HH:mm:ss",
+          "width": 80
+        },
+        {
+          "name": "Severity_s",
+          "type": "string",
+          "width": 80,
+          "colorMapping": {
+            "Critical": "red",
+            "High": "orange",
+            "Medium": "yellow",
+            "Low": "green"
+          }
+        },
+        {
+          "name": "ViolationType_s",
+          "type": "string",
+          "width": 150
+        },
+        {
+          "name": "Domain_s",
+          "type": "string",
+          "width": 100
+        },
+        {
+          "name": "AffectedResource_s",
+          "type": "string",
+          "width": 200
+        },
+        {
+          "name": "Status_s",
+          "type": "string",
+          "width": 100,
+          "colorMapping": {
+            "Active": "red",
+            "Investigating": "orange",
+            "Resolving": "yellow",
+            "Resolved": "green"
+          }
+        },
+        {
+          "name": "AssignedTo_s",
+          "type": "string",
+          "width": 120
+        }
+      ],
+      "rowClickAction": {
+        "type": "drilldown",
+        "target": "violation-details"
+      }
+    },
+    {
+      "id": "violation-trends",
+      "title": "Critical Violation Trends (24h)",
+      "type": "graph",
+      "position": {
+        "x": 0,
+        "y": 12,
+        "width": 12,
+        "height": 8
+      },
+      "refreshInterval": "30s",
+      "queries": [
+        {
+          "name": "Critical Violations",
+          "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) and Severity_s == 'Critical' | summarize count() by bin(TimeGenerated, 10m)",
+          "legend": "Critical Violations",
+          "color": "red",
+          "lineWidth": 3
+        },
+        {
+          "name": "High Violations",
+          "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) and Severity_s == 'High' | summarize count() by bin(TimeGenerated, 10m)",
+          "legend": "High Violations",
+          "color": "orange",
+          "lineWidth": 2
+        },
+        {
+          "name": "SLA Violations",
+          "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) and SLACompliant_b == false | summarize count() by bin(TimeGenerated, 10m)",
+          "legend": "SLA Violations",
+          "color": "purple",
+          "lineWidth": 2
+        }
+      ],
+      "yAxis": {
+        "title": "Violation Count",
+        "min": 0
+      },
+      "xAxis": {
+        "title": "Time"
+      }
+    },
+    {
+      "id": "violation-by-domain",
+      "title": "Violations by Domain (24h)",
+      "type": "pie",
+      "position": {
+        "x": 12,
+        "y": 12,
+        "width": 12,
+        "height": 8
+      },
+      "refreshInterval": "60s",
+      "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) and Severity_s in ('Critical', 'High') | summarize count() by Domain_s",
+      "legend": "Domain Distribution",
+      "colorScheme": "category10"
+    },
+    {
+      "id": "response-time-metrics",
+      "title": "Response Time Performance",
+      "type": "graph",
+      "position": {
+        "x": 0,
+        "y": 20,
+        "width": 12,
+        "height": 8
+      },
+      "refreshInterval": "30s",
+      "queries": [
+        {
+          "name": "Detection Time",
+          "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) | extend DetectionTime = datetime_diff('second', ViolationTime_t, DetectionTime_t) | summarize avg(DetectionTime) by bin(TimeGenerated, 1h)",
+          "legend": "Avg Detection Time (s)",
+          "color": "blue",
+          "yAxis": "left"
+        },
+        {
+          "name": "Response Time",
+          "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) | extend ResponseTime = datetime_diff('second', DetectionTime_t, ResponseTime_t) | summarize avg(ResponseTime) by bin(TimeGenerated, 1h)",
+          "legend": "Avg Response Time (s)",
+          "color": "green",
+          "yAxis": "left"
+        },
+        {
+          "name": "Resolution Time",
+          "query": "ComplianceViolations_CL | where TimeGenerated > ago(24h) and Status_s == 'Resolved' | extend ResolutionTime = datetime_diff('minute', DetectionTime_t, ResolutionTime_t) | summarize avg(ResolutionTime) by bin(TimeGenerated, 1h)",
+          "legend": "Avg Resolution Time (min)",
+          "color": "orange",
+          "yAxis": "right"
+        }
+      ],
+      "yAxes": {
+        "left": {
+          "title": "Time (seconds)",
+          "min": 0
+        },
+        "right": {
+          "title": "Time (minutes)",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": "security-incidents",
+      "title": "Security Incidents (Real-time)",
+      "type": "table",
+      "position": {
+        "x": 12,
+        "y": 20,
+        "width": 12,
+        "height": 8
+      },
+      "refreshInterval": "10s",
+      "query": "SecurityIncident | where TimeGenerated > ago(2h) and Severity in ('High', 'Medium') | order by TimeGenerated desc | take 20",
+      "columns": [
+        {
+          "name": "TimeGenerated",
+          "type": "datetime",
+          "format": "HH:mm:ss",
+          "width": 80
+        },
+        {
+          "name": "Title",
+          "type": "string",
+          "width": 200
+        },
+        {
+          "name": "Severity",
+          "type": "string",
+          "width": 80,
+          "colorMapping": {
+            "High": "red",
+            "Medium": "orange",
+            "Low": "yellow",
+            "Informational": "blue"
+          }
+        },
+        {
+          "name": "Status",
+          "type": "string",
+          "width": 100
+        },
+        {
+          "name": "Owner",
+          "type": "string",
+          "width": 120
+        }
+      ]
+    },
+    {
+      "id": "compliance-heatmap",
+      "title": "Compliance Status Heatmap",
+      "type": "heatmap",
+      "position": {
+        "x": 0,
+        "y": 28,
+        "width": 24,
+        "height": 8
+      },
+      "refreshInterval": "60s",
+      "query": "ComplianceStatus_CL | where TimeGenerated > ago(1h) | summarize ComplianceScore = avg(ComplianceScore_d) by Domain_s, System_s",
+      "xAxis": "Domain_s",
+      "yAxis": "System_s",
+      "value": "ComplianceScore",
+      "colorScale": {
+        "min": 0,
+        "max": 100,
+        "colors": ["red", "orange", "yellow", "green"]
+      }
+    },
+    {
+      "id": "automated-responses",
+      "title": "Automated Response Actions",
+      "type": "stat",
+      "position": {
+        "x": 0,
+        "y": 36,
+        "width": 12,
+        "height": 6
+      },
+      "refreshInterval": "30s",
+      "metrics": [
+        {
+          "name": "Auto-Responses Triggered",
+          "query": "AutomatedResponses_CL | where TimeGenerated > ago(24h) | count",
+          "unit": "count",
+          "color": "blue"
+        },
+        {
+          "name": "Success Rate",
+          "query": "AutomatedResponses_CL | where TimeGenerated > ago(24h) | summarize Success = countif(Status_s == 'Success'), Total = count() | extend SuccessRate = (Success * 100.0) / Total",
+          "target": 95,
+          "unit": "%",
+          "color": "green"
+        },
+        {
+          "name": "Manual Interventions",
+          "query": "AutomatedResponses_CL | where TimeGenerated > ago(24h) and RequiresManualIntervention_b == true | count",
+          "target": 5,
+          "unit": "count",
+          "color": "orange"
+        }
+      ]
+    },
+    {
+      "id": "stakeholder-notifications",
+      "title": "Stakeholder Notifications (24h)",
+      "type": "table",
+      "position": {
+        "x": 12,
+        "y": 36,
+        "width": 12,
+        "height": 6
+      },
+      "refreshInterval": "60s",
+      "query": "StakeholderNotifications_CL | where TimeGenerated > ago(24h) | order by TimeGenerated desc | take 15",
+      "columns": [
+        {
+          "name": "TimeGenerated",
+          "type": "datetime",
+          "format": "HH:mm:ss",
+          "width": 80
+        },
+        {
+          "name": "NotificationType_s",
+          "type": "string",
+          "width": 120
+        },
+        {
+          "name": "Recipient_s",
+          "type": "string",
+          "width": 150
+        },
+        {
+          "name": "Channel_s",
+          "type": "string",
+          "width": 80
+        },
+        {
+          "name": "Status_s",
+          "type": "string",
+          "width": 80,
+          "colorMapping": {
+            "Delivered": "green",
+            "Pending": "orange",
+            "Failed": "red"
+          }
+        }
+      ]
+    }
+  ],
+  "alerts": [
+    {
+      "name": "Critical Violation Detected",
+      "description": "Critical compliance violation requiring immediate attention",
+      "query": "ComplianceViolations_CL | where TimeGenerated > ago(1m) and Severity_s == 'Critical'",
+      "severity": "Critical",
+      "frequency": "1m",
+      "threshold": 1,
+      "actions": [
+        {
+          "type": "email",
+          "recipients": ["ciso@cbagroup.com", "governance-team@cbagroup.com"],
+          "subject": "CRITICAL: Compliance Violation Detected",
+          "template": "critical-violation-alert"
+        },
+        {
+          "type": "sms",
+          "recipients": ["+1234567890", "+1234567891"],
+          "message": "CRITICAL compliance violation detected. Check dashboard immediately."
+        },
+        {
+          "type": "teams",
+          "webhook": "https://outlook.office.com/webhook/...",
+          "message": "🚨 CRITICAL VIOLATION ALERT 🚨\nImmediate action required. Check real-time dashboard."
+        },
+        {
+          "type": "webhook",
+          "url": "https://automation.cbagroup.com/api/critical-alert",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {apiToken}",
+            "Content-Type": "application/json"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SLA Violation Warning",
+      "description": "Response time SLA approaching violation threshold",
+      "query": "ComplianceViolations_CL | where TimeGenerated > ago(5m) and Severity_s in ('Critical', 'High') and datetime_diff('second', DetectionTime_t, now()) > 240",
+      "severity": "High",
+      "frequency": "5m",
+      "threshold": 1,
+      "actions": [
+        {
+          "type": "email",
+          "recipients": ["governance-team@cbagroup.com"],
+          "subject": "SLA Warning: Response Time Approaching Threshold"
+        },
+        {
+          "type": "teams",
+          "webhook": "https://outlook.office.com/webhook/...",
+          "message": "⚠️ SLA WARNING: Response time approaching violation threshold"
+        }
+      ]
+    },
+    {
+      "name": "Multiple High Violations",
+      "description": "Multiple high-severity violations detected in short timeframe",
+      "query": "ComplianceViolations_CL | where TimeGenerated > ago(15m) and Severity_s == 'High' | count",
+      "severity": "High",
+      "frequency": "15m",
+      "threshold": 5,
+      "actions": [
+        {
+          "type": "email",
+          "recipients": ["security-team@cbagroup.com", "governance-team@cbagroup.com"],
+          "subject": "Alert: Multiple High-Severity Violations Detected"
+        },
+        {
+          "type": "automation",
+          "runbook": "Investigate-Multiple-Violations"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard System Health",
+      "description": "Real-time dashboard system health check",
+      "query": "Heartbeat | where TimeGenerated > ago(5m) and Computer == 'dashboard-server' | count",
+      "severity": "Medium",
+      "frequency": "5m",
+      "threshold": 0,
+      "invertThreshold": true,
+      "actions": [
+        {
+          "type": "email",
+          "recipients": ["it-operations@cbagroup.com"],
+          "subject": "Dashboard System Health Alert"
+        },
+        {
+          "type": "automation",
+          "runbook": "Restart-Dashboard-Services"
+        }
+      ]
+    }
+  ],
+  "automationRunbooks": [
+    {
+      "name": "Critical-Violation-Response",
+      "description": "Automated response for critical violations",
+      "trigger": "Critical Violation Detected",
+      "actions": [
+        "Collect violation context and evidence",
+        "Notify stakeholders via multiple channels",
+        "Create high-priority incident ticket",
+        "Initiate containment procedures",
+        "Schedule emergency response meeting"
+      ]
+    },
+    {
+      "name": "Investigate-Multiple-Violations",
+      "description": "Investigation workflow for multiple violations",
+      "trigger": "Multiple High Violations",
+      "actions": [
+        "Correlate violation patterns",
+        "Identify common root causes",
+        "Assess potential security incidents",
+        "Generate investigation report",
+        "Escalate to security team if needed"
+      ]
+    },
+    {
+      "name": "SLA-Escalation",
+      "description": "Automated escalation for SLA violations",
+      "trigger": "SLA Violation Warning",
+      "actions": [
+        "Calculate exact SLA breach time",
+        "Identify responsible teams",
+        "Send escalation notifications",
+        "Create SLA violation record",
+        "Schedule post-incident review"
+      ]
+    }
+  ],
+  "reportingSchedule": {
+    "realTimeAlerts": {
+      "frequency": "immediate",
+      "recipients": ["governance-team@cbagroup.com", "security-team@cbagroup.com"]
+    },
+    "hourlyDigest": {
+      "frequency": "hourly",
+      "time": "00",
+      "recipients": ["operations-team@cbagroup.com"]
+    },
+    "dailySummary": {
+      "frequency": "daily",
+      "time": "06:00",
+      "recipients": ["management-team@cbagroup.com"]
+    },
+    "weeklyExecutiveSummary": {
+      "frequency": "weekly",
+      "day": "Monday",
+      "time": "08:00",
+      "recipients": ["executive-team@cbagroup.com"]
+    }
+  },
+  "integrations": {
+    "ictGovernanceFramework": {
+      "enabled": true,
+      "endpoint": "https://governance.cbagroup.com/api/violations",
+      "authentication": "bearer_token"
+    },
+    "microsoftSentinel": {
+      "enabled": true,
+      "workspace": "law-governance-{environment}",
+      "subscriptionId": "{subscriptionId}"
+    },
+    "azureSecurityCenter": {
+      "enabled": true,
+      "subscriptionId": "{subscriptionId}",
+      "resourceGroup": "rg-governance-{environment}"
+    },
+    "logicApps": {
+      "enabled": true,
+      "automationAccount": "aa-governance-{environment}",
+      "resourceGroup": "rg-governance-{environment}"
+    },
+    "powerBI": {
+      "enabled": true,
+      "workspaceId": "{powerBIWorkspaceId}",
+      "datasetId": "{powerBIDatasetId}"
+    }
+  },
+  "customization": {
+    "themes": {
+      "executive": {
+        "colors": ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"],
+        "fontSize": "large",
+        "layout": "simplified"
+      },
+      "operational": {
+        "colors": ["#ff0000", "#ff8c00", "#ffd700", "#00ff00"],
+        "fontSize": "medium",
+        "layout": "detailed"
+      }
+    },
+    "userPreferences": {
+      "autoRefresh": true,
+      "soundAlerts": true,
+      "emailDigest": true,
+      "mobileNotifications": true
+    }
+  }
+}
