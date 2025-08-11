@@ -24,8 +24,7 @@ This framework covers all technology assets, services, and resources:
 * **🌐 IoT (Internet of Things):** IoT devices, sensors, edge processing, IoT data governance, device lifecycle management
 * **⚡ Edge Computing:** Edge infrastructure, distributed processing, real-time analytics, edge-cloud integration
 * **🔗 Blockchain:** Distributed ledger technologies, smart contracts, cryptocurrency, digital assets, decentralized applications
-=======
-* **🔄 Integration:** Unified API ecosystem, middleware, data exchange mechanisms, security information exchange, cross-domain workflow automation
+* **🌱 Sustainability:** Carbon footprint tracking, energy efficiency optimization, sustainable technology practices, ESG compliance
 
 ## Unified Governance Platform
 
@@ -76,6 +75,7 @@ The platform integrates the following governance domains:
 | **Multi-Cloud Governance** | API | AWS/GCP compliance, cross-cloud policies |
 | **Application Governance** | API | App catalog, discovery, validation workflows |
 | **Security Governance** | API | SIEM integration, threat management, compliance |
+| **Sustainability Governance** | API | Carbon tracking, energy monitoring, ESG reporting |
 
 #### API Ecosystem
 
@@ -93,6 +93,7 @@ https://governance-api.company.com/v2/
 ├── multi-cloud/             # Multi-cloud governance
 ├── applications/            # Application governance
 ├── security/                # Security governance
+├── sustainability/          # Sustainability governance
 └── integrations/            # External system integrations
 ```
 
@@ -1405,6 +1406,18 @@ For detailed guidance on onboarding new technology components and offboarding de
 * ✅ 85% success rate for innovation sandbox experiments
 * ✅ 100% of innovation initiatives aligned with strategic objectives
 * ✅ 70% of innovation partnerships delivering measurable value
+
+### Sustainability and Carbon Footprint Metrics
+* ✅ 30% reduction in ICT carbon footprint by 2027 (baseline: 2024)
+* ✅ 70% renewable energy usage in cloud operations by 2026
+* ✅ 20% annual energy efficiency improvement across all ICT operations
+* ✅ >95% compliance with sustainable technology procurement guidelines
+* ✅ 100% of technology investments >$50K include carbon impact assessment
+* ✅ <$100 per tonne CO2e for carbon reduction initiatives
+* ✅ 95% e-waste recycling rate for end-of-life ICT equipment
+* ✅ 85% stakeholder satisfaction with sustainability initiatives
+* ✅ Level 4 (Optimized) sustainability governance maturity
+* ✅ 100% completion of monthly carbon footprint tracking and reporting
 
 ### Stakeholder Engagement and Communication Metrics
 * ✅ >95% communication reach rate for target stakeholders

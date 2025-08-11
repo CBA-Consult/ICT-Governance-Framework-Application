@@ -44,6 +44,21 @@ This document defines the key performance indicators (KPIs), metrics, and report
 | **Cost Optimization** | Cost savings from standardization and governance | >5% annual reduction | Financial analysis | Annual |
 | **Time-to-Market** | Impact of governance on time-to-market for new initiatives | No negative impact | Project analysis | Quarterly |
 
+### Sustainability and Carbon Footprint KPIs
+
+| KPI | Description | Target | Measurement Method | Frequency |
+|-----|-------------|--------|-------------------|-----------|
+| **ICT Carbon Footprint Reduction** | Reduction in total ICT carbon emissions | 30% by 2027 | Carbon tracking tools | Monthly |
+| **Energy Efficiency Improvement** | Energy consumption per unit of work | 20% annual improvement | Energy monitoring systems | Monthly |
+| **Renewable Energy Usage** | Percentage of renewable energy in operations | >70% by 2026 | Cloud provider reports | Quarterly |
+| **Green Technology Adoption** | Percentage of sustainable technology choices | >80% | Technology assessment | Quarterly |
+| **Carbon Impact Assessment Compliance** | Technology investments with carbon assessment | 100% for >$50K | Investment tracking | Monthly |
+| **E-Waste Recycling Rate** | Percentage of ICT equipment properly recycled | >95% | Waste management tracking | Quarterly |
+| **Sustainability Policy Compliance** | Compliance with sustainable technology policies | >95% | Policy compliance scans | Monthly |
+| **Carbon Reduction ROI** | Cost-effectiveness of carbon reduction initiatives | <$100/tonne CO2e | Financial analysis | Quarterly |
+| **Sustainability Stakeholder Satisfaction** | Satisfaction with sustainability initiatives | >85% | Stakeholder survey | Quarterly |
+| **Sustainability Governance Maturity** | Maturity of sustainability governance processes | Level 4 (Optimized) | Maturity assessment | Annual |
+
 ### Annual Benchmarking KPIs
 
 | KPI | Description | Target | Measurement Method | Frequency |
