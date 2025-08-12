@@ -26,6 +26,8 @@ This document defines the comprehensive role structure for the ICT Governance Fr
 9. [Support and Operations Roles](#support-and-operations-roles)
 10. [Role Interaction Matrix](#role-interaction-matrix)
 11. [Escalation Paths](#escalation-paths)
+12. [Success Metrics and Accountability](#success-metrics-and-accountability)
+13. [Conclusion](#conclusion)
 
 ---
 
@@ -447,6 +449,104 @@ This document defines the comprehensive role structure for the ICT Governance Fr
 | **Quality Standards** | QA Manager | Technical Leads | Project Manager |
 | **Scope Changes** | Project Manager | Business Analyst Lead | Steering Committee |
 | **Risk Mitigation** | Project Manager | Domain Experts | Sponsor |
+
+### RACI Matrix for Key Activities and Decisions
+
+#### Legend
+- **R** = Responsible (performs the work)
+- **A** = Accountable (ultimately answerable for completion)
+- **C** = Consulted (provides input and expertise)
+- **I** = Informed (kept informed of progress/decisions)
+
+#### Project Management Activities
+
+| Activity/Decision | Project Sponsor | Steering Committee | Project Manager | PMO Lead | Solution Architect | Technical Leads | Business Analyst Lead | QA Manager | Change Mgmt Lead |
+|------------------|-----------------|-------------------|-----------------|----------|-------------------|-----------------|----------------------|------------|------------------|
+| **Project Charter Approval** | A | C | R | C | C | I | C | I | I |
+| **Project Planning** | A | I | R | C | C | C | R | C | C |
+| **Budget Approval** | A | C | R | C | I | I | I | I | I |
+| **Resource Allocation** | A | C | R | C | I | I | C | I | I |
+| **Schedule Management** | I | I | A | R | C | C | C | C | C |
+| **Risk Management** | A | C | R | C | C | C | C | C | C |
+| **Issue Escalation** | A | C | R | C | C | C | C | C | C |
+| **Project Status Reporting** | I | I | A | R | C | C | C | C | C |
+
+#### Technical Development Activities
+
+| Activity/Decision | Project Sponsor | Steering Committee | Project Manager | PMO Lead | Solution Architect | Technical Leads | Business Analyst Lead | QA Manager | Change Mgmt Lead |
+|------------------|-----------------|-------------------|-----------------|----------|-------------------|-----------------|----------------------|------------|------------------|
+| **Architecture Design** | I | I | C | I | A | R | C | C | I |
+| **Technology Selection** | A | C | C | I | A | R | C | I | I |
+| **Technical Standards** | I | I | C | I | A | R | I | C | I |
+| **Code Review Process** | I | I | C | I | C | A | I | R | I |
+| **Integration Planning** | I | I | C | I | C | A | C | R | I |
+| **Performance Requirements** | I | I | C | I | C | R | A | C | I |
+| **Security Implementation** | A | C | C | I | C | R | C | C | I |
+| **Cloud Governance Setup** | A | C | C | I | A | R | C | C | I |
+
+#### Requirements and Business Analysis
+
+| Activity/Decision | Project Sponsor | Steering Committee | Project Manager | PMO Lead | Solution Architect | Technical Leads | Business Analyst Lead | QA Manager | Change Mgmt Lead |
+|------------------|-----------------|-------------------|-----------------|----------|-------------------|-----------------|----------------------|------------|------------------|
+| **Requirements Gathering** | C | C | C | I | C | C | A | C | C |
+| **Requirements Validation** | A | C | C | I | C | C | R | C | C |
+| **Business Process Design** | A | C | C | I | C | I | R | C | R |
+| **User Story Creation** | I | I | C | I | C | C | A | R | C |
+| **Acceptance Criteria** | A | C | C | I | C | C | R | A | C |
+| **Requirements Traceability** | I | I | C | I | C | C | A | R | I |
+| **Process Documentation** | I | I | C | I | C | C | A | C | R |
+
+#### Quality Assurance Activities
+
+| Activity/Decision | Project Sponsor | Steering Committee | Project Manager | PMO Lead | Solution Architect | Technical Leads | Business Analyst Lead | QA Manager | Change Mgmt Lead |
+|------------------|-----------------|-------------------|-----------------|----------|-------------------|-----------------|----------------------|------------|------------------|
+| **Test Strategy** | A | C | C | I | C | C | C | R | I |
+| **Test Planning** | I | I | C | I | C | C | C | A | I |
+| **Test Case Development** | I | I | I | I | C | C | C | A | I |
+| **Test Execution** | I | I | C | I | I | C | C | A | I |
+| **Defect Management** | I | I | C | I | C | R | C | A | I |
+| **User Acceptance Testing** | A | C | C | I | C | C | R | C | C |
+| **Quality Gates** | A | C | C | I | C | C | C | R | I |
+| **Go-Live Approval** | A | C | R | C | C | C | C | C | C |
+
+#### Stakeholder Engagement and Change Management
+
+| Activity/Decision | Project Sponsor | Steering Committee | Project Manager | PMO Lead | Solution Architect | Technical Leads | Business Analyst Lead | QA Manager | Change Mgmt Lead |
+|------------------|-----------------|-------------------|-----------------|----------|-------------------|-----------------|----------------------|------------|------------------|
+| **Stakeholder Identification** | A | C | C | I | I | I | R | I | R |
+| **Communication Planning** | A | C | R | C | I | I | C | I | A |
+| **Training Strategy** | A | C | C | I | I | I | C | I | R |
+| **Change Impact Assessment** | A | C | C | I | C | C | R | C | A |
+| **User Adoption Planning** | A | C | C | I | I | I | C | I | R |
+| **Stakeholder Communication** | A | C | R | C | I | I | C | I | A |
+| **Training Delivery** | I | I | C | I | I | I | C | I | A |
+| **Adoption Measurement** | A | C | C | C | I | I | C | I | R |
+
+#### Governance and Compliance Activities
+
+| Activity/Decision | Project Sponsor | Steering Committee | Project Manager | PMO Lead | Solution Architect | Technical Leads | Business Analyst Lead | QA Manager | Change Mgmt Lead |
+|------------------|-----------------|-------------------|-----------------|----------|-------------------|-----------------|----------------------|------------|------------------|
+| **Governance Framework Design** | A | R | C | C | C | C | R | C | C |
+| **Policy Development** | A | R | C | C | C | C | R | C | C |
+| **Compliance Monitoring** | A | C | C | R | C | C | C | C | I |
+| **Audit Preparation** | A | C | R | C | C | C | C | C | I |
+| **Risk Assessment** | A | C | R | C | C | C | C | C | C |
+| **Security Reviews** | A | C | C | I | C | R | C | C | I |
+| **Data Governance** | A | C | C | I | C | C | R | C | I |
+| **Regulatory Compliance** | A | R | C | C | C | C | C | C | I |
+
+#### Deployment and Operations
+
+| Activity/Decision | Project Sponsor | Steering Committee | Project Manager | PMO Lead | Solution Architect | Technical Leads | Business Analyst Lead | QA Manager | Operations Lead |
+|------------------|-----------------|-------------------|-----------------|----------|-------------------|-----------------|----------------------|------------|-----------------|
+| **Deployment Planning** | A | C | R | C | C | R | C | C | R |
+| **Environment Setup** | I | I | C | I | C | A | I | C | R |
+| **Production Deployment** | A | C | R | C | C | R | C | C | A |
+| **Monitoring Setup** | I | I | C | I | C | R | I | C | A |
+| **Backup/Recovery** | A | I | C | I | C | R | I | I | A |
+| **Performance Monitoring** | I | I | C | I | C | R | C | C | A |
+| **Incident Response** | A | C | C | I | C | R | C | C | A |
+| **Maintenance Planning** | A | C | C | C | C | R | C | C | A |
 
 ---
 
