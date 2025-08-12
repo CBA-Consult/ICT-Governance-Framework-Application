@@ -243,14 +243,49 @@ Following the Framework Enhancement Plan, we have conducted a detailed analysis 
 
 R = Responsible, A = Accountable, C = Consulted, I = Informed
 
-## Approval
+## Formal Approval
 
-| Name | Role | Signature | Date |
-|------|------|-----------|------|
-| [Name] | Executive Sponsor | Menno Drescher | August 7, 2025 |
-| [Name] | Business Sponsor | ______________ | __________ |
-| [Name] | Project Manager | Menno Drescher | August 7, 2025 |
-| [Name] | IT Governance Lead | ______________ | __________ |
+This project charter requires formal approval from all designated authorities as outlined in the Formal Approval Process (CHARTER-APPROVAL-001). The charter will not be considered officially approved until all required signatures are obtained.
+
+### Executive Level Approvals
+
+| Authority | Name | Role | Signature | Date | Status |
+|-----------|------|------|-----------|------|--------|
+| Executive Sponsor | [CIO Name] | Chief Information Officer | __________________ | __________ | Pending |
+| Business Sponsor | [CFO Name] | Chief Financial Officer | __________________ | __________ | Pending |
+
+### Governance Body Approvals
+
+| Authority | Chair/Representative | Signature | Date | Status |
+|-----------|---------------------|-----------|------|--------|
+| ICT Governance Council | [Council Chair] | __________________ | __________ | Pending |
+| Risk and Compliance Committee | [Committee Chair] | __________________ | __________ | Pending |
+| Architecture Review Board | [ARB Chair] | __________________ | __________ | Pending |
+
+### Project Management Approval
+
+| Authority | Name | Role | Signature | Date | Status |
+|-----------|------|------|-----------|------|--------|
+| Project Manager | [PM Name] | Project Manager | __________________ | __________ | Pending |
+
+### Approval Certification
+
+By signing below, each authority certifies that:
+- They have reviewed the complete project charter and supporting documentation
+- The project aligns with organizational strategy and governance requirements
+- Required resources and support will be provided as outlined
+- The project is authorized to proceed upon completion of all approvals
+
+### Final Approval Summary
+
+**Charter Status:** Pending Formal Approval  
+**Approval Process Reference:** CHARTER-APPROVAL-001  
+**Expected Approval Completion:** January 26, 2025  
+**Project Commencement:** Upon final approval completion
+
+For detailed approval process, criteria, and tracking, refer to:
+- [Formal Approval Process](formal-approval-process.md)
+- [Charter Attachments and Approvals](charter-attachments-and-approvals.md)
 
 ---
 
