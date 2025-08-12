@@ -2,6 +2,23 @@
 
 This document lists all major documents and directories in the repository for easy navigation.
 
+> **📖 For a comprehensive, organized view of all documentation, visit the [Documentation Structure](docs/README.md)**
+
+## 🚀 Quick Navigation
+
+### Essential Documents
+- **[📖 Documentation Structure](docs/README.md)** - Complete organized documentation
+- **[🎯 Project Overview](docs/project-management/A001-Project-Scope-and-Objectives.md)** - Project scope and objectives  
+- **[🏛️ Core Framework](docs/governance-framework/core-framework/ICT-Governance-Framework.md)** - Main governance framework
+- **[🚀 Implementation Guide](docs/implementation/summaries/IMPLEMENTATION-SUMMARY.md)** - Implementation status
+
+### By Role
+- **👥 Project Managers**: [Project Management Documentation](docs/project-management/)
+- **🏛️ Governance Teams**: [Governance Framework Documentation](docs/governance-framework/)
+- **🔧 Implementers**: [Implementation Guides](docs/implementation/)
+- **👨‍💻 Developers**: [Technical Architecture](docs/architecture/)
+- **✅ Compliance Teams**: [Compliance Documentation](docs/compliance/)
+
 ## Top-Level Documents
 
 - [README.md](README.md)
@@ -10,30 +27,47 @@ This document lists all major documents and directories in the repository for ea
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - [SECURITY.md](SECURITY.md)
 
-## Key Framework Documents (Axxx)
-- [A006-Governance-Requirement-Justification.md](A006-Governance-Requirement-Justification.md)
-- [A006-Governance-to-Business-Mapping-Matrix.md](A006-Governance-to-Business-Mapping-Matrix.md)
-- [A008-Strategic-Fit-Priority-Validation.md](A008-Strategic-Fit-Priority-Validation.md)
-- [A009-Complete-Stakeholder-Identification.md](A009-Complete-Stakeholder-Identification.md)
-- [A009-Stakeholder-Categorization-Matrix.md](A009-Stakeholder-Categorization-Matrix.md)
-- [A011-Engagement-Tactics-Playbook.md](A011-Engagement-Tactics-Playbook.md)
-- [A011-Stakeholder-Engagement-Strategies.md](A011-Stakeholder-Engagement-Strategies.md)
-- [A014-Collaboration-Platform-Configuration-Guide.md](A014-Collaboration-Platform-Configuration-Guide.md)
-- [A016-Feedback-Escalation-Mechanisms-Framework.md](A016-Feedback-Escalation-Mechanisms-Framework.md)
-- [A017-Core-Team-Role-Descriptions.md](A017-Core-Team-Role-Descriptions.md)
-- [A018-Project-Roles-Definition.md](A018-Project-Roles-Definition.md)
-- [A019-Collaboration-Protocols.md](A019-Collaboration-Protocols.md)
-- [A021-Current-State-Assessment-Report.md](A021-Current-State-Assessment-Report.md)
-- [A022-Benchmark-Comparison.md](A022-Benchmark-Comparison.md)
-- [A023-Gap-Analysis-Heatmap.md](A023-Gap-Analysis-Heatmap.md)
-- [A024-Current-State-Governance-Architecture.md](A024-Current-State-Governance-Architecture.md)
-- [A025-Asset-Register.md](A025-Asset-Register.md)
-- [A026-Architecture-Constraint-Documentation.md](A026-Architecture-Constraint-Documentation.md)
-- [A027-Integration-Requirements-and-Constraints.md](A027-Integration-Requirements-and-Constraints.md)
-- [A028-Capacity-Planning-Model.md](A028-Capacity-Planning-Model.md)
-- [A029-Raw-Requirements.md](A029-Raw-Requirements.md)
-- [A030-Functional-Requirements-Specification.md](A030-Functional-Requirements-Specification.md)
-- [A030-Non-Functional-Requirements-Document.md](A030-Non-Functional-Requirements-Document.md)
+## 📁 Organized Documentation Structure
+
+### 🎯 Project Management
+- **Requirements**: [A006-A030 Requirements Documents](docs/project-management/requirements/)
+- **Stakeholder Management**: [A003, A009, A011 Stakeholder Documents](docs/project-management/stakeholder-management/)
+- **Team Management**: [A012-A020 Team Formation Documents](docs/project-management/team-management/)
+
+### 🏛️ Governance Framework
+- **Core Framework**: [ICT Governance Framework](docs/governance-framework/core-framework/)
+- **Target Framework**: [Enhanced Framework Documents](docs/governance-framework/target-framework/)
+- **Assessment**: [A021-A023 Assessment Documents](docs/governance-framework/assessment/)
+- **Metrics**: [KPIs and Measurement Framework](docs/governance-framework/metrics/)
+
+### 🏗️ Architecture
+- **Current State**: [A024-A026 Current Architecture](docs/architecture/current-state/)
+- **Target State**: [Future Architecture Designs](docs/architecture/target-state/)
+- **Integration**: [A027-A028 Integration Requirements](docs/architecture/integration/)
+- **Infrastructure**: [IaC and Infrastructure Documents](docs/architecture/infrastructure/)
+
+### 📋 Policies
+- **Governance Policies**: [Core governance and role definitions](docs/policies/governance/)
+- **Security Policies**: [Security and compliance policies](docs/policies/security/)
+- **Operational Policies**: [Day-to-day operational procedures](docs/policies/operational/)
+
+### 🚀 Implementation
+- **Guides**: [Step-by-step implementation guidance](docs/implementation/guides/)
+- **Summaries**: [Implementation status and completion](docs/implementation/summaries/)
+- **Deployment**: [Deployment strategies and plans](docs/implementation/deployment/)
+
+## Legacy Document References (A001-A030 Series)
+> **Note**: These documents have been reorganized into the structured documentation above.
+
+- **A001-A002**: Project scope and business case → [Project Management](docs/project-management/)
+- **A003**: Stakeholder documents → [Stakeholder Management](docs/project-management/stakeholder-management/)
+- **A006-A008**: Requirements and validation → [Requirements](docs/project-management/requirements/)
+- **A009-A011**: Stakeholder engagement → [Stakeholder Management](docs/project-management/stakeholder-management/)
+- **A012-A020**: Team formation and collaboration → [Team Management](docs/project-management/team-management/)
+- **A021-A023**: Assessments and gap analysis → [Assessment](docs/governance-framework/assessment/)
+- **A024-A026**: Current architecture → [Current State](docs/architecture/current-state/)
+- **A027-A028**: Integration requirements → [Integration](docs/architecture/integration/)
+- **A029-A030**: Requirements specification → [Requirements](docs/project-management/requirements/)
 
 ## Implementation Guides
 - [implementation-guides/api-integration-guide.md](implementation-guides/api-integration-guide.md)
@@ -89,13 +123,38 @@ This document lists all major documents and directories in the repository for ea
 ## Azure Automation
 - [azure-automation/README.md](azure-automation/README.md)
 
-## Other Key Documents
-- [Multi-Cloud-Multi-Tenant-ICT-Governance-Framework.md](Multi-Cloud-Multi-Tenant-ICT-Governance-Framework.md)
-- [ICT-Governance-Framework.md](ICT-Governance-Framework.md)
-- [Strategic-Tactical-IT-Governance-Overview.md](Strategic-Tactical-IT-Governance-Overview.md)
-- [Target-Governance-Framework.md](Target-Governance-Framework.md)
-- [ICT-Governance-Policies.md](ICT-Governance-Policies.md)
-- [ICT-Governance-IaC-Integration.md](ICT-Governance-IaC-Integration.md)
-- [ICT-Governance-Metrics.md](ICT-Governance-Metrics.md)
-- [Zero-Trust-Maturity-Model.md](Zero-Trust-Maturity-Model.md)
-- [InformationOverview.md](InformationOverview.md)
+## 🔧 Technical Components
+
+### Azure Automation
+- [azure-automation/README.md](azure-automation/README.md) - Azure-specific automation and scripts
+
+### Blueprint Templates  
+- [blueprint-templates/README.md](blueprint-templates/README.md) - Infrastructure as Code templates
+
+### ICT Governance Framework Application
+- [ict-governance-framework/README.md](ict-governance-framework/README.md) - Web application and APIs
+
+### Implementation Automation
+- [implementation-automation/](implementation-automation/) - Cross-platform deployment scripts
+
+## 📊 Supporting Resources
+
+### Framework Evaluation
+- [framework-evaluation/](framework-evaluation/) - Assessment tools and effectiveness measurement
+
+### Generated Documents
+- [generated-documents/README.md](generated-documents/README.md) - Auto-generated documentation
+
+### Multi-Cloud Governance
+- [multi-cloud-governance/](multi-cloud-governance/) - Multi-cloud specific guidance
+
+## 📄 Core Framework Documents (New Locations)
+- **[Multi-Cloud Multi-Tenant ICT Governance Framework](docs/governance-framework/core-framework/Multi-Cloud-Multi-Tenant-ICT-Governance-Framework.md)**
+- **[ICT Governance Framework](docs/governance-framework/core-framework/ICT-Governance-Framework.md)**
+- **[Strategic Tactical IT Governance Overview](docs/governance-framework/core-framework/Strategic-Tactical-IT-Governance-Overview.md)**
+- **[Target Governance Framework](docs/governance-framework/target-framework/Target-Governance-Framework.md)**
+- **[ICT Governance Policies](docs/policies/governance/ICT-Governance-Policies.md)**
+- **[ICT Governance IaC Integration](docs/architecture/integration/ICT-Governance-IaC-Integration.md)**
+- **[ICT Governance Metrics](docs/governance-framework/metrics/ICT-Governance-Metrics.md)**
+- **[Zero Trust Maturity Model](docs/architecture/target-state/Zero-Trust-Maturity-Model.md)**
+- **[Information Overview](InformationOverview.md)** *(Remaining at root level)*
