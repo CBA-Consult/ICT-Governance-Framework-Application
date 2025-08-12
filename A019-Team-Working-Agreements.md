@@ -7,7 +7,7 @@
 | Document Title       | Team Working Agreements          |
 | Project Name         | ICT Governance Framework         |
 | Document Version     | 1.0                              |
-| Document Status      | Draft                            |
+| Document Status      | Final                            |
 | Created Date         | December 19, 2024                |
 | Last Updated         | December 19, 2024                |
 | Document Owner       | ICT Governance Program Manager   |
