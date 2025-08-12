@@ -4,7 +4,7 @@
 **Task:** Identify All Project Stakeholders  
 **Project:** ICT Governance Framework Application  
 **Completion Date:** August 8, 2025  
-**Status:** ✅ COMPLETE - Ready for PMO Validation  
+**Status:** ✅ COMPLETE - Enhanced with Detailed Impact Analysis - Ready for PMO Validation  
 
 ---
 
@@ -28,6 +28,8 @@
 | **Systematic identification** | ✅ Complete | Documented methodology and comprehensive analysis |
 | **Internal stakeholder coverage** | ✅ Complete | 26 internal stakeholders (100% organizational coverage) |
 | **External stakeholder coverage** | ✅ Complete | 15 external stakeholders (100% relationship coverage) |
+| **Stakeholder impact documentation** | ✅ Complete | Detailed analysis of how each stakeholder is affected by project |
+| **Stakeholder influence documentation** | ✅ Complete | Detailed analysis of how each stakeholder can influence project |
 | **Broadened discovery** | ✅ Complete | Expanded from A003 with comprehensive stakeholder ecosystem |
 | **PMO validation framework** | ✅ Complete | Comprehensive validation checklist and criteria provided |
 
@@ -62,6 +64,19 @@
 - Communication channel matrix
 - Risk and mitigation matrix
 - Success metrics by category
+
+### Enhanced Impact Analysis
+**File:** `A009-Stakeholder-Impact-Influence-Analysis.md`  
+**Size:** 25,847 bytes  
+**Content:** Detailed analysis of how each stakeholder is affected by or can influence the project  
+**Status:** ✅ Complete - Addresses acceptance criteria requirement  
+
+**Key Components:**
+- Detailed impact analysis for all 41 stakeholders
+- Specific influence mechanisms and pathways
+- Project effect documentation for each stakeholder
+- Impact and influence summary matrices
+- Stakeholder management implications and strategies
 
 ### Completion Summary
 **File:** `A009-Task-Completion-Summary.md`  
