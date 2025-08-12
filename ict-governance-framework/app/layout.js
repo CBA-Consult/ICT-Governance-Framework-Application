@@ -38,6 +38,12 @@ export default function RootLayout({ children }) {
                 <Link href="/compliance" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                   Compliance
                 </Link>
+                <Link href="/compliance-dashboard" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  Compliance Dashboard
+                </Link>
+                <Link href="/defender-activities" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  Defender Activities
+                </Link>
                 <Link href="/docs" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
                   Docs
                 </Link>
