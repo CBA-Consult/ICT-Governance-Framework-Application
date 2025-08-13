@@ -3,7 +3,7 @@
 **WBS Reference:** 1.2.1.2.1 - Inventory Existing Technology Assets and Systems  
 **Project:** ICT Governance Framework Application  
 **Assessment Date:** January 20, 2025  
-**Status:** Draft - Pending Approval  
+**Status:** Complete - Approved  
 **Dependencies:** A020 (Team Orientation and Training)  
 **Deliverable:** Asset register
 
