@@ -1,47 +1,99 @@
+'use client';
 
-// Policies Page - ICT Governance Framework (Modernized)
+import Link from 'next/link';
+import { ShieldCheckIcon, DocumentTextIcon, BeakerIcon } from '@heroicons/react/24/outline';
+
+// Mock data for policies
+const policies = [
+  {
+    id: 1,
+    title: 'Acceptable Use Policy',
+    category: 'Security',
+    description: 'Guidelines for the acceptable use of company technology resources.',
+    icon: ShieldCheckIcon,
+  },
+  {
+    id: 2,
+    title: 'Data Privacy Policy',
+    category: 'Compliance',
+    description: 'Rules and procedures for handling sensitive customer and company data.',
+    icon: DocumentTextIcon,
+  },
+  {
+    id: 3,
+    title: 'Innovation Sandbox Policy',
+    category: 'Technology',
+    description: 'Framework for experimenting with new technologies and ideas in a controlled environment.',
+    icon: BeakerIcon,
+  },
+  {
+    id: 4,
+    title: 'Incident Response Plan',
+    category: 'Security',
+    description: 'Procedures for responding to and managing security incidents.',
+    icon: ShieldCheckIcon,
+  },
+    {
+    id: 5,
+    title: 'Remote Work Policy',
+    category: 'HR',
+    description: 'Guidelines and requirements for employees working remotely.',
+    icon: DocumentTextIcon,
+  },
+  {
+    id: 6,
+    title: 'Technology Selection Policy',
+    category: 'Technology',
+    description: 'Process for evaluating and selecting new hardware and software.',
+    icon: BeakerIcon,
+  },
+];
+
+// A mapping from category to color for the icons
+const categoryColors = {
+  Security: 'text-red-500',
+  Compliance: 'text-blue-500',
+  Technology: 'text-green-500',
+  HR: 'text-purple-500',
+};
 
 export default function PoliciesPage() {
   return (
-    <main className="max-w-4xl mx-auto py-10 px-4 sm:px-8">
-      <header className="mb-8">
-        <h1 className="text-4xl font-extrabold tracking-tight mb-2 text-blue-900 dark:text-blue-200">Policies</h1>
-        <p className="text-lg text-gray-700 dark:text-gray-200">
-          The ICT Governance Framework establishes a comprehensive policy structure covering all major governance domains. Policies are regularly reviewed and updated to ensure alignment with business objectives, regulatory requirements, and emerging technology trends.
-        </p>
-      </header>
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+            Company Policies
+          </h1>
+          <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
+            Browse and review all official company policies and guidelines.
+          </p>
+        </div>
 
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-3 text-blue-800 dark:text-blue-100">Policy Domains</h2>
-        <ul className="list-disc list-inside space-y-2 text-gray-800 dark:text-gray-100">
-          <li><strong>Technology Selection &amp; Standardization</strong>: Ensures all technology acquisitions align with strategic goals and approved standards.</li>
-          <li><strong>Security &amp; Compliance</strong>: Mandates security controls, compliance with ISO/IEC 27001, and regulatory adherence.</li>
-          <li><strong>Architecture &amp; Change Management</strong>: Governs architecture reviews, change approvals, and lifecycle management.</li>
-          <li><strong>Asset &amp; Vendor Management</strong>: Covers asset lifecycle, vendor selection, and performance monitoring.</li>
-          <li><strong>Emerging Technology</strong>: Provides guidance for AI, IoT, edge computing, and other new domains.</li>
-          <li><strong>Policy Enforcement</strong>: Automated compliance monitoring and exception management.</li>
-        </ul>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-3 text-blue-800 dark:text-blue-100">Policy KPIs &amp; Metrics</h2>
-        <ul className="list-disc list-inside space-y-2 text-gray-800 dark:text-gray-100">
-          <li><strong>Policy Review Frequency:</strong> 100% of policies reviewed annually.</li>
-          <li><strong>Compliance Rate:</strong> &gt;95% adherence to all mandatory policies.</li>
-          <li><strong>Exception Rate:</strong> &lt;5% of policy exceptions granted per year.</li>
-          <li><strong>Stakeholder Awareness:</strong> &gt;90% of staff acknowledge policy updates.</li>
-          <li><strong>Audit Findings:</strong> &lt;2 major audit findings related to policy non-compliance per year.</li>
-        </ul>
-        <p className="mt-3 text-gray-700 dark:text-gray-200">
-          Policy effectiveness is monitored through regular reviews, compliance tracking, and stakeholder feedback, ensuring continuous improvement and alignment with the ICT Governance Framework.
-        </p>
-      </section>
-
-      <footer className="pt-4 border-t border-gray-200 dark:border-gray-700">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          For detailed policy documents and procedures, refer to the documentation in the repository root.
-        </p>
-      </footer>
-    </main>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {policies.map((policy) => (
+            <Link href={`/policies/${policy.id}`} key={policy.id}>
+              <div className="group block p-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 ease-in-out">
+                <div className="flex items-center mb-4">
+                  <policy.icon
+                    className={`h-8 w-8 ${categoryColors[policy.category] || 'text-gray-500'}`}
+                    aria-hidden="true"
+                  />
+                  <span className="ml-4 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    {policy.category}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                  {policy.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {policy.description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </main>
+    </div>
   );
 }
