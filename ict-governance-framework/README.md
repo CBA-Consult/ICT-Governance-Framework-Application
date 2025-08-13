@@ -1,5 +1,8 @@
 
+
 # ICT Governance & IT Management Framework Dashboard
+
+**[See: Repository Table of Contents](../Table-of-Contents.md)**
 
 This project is an interactive dashboard designed to visualize, navigate, and operationalize the comprehensive ICT Governance and IT Management Framework developed in this repository.
 
@@ -10,31 +13,34 @@ The dashboard aims to:
 - Serve as a central portal for stakeholders to access, understand, and implement the framework's policies, procedures, and best practices.
 - Enable future integration of reporting, benchmarking, and workflow automation features aligned with the framework.
 
+
 ## Current Status
 
-- **First Draft:** The current dashboard is a prototype and does not yet reflect the depth, structure, or content of the full ICT Governance & IT Management Framework.
-- **Placeholder Pages:** Most pages are placeholders and do not display meaningful or actionable information.
-- **Documentation Source:** All authoritative content is maintained in the Markdown files at the root of this repository.
+- **Backend Refactor Complete:** Modular Express API endpoints for Defender for Cloud Apps (entities, alerts, files) and future integrations.
+- **Database Schema Updated:** PostgreSQL tables for defender_entities, defender_alerts, defender_files, and more. Table renames and migrations complete.
+- **API Integration:** Endpoints for syncing Defender for Cloud Apps data are live and tested. See `/api/defender-entities/sync`, `/api/defender-alerts/sync`, `/api/defender-files/sync`.
+- **Frontend Improvements:** Font color and UI readability improved. Dashboard pages scaffolded for future content integration.
+- **Documentation Source:** All authoritative content is maintained in the Markdown files at the root of this repository and referenced in the [Table of Contents](../Table-of-Contents.md).
+
 
 ## Next Steps / Roadmap
 
-To upgrade the dashboard to production quality and align it with the framework:
+To upgrade the dashboard and backend to production quality and align with the governance framework:
 
 1. **Content Integration:**
-	- Parse and render the Markdown documentation within the dashboard.
+	- Parse and render Markdown documentation within the dashboard.
 	- Organize content by framework domains, processes, and compliance requirements.
-
-2. **UI/UX Enhancements:**
+2. **API & Backend Enhancements:**
+	- Expand API endpoints for additional governance data sources and automation.
+	- Add authentication, authorization, and audit logging to all endpoints.
+3. **UI/UX Enhancements:**
 	- Design navigation and dashboards that reflect the structure of the framework.
 	- Add search, filtering, and cross-referencing capabilities.
-
-3. **Compliance & Reporting:**
+4. **Compliance & Reporting:**
 	- Integrate compliance checklists, reporting tools, and benchmarking features.
-
-4. **Automation & Workflows:**
+5. **Automation & Workflows:**
 	- Enable workflow automation for governance processes (e.g., registration, offboarding, audits).
-
-5. **Stakeholder Feedback:**
+6. **Stakeholder Feedback:**
 	- Gather input from users to refine features and prioritize enhancements.
 
 ## Contributing
@@ -46,11 +52,14 @@ Contributions are welcome! Please see the main repository documentation for guid
 
 ---
 
-**Note:** This dashboard is under active development. For authoritative framework content, refer to the Markdown files in the repository root.
+
+**Note:** This dashboard and backend are under active development. For authoritative framework content, refer to the Markdown files in the repository root or the [Table of Contents](../Table-of-Contents.md).
+
 
 ## Getting Started
 
-First, run the development server:
+### Frontend (Next.js)
+Run the development server:
 
 ```bash
 npm run dev
@@ -68,14 +77,23 @@ You can start editing the page by modifying `app/page.js`. The page auto-updates
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+### Backend (Express API)
+Run the backend server:
+
+```bash
+cd ict-governance-framework
+node server.js
+```
+
+API endpoints are available at `http://localhost:4000/api/` (see defender-entities, defender-alerts, defender-files, etc.).
+
+
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- [Repository Table of Contents](../Table-of-Contents.md) — All documents and directories
+- [Next.js Documentation](https://nextjs.org/docs) — Next.js features and API
+- [Learn Next.js](https://nextjs.org/learn) — Interactive Next.js tutorial
+- [Next.js GitHub repository](https://github.com/vercel/next.js/)
 
 ## Deploy on Vercel
 

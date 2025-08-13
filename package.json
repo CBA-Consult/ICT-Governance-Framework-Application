@@ -1,6 +1,13 @@
 {
   "dependencies": {
-    "adpa-enterprise-framework-automation": "^3.2.0"
+    "@modelcontextprotocol/sdk": "^1.17.2",
+    "@modelcontextprotocol/server-memory": "^2025.8.4",
+    "adpa-enterprise-framework-automation": "^3.2.0",
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.2",

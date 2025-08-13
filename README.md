@@ -1,4 +1,44 @@
+
+
 # Multi-Cloud Multi-Tenant ICT Governance Framework
+
+**[See: Table of Contents](Table-of-Contents.md)** | **[📁 Documentation Structure](docs/README.md)**
+
+## 🚀 Quick Start
+
+- **📖 [Complete Documentation](docs/README.md)** - Organized documentation structure
+- **🎯 [Project Overview](docs/project-management/A001-Project-Scope-and-Objectives.md)** - Project scope and objectives
+- **🏛️ [Core Framework](docs/governance-framework/core-framework/ICT-Governance-Framework.md)** - Main governance framework
+- **🚀 [Implementation Guide](docs/implementation/summaries/IMPLEMENTATION-SUMMARY.md)** - Implementation status and guidance
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Repository Structure](#repository-structure)
+- [Framework Components](#framework-components)
+   - [Core Framework Documents](#core-framework-documents)
+   - [Multi-Tenant Infrastructure and Automation](#multi-tenant-infrastructure-and-automation)
+   - [Integration and Monitoring](#integration-and-monitoring)
+- [Key Features](#key-features)
+   - [Multi-Tenant Governance](#multi-tenant-governance)
+   - [Cross-Cloud Operations](#cross-cloud-operations)
+   - [Automated Lifecycle Management](#automated-lifecycle-management)
+   - [Security and Compliance](#security-and-compliance)
+   - [Cost Management and Optimization](#cost-management-and-optimization)
+- [Getting Started](#getting-started)
+- [Documentation Structure](#documentation-structure)
+- [Additional Resources](#additional-resources)
+- [Implementation Approach](#implementation-approach)
+- [Continuous Improvement](#continuous-improvement)
+- [Contribution Guidelines](#contribution-guidelines)
+- [License and Usage](#license-and-usage)
+   - [Open Source License](#open-source-license)
+   - [Usage Rights](#usage-rights)
+   - [Documentation](#documentation)
+   - [Compliance and Responsibility](#compliance-and-responsibility)
+- [Background and Original Vision](#background-and-original-vision)
+- [Mobile Application Integration](#mobile-application-integration)
+- [Related Links](#related-links)
 
 ## Overview
 
@@ -14,21 +54,43 @@ The Multi-Cloud Multi-Tenant ICT Governance Framework is a comprehensive solutio
 
 Last Updated: January 15, 2024 | Original Creation: October 22, 2020, Amsterdam, The Netherlands
 
+## Repository Structure
+
+```
+📁 Repository Root
+├── 📖 docs/                          # Organized documentation structure
+│   ├── 🎯 project-management/        # Project artifacts and planning
+│   ├── 🏛️ governance-framework/      # Core governance documentation
+│   ├── 📋 policies/                  # Governance and operational policies
+│   ├── 🚀 implementation/            # Implementation guides and summaries
+│   ├── 🏗️ architecture/             # Technical architecture documentation
+│   ├── ✅ compliance/               # Compliance and audit documentation
+│   ├── 📚 training/                 # Training and communication materials
+│   └── 📄 templates/                # Reusable templates and methodologies
+├── 🔧 azure-automation/             # Azure automation scripts and configs
+├── 📋 blueprint-templates/          # Infrastructure and policy templates
+├── 🌐 ict-governance-framework/     # Web application and APIs
+├── 🤖 implementation-automation/    # Deployment automation scripts
+├── ☁️ multi-cloud-governance/      # Multi-cloud specific documentation
+├── 🔍 framework-evaluation/        # Framework assessment tools
+└── 📊 generated-documents/         # Auto-generated documentation
+```
+
 ## Framework Components
 
 The Multi-Cloud Multi-Tenant ICT Governance Framework consists of the following core components:
 
 ### Core Framework Documents
 
-1. **[Multi-Cloud Multi-Tenant ICT Governance Framework](Multi-Cloud-Multi-Tenant-ICT-Governance-Framework.md)** - The comprehensive framework document defining multi-tenant governance structure, tenant lifecycle management, and cross-cloud operations.
+1. **[Multi-Cloud Multi-Tenant ICT Governance Framework](docs/governance-framework/core-framework/Multi-Cloud-Multi-Tenant-ICT-Governance-Framework.md)** - The comprehensive framework document defining multi-tenant governance structure, tenant lifecycle management, and cross-cloud operations.
 
-2. **[ICT Governance Framework](ICT-Governance-Framework.md)** - The foundational document defining the governance structure, roles, responsibilities, and operating model.
+2. **[ICT Governance Framework](docs/governance-framework/core-framework/ICT-Governance-Framework.md)** - The foundational document defining the governance structure, roles, responsibilities, and operating model.
 
-3. **[Strategic and Tactical IT Governance Overview](Strategic-Tactical-IT-Governance-Overview.md)** - Comprehensive overview of strategic vs tactical governance tasks and responsibilities with clear role definitions and escalation frameworks.
+3. **[Strategic and Tactical IT Governance Overview](docs/governance-framework/core-framework/Strategic-Tactical-IT-Governance-Overview.md)** - Comprehensive overview of strategic vs tactical governance tasks and responsibilities with clear role definitions and escalation frameworks.
 
-4. **[Target Governance Framework](Target-Governance-Framework.md)** - Enhanced governance framework with industry-leading practices from ISO/IEC 38500, ITIL 4, COBIT 2019, CMMI, and FAIR frameworks.
+4. **[Target Governance Framework](docs/governance-framework/target-framework/Target-Governance-Framework.md)** - Enhanced governance framework with industry-leading practices from ISO/IEC 38500, ITIL 4, COBIT 2019, CMMI, and FAIR frameworks.
 
-5. **[ICT Governance Policies](ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
+5. **[ICT Governance Policies](docs/policies/governance/ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
 
 ### Multi-Tenant Infrastructure and Automation
 
@@ -40,11 +102,11 @@ The Multi-Cloud Multi-Tenant ICT Governance Framework consists of the following 
 
 ### Integration and Monitoring
 
-8. **[IaC and Version Control Integration](ICT-Governance-IaC-Integration.md)** - Guidelines for integrating the governance framework with Infrastructure as Code and version control systems.
+8. **[IaC and Version Control Integration](docs/architecture/integration/ICT-Governance-IaC-Integration.md)** - Guidelines for integrating the governance framework with Infrastructure as Code and version control systems.
 
-9. **[Metrics and Reporting](ICT-Governance-Metrics.md)** - Key performance indicators, dashboards, and reporting mechanisms for evaluating governance effectiveness.
+9. **[Metrics and Reporting](docs/governance-framework/metrics/ICT-Governance-Metrics.md)** - Key performance indicators, dashboards, and reporting mechanisms for evaluating governance effectiveness.
 
-10. **[Zero Trust Maturity Model](Zero-Trust-Maturity-Model.md)** - Comprehensive framework for assessing and implementing Zero Trust architecture across six pillars with automated service release capabilities.
+10. **[Zero Trust Maturity Model](docs/architecture/target-state/Zero-Trust-Maturity-Model.md)** - Comprehensive framework for assessing and implementing Zero Trust architecture across six pillars with automated service release capabilities.
 
 ## Key Features
 
@@ -78,11 +140,58 @@ The Multi-Cloud Multi-Tenant ICT Governance Framework consists of the following 
 - **Budget Management**: Tenant-specific budgets with automated controls and alerts
 - **ROI Tracking**: Comprehensive value realization tracking and reporting
 
+## Getting Started
+
+### For New Users
+1. **📖 Start with Documentation**: Review the [organized documentation structure](docs/README.md)
+2. **🎯 Understand the Project**: Read the [project scope and objectives](docs/project-management/A001-Project-Scope-and-Objectives.md)
+3. **🏛️ Learn the Framework**: Study the [core ICT governance framework](docs/governance-framework/core-framework/ICT-Governance-Framework.md)
+4. **📋 Review Policies**: Examine the [governance policies](docs/policies/governance/ICT-Governance-Policies.md)
+
+### For Implementers
+1. **🚀 Implementation Guide**: Follow the [implementation summary](docs/implementation/summaries/IMPLEMENTATION-SUMMARY.md)
+2. **🏗️ Architecture Review**: Understand the [technical architecture](docs/architecture/target-state/)
+3. **🔧 Automation Scripts**: Explore [Azure automation](azure-automation/) and [implementation automation](implementation-automation/)
+4. **📋 Use Templates**: Leverage [blueprint templates](blueprint-templates/) for deployment
+
+### For Administrators
+1. **👥 Team Setup**: Review [team management](docs/project-management/team-management/) documentation
+2. **📊 Metrics**: Implement [governance metrics](docs/governance-framework/metrics/)
+3. **✅ Compliance**: Set up [compliance monitoring](docs/compliance/monitoring/)
+4. **📚 Training**: Deploy [training materials](docs/training/materials/)
+
+## Documentation Structure
+
+The repository uses a hierarchical documentation structure for optimal organization:
+
+### 📁 Primary Documentation (`docs/`)
+All core documentation is organized in the `docs/` directory with logical categorization:
+
+- **🎯 Project Management** - Requirements, stakeholder management, team formation
+- **🏛️ Governance Framework** - Core framework, assessments, target state
+- **📋 Policies** - Governance, security, compliance, and operational policies
+- **🚀 Implementation** - Guides, summaries, automation, deployment
+- **🏗️ Architecture** - Current state, target state, integration, infrastructure
+- **✅ Compliance** - Audit, regulatory, assessment, monitoring
+- **📚 Training** - Materials, communication, onboarding
+- **📄 Templates** - Reusable templates and methodologies
+
+### 🔧 Technical Components
+- **`azure-automation/`** - PowerShell scripts and Azure-specific automation
+- **`blueprint-templates/`** - Infrastructure as Code templates and policies
+- **`ict-governance-framework/`** - Web application and API implementations
+- **`implementation-automation/`** - Cross-platform deployment automation
+
+### 📊 Supporting Resources
+- **`framework-evaluation/`** - Assessment tools and effectiveness measurement
+- **`generated-documents/`** - Auto-generated documentation and exports
+- **`multi-cloud-governance/`** - Multi-cloud specific guidance
+
 ## Additional Resources
 
-- **[Infrastructure as Code Management](IaC%20Infrastructure%20as%20Code%20Management.md)**: Guidelines for managing infrastructure as code
-- **[Microsoft365DSC Integration](Integrating%20Microsoft365DSC.md)**: Extension of governance to Microsoft 365 services
-- **[API Center Version Controls](Methodology%20API%20Center%20on%20Governance%20Framework%20Version%20Controls.md)**: API governance and versioning
+- **[Infrastructure as Code Management](docs/architecture/infrastructure/IaC%20Infrastructure%20as%20Code%20Management.md)**: Guidelines for managing infrastructure as code
+- **[Microsoft365DSC Integration](docs/architecture/integration/Integrating%20Microsoft365DSC.md)**: Extension of governance to Microsoft 365 services
+- **[API Center Version Controls](docs/architecture/integration/Methodology%20API%20Center%20on%20Governance%20Framework%20Version%20Controls.md)**: API governance and versioning
 - **[Information Governance Overview](InformationOverview.md)**: Information governance principles and approaches
 - **[Zero Trust Assessment Automation](azure-automation/Zero-Trust-Maturity-Assessment.ps1)**: Automated assessment tools for Zero Trust maturity evaluation
 - **[Zero Trust Configuration](azure-automation/zero-trust-assessment-config.json)**: Configuration file for Zero Trust maturity assessments

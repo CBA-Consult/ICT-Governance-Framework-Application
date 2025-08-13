@@ -150,7 +150,7 @@ function Deploy-Infrastructure {
 }
 
 # Function to handle compliance reports
-function Run-ComplianceReports {
+function Get-ComplianceReports {
     Clear-Host
     Write-Host "=======================================================" -ForegroundColor Cyan
     Write-Host "                RUN COMPLIANCE REPORTS                 " -ForegroundColor Cyan
@@ -191,7 +191,7 @@ function Run-ComplianceReports {
 }
 
 # Function to generate dashboard
-function Generate-Dashboard {
+function New-Dashboard {
     Clear-Host
     Write-Host "=======================================================" -ForegroundColor Cyan
     Write-Host "             GENERATE GOVERNANCE DASHBOARD             " -ForegroundColor Cyan
@@ -230,7 +230,7 @@ function Generate-Dashboard {
 }
 
 # Function to run governance assessment
-function Run-GovernanceAssessment {
+function Invoke-GovernanceAssessment {
     Clear-Host
     Write-Host "=======================================================" -ForegroundColor Cyan
     Write-Host "              RUN GOVERNANCE ASSESSMENT                " -ForegroundColor Cyan
@@ -263,7 +263,7 @@ function Run-GovernanceAssessment {
 }
 
 # Function to view documentation
-function View-Documentation {
+function Show-Documentation {
     Clear-Host
     Write-Host "=======================================================" -ForegroundColor Cyan
     Write-Host "                  VIEW DOCUMENTATION                   " -ForegroundColor Cyan
@@ -361,16 +361,16 @@ while (-not $exit) {
             Deploy-Infrastructure
         }
         "3" {
-            Run-ComplianceReports
+            Get-ComplianceReports
         }
         "4" {
-            Generate-Dashboard
+            New-Dashboard
         }
         "5" {
-            Run-GovernanceAssessment
+            Invoke-GovernanceAssessment
         }
         "6" {
-            View-Documentation
+            Show-Documentation
         }
         "7" {
             $exit = $true

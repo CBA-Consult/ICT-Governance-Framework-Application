@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "github-chat": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_API_KEY",
+        "mcp/github-chat"
+      ],
+      "env": {
+        "GITHUB_API_KEY": "YOUR_GITHUB_API_KEY"
+      }
+    }
+  }
+}

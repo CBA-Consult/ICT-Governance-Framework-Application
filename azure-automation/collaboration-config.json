@@ -1,0 +1,759 @@
+{
+  "version": "1.0.0",
+  "framework": "ICT Governance Framework A014",
+  "description": "Configuration for collaboration platforms and tools deployment",
+  "teams": {
+    "governanceTeams": [
+      {
+        "name": "ICT Governance Council",
+        "description": "Strategic governance oversight and decision-making",
+        "privacy": "Private",
+        "channels": [
+          "General",
+          "Strategic Planning",
+          "Policy Decisions",
+          "Risk Management",
+          "Compliance Review",
+          "Escalations",
+          "Executive Reports"
+        ],
+        "apps": [
+          "Planner",
+          "OneNote",
+          "SharePoint",
+          "Power BI"
+        ],
+        "members": {
+          "owners": [
+            "governance-council-chair@company.com",
+            "cio@company.com"
+          ],
+          "members": [
+            "domain-owners@company.com",
+            "governance-team@company.com"
+          ]
+        }
+      },
+      {
+        "name": "Domain Owners",
+        "description": "Domain-specific governance and oversight",
+        "privacy": "Private",
+        "channels": [
+          "General",
+          "Architecture Review",
+          "Security Governance",
+          "Compliance Monitoring",
+          "Technology Standards",
+          "Change Management",
+          "Best Practices"
+        ],
+        "apps": [
+          "Planner",
+          "OneNote",
+          "SharePoint",
+          "Azure DevOps"
+        ],
+        "members": {
+          "owners": [
+            "domain-owners-lead@company.com"
+          ],
+          "members": [
+            "infrastructure-owner@company.com",
+            "security-owner@company.com",
+            "application-owner@company.com",
+            "data-owner@company.com"
+          ]
+        }
+      },
+      {
+        "name": "Technology Stewards",
+        "description": "Technical governance and implementation",
+        "privacy": "Private",
+        "channels": [
+          "General",
+          "Implementation",
+          "Technical Issues",
+          "Automation",
+          "Monitoring",
+          "Documentation",
+          "Knowledge Sharing"
+        ],
+        "apps": [
+          "Planner",
+          "OneNote",
+          "SharePoint",
+          "Azure DevOps",
+          "Power Automate"
+        ],
+        "members": {
+          "owners": [
+            "technology-stewards-lead@company.com"
+          ],
+          "members": [
+            "infrastructure-stewards@company.com",
+            "security-stewards@company.com",
+            "application-stewards@company.com"
+          ]
+        }
+      },
+      {
+        "name": "Technology Custodians",
+        "description": "Operational technology management and support",
+        "privacy": "Private",
+        "channels": [
+          "General",
+          "Operations",
+          "Incident Management",
+          "Maintenance",
+          "Support",
+          "Training",
+          "Procedures"
+        ],
+        "apps": [
+          "Planner",
+          "OneNote",
+          "SharePoint",
+          "ServiceNow"
+        ],
+        "members": {
+          "owners": [
+            "technology-custodians-lead@company.com"
+          ],
+          "members": [
+            "it-operations@company.com",
+            "help-desk@company.com",
+            "system-administrators@company.com"
+          ]
+        }
+      },
+      {
+        "name": "Governance Project Management",
+        "description": "Project management for governance initiatives",
+        "privacy": "Private",
+        "channels": [
+          "General",
+          "Project Planning",
+          "Status Updates",
+          "Resource Management",
+          "Risk Issues",
+          "Deliverables",
+          "Stakeholder Communication"
+        ],
+        "apps": [
+          "Planner",
+          "Project",
+          "OneNote",
+          "SharePoint",
+          "Power BI"
+        ],
+        "members": {
+          "owners": [
+            "project-manager@company.com"
+          ],
+          "members": [
+            "governance-team@company.com",
+            "business-analysts@company.com"
+          ]
+        }
+      }
+    ],
+    "policies": {
+      "guestAccess": false,
+      "allowCreateUpdateChannels": true,
+      "allowDeleteChannels": false,
+      "allowAddRemoveApps": false,
+      "allowCreateUpdateRemoveTabs": true,
+      "allowCreateUpdateRemoveConnectors": false,
+      "allowCustomMemes": false,
+      "allowGiphy": false,
+      "allowStickers": false,
+      "allowUserTranslation": true,
+      "allowImmersiveReader": true,
+      "allowUrlPreviews": true,
+      "retentionPolicy": {
+        "enabled": true,
+        "retentionDays": 2555,
+        "deleteAfterRetention": false
+      }
+    },
+    "governance": {
+      "namingConvention": "ICT-Gov-{Purpose}-{Environment}",
+      "approvalRequired": true,
+      "complianceMonitoring": true,
+      "auditLogging": true
+    }
+  },
+  "sharepoint": {
+    "sites": [
+      {
+        "name": "ICT Governance Hub",
+        "template": "CommunicationSite",
+        "description": "Central hub for ICT governance documentation, policies, and resources",
+        "url": "ict-governance-hub",
+        "features": {
+          "navigation": [
+            "Home",
+            "Policies",
+            "Procedures",
+            "Reports",
+            "Training",
+            "Resources",
+            "Contact"
+          ],
+          "webParts": [
+            "News",
+            "Quick Links",
+            "Document Library",
+            "Events",
+            "People"
+          ]
+        },
+        "permissions": {
+          "owners": ["governance-council@company.com"],
+          "members": ["all-employees@company.com"],
+          "visitors": ["external-auditors@company.com"]
+        }
+      },
+      {
+        "name": "Policy Library",
+        "template": "TeamSite",
+        "description": "Repository for all ICT policies, procedures, and governance documentation",
+        "url": "policy-library",
+        "features": {
+          "documentLibraries": [
+            "Policies",
+            "Procedures",
+            "Standards",
+            "Guidelines",
+            "Templates",
+            "Archive"
+          ],
+          "lists": [
+            "Policy Register",
+            "Review Schedule",
+            "Approval Workflow",
+            "Change Requests"
+          ]
+        },
+        "permissions": {
+          "owners": ["governance-council@company.com"],
+          "members": ["domain-owners@company.com", "technology-stewards@company.com"],
+          "visitors": ["all-employees@company.com"]
+        }
+      },
+      {
+        "name": "Governance Reports",
+        "template": "TeamSite",
+        "description": "Governance reporting, analytics, and dashboard repository",
+        "url": "governance-reports",
+        "features": {
+          "documentLibraries": [
+            "Executive Reports",
+            "Compliance Reports",
+            "Audit Reports",
+            "Performance Metrics",
+            "Risk Assessments"
+          ],
+          "lists": [
+            "Report Schedule",
+            "KPI Tracking",
+            "Action Items",
+            "Recommendations"
+          ]
+        },
+        "permissions": {
+          "owners": ["governance-council@company.com"],
+          "members": ["domain-owners@company.com"],
+          "visitors": ["executive-team@company.com"]
+        }
+      },
+      {
+        "name": "Training and Resources",
+        "template": "CommunicationSite",
+        "description": "Training materials, resources, and knowledge base for governance",
+        "url": "governance-training",
+        "features": {
+          "documentLibraries": [
+            "Training Materials",
+            "User Guides",
+            "Video Library",
+            "Certification",
+            "FAQ"
+          ],
+          "lists": [
+            "Training Schedule",
+            "Certification Tracking",
+            "Feedback",
+            "Resource Requests"
+          ]
+        },
+        "permissions": {
+          "owners": ["governance-team@company.com"],
+          "members": ["all-employees@company.com"],
+          "visitors": ["contractors@company.com"]
+        }
+      }
+    ],
+    "features": {
+      "versioningEnabled": true,
+      "majorVersions": 50,
+      "minorVersions": 10,
+      "contentApprovalRequired": true,
+      "checkoutRequired": false,
+      "audienceTargeting": true,
+      "searchEnabled": true,
+      "metadataNavigation": true
+    },
+    "governance": {
+      "informationArchitecture": {
+        "contentTypes": [
+          "Policy Document",
+          "Procedure Document",
+          "Report",
+          "Training Material",
+          "Template"
+        ],
+        "metadata": [
+          "Document Type",
+          "Classification",
+          "Owner",
+          "Review Date",
+          "Approval Status",
+          "Version"
+        ]
+      },
+      "retention": {
+        "enabled": true,
+        "policies": [
+          {
+            "name": "Policy Documents",
+            "retentionPeriod": "7 years",
+            "action": "Archive"
+          },
+          {
+            "name": "Reports",
+            "retentionPeriod": "5 years",
+            "action": "Delete"
+          }
+        ]
+      }
+    }
+  },
+  "devops": {
+    "organization": "ict-governance",
+    "projects": [
+      {
+        "name": "ICT Governance Framework",
+        "description": "Main governance framework implementation and maintenance project",
+        "visibility": "Private",
+        "processTemplate": "Agile",
+        "features": {
+          "boards": true,
+          "repos": true,
+          "pipelines": true,
+          "testPlans": true,
+          "artifacts": true
+        },
+        "workItemTypes": [
+          "Epic",
+          "Feature",
+          "User Story",
+          "Task",
+          "Bug",
+          "Issue"
+        ]
+      },
+      {
+        "name": "Policy Management",
+        "description": "Policy development, review, and management workflows",
+        "visibility": "Private",
+        "processTemplate": "Scrum",
+        "features": {
+          "boards": true,
+          "repos": true,
+          "pipelines": false,
+          "testPlans": false,
+          "artifacts": false
+        },
+        "workItemTypes": [
+          "Epic",
+          "Feature",
+          "Product Backlog Item",
+          "Task",
+          "Bug"
+        ]
+      },
+      {
+        "name": "Compliance Automation",
+        "description": "Automated compliance monitoring and reporting solutions",
+        "visibility": "Private",
+        "processTemplate": "Agile",
+        "features": {
+          "boards": true,
+          "repos": true,
+          "pipelines": true,
+          "testPlans": true,
+          "artifacts": true
+        },
+        "workItemTypes": [
+          "Epic",
+          "Feature",
+          "User Story",
+          "Task",
+          "Bug"
+        ]
+      }
+    ],
+    "repositories": [
+      {
+        "name": "governance-policies",
+        "description": "ICT governance policies and procedures repository",
+        "type": "Git",
+        "project": "Policy Management",
+        "branchPolicies": {
+          "requirePullRequest": true,
+          "minimumReviewers": 2,
+          "requireWorkItemLinking": true,
+          "requireBuildValidation": false
+        }
+      },
+      {
+        "name": "automation-scripts",
+        "description": "Governance automation and deployment scripts",
+        "type": "Git",
+        "project": "ICT Governance Framework",
+        "branchPolicies": {
+          "requirePullRequest": true,
+          "minimumReviewers": 2,
+          "requireWorkItemLinking": true,
+          "requireBuildValidation": true
+        }
+      },
+      {
+        "name": "compliance-monitoring",
+        "description": "Compliance monitoring tools and dashboards",
+        "type": "Git",
+        "project": "Compliance Automation",
+        "branchPolicies": {
+          "requirePullRequest": true,
+          "minimumReviewers": 1,
+          "requireWorkItemLinking": true,
+          "requireBuildValidation": true
+        }
+      },
+      {
+        "name": "documentation",
+        "description": "Governance framework documentation and guides",
+        "type": "Git",
+        "project": "ICT Governance Framework",
+        "branchPolicies": {
+          "requirePullRequest": true,
+          "minimumReviewers": 1,
+          "requireWorkItemLinking": false,
+          "requireBuildValidation": false
+        }
+      }
+    ],
+    "pipelines": [
+      {
+        "name": "Policy Validation",
+        "description": "Validates policy documents for compliance and standards",
+        "repository": "governance-policies",
+        "trigger": "Pull Request",
+        "stages": ["Validation", "Review", "Approval"]
+      },
+      {
+        "name": "Automation Deployment",
+        "description": "Deploys governance automation scripts",
+        "repository": "automation-scripts",
+        "trigger": "Main Branch",
+        "stages": ["Build", "Test", "Deploy"]
+      }
+    ],
+    "governance": {
+      "security": {
+        "requireSecurityReview": true,
+        "vulnerabilityScanning": true,
+        "secretScanning": true
+      },
+      "compliance": {
+        "auditLogging": true,
+        "accessReview": "Monthly",
+        "retentionPolicy": "7 years"
+      }
+    }
+  },
+  "powerPlatform": {
+    "environments": [
+      {
+        "name": "ICT Governance Production",
+        "type": "Production",
+        "region": "unitedstates",
+        "description": "Production environment for governance applications and workflows",
+        "features": {
+          "dataverse": true,
+          "powerApps": true,
+          "powerAutomate": true,
+          "powerBI": true,
+          "aiBuilder": false
+        }
+      },
+      {
+        "name": "ICT Governance Development",
+        "type": "Sandbox",
+        "region": "unitedstates",
+        "description": "Development environment for governance solution development",
+        "features": {
+          "dataverse": true,
+          "powerApps": true,
+          "powerAutomate": true,
+          "powerBI": true,
+          "aiBuilder": true
+        }
+      },
+      {
+        "name": "ICT Governance Testing",
+        "type": "Sandbox",
+        "region": "unitedstates",
+        "description": "Testing environment for governance solution validation",
+        "features": {
+          "dataverse": true,
+          "powerApps": true,
+          "powerAutomate": true,
+          "powerBI": false,
+          "aiBuilder": false
+        }
+      }
+    ],
+    "dataLossPrevention": {
+      "enabled": true,
+      "policies": [
+        {
+          "name": "ICT Governance DLP Policy",
+          "description": "Data loss prevention for governance applications",
+          "scope": "All Environments",
+          "connectorGroups": {
+            "business": [
+              "shared_office365",
+              "shared_sharepointonline",
+              "shared_teams",
+              "shared_onedriveforbusiness",
+              "shared_azuread",
+              "shared_sql",
+              "shared_commondataservice"
+            ],
+            "nonBusiness": [
+              "shared_twitter",
+              "shared_facebook",
+              "shared_instagram",
+              "shared_dropbox",
+              "shared_googledrive"
+            ],
+            "blocked": [
+              "shared_filesystem",
+              "shared_ftp",
+              "shared_smtp"
+            ]
+          }
+        }
+      ],
+      "blockHighRiskConnectors": true,
+      "requireApprovalForNewConnectors": true,
+      "auditConnectorUsage": true
+    },
+    "applications": [
+      {
+        "name": "Governance Dashboard",
+        "type": "Canvas App",
+        "description": "Executive dashboard for governance metrics and KPIs",
+        "environment": "ICT Governance Production",
+        "dataSources": ["SharePoint", "Azure DevOps", "Microsoft Graph"]
+      },
+      {
+        "name": "Policy Request System",
+        "type": "Model-driven App",
+        "description": "System for requesting and managing policy changes",
+        "environment": "ICT Governance Production",
+        "dataSources": ["Dataverse", "SharePoint", "Teams"]
+      },
+      {
+        "name": "Compliance Tracker",
+        "type": "Canvas App",
+        "description": "Track compliance status across all governance domains",
+        "environment": "ICT Governance Production",
+        "dataSources": ["Dataverse", "Azure Monitor", "Security Center"]
+      }
+    ],
+    "flows": [
+      {
+        "name": "Policy Approval Workflow",
+        "description": "Automated workflow for policy approval process",
+        "trigger": "SharePoint - When an item is created or modified",
+        "actions": ["Send approval request", "Update status", "Notify stakeholders"]
+      },
+      {
+        "name": "Compliance Alert System",
+        "description": "Automated alerts for compliance violations",
+        "trigger": "Scheduled - Daily",
+        "actions": ["Check compliance status", "Generate alerts", "Send notifications"]
+      },
+      {
+        "name": "Governance Reporting",
+        "description": "Automated generation of governance reports",
+        "trigger": "Scheduled - Weekly",
+        "actions": ["Collect data", "Generate reports", "Distribute to stakeholders"]
+      }
+    ],
+    "governance": {
+      "security": {
+        "requireMFA": true,
+        "conditionalAccess": true,
+        "privilegedAccess": true
+      },
+      "monitoring": {
+        "auditLogging": true,
+        "usageAnalytics": true,
+        "performanceMonitoring": true
+      },
+      "lifecycle": {
+        "developmentProcess": "ALM",
+        "testingRequired": true,
+        "approvalRequired": true,
+        "deploymentAutomation": true
+      }
+    }
+  },
+  "integration": {
+    "unifiedGovernancePlatform": {
+      "enabled": true,
+      "apiEndpoint": "https://governance-api.company.com/v2/",
+      "authentication": "Azure AD",
+      "monitoring": {
+        "healthChecks": true,
+        "performanceMetrics": true,
+        "errorTracking": true
+      }
+    },
+    "externalSystems": [
+      {
+        "name": "ServiceNow",
+        "type": "ITSM",
+        "integration": "API",
+        "purpose": "Incident and change management"
+      },
+      {
+        "name": "Azure Monitor",
+        "type": "Monitoring",
+        "integration": "Native",
+        "purpose": "Infrastructure and application monitoring"
+      },
+      {
+        "name": "Microsoft Sentinel",
+        "type": "SIEM",
+        "integration": "API",
+        "purpose": "Security monitoring and compliance"
+      }
+    ]
+  },
+  "monitoring": {
+    "platforms": {
+      "teams": {
+        "metrics": [
+          "Active users",
+          "Team creation rate",
+          "Channel activity",
+          "Guest access usage",
+          "App usage",
+          "Compliance violations"
+        ],
+        "alerts": [
+          "Unauthorized guest access",
+          "Excessive team creation",
+          "Policy violations",
+          "Security incidents"
+        ]
+      },
+      "sharepoint": {
+        "metrics": [
+          "Site usage",
+          "Document activity",
+          "Permission changes",
+          "Storage usage",
+          "Search activity",
+          "Compliance status"
+        ],
+        "alerts": [
+          "Unauthorized access",
+          "Large file uploads",
+          "Permission escalation",
+          "Retention policy violations"
+        ]
+      },
+      "devops": {
+        "metrics": [
+          "Project activity",
+          "Code commits",
+          "Build success rate",
+          "Security scan results",
+          "Access reviews",
+          "Policy compliance"
+        ],
+        "alerts": [
+          "Security vulnerabilities",
+          "Failed builds",
+          "Unauthorized access",
+          "Policy violations"
+        ]
+      },
+      "powerPlatform": {
+        "metrics": [
+          "App usage",
+          "Flow executions",
+          "Connector usage",
+          "DLP violations",
+          "Performance metrics",
+          "License usage"
+        ],
+        "alerts": [
+          "DLP violations",
+          "Unauthorized connectors",
+          "Performance issues",
+          "License violations"
+        ]
+      }
+    },
+    "reporting": {
+      "frequency": "Weekly",
+      "recipients": [
+        "governance-council@company.com",
+        "domain-owners@company.com",
+        "cio@company.com"
+      ],
+      "format": "Dashboard + Email Summary",
+      "retention": "2 years"
+    }
+  },
+  "compliance": {
+    "frameworks": [
+      "ISO 27001",
+      "NIST Cybersecurity Framework",
+      "COBIT 2019",
+      "ITIL 4",
+      "SOX",
+      "GDPR"
+    ],
+    "requirements": {
+      "dataRetention": "7 years",
+      "auditLogging": "All activities",
+      "accessReview": "Quarterly",
+      "securityAssessment": "Annual",
+      "complianceReporting": "Monthly"
+    },
+    "automation": {
+      "complianceChecks": "Daily",
+      "violationAlerts": "Real-time",
+      "remediation": "Automated where possible",
+      "reporting": "Automated"
+    }
+  }
+}
