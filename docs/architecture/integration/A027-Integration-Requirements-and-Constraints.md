@@ -16,10 +16,12 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
 **Key Findings:**
 - **Integration Complexity:** High - 45 legacy systems requiring specialized integration approaches
 - **API Ecosystem Maturity:** Advanced - 89.7% API documentation coverage with 234 managed APIs
+- **IaC Integration Readiness:** High - Strong foundation for Infrastructure as Code and Microsoft 365 DSC integration
+- **Multi-Cloud Capability:** Medium - Requires enhancement for AWS/GCP governance integration
 - **Constraint Impact:** Medium-High - Manageable with proper planning and mitigation strategies
 - **Interoperability Readiness:** High - Strong foundation with identified enhancement opportunities
 
-**Critical Integration Requirements:** 67 external system integrations, real-time governance data synchronization, legacy system API wrappers, compliance reporting automation
+**Critical Integration Requirements:** 42 core integration requirements covering Azure, Microsoft 365, multi-cloud, legacy systems, and API management
 
 **Integration Readiness Assessment:** **High** - Strong API ecosystem and integration capabilities with clear constraint mitigation paths
 
@@ -106,15 +108,62 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
 - **Refresh Schedule:** Daily for batch data, real-time for streaming events
 - **Data Retention:** 7 years for compliance, 2 years for operational analytics
 
-### 1.3 Legacy System Integrations
+### 1.3 Infrastructure as Code (IaC) Integration
 
-#### 1.3.1 Mainframe System Integration
+#### 1.3.1 Azure Infrastructure as Code Integration
 
 | ID | Requirement Description | Priority | Type | Acceptance Criteria |
 |----|------------------------|----------|------|-------------------|
-| **IR-021** | COBOL Mainframe Data Integration | High | Batch | Critical governance data extracted from 12 mainframe systems daily |
-| **IR-022** | Mainframe Security Integration | Medium | Batch | User access and security policies synchronized weekly |
-| **IR-023** | Mainframe Compliance Reporting | High | Batch | Compliance data extracted for regulatory reporting |
+| **IR-021** | Bicep/ARM Template Integration | Critical | Real-time | Infrastructure deployments tracked and governed through IaC templates |
+| **IR-022** | Azure Policy as Code Integration | Critical | Real-time | Policy definitions managed as code with automated deployment |
+| **IR-023** | Infrastructure Drift Detection | High | Real-time | Automated detection of infrastructure changes outside IaC process |
+| **IR-024** | IaC Compliance Validation | High | Real-time | Pre-deployment validation of infrastructure against governance policies |
+
+**Technical Specifications:**
+- **Integration Pattern:** GitOps with Azure DevOps/GitHub Actions
+- **Templates:** Bicep templates with Azure Resource Manager
+- **Validation:** Azure Policy and custom compliance checks
+- **Monitoring:** Azure Resource Graph for drift detection
+
+#### 1.3.2 Microsoft 365 DSC Integration
+
+| ID | Requirement Description | Priority | Type | Acceptance Criteria |
+|----|------------------------|----------|------|-------------------|
+| **IR-025** | Microsoft365DSC Configuration Management | High | Batch | M365 tenant configuration managed as code with PowerShell DSC |
+| **IR-026** | M365 Configuration Drift Detection | High | Daily | Automated scanning and reporting of M365 configuration drift |
+| **IR-027** | M365 Compliance Enforcement | High | Real-time | Automated enforcement of M365 governance policies |
+| **IR-028** | M365 Security Configuration Integration | Medium | Daily | Security settings synchronized with governance framework |
+
+**Technical Specifications:**
+- **Integration Pattern:** PowerShell DSC with scheduled execution
+- **Configuration:** Microsoft365DSC modules for all M365 services
+- **Drift Detection:** Start-M365DSCScan for configuration comparison
+- **Enforcement:** Start-M365DSCConfiguration for remediation
+
+#### 1.3.3 Multi-Cloud Integration
+
+| ID | Requirement Description | Priority | Type | Acceptance Criteria |
+|----|------------------------|----------|------|-------------------|
+| **IR-029** | AWS Governance Integration | Medium | Real-time | AWS resources governed through unified governance framework |
+| **IR-030** | GCP Governance Integration | Medium | Real-time | GCP resources integrated with governance policies |
+| **IR-031** | Multi-Cloud Cost Management | High | Daily | Unified cost reporting across all cloud platforms |
+| **IR-032** | Cross-Cloud Security Monitoring | High | Real-time | Security events from all clouds integrated into SIEM |
+
+**Technical Specifications:**
+- **Integration Pattern:** Cloud-native APIs with unified governance layer
+- **Authentication:** Cross-cloud service principals and IAM roles
+- **Data Formats:** JSON with standardized cloud resource schema
+- **Monitoring:** Unified dashboard for multi-cloud governance
+
+### 1.4 Legacy System Integrations
+
+#### 1.4.1 Mainframe System Integration
+
+| ID | Requirement Description | Priority | Type | Acceptance Criteria |
+|----|------------------------|----------|------|-------------------|
+| **IR-033** | COBOL Mainframe Data Integration | High | Batch | Critical governance data extracted from 12 mainframe systems daily |
+| **IR-034** | Mainframe Security Integration | Medium | Batch | User access and security policies synchronized weekly |
+| **IR-035** | Mainframe Compliance Reporting | High | Batch | Compliance data extracted for regulatory reporting |
 
 **Technical Specifications:**
 - **Integration Pattern:** File-based integration with SFTP
@@ -122,19 +171,36 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
 - **Schedule:** Daily batch processing during maintenance windows
 - **Error Handling:** File validation, data quality checks, manual intervention procedures
 
-#### 1.3.2 Legacy .NET Application Integration
+#### 1.4.2 Legacy .NET Application Integration
 
 | ID | Requirement Description | Priority | Type | Acceptance Criteria |
 |----|------------------------|----------|------|-------------------|
-| **IR-024** | Legacy .NET API Wrapper Development | High | Real-time | 18 legacy .NET applications accessible via standardized REST APIs |
-| **IR-025** | Database Direct Integration | Medium | Batch | Critical data extracted from legacy SQL Server databases |
-| **IR-026** | Legacy Authentication Bridge | High | Real-time | Legacy applications integrated with modern authentication |
+| **IR-036** | Legacy .NET API Wrapper Development | High | Real-time | 18 legacy .NET applications accessible via standardized REST APIs |
+| **IR-037** | Database Direct Integration | Medium | Batch | Critical data extracted from legacy SQL Server databases |
+| **IR-038** | Legacy Authentication Bridge | High | Real-time | Legacy applications integrated with modern authentication |
 
 **Technical Specifications:**
 - **Integration Pattern:** API wrapper with database integration
 - **Authentication:** Custom token bridge to Azure AD
 - **Data Formats:** JSON API responses, SQL Server stored procedures
 - **Performance:** <500ms response time for API calls
+
+### 1.5 API Management and Versioning Integration
+
+#### 1.5.1 Azure API Center Integration
+
+| ID | Requirement Description | Priority | Type | Acceptance Criteria |
+|----|------------------------|----------|------|-------------------|
+| **IR-039** | API Center Governance Integration | High | Real-time | All governance APIs registered and managed through Azure API Center |
+| **IR-040** | API Version Control Integration | High | Real-time | API versions tracked and managed with governance framework |
+| **IR-041** | API Lifecycle Management | Medium | Real-time | API lifecycle stages managed according to governance policies |
+| **IR-042** | API Drift Detection | Medium | Daily | Automated detection of API changes outside governance process |
+
+**Technical Specifications:**
+- **Integration Pattern:** Azure API Center REST API
+- **Versioning:** Semantic versioning with lifecycle stage management
+- **Monitoring:** Automated API change detection and reporting
+- **Governance:** API approval workflows integrated with change management
 
 ---
 
@@ -155,6 +221,10 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
 | **TC-003** | Proprietary vendor APIs with custom authentication | Medium | Create authentication adapters and protocol translators |
 | **TC-004** | Network latency for cross-region integration | Medium | Implement regional caching and data replication |
 | **TC-005** | Legacy systems maintenance windows (weekends only) | Medium | Schedule batch processing during maintenance windows |
+| **TC-006** | Microsoft365DSC PowerShell execution constraints | Medium | Implement scheduled execution with proper error handling |
+| **TC-007** | Multi-cloud API rate limits and quotas | High | Implement unified rate limiting and quota management |
+| **TC-008** | IaC template validation and deployment time | Medium | Optimize template validation and parallel deployment |
+| **TC-009** | Azure API Center API limitations | Low | Use batch operations and caching for API management |
 
 #### 2.1.2 Data Format and Schema Constraints
 
@@ -286,6 +356,11 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
 | **COBOL Mainframes** | Batch | File/SFTP | Custom | Fixed-width | 60% | High |
 | **Legacy .NET Apps** | Real-time | Custom API | Custom Token | JSON | 70% | Medium |
 | **Proprietary Vendor Systems** | Varies | Custom | Varies | Varies | 55% | High |
+| **Microsoft365DSC** | Batch | PowerShell | Certificate | PowerShell Objects | 85% | Medium |
+| **Azure API Center** | Real-time | REST | Managed Identity | JSON | 90% | Low |
+| **AWS Governance APIs** | Real-time | REST | IAM Roles | JSON | 80% | Medium |
+| **GCP Governance APIs** | Real-time | REST | Service Accounts | JSON | 80% | Medium |
+| **IaC Templates (Bicep/ARM)** | Real-time | REST | Managed Identity | JSON | 95% | Low |
 
 #### 3.2.2 Integration Risk Assessment
 
@@ -320,6 +395,10 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
 | **Security Policies** | Azure Policy | Governance DB, SIEM | Strong consistency | Real-time |
 | **Compliance Status** | Governance Framework | BI tools, ITSM | Eventual consistency | Daily |
 | **Cost Data** | Azure Cost Management | Governance DB, BI | Eventual consistency | Daily |
+| **Infrastructure State** | IaC Templates | Azure Resource Graph, CMDB | Strong consistency | Real-time |
+| **M365 Configuration** | Microsoft365DSC | Governance DB, Compliance | Eventual consistency | Daily |
+| **API Metadata** | Azure API Center | Governance DB, Documentation | Eventual consistency | Hourly |
+| **Multi-Cloud Resources** | Cloud-specific APIs | Unified Governance DB | Eventual consistency | 30 minutes |
 
 #### 3.3.2 Error Handling and Resilience
 
@@ -456,33 +535,53 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
    - Data warehouse population
    - Reporting automation
 
-### 5.3 Phase 3: Legacy System Integrations (Weeks 17-24)
+### 5.3 Phase 3: Infrastructure as Code and Microsoft 365 Integration (Weeks 17-24)
 
-**Priority:** Complex legacy system integrations
+**Priority:** IaC and SaaS platform integrations
 
-1. **Legacy .NET Application Integration (Weeks 17-20)**
+1. **Infrastructure as Code Integration (Weeks 17-20)**
+   - Bicep/ARM template integration
+   - Azure Policy as Code implementation
+   - Infrastructure drift detection
+   - IaC compliance validation
+
+2. **Microsoft 365 DSC Integration (Weeks 21-24)**
+   - Microsoft365DSC configuration management
+   - M365 configuration drift detection
+   - M365 compliance enforcement
+   - Security configuration integration
+
+### 5.4 Phase 4: Multi-Cloud and Legacy System Integration (Weeks 25-32)
+
+**Priority:** Multi-cloud and complex legacy system integrations
+
+1. **Multi-Cloud Integration (Weeks 25-28)**
+   - AWS governance integration
+   - GCP governance integration
+   - Multi-cloud cost management
+   - Cross-cloud security monitoring
+
+2. **Legacy System Integration (Weeks 29-32)**
+   - Legacy .NET application integration
+   - Mainframe integration
    - API wrapper development
-   - Authentication bridge implementation
-   - Database integration
+   - Legacy authentication bridge
 
-2. **Mainframe Integration (Weeks 21-24)**
-   - File-based integration development
-   - Data transformation pipelines
-   - Error handling and monitoring
+### 5.5 Phase 5: Advanced Features and API Management (Weeks 33-40)
 
-### 5.4 Phase 4: Advanced Features (Weeks 25-32)
+**Priority:** Advanced integration features and API management
 
-**Priority:** Advanced integration features and optimization
+1. **API Management Integration (Weeks 33-36)**
+   - Azure API Center integration
+   - API version control integration
+   - API lifecycle management
+   - API drift detection
 
-1. **Real-time Analytics Integration (Weeks 25-28)**
+2. **Advanced Analytics and Optimization (Weeks 37-40)**
+   - Real-time analytics integration
    - Event streaming implementation
-   - Real-time dashboard updates
-   - Predictive analytics integration
-
-2. **Advanced Security Integration (Weeks 29-32)**
-   - Advanced threat detection
-   - Automated remediation
-   - Security orchestration
+   - Performance optimization
+   - Advanced security orchestration
 
 ---
 
@@ -533,7 +632,7 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
 
 #### 7.1.1 Integration Functionality
 
-- [ ] All critical integrations (IR-001 to IR-012) implemented and tested
+- [ ] All critical integrations (IR-001 to IR-042) implemented and tested
 - [ ] API response times meet performance requirements (<200ms average)
 - [ ] System availability meets target (99.9%)
 - [ ] Error rates below acceptable threshold (<0.1%)
@@ -657,7 +756,7 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
 
 ## 10. Conclusion
 
-This Integration Requirements and Constraints Analysis provides a comprehensive foundation for implementing the ICT Governance Framework integration architecture. The analysis identifies 26 critical integration requirements, documents 15 major constraint categories, and provides detailed compatibility assessments for all target systems.
+This Integration Requirements and Constraints Analysis provides a comprehensive foundation for implementing the ICT Governance Framework integration architecture. The analysis identifies 42 critical integration requirements across Azure, Microsoft 365, multi-cloud, legacy systems, and API management, documents 20+ major constraint categories, and provides detailed compatibility assessments for all target systems.
 
 **Key Outcomes:**
 
@@ -671,7 +770,7 @@ This Integration Requirements and Constraints Analysis provides a comprehensive 
 
 **Risk Mitigation:** **Comprehensive** - Detailed risk assessment with specific mitigation strategies for all identified risks
 
-**Implementation Approach:** **Phased** - 32-week implementation roadmap with clear priorities and dependencies
+**Implementation Approach:** **Phased** - 40-week implementation roadmap with clear priorities and dependencies covering all integration domains
 
 **Approval Status:** **Pending** - Requires technical and business stakeholder approval before proceeding to implementation
 
