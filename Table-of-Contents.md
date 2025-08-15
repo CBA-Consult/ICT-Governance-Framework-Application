@@ -68,6 +68,7 @@ This document lists all major documents and directories in the repository for ea
 - **A024-A026**: Current architecture → [Current State](docs/architecture/current-state/)
 - **A027-A028**: Integration requirements → [Integration](docs/architecture/integration/)
 - **A029-A030**: Requirements specification → [Requirements](docs/project-management/requirements/)
+- **A040**: Data model and information architecture → [Architecture](docs/architecture/) and [Governance Framework](docs/governance-framework/)
 
 ## Implementation Guides
 - [implementation-guides/api-integration-guide.md](implementation-guides/api-integration-guide.md)
