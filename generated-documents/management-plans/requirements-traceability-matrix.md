@@ -21,25 +21,25 @@ This RTM provides complete bidirectional traceability linking:
 
 ## A006 Governance-to-Business Mapping RTM Entries
 
-### Governance Requirements Traceability
+### Enhanced Governance Requirements Traceability
 
-| REQ ID | Description | Source | Business Objective | Priority | Design Artefacts | Code Modules | Test Cases | Status |
-|--------|-------------|--------|-------------------|----------|------------------|--------------|------------|--------|
-| **GR-001** | Strategic Technology Oversight | ICT Governance Framework | BO-001, BO-009, BO-010 | Critical | Governance Council Charter, Decision Framework | Governance Dashboard, Approval Workflow | TC-GR-001-001 to TC-GR-001-005 | Draft |
-| **GR-002** | Policy Governance | ICT Governance Framework | BO-011, BO-013 | High | Policy Management Framework, Policy Templates | Policy Engine, Compliance Monitor | TC-GR-002-001 to TC-GR-002-003 | Draft |
-| **GR-003** | Resource Allocation (Value-Based) | ICT Governance Framework | BO-001, BO-012 | Critical | Resource Allocation Model, Investment Framework | Portfolio Manager, Resource Optimizer | TC-GR-003-001 to TC-GR-003-004 | Draft |
-| **GR-004** | Business Value Quantification Process | ICT Governance Framework | BO-001, BO-009 | Critical | Value Assessment Framework, ROI Calculator | Value Analytics Engine, Reporting Dashboard | TC-GR-004-001 to TC-GR-004-006 | Draft |
-| **GR-005** | FAIR-Based Risk Management | ICT Governance Framework | BO-002, BO-011 | High | FAIR Risk Model, Risk Assessment Templates | Risk Analytics Engine, Risk Dashboard | TC-GR-005-001 to TC-GR-005-005 | Draft |
-| **GR-006** | Compliance Oversight | ICT Governance Framework | BO-013, BO-011 | Critical | Compliance Framework, Audit Templates | Compliance Monitor, Audit Manager | TC-GR-006-001 to TC-GR-006-004 | Draft |
-| **GR-007** | Performance Monitoring | ICT Governance Framework | BO-011, BO-008 | High | Performance Framework, KPI Dashboard | Monitoring Engine, Analytics Platform | TC-GR-007-001 to TC-GR-007-003 | Draft |
-| **GR-008** | Exception Management | ICT Governance Framework | BO-002, BO-011 | Medium | Exception Framework, Approval Workflow | Exception Manager, Tracking System | TC-GR-008-001 to TC-GR-008-002 | Draft |
-| **GR-009** | Technology Initiative Approval | ICT Governance Framework | BO-001, BO-006 | High | Approval Framework, Initiative Templates | Approval Workflow, Portfolio Tracker | TC-GR-009-001 to TC-GR-009-004 | Draft |
-| **GR-010** | Zero Trust Security Architecture | ICT Governance Framework | BO-005, BO-011 | Critical | Zero Trust Architecture, Security Policies | Security Engine, Identity Manager | TC-GR-010-001 to TC-GR-010-008 | Draft |
-| **GR-011** | AI Ethics Framework | ICT Governance Framework Strategic Statements | BO-003, BO-010 | High | AI Ethics Framework, Assessment Templates | AI Ethics Monitor, Compliance Tracker | TC-GR-011-001 to TC-GR-011-004 | Draft |
-| **GR-012** | Sustainable Technology Practices | ICT Governance Framework Strategic Statements | BO-004, BO-010 | High | Sustainability Framework, Carbon Tracker | Sustainability Monitor, Reporting Engine | TC-GR-012-001 to TC-GR-012-003 | Draft |
-| **GR-013** | Innovation Governance Framework | ICT Governance Framework Strategic Statements | BO-006, BO-009 | High | Innovation Framework, Sandbox Architecture | Innovation Platform, Experiment Tracker | TC-GR-013-001 to TC-GR-013-005 | Draft |
-| **GR-014** | Stakeholder Engagement Framework | ICT Governance Framework | BO-007, BO-014 | High | Engagement Framework, Communication Plan | Engagement Platform, Feedback System | TC-GR-014-001 to TC-GR-014-003 | Draft |
-| **GR-015** | Annual Benchmarking Framework | ICT Governance Framework | BO-008, BO-010 | Medium | Benchmarking Framework, Assessment Tools | Benchmarking Engine, Analytics Platform | TC-GR-015-001 to TC-GR-015-002 | Draft |
+| REQ ID | Description | Source | Business Objective | Priority | Design Artefacts | Code Modules | Test Cases | Document Sections | WBS Tasks | Status |
+|--------|-------------|--------|-------------------|----------|------------------|--------------|------------|------------------|-----------|--------|
+| **GR-001** | Strategic Technology Oversight | ICT Governance Framework | BO-001, BO-009, BO-010 | Critical | Governance Council Charter, Decision Framework | Governance Dashboard, Approval Workflow | TC-GR-001-001 to TC-GR-001-005 | Charter §2.1, Framework §3.1, Roles §4.1 | 1.1.1.1, 1.2.2.1 | Draft |
+| **GR-002** | Policy Governance | ICT Governance Framework | BO-011, BO-013 | High | Policy Management Framework, Policy Templates | Policy Engine, Compliance Monitor | TC-GR-002-001 to TC-GR-002-003 | Policies §5.2, Procedures §6.1, Templates §7.1 | 1.2.3.1, 1.3.1.2 | Draft |
+| **GR-003** | Resource Allocation (Value-Based) | ICT Governance Framework | BO-001, BO-012 | Critical | Resource Allocation Model, Investment Framework | Portfolio Manager, Resource Optimizer | TC-GR-003-001 to TC-GR-003-004 | Budget §8.1, ROI §8.2, Portfolio §9.1 | 1.1.1.2, 1.2.1.3 | Draft |
+| **GR-004** | Business Value Quantification Process | ICT Governance Framework | BO-001, BO-009 | Critical | Value Assessment Framework, ROI Calculator | Value Analytics Engine, Reporting Dashboard | TC-GR-004-001 to TC-GR-004-006 | Value Framework §10.1, Metrics §10.2 | 1.2.2.2, 1.3.2.1 | Draft |
+| **GR-005** | FAIR-Based Risk Management | ICT Governance Framework | BO-002, BO-011 | High | FAIR Risk Model, Risk Assessment Templates | Risk Analytics Engine, Risk Dashboard | TC-GR-005-001 to TC-GR-005-005 | Risk Register §11.1, FAIR Model §11.2 | 1.2.1.4, 1.3.1.3 | Draft |
+| **GR-006** | Compliance Oversight | ICT Governance Framework | BO-013, BO-011 | Critical | Compliance Framework, Audit Templates | Compliance Monitor, Audit Manager | TC-GR-006-001 to TC-GR-006-004 | Compliance §12.1, Audit §12.2, Reports §12.3 | 1.2.3.2, 1.3.3.1 | Draft |
+| **GR-007** | Performance Monitoring | ICT Governance Framework | BO-011, BO-008 | High | Performance Framework, KPI Dashboard | Monitoring Engine, Analytics Platform | TC-GR-007-001 to TC-GR-007-003 | KPIs §13.1, Dashboard §13.2, Analytics §13.3 | 1.3.2.2, 1.4.1.1 | Draft |
+| **GR-008** | Exception Management | ICT Governance Framework | BO-002, BO-011 | Medium | Exception Framework, Approval Workflow | Exception Manager, Tracking System | TC-GR-008-001 to TC-GR-008-002 | Exceptions §14.1, Workflow §14.2 | 1.3.1.4, 1.3.2.3 | Draft |
+| **GR-009** | Technology Initiative Approval | ICT Governance Framework | BO-001, BO-006 | High | Approval Framework, Initiative Templates | Approval Workflow, Portfolio Tracker | TC-GR-009-001 to TC-GR-009-004 | Approval Process §15.1, Templates §15.2 | 1.2.2.3, 1.3.1.5 | Draft |
+| **GR-010** | Zero Trust Security Architecture | ICT Governance Framework | BO-005, BO-011 | Critical | Zero Trust Architecture, Security Policies | Security Engine, Identity Manager | TC-GR-010-001 to TC-GR-010-008 | Security §16.1, Zero Trust §16.2, Identity §16.3 | 1.3.1.6, 1.3.2.4 | Draft |
+| **GR-011** | AI Ethics Framework | ICT Governance Framework Strategic Statements | BO-003, BO-010 | High | AI Ethics Framework, Assessment Templates | AI Ethics Monitor, Compliance Tracker | TC-GR-011-001 to TC-GR-011-004 | AI Ethics §17.1, Assessment §17.2 | 1.2.3.3, 1.3.3.2 | Draft |
+| **GR-012** | Sustainable Technology Practices | ICT Governance Framework Strategic Statements | BO-004, BO-010 | High | Sustainability Framework, Carbon Tracker | Sustainability Monitor, Reporting Engine | TC-GR-012-001 to TC-GR-012-003 | Sustainability §18.1, Carbon §18.2 | 1.2.3.4, 1.3.3.3 | Draft |
+| **GR-013** | Innovation Governance Framework | ICT Governance Framework Strategic Statements | BO-006, BO-009 | High | Innovation Framework, Sandbox Architecture | Innovation Platform, Experiment Tracker | TC-GR-013-001 to TC-GR-013-005 | Innovation §19.1, Sandbox §19.2 | 1.2.3.5, 1.3.3.4 | Draft |
+| **GR-014** | Stakeholder Engagement Framework | ICT Governance Framework | BO-007, BO-014 | High | Engagement Framework, Communication Plan | Engagement Platform, Feedback System | TC-GR-014-001 to TC-GR-014-003 | Stakeholder §20.1, Communication §20.2 | 1.1.2.1, 1.2.1.5 | Draft |
+| **GR-015** | Annual Benchmarking Framework | ICT Governance Framework | BO-008, BO-010 | Medium | Benchmarking Framework, Assessment Tools | Benchmarking Engine, Analytics Platform | TC-GR-015-001 to TC-GR-015-002 | Benchmarking §21.1, Assessment §21.2 | 1.2.3.6, 1.5.1.1 | Draft |
 
 ### Business Objectives Traceability
 
