@@ -53,7 +53,12 @@ This document lists all major documents and directories in the repository for ea
 
 ### 🚀 Implementation
 - **Guides**: [Step-by-step implementation guidance](docs/implementation/guides/)
+  - **[CLI/API Usage Guide](docs/implementation/guides/CLI-API-Usage-Guide.md)** - Comprehensive technical implementation guide
+  - **[AI Prompt Engineering Framework](docs/implementation/guides/AI-Prompt-Engineering-Framework.md)** - PMBOK-aligned AI prompt optimization
+  - **[Human-in-the-Loop Verification Framework](docs/implementation/guides/Human-in-the-Loop-Verification-Framework.md)** - SME review and validation processes
+  - **[Enhanced Feedback Mechanisms Framework](docs/implementation/guides/Enhanced-Feedback-Mechanisms-Framework.md)** - PM contribution and improvement workflows
 - **Summaries**: [Implementation status and completion](docs/implementation/summaries/)
+  - **[RGA Enhancement Implementation Summary](docs/implementation/summaries/RGA-Enhancement-Implementation-Summary.md)** - Comprehensive enhancement overview
 - **Deployment**: [Deployment strategies and plans](docs/implementation/deployment/)
 
 ## Legacy Document References (A001-A030 Series)

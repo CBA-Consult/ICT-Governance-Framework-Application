@@ -10,6 +10,7 @@
 - **🎯 [Project Overview](docs/project-management/A001-Project-Scope-and-Objectives.md)** - Project scope and objectives
 - **🏛️ [Core Framework](docs/governance-framework/core-framework/ICT-Governance-Framework.md)** - Main governance framework
 - **🚀 [Implementation Guide](docs/implementation/summaries/IMPLEMENTATION-SUMMARY.md)** - Implementation status and guidance
+- **📈 [RGA Enhancement Summary](docs/implementation/summaries/RGA-Enhancement-Implementation-Summary.md)** - Latest quality improvements and enhancements
 
 ## Table of Contents
 
