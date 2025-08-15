@@ -17,20 +17,13 @@
 }
 
 body {
-  color: #222 !important;
+  color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-}
-
-/* Ensure all text is dark by default for readability */
-*,
-*::before,
-*::after {
-  color: #222 !important;
 }
 
 @layer utilities {
