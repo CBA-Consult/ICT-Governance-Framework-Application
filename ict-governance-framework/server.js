@@ -19,6 +19,8 @@ const escalationsRouter = require('./api/escalations');
 
 // Import new user management API routes
 const authRouter = require('./api/auth');
+const usersRouter = require('./api/users');
+const rolesRouter = require('./api/roles');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -64,6 +66,8 @@ app.set('trust proxy', 1);
 // Mount the API routes
 // Authentication and user management routes
 app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/roles', rolesRouter);
 
 // Existing application routes
 app.use('/api/defender-activities', defenderActivitiesRoute);

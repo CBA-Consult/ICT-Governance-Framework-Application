@@ -347,3 +347,387 @@ CREATE INDEX IF NOT EXISTS idx_workflow_automation_log_executed_at ON workflow_a
 CREATE INDEX IF NOT EXISTS idx_workflow_metrics_workflow_id ON workflow_metrics(workflow_id);
 CREATE INDEX IF NOT EXISTS idx_workflow_metrics_metric_type ON workflow_metrics(metric_type);
 CREATE INDEX IF NOT EXISTS idx_workflow_metrics_measurement_date ON workflow_metrics(measurement_date);
+
+-- ============================================================================
+-- USER MANAGEMENT AND ACCESS CONTROL TABLES
+-- ============================================================================
+
+-- Users table - core user information
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(50) UNIQUE NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    display_name VARCHAR(200),
+    department VARCHAR(100),
+    job_title VARCHAR(150),
+    manager_id VARCHAR(50),
+    phone VARCHAR(20),
+    office_location VARCHAR(100),
+    employee_id VARCHAR(50),
+    status VARCHAR(20) DEFAULT 'Active' CHECK (status IN ('Active', 'Inactive', 'Suspended', 'Pending')),
+    email_verified BOOLEAN DEFAULT FALSE,
+    phone_verified BOOLEAN DEFAULT FALSE,
+    two_factor_enabled BOOLEAN DEFAULT FALSE,
+    two_factor_secret VARCHAR(255),
+    password_reset_token VARCHAR(255),
+    password_reset_expires TIMESTAMP,
+    email_verification_token VARCHAR(255),
+    email_verification_expires TIMESTAMP,
+    last_login TIMESTAMP,
+    last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    failed_login_attempts INTEGER DEFAULT 0,
+    account_locked_until TIMESTAMP,
+    profile_picture_url VARCHAR(500),
+    preferences JSONB DEFAULT '{}',
+    metadata JSONB DEFAULT '{}',
+    created_by VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (manager_id) REFERENCES users(user_id),
+    FOREIGN KEY (created_by) REFERENCES users(user_id),
+    FOREIGN KEY (updated_by) REFERENCES users(user_id)
+);
+
+-- Roles table - system roles definition
+CREATE TABLE IF NOT EXISTS roles (
+    id SERIAL PRIMARY KEY,
+    role_id VARCHAR(50) UNIQUE NOT NULL,
+    role_name VARCHAR(100) UNIQUE NOT NULL,
+    display_name VARCHAR(150) NOT NULL,
+    description TEXT,
+    role_type VARCHAR(30) DEFAULT 'Custom' CHECK (role_type IN ('System', 'Custom', 'Functional', 'Organizational')),
+    is_system_role BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
+    permissions JSONB DEFAULT '[]',
+    role_hierarchy_level INTEGER DEFAULT 0,
+    parent_role_id VARCHAR(50),
+    created_by VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_role_id) REFERENCES roles(role_id),
+    FOREIGN KEY (created_by) REFERENCES users(user_id),
+    FOREIGN KEY (updated_by) REFERENCES users(user_id)
+);
+
+-- Permissions table - granular permissions definition
+CREATE TABLE IF NOT EXISTS permissions (
+    id SERIAL PRIMARY KEY,
+    permission_id VARCHAR(50) UNIQUE NOT NULL,
+    permission_name VARCHAR(100) UNIQUE NOT NULL,
+    display_name VARCHAR(150) NOT NULL,
+    description TEXT,
+    resource VARCHAR(100) NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    scope VARCHAR(50) DEFAULT 'Global' CHECK (scope IN ('Global', 'Department', 'Team', 'Personal')),
+    is_system_permission BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User roles mapping table - many-to-many relationship
+CREATE TABLE IF NOT EXISTS user_roles (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(50) NOT NULL,
+    role_id VARCHAR(50) NOT NULL,
+    assigned_by VARCHAR(50),
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    assignment_reason TEXT,
+    UNIQUE(user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE,
+    FOREIGN KEY (assigned_by) REFERENCES users(user_id)
+);
+
+-- Role permissions mapping table - many-to-many relationship
+CREATE TABLE IF NOT EXISTS role_permissions (
+    id SERIAL PRIMARY KEY,
+    role_id VARCHAR(50) NOT NULL,
+    permission_id VARCHAR(50) NOT NULL,
+    granted_by VARCHAR(50),
+    granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    UNIQUE(role_id, permission_id),
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE,
+    FOREIGN KEY (permission_id) REFERENCES permissions(permission_id) ON DELETE CASCADE,
+    FOREIGN KEY (granted_by) REFERENCES users(user_id)
+);
+
+-- User sessions table - session management
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id SERIAL PRIMARY KEY,
+    session_id VARCHAR(255) UNIQUE NOT NULL,
+    user_id VARCHAR(50) NOT NULL,
+    refresh_token VARCHAR(500) UNIQUE NOT NULL,
+    access_token_hash VARCHAR(255),
+    device_info JSONB,
+    ip_address INET,
+    user_agent TEXT,
+    location_info JSONB,
+    is_active BOOLEAN DEFAULT TRUE,
+    expires_at TIMESTAMP NOT NULL,
+    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- User activity log table - audit trail
+CREATE TABLE IF NOT EXISTS user_activity_log (
+    id SERIAL PRIMARY KEY,
+    log_id VARCHAR(50) UNIQUE NOT NULL,
+    user_id VARCHAR(50),
+    session_id VARCHAR(255),
+    activity_type VARCHAR(50) NOT NULL,
+    activity_description TEXT NOT NULL,
+    resource VARCHAR(100),
+    action VARCHAR(50),
+    ip_address INET,
+    user_agent TEXT,
+    request_data JSONB,
+    response_status INTEGER,
+    success BOOLEAN DEFAULT TRUE,
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (session_id) REFERENCES user_sessions(session_id)
+);
+
+-- Password history table - prevent password reuse
+CREATE TABLE IF NOT EXISTS password_history (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- Insert default system roles
+INSERT INTO roles (role_id, role_name, display_name, description, role_type, is_system_role, role_hierarchy_level) VALUES
+('ROLE_SUPER_ADMIN', 'super_admin', 'Super Administrator', 'Full system access with all permissions', 'System', TRUE, 100),
+('ROLE_ADMIN', 'admin', 'Administrator', 'Administrative access to most system functions', 'System', TRUE, 90),
+('ROLE_GOVERNANCE_MANAGER', 'governance_manager', 'Governance Manager', 'Manages governance policies and processes', 'Functional', TRUE, 80),
+('ROLE_COMPLIANCE_OFFICER', 'compliance_officer', 'Compliance Officer', 'Oversees compliance monitoring and reporting', 'Functional', TRUE, 70),
+('ROLE_IT_MANAGER', 'it_manager', 'IT Manager', 'Manages IT operations and technology decisions', 'Functional', TRUE, 70),
+('ROLE_SECURITY_ANALYST', 'security_analyst', 'Security Analyst', 'Monitors security and investigates incidents', 'Functional', TRUE, 60),
+('ROLE_AUDITOR', 'auditor', 'Auditor', 'Conducts audits and reviews compliance', 'Functional', TRUE, 60),
+('ROLE_EMPLOYEE', 'employee', 'Employee', 'Standard employee access', 'System', TRUE, 10),
+('ROLE_GUEST', 'guest', 'Guest', 'Limited read-only access', 'System', TRUE, 5)
+ON CONFLICT (role_id) DO NOTHING;
+
+-- Insert default system permissions
+INSERT INTO permissions (permission_id, permission_name, display_name, description, resource, action, is_system_permission) VALUES
+-- User Management
+('PERM_USER_CREATE', 'user.create', 'Create Users', 'Create new user accounts', 'users', 'create', TRUE),
+('PERM_USER_READ', 'user.read', 'View Users', 'View user information', 'users', 'read', TRUE),
+('PERM_USER_UPDATE', 'user.update', 'Update Users', 'Update user information', 'users', 'update', TRUE),
+('PERM_USER_DELETE', 'user.delete', 'Delete Users', 'Delete user accounts', 'users', 'delete', TRUE),
+('PERM_USER_MANAGE_ROLES', 'user.manage_roles', 'Manage User Roles', 'Assign and remove user roles', 'users', 'manage_roles', TRUE),
+
+-- Role Management
+('PERM_ROLE_CREATE', 'role.create', 'Create Roles', 'Create new roles', 'roles', 'create', TRUE),
+('PERM_ROLE_READ', 'role.read', 'View Roles', 'View role information', 'roles', 'read', TRUE),
+('PERM_ROLE_UPDATE', 'role.update', 'Update Roles', 'Update role information', 'roles', 'update', TRUE),
+('PERM_ROLE_DELETE', 'role.delete', 'Delete Roles', 'Delete roles', 'roles', 'delete', TRUE),
+('PERM_ROLE_MANAGE_PERMISSIONS', 'role.manage_permissions', 'Manage Role Permissions', 'Assign and remove role permissions', 'roles', 'manage_permissions', TRUE),
+
+-- System Administration
+('PERM_SYSTEM_ADMIN', 'system.admin', 'System Administration', 'Full system administration access', 'system', 'admin', TRUE),
+('PERM_SYSTEM_CONFIG', 'system.config', 'System Configuration', 'Configure system settings', 'system', 'config', TRUE),
+('PERM_SYSTEM_AUDIT', 'system.audit', 'System Audit', 'View system audit logs', 'system', 'audit', TRUE),
+
+-- Governance
+('PERM_GOVERNANCE_READ', 'governance.read', 'View Governance', 'View governance information', 'governance', 'read', TRUE),
+('PERM_GOVERNANCE_MANAGE', 'governance.manage', 'Manage Governance', 'Manage governance policies and processes', 'governance', 'manage', TRUE),
+
+-- Compliance
+('PERM_COMPLIANCE_READ', 'compliance.read', 'View Compliance', 'View compliance information', 'compliance', 'read', TRUE),
+('PERM_COMPLIANCE_MANAGE', 'compliance.manage', 'Manage Compliance', 'Manage compliance monitoring and reporting', 'compliance', 'manage', TRUE),
+
+-- Feedback and Escalations
+('PERM_FEEDBACK_CREATE', 'feedback.create', 'Create Feedback', 'Submit feedback and requests', 'feedback', 'create', TRUE),
+('PERM_FEEDBACK_READ', 'feedback.read', 'View Feedback', 'View feedback submissions', 'feedback', 'read', TRUE),
+('PERM_FEEDBACK_MANAGE', 'feedback.manage', 'Manage Feedback', 'Manage feedback and escalations', 'feedback', 'manage', TRUE),
+
+-- Workflows
+('PERM_WORKFLOW_CREATE', 'workflow.create', 'Create Workflows', 'Create workflow instances', 'workflows', 'create', TRUE),
+('PERM_WORKFLOW_READ', 'workflow.read', 'View Workflows', 'View workflow information', 'workflows', 'read', TRUE),
+('PERM_WORKFLOW_MANAGE', 'workflow.manage', 'Manage Workflows', 'Manage workflow definitions and instances', 'workflows', 'manage', TRUE),
+
+-- Applications
+('PERM_APP_PROCUREMENT', 'app.procurement', 'Application Procurement', 'Request and manage application procurement', 'applications', 'procurement', TRUE),
+('PERM_APP_MANAGE', 'app.manage', 'Manage Applications', 'Manage application catalog and registrations', 'applications', 'manage', TRUE)
+ON CONFLICT (permission_id) DO NOTHING;
+
+-- Assign permissions to default roles
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+-- Super Admin - All permissions
+('ROLE_SUPER_ADMIN', 'PERM_USER_CREATE'),
+('ROLE_SUPER_ADMIN', 'PERM_USER_READ'),
+('ROLE_SUPER_ADMIN', 'PERM_USER_UPDATE'),
+('ROLE_SUPER_ADMIN', 'PERM_USER_DELETE'),
+('ROLE_SUPER_ADMIN', 'PERM_USER_MANAGE_ROLES'),
+('ROLE_SUPER_ADMIN', 'PERM_ROLE_CREATE'),
+('ROLE_SUPER_ADMIN', 'PERM_ROLE_READ'),
+('ROLE_SUPER_ADMIN', 'PERM_ROLE_UPDATE'),
+('ROLE_SUPER_ADMIN', 'PERM_ROLE_DELETE'),
+('ROLE_SUPER_ADMIN', 'PERM_ROLE_MANAGE_PERMISSIONS'),
+('ROLE_SUPER_ADMIN', 'PERM_SYSTEM_ADMIN'),
+('ROLE_SUPER_ADMIN', 'PERM_SYSTEM_CONFIG'),
+('ROLE_SUPER_ADMIN', 'PERM_SYSTEM_AUDIT'),
+('ROLE_SUPER_ADMIN', 'PERM_GOVERNANCE_READ'),
+('ROLE_SUPER_ADMIN', 'PERM_GOVERNANCE_MANAGE'),
+('ROLE_SUPER_ADMIN', 'PERM_COMPLIANCE_READ'),
+('ROLE_SUPER_ADMIN', 'PERM_COMPLIANCE_MANAGE'),
+('ROLE_SUPER_ADMIN', 'PERM_FEEDBACK_CREATE'),
+('ROLE_SUPER_ADMIN', 'PERM_FEEDBACK_READ'),
+('ROLE_SUPER_ADMIN', 'PERM_FEEDBACK_MANAGE'),
+('ROLE_SUPER_ADMIN', 'PERM_WORKFLOW_CREATE'),
+('ROLE_SUPER_ADMIN', 'PERM_WORKFLOW_READ'),
+('ROLE_SUPER_ADMIN', 'PERM_WORKFLOW_MANAGE'),
+('ROLE_SUPER_ADMIN', 'PERM_APP_PROCUREMENT'),
+('ROLE_SUPER_ADMIN', 'PERM_APP_MANAGE'),
+
+-- Admin - Most permissions except user/role management
+('ROLE_ADMIN', 'PERM_USER_READ'),
+('ROLE_ADMIN', 'PERM_USER_UPDATE'),
+('ROLE_ADMIN', 'PERM_ROLE_READ'),
+('ROLE_ADMIN', 'PERM_SYSTEM_CONFIG'),
+('ROLE_ADMIN', 'PERM_SYSTEM_AUDIT'),
+('ROLE_ADMIN', 'PERM_GOVERNANCE_READ'),
+('ROLE_ADMIN', 'PERM_GOVERNANCE_MANAGE'),
+('ROLE_ADMIN', 'PERM_COMPLIANCE_READ'),
+('ROLE_ADMIN', 'PERM_COMPLIANCE_MANAGE'),
+('ROLE_ADMIN', 'PERM_FEEDBACK_CREATE'),
+('ROLE_ADMIN', 'PERM_FEEDBACK_READ'),
+('ROLE_ADMIN', 'PERM_FEEDBACK_MANAGE'),
+('ROLE_ADMIN', 'PERM_WORKFLOW_CREATE'),
+('ROLE_ADMIN', 'PERM_WORKFLOW_READ'),
+('ROLE_ADMIN', 'PERM_WORKFLOW_MANAGE'),
+('ROLE_ADMIN', 'PERM_APP_PROCUREMENT'),
+('ROLE_ADMIN', 'PERM_APP_MANAGE'),
+
+-- Governance Manager
+('ROLE_GOVERNANCE_MANAGER', 'PERM_USER_READ'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_ROLE_READ'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_GOVERNANCE_READ'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_GOVERNANCE_MANAGE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_COMPLIANCE_READ'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_FEEDBACK_CREATE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_FEEDBACK_READ'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_FEEDBACK_MANAGE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_WORKFLOW_CREATE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_WORKFLOW_READ'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_WORKFLOW_MANAGE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_APP_PROCUREMENT'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_APP_MANAGE'),
+
+-- Compliance Officer
+('ROLE_COMPLIANCE_OFFICER', 'PERM_USER_READ'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_ROLE_READ'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_GOVERNANCE_READ'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_COMPLIANCE_READ'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_COMPLIANCE_MANAGE'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_FEEDBACK_CREATE'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_FEEDBACK_READ'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_WORKFLOW_CREATE'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_WORKFLOW_READ'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_APP_PROCUREMENT'),
+
+-- IT Manager
+('ROLE_IT_MANAGER', 'PERM_USER_READ'),
+('ROLE_IT_MANAGER', 'PERM_ROLE_READ'),
+('ROLE_IT_MANAGER', 'PERM_GOVERNANCE_READ'),
+('ROLE_IT_MANAGER', 'PERM_COMPLIANCE_READ'),
+('ROLE_IT_MANAGER', 'PERM_FEEDBACK_CREATE'),
+('ROLE_IT_MANAGER', 'PERM_FEEDBACK_READ'),
+('ROLE_IT_MANAGER', 'PERM_FEEDBACK_MANAGE'),
+('ROLE_IT_MANAGER', 'PERM_WORKFLOW_CREATE'),
+('ROLE_IT_MANAGER', 'PERM_WORKFLOW_READ'),
+('ROLE_IT_MANAGER', 'PERM_WORKFLOW_MANAGE'),
+('ROLE_IT_MANAGER', 'PERM_APP_PROCUREMENT'),
+('ROLE_IT_MANAGER', 'PERM_APP_MANAGE'),
+
+-- Security Analyst
+('ROLE_SECURITY_ANALYST', 'PERM_USER_READ'),
+('ROLE_SECURITY_ANALYST', 'PERM_ROLE_READ'),
+('ROLE_SECURITY_ANALYST', 'PERM_SYSTEM_AUDIT'),
+('ROLE_SECURITY_ANALYST', 'PERM_GOVERNANCE_READ'),
+('ROLE_SECURITY_ANALYST', 'PERM_COMPLIANCE_READ'),
+('ROLE_SECURITY_ANALYST', 'PERM_FEEDBACK_CREATE'),
+('ROLE_SECURITY_ANALYST', 'PERM_FEEDBACK_READ'),
+('ROLE_SECURITY_ANALYST', 'PERM_WORKFLOW_CREATE'),
+('ROLE_SECURITY_ANALYST', 'PERM_WORKFLOW_READ'),
+('ROLE_SECURITY_ANALYST', 'PERM_APP_PROCUREMENT'),
+
+-- Auditor
+('ROLE_AUDITOR', 'PERM_USER_READ'),
+('ROLE_AUDITOR', 'PERM_ROLE_READ'),
+('ROLE_AUDITOR', 'PERM_SYSTEM_AUDIT'),
+('ROLE_AUDITOR', 'PERM_GOVERNANCE_READ'),
+('ROLE_AUDITOR', 'PERM_COMPLIANCE_READ'),
+('ROLE_AUDITOR', 'PERM_FEEDBACK_CREATE'),
+('ROLE_AUDITOR', 'PERM_FEEDBACK_READ'),
+('ROLE_AUDITOR', 'PERM_WORKFLOW_READ'),
+('ROLE_AUDITOR', 'PERM_APP_PROCUREMENT'),
+
+-- Employee
+('ROLE_EMPLOYEE', 'PERM_GOVERNANCE_READ'),
+('ROLE_EMPLOYEE', 'PERM_COMPLIANCE_READ'),
+('ROLE_EMPLOYEE', 'PERM_FEEDBACK_CREATE'),
+('ROLE_EMPLOYEE', 'PERM_FEEDBACK_READ'),
+('ROLE_EMPLOYEE', 'PERM_WORKFLOW_CREATE'),
+('ROLE_EMPLOYEE', 'PERM_WORKFLOW_READ'),
+('ROLE_EMPLOYEE', 'PERM_APP_PROCUREMENT'),
+
+-- Guest
+('ROLE_GUEST', 'PERM_GOVERNANCE_READ'),
+('ROLE_GUEST', 'PERM_COMPLIANCE_READ')
+ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+-- Create indexes for user management performance
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
+CREATE INDEX IF NOT EXISTS idx_users_department ON users(department);
+CREATE INDEX IF NOT EXISTS idx_users_manager_id ON users(manager_id);
+CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_roles_role_name ON roles(role_name);
+CREATE INDEX IF NOT EXISTS idx_roles_role_type ON roles(role_type);
+CREATE INDEX IF NOT EXISTS idx_roles_is_active ON roles(is_active);
+CREATE INDEX IF NOT EXISTS idx_roles_hierarchy_level ON roles(role_hierarchy_level);
+
+CREATE INDEX IF NOT EXISTS idx_permissions_resource ON permissions(resource);
+CREATE INDEX IF NOT EXISTS idx_permissions_action ON permissions(action);
+CREATE INDEX IF NOT EXISTS idx_permissions_scope ON permissions(scope);
+
+CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON user_roles(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_role_id ON user_roles(role_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_is_active ON user_roles(is_active);
+CREATE INDEX IF NOT EXISTS idx_user_roles_expires_at ON user_roles(expires_at);
+
+CREATE INDEX IF NOT EXISTS idx_role_permissions_role_id ON role_permissions(role_id);
+CREATE INDEX IF NOT EXISTS idx_role_permissions_permission_id ON role_permissions(permission_id);
+CREATE INDEX IF NOT EXISTS idx_role_permissions_is_active ON role_permissions(is_active);
+
+CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_session_id ON user_sessions(session_id);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_refresh_token ON user_sessions(refresh_token);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_is_active ON user_sessions(is_active);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_expires_at ON user_sessions(expires_at);
+
+CREATE INDEX IF NOT EXISTS idx_user_activity_log_user_id ON user_activity_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_activity_log_activity_type ON user_activity_log(activity_type);
+CREATE INDEX IF NOT EXISTS idx_user_activity_log_created_at ON user_activity_log(created_at);
+CREATE INDEX IF NOT EXISTS idx_user_activity_log_success ON user_activity_log(success);
+
+CREATE INDEX IF NOT EXISTS idx_password_history_user_id ON password_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_password_history_created_at ON password_history(created_at);

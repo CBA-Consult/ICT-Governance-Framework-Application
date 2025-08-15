@@ -502,6 +502,36 @@ router.post('/logout', authenticateToken, async (req, res) => {
 });
 
 /**
+ * POST /api/auth/logout-all
+ * Logout from all devices
+ */
+router.post('/logout-all', authenticateToken, async (req, res) => {
+  try {
+    const { user_id } = req.user;
+
+    // Invalidate all sessions for the user
+    await pool.query(
+      'UPDATE user_sessions SET is_active = false WHERE user_id = $1',
+      [user_id]
+    );
+
+    // Log logout all activity
+    await logUserActivity(req, 'LOGOUT_ALL', 'User logged out from all devices', true);
+
+    res.json({
+      message: 'Logged out from all devices successfully'
+    });
+
+  } catch (error) {
+    console.error('Logout all error:', error);
+    res.status(500).json({
+      error: 'Logout from all devices failed',
+      code: 'LOGOUT_ALL_ERROR'
+    });
+  }
+});
+
+/**
  * GET /api/auth/me
  * Get current user information
  */
@@ -535,6 +565,67 @@ router.get('/me', authenticateToken, async (req, res) => {
     res.status(500).json({
       error: 'Failed to get user information',
       code: 'USER_INFO_ERROR'
+    });
+  }
+});
+
+/**
+ * POST /api/auth/verify-email
+ * Verify user email address
+ */
+router.post('/verify-email', async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        error: 'Verification token required',
+        code: 'TOKEN_MISSING'
+      });
+    }
+
+    const userQuery = `
+      SELECT user_id, email, email_verification_expires
+      FROM users
+      WHERE email_verification_token = $1 AND status = 'Pending'
+    `;
+
+    const userResult = await pool.query(userQuery, [token]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(400).json({
+        error: 'Invalid or expired verification token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    if (new Date() > new Date(user.email_verification_expires)) {
+      return res.status(400).json({
+        error: 'Verification token has expired',
+        code: 'TOKEN_EXPIRED'
+      });
+    }
+
+    // Update user status and clear verification token
+    await pool.query(`
+      UPDATE users 
+      SET status = 'Active', email_verified = true, 
+          email_verification_token = NULL, email_verification_expires = NULL
+      WHERE user_id = $1
+    `, [user.user_id]);
+
+    res.json({
+      message: 'Email verified successfully',
+      email: user.email
+    });
+
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(500).json({
+      error: 'Email verification failed',
+      code: 'VERIFICATION_ERROR'
     });
   }
 });

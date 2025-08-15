@@ -187,6 +187,16 @@ const requireRoles = (requiredRoles) => {
 };
 
 /**
+ * Middleware to check if user is admin (has admin or super_admin role)
+ */
+const requireAdmin = requireRoles(['admin', 'super_admin']);
+
+/**
+ * Middleware to check if user is super admin
+ */
+const requireSuperAdmin = requireRoles(['super_admin']);
+
+/**
  * Middleware to log user activities
  */
 const logActivity = (activityType, getDescription) => {
@@ -266,6 +276,58 @@ async function logUserActivity(req, activityType, description, success = true, r
 }
 
 /**
+ * Middleware for optional authentication (doesn't fail if no token)
+ */
+const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+      req.user = null;
+      return next();
+    }
+
+    // Use the same logic as authenticateToken but don't fail
+    const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+    
+    const userQuery = `
+      SELECT u.*, 
+             array_agg(DISTINCT r.role_name) as roles,
+             array_agg(DISTINCT p.permission_name) as permissions
+      FROM users u
+      LEFT JOIN user_roles ur ON u.user_id = ur.user_id AND ur.is_active = true
+      LEFT JOIN roles r ON ur.role_id = r.role_id AND r.is_active = true
+      LEFT JOIN role_permissions rp ON r.role_id = rp.role_id AND rp.is_active = true
+      LEFT JOIN permissions p ON rp.permission_id = p.permission_id AND p.is_active = true
+      WHERE u.user_id = $1 AND u.status = 'Active'
+      GROUP BY u.id, u.user_id, u.username, u.email, u.first_name, u.last_name, 
+               u.display_name, u.department, u.job_title, u.status, u.created_at
+    `;
+
+    const userResult = await pool.query(userQuery, [decoded.userId]);
+    
+    if (userResult.rows.length > 0) {
+      const user = userResult.rows[0];
+      req.user = {
+        ...user,
+        sessionId: decoded.sessionId,
+        roles: user.roles.filter(r => r !== null),
+        permissions: user.permissions.filter(p => p !== null)
+      };
+    } else {
+      req.user = null;
+    }
+
+    next();
+  } catch (error) {
+    // If optional auth fails, just continue without user
+    req.user = null;
+    next();
+  }
+};
+
+/**
  * Utility function to generate JWT tokens
  */
 function generateTokens(userId, sessionId) {
@@ -297,6 +359,11 @@ module.exports = {
   requireRoles,
   logActivity,
   logUserActivity,
+  requireAdmin,
+  requireSuperAdmin,
+  logActivity,
+  logUserActivity,
+  optionalAuth,
   generateTokens,
   verifyRefreshToken
 };
