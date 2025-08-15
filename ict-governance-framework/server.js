@@ -1,5 +1,5 @@
 // File: ict-governance-framework/server.js
-// Simple Express server to serve the Defender Activities API route
+// Express server for the ICT Governance Framework with user management
 
 const express = require('express');
 const cors = require('cors');

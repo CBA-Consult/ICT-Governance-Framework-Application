@@ -357,6 +357,8 @@ module.exports = {
   authenticateToken,
   requirePermissions,
   requireRoles,
+  logActivity,
+  logUserActivity,
   requireAdmin,
   requireSuperAdmin,
   logActivity,
