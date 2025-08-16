@@ -156,6 +156,13 @@ Then assign the super_admin role using the SQL command above.
 - Bulk user operations
 - User status management (Active, Inactive, Suspended, Pending)
 
+### **Document & Policy Management**
+- Comprehensive document management with version control
+- Approval workflows for governance documents
+- Document categorization and metadata management
+- Advanced search and filtering capabilities
+- Document relationships and compliance tracking
+
 ### **Activity Logging & Audit Trail**
 - Comprehensive user activity logging
 - API request/response tracking
@@ -211,6 +218,23 @@ Then assign the super_admin role using the SQL command above.
 - `DELETE /api/users/:userId` - Deactivate user
 - `POST /api/users/:userId/roles` - Assign roles to user
 - `DELETE /api/users/:userId/roles/:roleId` - Remove role from user
+
+### Document Management Endpoints
+- `GET /api/documents` - List documents with filtering and pagination
+- `GET /api/documents/categories` - Get document categories
+- `GET /api/documents/:id` - Get specific document with versions
+- `POST /api/documents` - Create new document
+- `PUT /api/documents/:id` - Update document
+- `DELETE /api/documents/:id` - Delete document
+- `POST /api/documents/:id/versions` - Create new version
+
+### Workflow Management Endpoints
+- `GET /api/document-workflows` - List workflows with filtering
+- `GET /api/document-workflows/:id` - Get specific workflow with steps
+- `POST /api/document-workflows` - Create new approval workflow
+- `POST /api/document-workflows/:id/approve/:stepId` - Approve/reject workflow step
+- `DELETE /api/document-workflows/:id` - Cancel workflow
+- `GET /api/document-workflows/my-tasks` - Get tasks assigned to current user
 
 ### Role Management Endpoints
 - `GET /api/roles` - List roles
