@@ -11,6 +11,7 @@ import {
   UserCircleIcon,
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
+import NotificationCenter from './NotificationCenter';
 
 export default function Header() {
   const { isAuthenticated, user, logout, hasPermission, hasRole } = useAuth();
@@ -100,6 +101,16 @@ export default function Header() {
                   </Link>
                 )}
 
+                {hasPermission('alert.read') && (
+                  <Link href="/alerts" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                    Alerts
+                  </Link>
+                )}
+
+                <Link href="/notifications" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  Notifications
+                </Link>
+
                 {hasPermission('feedback.create') && (
                   <>
                     <Link href="/feedback" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
@@ -126,6 +137,9 @@ export default function Header() {
                 )}
               </nav>
             )}
+
+            {/* Notification Center */}
+            {isAuthenticated && <NotificationCenter />}
 
             {/* User Menu or Login Button */}
             {isAuthenticated ? (
