@@ -65,6 +65,18 @@ export default function Header() {
                   </Link>
                 )}
 
+                {hasPermission('document.read') && (
+                  <Link href="/documents" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                    Documents
+                  </Link>
+                )}
+
+                {hasPermission('workflow.approve') && (
+                  <Link href="/workflows" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                    Workflows
+                  </Link>
+                )}
+
                 {hasPermission('governance.read') && (
                   <Link href="/blueprints" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                     Blueprints
@@ -239,6 +251,18 @@ export default function Header() {
                     Blueprints
                   </Link>
                 </>
+              )}
+
+              {hasPermission('document.read') && (
+                <Link href="/documents" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  Documents
+                </Link>
+              )}
+
+              {hasPermission('workflow.approve') && (
+                <Link href="/workflows" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  Workflows
+                </Link>
               )}
 
               {hasPermission('compliance.read') && (

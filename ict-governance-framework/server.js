@@ -22,6 +22,10 @@ const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
 const rolesRouter = require('./api/roles');
 
+// Import document management API routes
+const documentsRouter = require('./api/documents');
+const documentWorkflowsRouter = require('./api/document-workflows');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -69,6 +73,10 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/roles', rolesRouter);
 
+// Document management routes
+app.use('/api/documents', documentsRouter);
+app.use('/api/document-workflows', documentWorkflowsRouter);
+
 // Existing application routes
 app.use('/api/defender-activities', defenderActivitiesRoute);
 app.use('/api/defender-entities', defenderEntitiesRouter);
@@ -86,7 +94,9 @@ app.get('/api/health', (req, res) => res.json({
   services: {
     database: 'connected',
     authentication: 'enabled',
-    userManagement: 'enabled'
+    userManagement: 'enabled',
+    documentManagement: 'enabled',
+    workflowEngine: 'enabled'
   }
 }));
 

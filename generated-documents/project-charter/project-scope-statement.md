@@ -320,6 +320,66 @@ This scope statement supports the achievement of all eight project objectives de
 
 ### 6.1 Scope Change Control Process
 
+### 3. PROJECT EXCLUSIONS
+
+#### 3.1 Explicit Scope Exclusions
+
+The following items are explicitly excluded from the ICT Governance Framework project scope:
+
+##### 3.1.1 Technical Exclusions
+- **Legacy System Replacement**: Migration or replacement of existing legacy systems not directly related to governance
+- **Hardware Procurement**: Purchase of new physical hardware infrastructure (servers, networking equipment)
+- **Network Infrastructure Changes**: Modifications to core network architecture or WAN/LAN infrastructure
+- **Desktop/Endpoint Management**: End-user device management, desktop standardization, or endpoint security solutions
+- **Telecommunications Systems**: Voice, video conferencing, or unified communications platform changes
+- **Physical Security Systems**: Access control systems, CCTV, or physical security infrastructure
+
+##### 3.1.2 Functional Exclusions
+- **Financial System Integration**: Direct integration with ERP, accounting, or financial management systems
+- **HR System Integration**: Integration with HRIS, payroll, or employee management systems beyond user provisioning
+- **Customer-Facing Applications**: Development or modification of customer portals, e-commerce, or public websites
+- **Business Process Reengineering**: Fundamental changes to business processes outside of IT governance
+- **Organizational Restructuring**: Changes to organizational structure, reporting relationships, or job roles
+- **Vendor Contract Renegotiation**: Renegotiation of existing vendor contracts or service agreements
+
+##### 3.1.3 Operational Exclusions
+- **24/7 Support Services**: Establishment of round-the-clock support operations
+- **Disaster Recovery Site Setup**: Physical disaster recovery site establishment or data center construction
+- **Backup System Replacement**: Replacement of existing backup and recovery infrastructure
+- **Performance Tuning**: Optimization of existing application or database performance
+- **Data Migration Projects**: Large-scale data migration from legacy systems
+- **User Training Programs**: Comprehensive end-user training beyond governance framework adoption
+
+##### 3.1.4 Compliance Exclusions
+- **Industry-Specific Compliance**: Specialized compliance requirements beyond general IT governance (e.g., HIPAA, PCI-DSS)
+- **International Regulations**: Compliance with regulations outside the organization's primary jurisdiction
+- **Legal System Integration**: Integration with legal case management or contract management systems
+- **Audit Firm Selection**: Selection or engagement of external audit firms
+- **Regulatory Reporting Automation**: Automated generation of regulatory reports beyond governance metrics
+
+##### 3.1.5 Strategic Exclusions
+- **Business Strategy Development**: Creation or modification of overall business strategy
+- **Market Analysis**: Competitive analysis or market research activities
+- **Merger & Acquisition Support**: IT due diligence or integration support for M&A activities
+- **Innovation Lab Setup**: Establishment of separate innovation or research facilities
+- **Partnership Agreements**: Negotiation of technology partnerships or joint ventures
+
+#### 3.2 Boundary Management
+
+##### 3.2.1 Interface Points
+- **Clear Handoff Procedures**: Defined processes for work that interfaces with excluded scope
+- **Dependency Management**: Tracking of dependencies on excluded scope items
+- **Communication Protocols**: Clear communication when excluded items impact project delivery
+- **Escalation Procedures**: Process for addressing scope boundary disputes
+
+##### 3.2.2 Future Consideration Items
+Items excluded from current scope but may be considered for future phases:
+- Advanced AI/ML governance capabilities
+- IoT device governance framework
+- Blockchain technology governance
+- Quantum computing readiness assessment
+- Extended reality (AR/VR) governance policies
+
 #### 6.1.1 Change Request Submission
 1. **Initiation:** Any stakeholder may submit a scope change request
 2. **Documentation:** Complete change request form with business justification

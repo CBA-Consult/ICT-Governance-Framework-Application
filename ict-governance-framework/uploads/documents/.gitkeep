@@ -1,0 +1,2 @@
+# This file ensures the uploads/documents directory is tracked by git
+# Uploaded document files will be stored in this directory

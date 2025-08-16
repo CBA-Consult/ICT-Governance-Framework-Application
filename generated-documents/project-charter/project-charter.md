@@ -159,6 +159,99 @@ Following the Framework Enhancement Plan, we have conducted a detailed analysis 
 - Delivery of enabling platforms (APIM, AKS, Data Platform) per roadmap.
 
 
+## Assumptions Log
+
+### Project Assumptions
+
+| Assumption ID | Assumption Description | Impact if False | Validation Method | Owner | Status |
+|---------------|------------------------|-----------------|-------------------|-------|--------|
+| **ASS-001** | Stakeholders will provide timely input and feedback during requirements gathering | Project delays, incomplete requirements | Regular stakeholder check-ins, formal sign-offs | Project Manager | Active |
+| **ASS-002** | Azure cloud infrastructure will remain stable and available during implementation | Implementation delays, additional costs | Azure service health monitoring, SLA reviews | IT Infrastructure Team | Active |
+| **ASS-003** | Existing IT staff have sufficient technical skills for framework adoption | Training costs, implementation delays | Skills assessment, training needs analysis | HR Manager | Active |
+| **ASS-004** | Regulatory requirements will remain stable during project duration | Scope changes, compliance gaps | Regular regulatory monitoring, legal reviews | Compliance Officer | Active |
+| **ASS-005** | Budget allocation of $1.275M will be approved and available | Project cannot proceed, scope reduction | Budget approval process, financial reviews | Finance Director | Active |
+| **ASS-006** | Third-party integrations (JIRA, Confluence) will remain compatible | Integration failures, additional development | Vendor roadmap reviews, compatibility testing | Technical Lead | Active |
+| **ASS-007** | Business stakeholders will adopt new governance processes | Low adoption, reduced ROI | Change management activities, user feedback | Change Manager | Active |
+| **ASS-008** | Current IT architecture can support the new governance framework | Performance issues, additional infrastructure costs | Architecture assessment, capacity planning | Enterprise Architect | Active |
+| **ASS-009** | Data quality in existing systems is sufficient for migration | Data cleanup costs, implementation delays | Data quality assessment, cleansing activities | Data Manager | Active |
+| **ASS-010** | Security policies will allow implementation of proposed solutions | Security delays, design changes | Security review process, policy validation | Security Officer | Active |
+
+### Assumption Management Process
+
+1. **Regular Review**: Assumptions reviewed bi-weekly during project status meetings
+2. **Validation Activities**: Specific validation methods executed as defined above
+3. **Impact Assessment**: If assumptions prove false, impact analysis conducted immediately
+4. **Mitigation Planning**: Contingency plans developed for high-risk assumptions
+5. **Stakeholder Communication**: Assumption changes communicated to all affected parties
+
+## Budget Summary
+
+### Project Investment Overview
+
+**Total Project Investment:** $1,275,000 over 15 months  
+**Expected Annual Value:** $2,300,000  
+**Net ROI:** 94% in Year 1, 180% annually thereafter
+
+### Budget Breakdown by Phase
+
+| Phase | Duration | Budget Allocation | Percentage | Key Activities |
+|-------|----------|------------------|------------|----------------|
+| **Phase 1: Initiation** | 4 weeks | $95,000 | 7.5% | Charter, stakeholder analysis, initial planning |
+| **Phase 2: Analysis & Design** | 12 weeks | $382,500 | 30% | Requirements, architecture, detailed design |
+| **Phase 3: Development** | 32 weeks | $637,500 | 50% | Platform development, integration, testing |
+| **Phase 4: Deployment** | 8 weeks | $127,500 | 10% | Production deployment, training, go-live |
+| **Phase 5: Closure** | 4 weeks | $32,500 | 2.5% | Documentation, lessons learned, handover |
+
+### Budget Breakdown by Category
+
+| Category | Amount | Percentage | Description |
+|----------|--------|------------|-------------|
+| **Personnel Costs** | $892,500 | 70% | Project team salaries, contractors, SME time |
+| **Technology & Licenses** | $191,250 | 15% | Software licenses, cloud services, tools |
+| **Training & Development** | $76,500 | 6% | Staff training, certification, knowledge transfer |
+| **External Services** | $63,750 | 5% | Consulting, specialized services, audits |
+| **Infrastructure** | $38,250 | 3% | Hardware, network, security infrastructure |
+| **Contingency** | $12,750 | 1% | Risk mitigation, unforeseen expenses |
+
+### Detailed Personnel Allocation
+
+| Role | FTE | Duration | Rate/Month | Total Cost |
+|------|-----|----------|------------|------------|
+| **Project Manager** | 1.0 | 15 months | $12,000 | $180,000 |
+| **Technical Lead** | 1.0 | 15 months | $15,000 | $225,000 |
+| **Senior Developers** | 2.0 | 12 months | $10,000 | $240,000 |
+| **Business Analysts** | 1.5 | 10 months | $8,000 | $120,000 |
+| **Security Specialist** | 0.5 | 8 months | $12,000 | $48,000 |
+| **UX/UI Designer** | 0.5 | 6 months | $9,000 | $27,000 |
+| **QA Engineers** | 1.0 | 8 months | $7,500 | $60,000 |
+| **DevOps Engineer** | 0.5 | 10 months | $11,000 | $55,000 |
+
+### Technology & Infrastructure Costs
+
+| Item | Cost | Duration | Total |
+|------|------|----------|-------|
+| **Azure Cloud Services** | $8,000/month | 15 months | $120,000 |
+| **Development Tools & Licenses** | $15,000 | One-time | $15,000 |
+| **Security & Monitoring Tools** | $3,000/month | 15 months | $45,000 |
+| **Integration Platform Licenses** | $750/month | 15 months | $11,250 |
+
+### Value Realization Timeline
+
+| Year | Investment | Annual Value | Cumulative ROI |
+|------|------------|--------------|----------------|
+| **Year 0** | $1,275,000 | $0 | -100% |
+| **Year 1** | $0 | $2,300,000 | 80% |
+| **Year 2** | $0 | $2,300,000 | 260% |
+| **Year 3** | $0 | $2,300,000 | 440% |
+
+### Budget Control Measures
+
+1. **Monthly Budget Reviews**: Track actual vs. planned expenditure
+2. **Change Control Process**: All budget changes require formal approval
+3. **Contingency Management**: 1% contingency for unforeseen expenses
+4. **Vendor Management**: Competitive bidding for external services
+5. **Cost Optimization**: Regular review of cloud and license costs
+
 ## Project Deliverables
 
 | Deliverable | Description | Acceptance Criteria |
