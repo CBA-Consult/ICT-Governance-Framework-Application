@@ -731,3 +731,280 @@ CREATE INDEX IF NOT EXISTS idx_user_activity_log_success ON user_activity_log(su
 
 CREATE INDEX IF NOT EXISTS idx_password_history_user_id ON password_history(user_id);
 CREATE INDEX IF NOT EXISTS idx_password_history_created_at ON password_history(created_at);
+
+-- Document and Policy Management System Tables
+
+-- Document categories table
+CREATE TABLE IF NOT EXISTS document_categories (
+    id SERIAL PRIMARY KEY,
+    category_id VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    parent_category_id VARCHAR(50),
+    color VARCHAR(20) DEFAULT 'gray',
+    icon VARCHAR(50) DEFAULT 'DocumentTextIcon',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_category_id) REFERENCES document_categories(category_id)
+);
+
+-- Documents table - main document registry
+CREATE TABLE IF NOT EXISTS documents (
+    id SERIAL PRIMARY KEY,
+    document_id VARCHAR(50) UNIQUE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    category_id VARCHAR(50) NOT NULL,
+    document_type VARCHAR(50) NOT NULL CHECK (document_type IN ('Policy', 'Procedure', 'Standard', 'Guideline', 'Template', 'Form', 'Manual', 'Report')),
+    status VARCHAR(20) DEFAULT 'Draft' CHECK (status IN ('Draft', 'Under Review', 'Approved', 'Published', 'Archived', 'Deprecated')),
+    priority VARCHAR(20) DEFAULT 'Medium' CHECK (priority IN ('Critical', 'High', 'Medium', 'Low')),
+    owner_user_id VARCHAR(50) NOT NULL,
+    approver_user_id VARCHAR(50),
+    tags JSONB DEFAULT '[]',
+    metadata JSONB DEFAULT '{}',
+    compliance_frameworks JSONB DEFAULT '[]',
+    review_frequency_months INTEGER DEFAULT 12,
+    next_review_date DATE,
+    effective_date DATE,
+    expiry_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES document_categories(category_id),
+    FOREIGN KEY (owner_user_id) REFERENCES users(user_id),
+    FOREIGN KEY (approver_user_id) REFERENCES users(user_id)
+);
+
+-- Document versions table - version control
+CREATE TABLE IF NOT EXISTS document_versions (
+    id SERIAL PRIMARY KEY,
+    version_id VARCHAR(50) UNIQUE NOT NULL,
+    document_id VARCHAR(50) NOT NULL,
+    version_number VARCHAR(20) NOT NULL,
+    major_version INTEGER NOT NULL,
+    minor_version INTEGER NOT NULL,
+    patch_version INTEGER DEFAULT 0,
+    content TEXT NOT NULL,
+    content_type VARCHAR(50) DEFAULT 'markdown',
+    file_path VARCHAR(500),
+    file_size BIGINT,
+    file_hash VARCHAR(128),
+    change_summary TEXT,
+    change_type VARCHAR(20) DEFAULT 'Minor' CHECK (change_type IN ('Major', 'Minor', 'Patch', 'Emergency')),
+    created_by VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_current BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (document_id) REFERENCES documents(document_id),
+    FOREIGN KEY (created_by) REFERENCES users(user_id),
+    UNIQUE(document_id, version_number)
+);
+
+-- Document approval workflows
+CREATE TABLE IF NOT EXISTS document_approval_workflows (
+    id SERIAL PRIMARY KEY,
+    workflow_id VARCHAR(50) UNIQUE NOT NULL,
+    document_id VARCHAR(50) NOT NULL,
+    version_id VARCHAR(50) NOT NULL,
+    workflow_type VARCHAR(50) DEFAULT 'Standard' CHECK (workflow_type IN ('Standard', 'Fast-Track', 'Emergency', 'Collaborative')),
+    status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'In Progress', 'Approved', 'Rejected', 'Cancelled')),
+    initiated_by VARCHAR(50) NOT NULL,
+    initiated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP,
+    due_date TIMESTAMP,
+    priority VARCHAR(20) DEFAULT 'Medium' CHECK (priority IN ('Critical', 'High', 'Medium', 'Low')),
+    approval_steps JSONB DEFAULT '[]',
+    current_step INTEGER DEFAULT 1,
+    comments TEXT,
+    FOREIGN KEY (document_id) REFERENCES documents(document_id),
+    FOREIGN KEY (version_id) REFERENCES document_versions(version_id),
+    FOREIGN KEY (initiated_by) REFERENCES users(user_id)
+);
+
+-- Document approval steps
+CREATE TABLE IF NOT EXISTS document_approval_steps (
+    id SERIAL PRIMARY KEY,
+    step_id VARCHAR(50) UNIQUE NOT NULL,
+    workflow_id VARCHAR(50) NOT NULL,
+    step_number INTEGER NOT NULL,
+    step_name VARCHAR(100) NOT NULL,
+    approver_user_id VARCHAR(50),
+    approver_role VARCHAR(100),
+    approval_type VARCHAR(20) DEFAULT 'Required' CHECK (approval_type IN ('Required', 'Optional', 'Informational')),
+    status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected', 'Skipped')),
+    approved_at TIMESTAMP,
+    comments TEXT,
+    due_date TIMESTAMP,
+    FOREIGN KEY (workflow_id) REFERENCES document_approval_workflows(workflow_id),
+    FOREIGN KEY (approver_user_id) REFERENCES users(user_id)
+);
+
+-- Document access permissions
+CREATE TABLE IF NOT EXISTS document_permissions (
+    id SERIAL PRIMARY KEY,
+    document_id VARCHAR(50) NOT NULL,
+    permission_type VARCHAR(20) NOT NULL CHECK (permission_type IN ('Read', 'Write', 'Approve', 'Admin')),
+    granted_to_type VARCHAR(20) NOT NULL CHECK (granted_to_type IN ('User', 'Role', 'Department')),
+    granted_to_id VARCHAR(50) NOT NULL,
+    granted_by VARCHAR(50) NOT NULL,
+    granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    FOREIGN KEY (document_id) REFERENCES documents(document_id),
+    FOREIGN KEY (granted_by) REFERENCES users(user_id),
+    UNIQUE(document_id, permission_type, granted_to_type, granted_to_id)
+);
+
+-- Document activity log
+CREATE TABLE IF NOT EXISTS document_activity_log (
+    id SERIAL PRIMARY KEY,
+    activity_id VARCHAR(50) UNIQUE NOT NULL,
+    document_id VARCHAR(50) NOT NULL,
+    version_id VARCHAR(50),
+    activity_type VARCHAR(50) NOT NULL,
+    description TEXT,
+    user_id VARCHAR(50) NOT NULL,
+    ip_address INET,
+    user_agent TEXT,
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (document_id) REFERENCES documents(document_id),
+    FOREIGN KEY (version_id) REFERENCES document_versions(version_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- Document relationships (for linking related documents)
+CREATE TABLE IF NOT EXISTS document_relationships (
+    id SERIAL PRIMARY KEY,
+    source_document_id VARCHAR(50) NOT NULL,
+    target_document_id VARCHAR(50) NOT NULL,
+    relationship_type VARCHAR(50) NOT NULL CHECK (relationship_type IN ('References', 'Supersedes', 'Supplements', 'Depends On', 'Related To')),
+    created_by VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (source_document_id) REFERENCES documents(document_id),
+    FOREIGN KEY (target_document_id) REFERENCES documents(document_id),
+    FOREIGN KEY (created_by) REFERENCES users(user_id),
+    UNIQUE(source_document_id, target_document_id, relationship_type)
+);
+
+-- Document comments and reviews
+CREATE TABLE IF NOT EXISTS document_comments (
+    id SERIAL PRIMARY KEY,
+    comment_id VARCHAR(50) UNIQUE NOT NULL,
+    document_id VARCHAR(50) NOT NULL,
+    version_id VARCHAR(50),
+    parent_comment_id VARCHAR(50),
+    comment_text TEXT NOT NULL,
+    comment_type VARCHAR(20) DEFAULT 'General' CHECK (comment_type IN ('General', 'Review', 'Suggestion', 'Issue', 'Approval')),
+    line_number INTEGER,
+    section_reference VARCHAR(100),
+    status VARCHAR(20) DEFAULT 'Open' CHECK (status IN ('Open', 'Addressed', 'Resolved', 'Dismissed')),
+    created_by VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (document_id) REFERENCES documents(document_id),
+    FOREIGN KEY (version_id) REFERENCES document_versions(version_id),
+    FOREIGN KEY (parent_comment_id) REFERENCES document_comments(comment_id),
+    FOREIGN KEY (created_by) REFERENCES users(user_id)
+);
+
+-- Insert default document categories
+INSERT INTO document_categories (category_id, name, description, color, icon) VALUES
+('POLICY', 'Policies', 'Organizational policies and governance documents', 'blue', 'ShieldCheckIcon'),
+('PROCEDURE', 'Procedures', 'Step-by-step operational procedures', 'green', 'DocumentTextIcon'),
+('STANDARD', 'Standards', 'Technical and operational standards', 'purple', 'CogIcon'),
+('GUIDELINE', 'Guidelines', 'Best practices and guidelines', 'yellow', 'LightBulbIcon'),
+('TEMPLATE', 'Templates', 'Document and form templates', 'indigo', 'DocumentDuplicateIcon'),
+('MANUAL', 'Manuals', 'User and technical manuals', 'red', 'BookOpenIcon'),
+('COMPLIANCE', 'Compliance', 'Regulatory and compliance documents', 'orange', 'ScaleIcon'),
+('SECURITY', 'Security', 'Security policies and procedures', 'red', 'LockClosedIcon'),
+('HR', 'Human Resources', 'HR policies and procedures', 'pink', 'UserGroupIcon'),
+('IT', 'Information Technology', 'IT policies and technical documentation', 'cyan', 'ComputerDesktopIcon')
+ON CONFLICT (category_id) DO NOTHING;
+
+-- Insert default document permissions for roles
+INSERT INTO permissions (permission_id, name, description, category) VALUES
+('document.read', 'Read Documents', 'View and read documents', 'Document Management'),
+('document.create', 'Create Documents', 'Create new documents', 'Document Management'),
+('document.edit', 'Edit Documents', 'Edit existing documents', 'Document Management'),
+('document.delete', 'Delete Documents', 'Delete documents', 'Document Management'),
+('document.approve', 'Approve Documents', 'Approve document versions', 'Document Management'),
+('document.publish', 'Publish Documents', 'Publish approved documents', 'Document Management'),
+('document.admin', 'Document Administration', 'Full document management administration', 'Document Management'),
+('version.create', 'Create Versions', 'Create new document versions', 'Version Control'),
+('version.compare', 'Compare Versions', 'Compare document versions', 'Version Control'),
+('workflow.initiate', 'Initiate Workflows', 'Start approval workflows', 'Workflow Management'),
+('workflow.approve', 'Approve in Workflows', 'Approve documents in workflows', 'Workflow Management'),
+('workflow.admin', 'Workflow Administration', 'Manage approval workflows', 'Workflow Management')
+ON CONFLICT (permission_id) DO NOTHING;
+
+-- Grant document permissions to existing roles
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+-- Admin gets all document permissions
+('ADMIN', 'document.read'),
+('ADMIN', 'document.create'),
+('ADMIN', 'document.edit'),
+('ADMIN', 'document.delete'),
+('ADMIN', 'document.approve'),
+('ADMIN', 'document.publish'),
+('ADMIN', 'document.admin'),
+('ADMIN', 'version.create'),
+('ADMIN', 'version.compare'),
+('ADMIN', 'workflow.initiate'),
+('ADMIN', 'workflow.approve'),
+('ADMIN', 'workflow.admin'),
+
+-- IT Manager gets most document permissions
+('IT_MANAGER', 'document.read'),
+('IT_MANAGER', 'document.create'),
+('IT_MANAGER', 'document.edit'),
+('IT_MANAGER', 'document.approve'),
+('IT_MANAGER', 'document.publish'),
+('IT_MANAGER', 'version.create'),
+('IT_MANAGER', 'version.compare'),
+('IT_MANAGER', 'workflow.initiate'),
+('IT_MANAGER', 'workflow.approve'),
+
+-- Employee gets basic document permissions
+('EMPLOYEE', 'document.read'),
+('EMPLOYEE', 'document.create'),
+('EMPLOYEE', 'version.compare'),
+
+-- Auditor gets read and compare permissions
+('AUDITOR', 'document.read'),
+('AUDITOR', 'version.compare')
+ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+-- Create indexes for document management tables
+CREATE INDEX IF NOT EXISTS idx_documents_category_id ON documents(category_id);
+CREATE INDEX IF NOT EXISTS idx_documents_status ON documents(status);
+CREATE INDEX IF NOT EXISTS idx_documents_owner_user_id ON documents(owner_user_id);
+CREATE INDEX IF NOT EXISTS idx_documents_document_type ON documents(document_type);
+CREATE INDEX IF NOT EXISTS idx_documents_next_review_date ON documents(next_review_date);
+CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_document_versions_document_id ON document_versions(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_versions_is_current ON document_versions(is_current);
+CREATE INDEX IF NOT EXISTS idx_document_versions_created_by ON document_versions(created_by);
+CREATE INDEX IF NOT EXISTS idx_document_versions_created_at ON document_versions(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_document_approval_workflows_document_id ON document_approval_workflows(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_approval_workflows_status ON document_approval_workflows(status);
+CREATE INDEX IF NOT EXISTS idx_document_approval_workflows_initiated_by ON document_approval_workflows(initiated_by);
+
+CREATE INDEX IF NOT EXISTS idx_document_approval_steps_workflow_id ON document_approval_steps(workflow_id);
+CREATE INDEX IF NOT EXISTS idx_document_approval_steps_approver_user_id ON document_approval_steps(approver_user_id);
+CREATE INDEX IF NOT EXISTS idx_document_approval_steps_status ON document_approval_steps(status);
+
+CREATE INDEX IF NOT EXISTS idx_document_permissions_document_id ON document_permissions(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_permissions_granted_to ON document_permissions(granted_to_type, granted_to_id);
+
+CREATE INDEX IF NOT EXISTS idx_document_activity_log_document_id ON document_activity_log(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_activity_log_user_id ON document_activity_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_document_activity_log_activity_type ON document_activity_log(activity_type);
+CREATE INDEX IF NOT EXISTS idx_document_activity_log_created_at ON document_activity_log(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_document_relationships_source ON document_relationships(source_document_id);
+CREATE INDEX IF NOT EXISTS idx_document_relationships_target ON document_relationships(target_document_id);
+
+CREATE INDEX IF NOT EXISTS idx_document_comments_document_id ON document_comments(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_comments_version_id ON document_comments(version_id);
+CREATE INDEX IF NOT EXISTS idx_document_comments_created_by ON document_comments(created_by);
+CREATE INDEX IF NOT EXISTS idx_document_comments_status ON document_comments(status);
