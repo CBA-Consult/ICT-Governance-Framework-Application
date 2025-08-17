@@ -33,6 +33,12 @@ const rolesRouter = require('./api/roles');
 const documentsRouter = require('./api/documents');
 const documentWorkflowsRouter = require('./api/document-workflows');
 
+// Import data collection and processing API routes
+const dataCollectionRouter = require('./api/data-collection');
+const dataProcessingRouter = require('./api/data-processing');
+const reportingRouter = require('./api/reporting');
+const dataAnalyticsRouter = require('./api/data-analytics');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -100,6 +106,12 @@ app.use('/api/communication', communicationRouter);
 app.use('/api/realtime', realtimeNotificationsRouter);
 app.use('/api/escalation-management', escalationManagementRouter);
 
+// Data collection and processing routes
+app.use('/api/data-collection', dataCollectionRouter);
+app.use('/api/data-processing', dataProcessingRouter);
+app.use('/api/reporting', reportingRouter);
+app.use('/api/data-analytics', dataAnalyticsRouter);
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ 
   status: 'ok',
@@ -115,7 +127,11 @@ app.get('/api/health', (req, res) => res.json({
     alerts: 'enabled',
     communication: 'enabled',
     realtimeNotifications: 'enabled',
-    escalationManagement: 'enabled'
+    escalationManagement: 'enabled',
+    dataCollection: 'enabled',
+    dataProcessing: 'enabled',
+    reporting: 'enabled',
+    dataAnalytics: 'enabled'
   }
 }));
 
