@@ -111,6 +111,24 @@ export default function Header() {
                   Notifications
                 </Link>
 
+                {hasPermission('data_collection_read') && (
+                  <Link href="/data-collection" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                    Data Collection
+                  </Link>
+                )}
+
+                {hasPermission('reporting_read') && (
+                  <Link href="/reporting" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                    Reports
+                  </Link>
+                )}
+
+                {hasPermission('data_analytics_read') && (
+                  <Link href="/analytics" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                    Analytics
+                  </Link>
+                )}
+
                 {hasPermission('feedback.create') && (
                   <>
                     <Link href="/feedback" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
@@ -288,6 +306,24 @@ export default function Header() {
                     Compliance Dashboard
                   </Link>
                 </>
+              )}
+
+              {hasPermission('data_collection_read') && (
+                <Link href="/data-collection" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  Data Collection
+                </Link>
+              )}
+
+              {hasPermission('reporting_read') && (
+                <Link href="/reporting" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  Reports
+                </Link>
+              )}
+
+              {hasPermission('data_analytics_read') && (
+                <Link href="/analytics" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  Analytics
+                </Link>
               )}
 
               {hasPermission('feedback.create') && (
