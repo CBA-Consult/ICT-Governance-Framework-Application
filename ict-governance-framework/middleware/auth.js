@@ -263,7 +263,7 @@ async function logUserActivity(req, activityType, description, success = true, r
       ipAddress,
       userAgent,
       JSON.stringify(requestData),
-      res.statusCode,
+  (req.res ? req.res.statusCode : (req.statusCode || 200)),
       success,
       success ? null : (responseData?.error || 'Unknown error')
     ];

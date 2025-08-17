@@ -935,21 +935,20 @@ INSERT INTO permissions (permission_id, name, description, category) VALUES
 ('workflow.admin', 'Workflow Administration', 'Manage approval workflows', 'Workflow Management')
 ON CONFLICT (permission_id) DO NOTHING;
 
--- Grant document permissions to existing roles
 INSERT INTO role_permissions (role_id, permission_id) VALUES
--- Admin gets all document permissions
-('ADMIN', 'document.read'),
-('ADMIN', 'document.create'),
-('ADMIN', 'document.edit'),
-('ADMIN', 'document.delete'),
-('ADMIN', 'document.approve'),
-('ADMIN', 'document.publish'),
-('ADMIN', 'document.admin'),
-('ADMIN', 'version.create'),
-('ADMIN', 'version.compare'),
-('ADMIN', 'workflow.initiate'),
-('ADMIN', 'workflow.approve'),
-('ADMIN', 'workflow.admin'),
+-- Super Admin gets all document permissions
+('ROLE_SUPER_ADMIN', 'document.read'),
+('ROLE_SUPER_ADMIN', 'document.create'),
+('ROLE_SUPER_ADMIN', 'document.edit'),
+('ROLE_SUPER_ADMIN', 'document.delete'),
+('ROLE_SUPER_ADMIN', 'document.approve'),
+('ROLE_SUPER_ADMIN', 'document.publish'),
+('ROLE_SUPER_ADMIN', 'document.admin'),
+('ROLE_SUPER_ADMIN', 'version.create'),
+('ROLE_SUPER_ADMIN', 'version.compare'),
+('ROLE_SUPER_ADMIN', 'workflow.initiate'),
+('ROLE_SUPER_ADMIN', 'workflow.approve'),
+('ROLE_SUPER_ADMIN', 'workflow.admin'),
 
 -- IT Manager gets most document permissions
 ('IT_MANAGER', 'document.read'),

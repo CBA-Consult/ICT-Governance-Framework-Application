@@ -2,7 +2,8 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }
 const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
-const { authenticateToken, requirePermission } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissions');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });

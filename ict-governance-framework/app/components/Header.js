@@ -67,8 +67,8 @@ export default function Header() {
                 )}
 
                 {hasPermission('document.read') && (
-                  <Link href="/documents" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                    Documents
+                  <Link href="/documents" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                    Document Management System
                   </Link>
                 )}
 
