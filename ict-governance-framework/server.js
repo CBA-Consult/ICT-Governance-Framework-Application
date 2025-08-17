@@ -17,6 +17,13 @@ const defenderDataEnrichmentRouter = require('./api/defender-dataenrichment');
 const feedbackRouter = require('./api/feedback');
 const escalationsRouter = require('./api/escalations');
 
+// Import notification and communication API routes
+const notificationsRouter = require('./api/notifications');
+const alertsRouter = require('./api/alerts');
+const communicationRouter = require('./api/communication');
+const realtimeNotificationsRouter = require('./api/realtime-notifications');
+const escalationManagementRouter = require('./api/escalation-management');
+
 // Import new user management API routes
 const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
@@ -86,6 +93,13 @@ app.use('/api/defender-dataenrichment', defenderDataEnrichmentRouter);
 app.use('/api/feedback', feedbackRouter);
 app.use('/api/escalations', escalationsRouter);
 
+// Notification and communication routes
+app.use('/api/notifications', notificationsRouter);
+app.use('/api/alerts', alertsRouter);
+app.use('/api/communication', communicationRouter);
+app.use('/api/realtime', realtimeNotificationsRouter);
+app.use('/api/escalation-management', escalationManagementRouter);
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ 
   status: 'ok',
@@ -96,7 +110,12 @@ app.get('/api/health', (req, res) => res.json({
     authentication: 'enabled',
     userManagement: 'enabled',
     documentManagement: 'enabled',
-    workflowEngine: 'enabled'
+    workflowEngine: 'enabled',
+    notifications: 'enabled',
+    alerts: 'enabled',
+    communication: 'enabled',
+    realtimeNotifications: 'enabled',
+    escalationManagement: 'enabled'
   }
 }));
 
