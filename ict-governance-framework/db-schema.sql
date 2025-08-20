@@ -148,6 +148,188 @@ CREATE INDEX IF NOT EXISTS idx_escalations_date ON escalations(escalation_date);
 -- );
 
 -- ============================================================================
+-- REPORTING SYSTEM TABLES
+-- ============================================================================
+
+-- Generated reports table - stores completed reports
+CREATE TABLE IF NOT EXISTS generated_reports (
+    report_id VARCHAR(50) PRIMARY KEY,
+    report_type VARCHAR(100) NOT NULL,
+    report_name VARCHAR(255),
+    report_data JSONB NOT NULL,
+    time_range_start TIMESTAMP,
+    time_range_end TIMESTAMP,
+    generated_by VARCHAR(50) REFERENCES users(user_id),
+    generation_options JSONB DEFAULT '{}',
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'generating', 'completed', 'failed')),
+    file_path VARCHAR(500),
+    file_size BIGINT,
+    export_format VARCHAR(20) DEFAULT 'json',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    download_count INTEGER DEFAULT 0,
+    is_scheduled BOOLEAN DEFAULT FALSE,
+    schedule_id VARCHAR(50),
+    tags TEXT[],
+    metadata JSONB DEFAULT '{}'
+);
+
+-- Custom report templates table - stores user-defined report templates
+CREATE TABLE IF NOT EXISTS custom_report_templates (
+    template_id VARCHAR(50) PRIMARY KEY,
+    template_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_by VARCHAR(50) REFERENCES users(user_id),
+    is_public BOOLEAN DEFAULT FALSE,
+    template_config JSONB NOT NULL,
+    data_sources TEXT[] NOT NULL,
+    visualization_config JSONB DEFAULT '{}',
+    filters_config JSONB DEFAULT '{}',
+    parameters_config JSONB DEFAULT '{}',
+    output_format VARCHAR(20) DEFAULT 'json',
+    category VARCHAR(100),
+    tags TEXT[],
+    version INTEGER DEFAULT 1,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_used_at TIMESTAMP,
+    usage_count INTEGER DEFAULT 0
+);
+
+-- Report schedules table - stores automated report generation schedules
+CREATE TABLE IF NOT EXISTS report_schedules (
+    schedule_id VARCHAR(50) PRIMARY KEY,
+    schedule_name VARCHAR(255) NOT NULL,
+    report_type VARCHAR(100),
+    template_id VARCHAR(50) REFERENCES custom_report_templates(template_id),
+    created_by VARCHAR(50) REFERENCES users(user_id),
+    recipients TEXT[] NOT NULL,
+    schedule_expression VARCHAR(100) NOT NULL, -- Cron expression
+    time_range_config JSONB NOT NULL,
+    generation_options JSONB DEFAULT '{}',
+    output_formats TEXT[] DEFAULT ARRAY['pdf'],
+    delivery_method VARCHAR(50) DEFAULT 'email',
+    delivery_config JSONB DEFAULT '{}',
+    is_active BOOLEAN DEFAULT TRUE,
+    next_run_at TIMESTAMP,
+    last_run_at TIMESTAMP,
+    last_run_status VARCHAR(20),
+    run_count INTEGER DEFAULT 0,
+    failure_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Metric data table - stores all metrics for reporting
+CREATE TABLE IF NOT EXISTS metric_data (
+    metric_id VARCHAR(50) PRIMARY KEY,
+    metric_name VARCHAR(255) NOT NULL,
+    metric_category VARCHAR(100) NOT NULL,
+    value DECIMAL(15,4) NOT NULL,
+    target_value DECIMAL(15,4),
+    unit VARCHAR(50),
+    data_source VARCHAR(100),
+    collection_timestamp TIMESTAMP NOT NULL,
+    collection_method VARCHAR(50),
+    metadata JSONB DEFAULT '{}',
+    tags TEXT[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(50) REFERENCES users(user_id)
+);
+
+-- Report sharing table - manages report access and sharing
+CREATE TABLE IF NOT EXISTS report_sharing (
+    sharing_id VARCHAR(50) PRIMARY KEY,
+    report_id VARCHAR(50) REFERENCES generated_reports(report_id) ON DELETE CASCADE,
+    shared_by VARCHAR(50) REFERENCES users(user_id),
+    shared_with VARCHAR(50) REFERENCES users(user_id),
+    share_type VARCHAR(20) DEFAULT 'view' CHECK (share_type IN ('view', 'download', 'edit')),
+    expires_at TIMESTAMP,
+    access_count INTEGER DEFAULT 0,
+    last_accessed_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Report comments table - allows commenting on reports
+CREATE TABLE IF NOT EXISTS report_comments (
+    comment_id VARCHAR(50) PRIMARY KEY,
+    report_id VARCHAR(50) REFERENCES generated_reports(report_id) ON DELETE CASCADE,
+    user_id VARCHAR(50) REFERENCES users(user_id),
+    comment_text TEXT NOT NULL,
+    parent_comment_id VARCHAR(50) REFERENCES report_comments(comment_id),
+    is_resolved BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Report bookmarks table - allows users to bookmark reports
+CREATE TABLE IF NOT EXISTS report_bookmarks (
+    bookmark_id VARCHAR(50) PRIMARY KEY,
+    user_id VARCHAR(50) REFERENCES users(user_id),
+    report_id VARCHAR(50) REFERENCES generated_reports(report_id) ON DELETE CASCADE,
+    bookmark_name VARCHAR(255),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, report_id)
+);
+
+-- Create indexes for reporting system performance
+CREATE INDEX IF NOT EXISTS idx_generated_reports_type ON generated_reports(report_type);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_status ON generated_reports(status);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_created_by ON generated_reports(generated_by);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_created_at ON generated_reports(created_at);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_time_range ON generated_reports(time_range_start, time_range_end);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_tags ON generated_reports USING GIN(tags);
+
+CREATE INDEX IF NOT EXISTS idx_custom_report_templates_created_by ON custom_report_templates(created_by);
+CREATE INDEX IF NOT EXISTS idx_custom_report_templates_category ON custom_report_templates(category);
+CREATE INDEX IF NOT EXISTS idx_custom_report_templates_is_public ON custom_report_templates(is_public);
+CREATE INDEX IF NOT EXISTS idx_custom_report_templates_tags ON custom_report_templates USING GIN(tags);
+
+CREATE INDEX IF NOT EXISTS idx_report_schedules_next_run ON report_schedules(next_run_at);
+CREATE INDEX IF NOT EXISTS idx_report_schedules_is_active ON report_schedules(is_active);
+CREATE INDEX IF NOT EXISTS idx_report_schedules_created_by ON report_schedules(created_by);
+
+CREATE INDEX IF NOT EXISTS idx_metric_data_name_category ON metric_data(metric_name, metric_category);
+CREATE INDEX IF NOT EXISTS idx_metric_data_collection_timestamp ON metric_data(collection_timestamp);
+CREATE INDEX IF NOT EXISTS idx_metric_data_category ON metric_data(metric_category);
+CREATE INDEX IF NOT EXISTS idx_metric_data_tags ON metric_data USING GIN(tags);
+
+CREATE INDEX IF NOT EXISTS idx_report_sharing_report_id ON report_sharing(report_id);
+CREATE INDEX IF NOT EXISTS idx_report_sharing_shared_with ON report_sharing(shared_with);
+
+-- Insert sample metric data for reporting
+INSERT INTO metric_data (metric_id, metric_name, metric_category, value, target_value, unit, data_source, collection_timestamp, collection_method, metadata, tags) VALUES
+-- Governance KPIs
+('MET-001', 'governance_maturity_level', 'kpi', 3.5, 4.0, 'score', 'governance_assessment', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"assessment_type": "quarterly"}', ARRAY['governance', 'maturity']),
+('MET-002', 'policy_compliance_rate', 'compliance', 85.5, 95.0, 'percentage', 'compliance_monitor', CURRENT_TIMESTAMP - INTERVAL '2 days', 'automated', '{"policy_count": 25}', ARRAY['compliance', 'policy']),
+('MET-003', 'overall_risk_score', 'risk', 6.2, 4.0, 'score', 'risk_assessment', CURRENT_TIMESTAMP - INTERVAL '1 day', 'manual', '{"risk_factors": 15}', ARRAY['risk', 'assessment']),
+('MET-004', 'stakeholder_satisfaction', 'kpi', 78.0, 85.0, 'percentage', 'survey_system', CURRENT_TIMESTAMP - INTERVAL '3 days', 'survey', '{"response_rate": 65}', ARRAY['stakeholder', 'satisfaction']),
+('MET-005', 'business_value_realization', 'financial', 1250000, 1500000, 'currency', 'financial_system', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"currency": "USD"}', ARRAY['financial', 'value']),
+
+-- Compliance Metrics
+('MET-006', 'security_policy_compliance', 'compliance', 92.0, 98.0, 'percentage', 'security_monitor', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"controls_checked": 45}', ARRAY['security', 'compliance']),
+('MET-007', 'privacy_policy_compliance', 'compliance', 88.5, 95.0, 'percentage', 'privacy_monitor', CURRENT_TIMESTAMP - INTERVAL '2 days', 'automated', '{"data_subjects": 1250}', ARRAY['privacy', 'compliance']),
+('MET-008', 'operational_policy_compliance', 'compliance', 76.0, 90.0, 'percentage', 'ops_monitor', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"processes_checked": 32}', ARRAY['operational', 'compliance']),
+
+-- Risk Metrics
+('MET-009', 'cloud_security_risk', 'risk', 7.5, 5.0, 'score', 'cloud_monitor', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"cloud_services": 15}', ARRAY['cloud', 'security', 'risk']),
+('MET-010', 'vendor_risk', 'risk', 6.8, 4.0, 'score', 'vendor_assessment', CURRENT_TIMESTAMP - INTERVAL '2 days', 'manual', '{"vendor_count": 25}', ARRAY['vendor', 'risk']),
+('MET-011', 'data_breach_risk', 'risk', 4.2, 3.0, 'score', 'security_assessment', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"data_assets": 150}', ARRAY['data', 'security', 'risk']),
+
+-- Financial Metrics
+('MET-012', 'governance_investment', 'financial', 500000, 600000, 'currency', 'budget_system', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"currency": "USD", "period": "quarterly"}', ARRAY['investment', 'governance']),
+('MET-013', 'cost_savings', 'financial', 750000, 800000, 'currency', 'cost_tracking', CURRENT_TIMESTAMP - INTERVAL '2 days', 'automated', '{"currency": "USD", "period": "quarterly"}', ARRAY['savings', 'cost']),
+
+-- Remediation Metrics
+('MET-014', 'security_remediation_rate', 'compliance', 85.0, 95.0, 'percentage', 'security_system', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"issues_total": 45, "issues_resolved": 38}', ARRAY['remediation', 'security']),
+('MET-015', 'compliance_remediation_rate', 'compliance', 78.5, 90.0, 'percentage', 'compliance_system', CURRENT_TIMESTAMP - INTERVAL '2 days', 'automated', '{"issues_total": 28, "issues_resolved": 22}', ARRAY['remediation', 'compliance']),
+('MET-016', 'risk_remediation_rate', 'risk', 72.0, 85.0, 'percentage', 'risk_system', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"risks_total": 18, "risks_mitigated": 13}', ARRAY['remediation', 'risk'])
+ON CONFLICT (metric_id) DO NOTHING;
+
+-- ============================================================================
 -- GOVERNANCE WORKFLOW ENGINE TABLES
 -- ============================================================================
 
@@ -563,7 +745,15 @@ INSERT INTO permissions (permission_id, permission_name, display_name, descripti
 
 -- Applications
 ('PERM_APP_PROCUREMENT', 'app.procurement', 'Application Procurement', 'Request and manage application procurement', 'applications', 'procurement', TRUE),
-('PERM_APP_MANAGE', 'app.manage', 'Manage Applications', 'Manage application catalog and registrations', 'applications', 'manage', TRUE)
+('PERM_APP_MANAGE', 'app.manage', 'Manage Applications', 'Manage application catalog and registrations', 'applications', 'manage', TRUE),
+
+-- Reporting
+('PERM_REPORTING_READ', 'reporting.read', 'View Reports', 'View and access reports', 'reporting', 'read', TRUE),
+('PERM_REPORTING_WRITE', 'reporting.write', 'Generate Reports', 'Generate and create reports', 'reporting', 'write', TRUE),
+('PERM_REPORTING_MANAGE', 'reporting.manage', 'Manage Reports', 'Manage report templates and schedules', 'reporting', 'manage', TRUE),
+('PERM_REPORTING_ADMIN', 'reporting.admin', 'Reporting Administration', 'Full reporting system administration', 'reporting', 'admin', TRUE),
+('PERM_CUSTOM_REPORTS', 'reporting.custom', 'Custom Reports', 'Create and manage custom report templates', 'reporting', 'custom', TRUE),
+('PERM_REPORT_SCHEDULE', 'reporting.schedule', 'Schedule Reports', 'Create and manage scheduled reports', 'reporting', 'schedule', TRUE)
 ON CONFLICT (permission_id) DO NOTHING;
 
 -- Assign permissions to default roles
@@ -594,6 +784,12 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_SUPER_ADMIN', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_SUPER_ADMIN', 'PERM_APP_PROCUREMENT'),
 ('ROLE_SUPER_ADMIN', 'PERM_APP_MANAGE'),
+('ROLE_SUPER_ADMIN', 'PERM_REPORTING_READ'),
+('ROLE_SUPER_ADMIN', 'PERM_REPORTING_WRITE'),
+('ROLE_SUPER_ADMIN', 'PERM_REPORTING_MANAGE'),
+('ROLE_SUPER_ADMIN', 'PERM_REPORTING_ADMIN'),
+('ROLE_SUPER_ADMIN', 'PERM_CUSTOM_REPORTS'),
+('ROLE_SUPER_ADMIN', 'PERM_REPORT_SCHEDULE'),
 
 -- Admin - Most permissions except user/role management
 ('ROLE_ADMIN', 'PERM_USER_READ'),
@@ -613,6 +809,11 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_ADMIN', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_ADMIN', 'PERM_APP_PROCUREMENT'),
 ('ROLE_ADMIN', 'PERM_APP_MANAGE'),
+('ROLE_ADMIN', 'PERM_REPORTING_READ'),
+('ROLE_ADMIN', 'PERM_REPORTING_WRITE'),
+('ROLE_ADMIN', 'PERM_REPORTING_MANAGE'),
+('ROLE_ADMIN', 'PERM_CUSTOM_REPORTS'),
+('ROLE_ADMIN', 'PERM_REPORT_SCHEDULE'),
 
 -- Governance Manager
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_USER_READ'),
@@ -628,6 +829,11 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_APP_PROCUREMENT'),
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_APP_MANAGE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_REPORTING_READ'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_REPORTING_WRITE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_REPORTING_MANAGE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_CUSTOM_REPORTS'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_REPORT_SCHEDULE'),
 
 -- Compliance Officer
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_USER_READ'),
@@ -640,6 +846,9 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_WORKFLOW_CREATE'),
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_WORKFLOW_READ'),
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_APP_PROCUREMENT'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_REPORTING_READ'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_REPORTING_WRITE'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_CUSTOM_REPORTS'),
 
 -- IT Manager
 ('ROLE_IT_MANAGER', 'PERM_USER_READ'),
@@ -654,6 +863,9 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_IT_MANAGER', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_IT_MANAGER', 'PERM_APP_PROCUREMENT'),
 ('ROLE_IT_MANAGER', 'PERM_APP_MANAGE'),
+('ROLE_IT_MANAGER', 'PERM_REPORTING_READ'),
+('ROLE_IT_MANAGER', 'PERM_REPORTING_WRITE'),
+('ROLE_IT_MANAGER', 'PERM_CUSTOM_REPORTS'),
 
 -- Security Analyst
 ('ROLE_SECURITY_ANALYST', 'PERM_USER_READ'),
@@ -666,6 +878,8 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_SECURITY_ANALYST', 'PERM_WORKFLOW_CREATE'),
 ('ROLE_SECURITY_ANALYST', 'PERM_WORKFLOW_READ'),
 ('ROLE_SECURITY_ANALYST', 'PERM_APP_PROCUREMENT'),
+('ROLE_SECURITY_ANALYST', 'PERM_REPORTING_READ'),
+('ROLE_SECURITY_ANALYST', 'PERM_REPORTING_WRITE'),
 
 -- Auditor
 ('ROLE_AUDITOR', 'PERM_USER_READ'),
@@ -677,6 +891,8 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_AUDITOR', 'PERM_FEEDBACK_READ'),
 ('ROLE_AUDITOR', 'PERM_WORKFLOW_READ'),
 ('ROLE_AUDITOR', 'PERM_APP_PROCUREMENT'),
+('ROLE_AUDITOR', 'PERM_REPORTING_READ'),
+('ROLE_AUDITOR', 'PERM_REPORTING_WRITE'),
 
 -- Employee
 ('ROLE_EMPLOYEE', 'PERM_GOVERNANCE_READ'),
@@ -686,6 +902,7 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_EMPLOYEE', 'PERM_WORKFLOW_CREATE'),
 ('ROLE_EMPLOYEE', 'PERM_WORKFLOW_READ'),
 ('ROLE_EMPLOYEE', 'PERM_APP_PROCUREMENT'),
+('ROLE_EMPLOYEE', 'PERM_REPORTING_READ'),
 
 -- Guest
 ('ROLE_GUEST', 'PERM_GOVERNANCE_READ'),
