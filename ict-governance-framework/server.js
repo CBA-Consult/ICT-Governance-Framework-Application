@@ -39,6 +39,10 @@ const dataProcessingRouter = require('./api/data-processing');
 const reportingRouter = require('./api/reporting');
 const dataAnalyticsRouter = require('./api/data-analytics');
 
+// Import enhanced predictive analytics and insights API routes
+const { router: predictiveAnalyticsRouter } = require('./api/predictive-analytics-engine');
+const { router: insightsGeneratorRouter } = require('./api/insights-generator');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -112,6 +116,10 @@ app.use('/api/data-processing', dataProcessingRouter);
 app.use('/api/reporting', reportingRouter);
 app.use('/api/data-analytics', dataAnalyticsRouter);
 
+// Enhanced predictive analytics and insights routes
+app.use('/api/predictive-analytics', predictiveAnalyticsRouter);
+app.use('/api/insights', insightsGeneratorRouter);
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ 
   status: 'ok',
@@ -131,7 +139,9 @@ app.get('/api/health', (req, res) => res.json({
     dataCollection: 'enabled',
     dataProcessing: 'enabled',
     reporting: 'enabled',
-    dataAnalytics: 'enabled'
+    dataAnalytics: 'enabled',
+    predictiveAnalytics: 'enabled',
+    insightsGenerator: 'enabled'
   }
 }));
 
