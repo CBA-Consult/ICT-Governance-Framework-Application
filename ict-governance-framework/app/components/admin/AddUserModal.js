@@ -19,8 +19,47 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+
+  // Calculate password strength
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength += 1;
+    if (password.length >= 12) strength += 1;
+    if (/[a-z]/.test(password)) strength += 1;
+    if (/[A-Z]/.test(password)) strength += 1;
+    if (/[0-9]/.test(password)) strength += 1;
+    if (/[@$!%*?&]/.test(password)) strength += 1;
+    if (password.length >= 16) strength += 1;
+    return Math.min(strength, 5);
+  };
+
+  const getPasswordStrengthLabel = (strength) => {
+    switch (strength) {
+      case 0:
+      case 1: return 'Very Weak';
+      case 2: return 'Weak';
+      case 3: return 'Fair';
+      case 4: return 'Good';
+      case 5: return 'Strong';
+      default: return 'Very Weak';
+    }
+  };
+
+  const getPasswordStrengthColor = (strength) => {
+    switch (strength) {
+      case 0:
+      case 1: return 'bg-red-500';
+      case 2: return 'bg-orange-500';
+      case 3: return 'bg-yellow-500';
+      case 4: return 'bg-blue-500';
+      case 5: return 'bg-green-500';
+      default: return 'bg-gray-300';
+    }
+  };
 
   // Fetch available roles
   const fetchRoles = async () => {
@@ -44,6 +83,17 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
       ...prev,
       [name]: value
     }));
+    
+    // Clear field-specific error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+    
+    // Real-time validation for specific fields
+    validateField(name, value);
   };
 
   const handleRoleChange = (roleName, checked) => {
@@ -55,39 +105,166 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
     }));
   };
 
+  const validateField = (fieldName, value) => {
+    const errors = {};
+    
+    switch (fieldName) {
+      case 'username':
+        if (!value.trim()) {
+          errors.username = 'Username is required';
+        } else if (value.length < 3 || value.length > 50) {
+          errors.username = 'Username must be 3-50 characters';
+        } else if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
+          errors.username = 'Username can only contain letters, numbers, underscores, and hyphens';
+        }
+        break;
+        
+      case 'email':
+        if (!value.trim()) {
+          errors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          errors.email = 'Please enter a valid email address';
+        }
+        break;
+        
+      case 'password':
+        // Calculate password strength
+        const strength = calculatePasswordStrength(value);
+        setPasswordStrength(strength);
+        
+        if (!value) {
+          errors.password = 'Password is required';
+        } else if (value.length < 8) {
+          errors.password = 'Password must be at least 8 characters';
+        } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(value)) {
+          errors.password = 'Password must contain uppercase, lowercase, number, and special character';
+        } else if (strength < 3) {
+          errors.password = 'Password is too weak. Please use a stronger password.';
+        }
+        
+        // Also validate confirm password if it exists
+        if (formData.confirmPassword && value !== formData.confirmPassword) {
+          errors.confirmPassword = 'Passwords do not match';
+        } else if (formData.confirmPassword && value === formData.confirmPassword) {
+          // Clear confirm password error if passwords now match
+          setFieldErrors(prev => ({
+            ...prev,
+            confirmPassword: ''
+          }));
+        }
+        break;
+        
+      case 'confirmPassword':
+        if (!value) {
+          errors.confirmPassword = 'Please confirm your password';
+        } else if (value !== formData.password) {
+          errors.confirmPassword = 'Passwords do not match';
+        }
+        break;
+        
+      case 'firstName':
+        if (!value.trim()) {
+          errors.firstName = 'First name is required';
+        } else if (value.length > 100) {
+          errors.firstName = 'First name must be less than 100 characters';
+        }
+        break;
+        
+      case 'lastName':
+        if (!value.trim()) {
+          errors.lastName = 'Last name is required';
+        } else if (value.length > 100) {
+          errors.lastName = 'Last name must be less than 100 characters';
+        }
+        break;
+        
+      case 'department':
+        if (value && value.length > 100) {
+          errors.department = 'Department must be less than 100 characters';
+        }
+        break;
+        
+      case 'jobTitle':
+        if (value && value.length > 150) {
+          errors.jobTitle = 'Job title must be less than 150 characters';
+        }
+        break;
+    }
+    
+    setFieldErrors(prev => ({
+      ...prev,
+      ...errors
+    }));
+    
+    return Object.keys(errors).length === 0;
+  };
+
   const validateForm = () => {
+    const newErrors = {};
+    
+    // Username validation
     if (!formData.username.trim()) {
-      setError('Username is required');
-      return false;
+      newErrors.username = 'Username is required';
+    } else if (formData.username.length < 3 || formData.username.length > 50) {
+      newErrors.username = 'Username must be 3-50 characters';
+    } else if (!/^[a-zA-Z0-9_-]+$/.test(formData.username)) {
+      newErrors.username = 'Username can only contain letters, numbers, underscores, and hyphens';
     }
+    
+    // Email validation
     if (!formData.email.trim()) {
-      setError('Email is required');
-      return false;
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
     }
-    if (!formData.firstName.trim()) {
-      setError('First name is required');
-      return false;
-    }
-    if (!formData.lastName.trim()) {
-      setError('Last name is required');
-      return false;
-    }
+    
+    // Password validation
     if (!formData.password) {
-      setError('Password is required');
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(formData.password)) {
+      newErrors.password = 'Password must contain uppercase, lowercase, number, and special character';
+    }
+    
+    // Confirm password validation
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    // First name validation
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    } else if (formData.firstName.length > 100) {
+      newErrors.firstName = 'First name must be less than 100 characters';
+    }
+    
+    // Last name validation
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    } else if (formData.lastName.length > 100) {
+      newErrors.lastName = 'Last name must be less than 100 characters';
+    }
+    
+    // Optional field length validation
+    if (formData.department && formData.department.length > 100) {
+      newErrors.department = 'Department must be less than 100 characters';
+    }
+    
+    if (formData.jobTitle && formData.jobTitle.length > 150) {
+      newErrors.jobTitle = 'Job title must be less than 150 characters';
+    }
+    
+    setFieldErrors(newErrors);
+    
+    if (Object.keys(newErrors).length > 0) {
+      setError('Please correct the errors below');
       return false;
     }
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
-    if (!formData.email.includes('@')) {
-      setError('Please enter a valid email address');
-      return false;
-    }
+    
+    setError('');
     return true;
   };
 
@@ -128,12 +305,36 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
         roles: [],
         status: 'Active'
       });
+      setFieldErrors({});
+      setPasswordStrength(0);
       
       onUserAdded();
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create user');
       console.error('Create user error:', err);
+      
+      // Handle validation errors from server
+      if (err.response?.data?.code === 'VALIDATION_ERROR' && err.response?.data?.details) {
+        const serverErrors = {};
+        err.response.data.details.forEach(detail => {
+          const field = detail.field || detail.path || detail.param;
+          if (field) {
+            serverErrors[field] = detail.message || detail.msg;
+          }
+        });
+        setFieldErrors(serverErrors);
+        setError(err.response.data.message || 'Please correct the validation errors');
+      } else if (err.response?.data?.code === 'USER_EXISTS' && err.response?.data?.details) {
+        const serverErrors = {};
+        err.response.data.details.forEach(detail => {
+          serverErrors[detail.field] = detail.message;
+        });
+        setFieldErrors(serverErrors);
+        setError(err.response.data.message || 'User already exists');
+      } else {
+        setError(err.response?.data?.error || err.response?.data?.message || 'Failed to create user');
+        setFieldErrors({});
+      }
     } finally {
       setLoading(false);
     }
@@ -153,6 +354,8 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
       status: 'Active'
     });
     setError('');
+    setFieldErrors({});
+    setPasswordStrength(0);
     onClose();
   };
 
@@ -189,9 +392,20 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.username 
+                    ? 'border-red-300 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                }`}
                 required
+                aria-invalid={fieldErrors.username ? 'true' : 'false'}
+                aria-describedby={fieldErrors.username ? 'username-error' : undefined}
               />
+              {fieldErrors.username && (
+                <p id="username-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {fieldErrors.username}
+                </p>
+              )}
             </div>
 
             {/* Email */}
@@ -204,9 +418,20 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.email 
+                    ? 'border-red-300 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                }`}
                 required
+                aria-invalid={fieldErrors.email ? 'true' : 'false'}
+                aria-describedby={fieldErrors.email ? 'email-error' : undefined}
               />
+              {fieldErrors.email && (
+                <p id="email-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
 
             {/* First Name */}
@@ -219,9 +444,20 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.firstName 
+                    ? 'border-red-300 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                }`}
                 required
+                aria-invalid={fieldErrors.firstName ? 'true' : 'false'}
+                aria-describedby={fieldErrors.firstName ? 'firstName-error' : undefined}
               />
+              {fieldErrors.firstName && (
+                <p id="firstName-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {fieldErrors.firstName}
+                </p>
+              )}
             </div>
 
             {/* Last Name */}
@@ -234,9 +470,20 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.lastName 
+                    ? 'border-red-300 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                }`}
                 required
+                aria-invalid={fieldErrors.lastName ? 'true' : 'false'}
+                aria-describedby={fieldErrors.lastName ? 'lastName-error' : undefined}
               />
+              {fieldErrors.lastName && (
+                <p id="lastName-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {fieldErrors.lastName}
+                </p>
+              )}
             </div>
 
             {/* Password */}
@@ -250,8 +497,14 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className={`w-full px-3 py-2 pr-10 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
+                    fieldErrors.password 
+                      ? 'border-red-300 dark:border-red-500' 
+                      : 'border-gray-300 dark:border-gray-600'
+                  }`}
                   required
+                  aria-invalid={fieldErrors.password ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.password ? 'password-error' : undefined}
                 />
                 <button
                   type="button"
@@ -265,6 +518,32 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                   )}
                 </button>
               </div>
+              {fieldErrors.password && (
+                <p id="password-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {fieldErrors.password}
+                </p>
+              )}
+              {formData.password && (
+                <div className="mt-2">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Password Strength:</span>
+                    <span className={`text-xs font-medium ${
+                      passwordStrength < 2 ? 'text-red-600' :
+                      passwordStrength < 3 ? 'text-orange-600' :
+                      passwordStrength < 4 ? 'text-yellow-600' :
+                      passwordStrength < 5 ? 'text-blue-600' : 'text-green-600'
+                    }`}>
+                      {getPasswordStrengthLabel(passwordStrength)}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrengthColor(passwordStrength)}`}
+                      style={{ width: `${(passwordStrength / 5) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Confirm Password */}
@@ -278,8 +557,14 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className={`w-full px-3 py-2 pr-10 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
+                    fieldErrors.confirmPassword 
+                      ? 'border-red-300 dark:border-red-500' 
+                      : 'border-gray-300 dark:border-gray-600'
+                  }`}
                   required
+                  aria-invalid={fieldErrors.confirmPassword ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined}
                 />
                 <button
                   type="button"
@@ -293,6 +578,11 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                   )}
                 </button>
               </div>
+              {fieldErrors.confirmPassword && (
+                <p id="confirmPassword-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {fieldErrors.confirmPassword}
+                </p>
+              )}
             </div>
 
             {/* Department */}
@@ -305,8 +595,19 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                 name="department"
                 value={formData.department}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.department 
+                    ? 'border-red-300 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                }`}
+                aria-invalid={fieldErrors.department ? 'true' : 'false'}
+                aria-describedby={fieldErrors.department ? 'department-error' : undefined}
               />
+              {fieldErrors.department && (
+                <p id="department-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {fieldErrors.department}
+                </p>
+              )}
             </div>
 
             {/* Job Title */}
@@ -319,8 +620,19 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
                 name="jobTitle"
                 value={formData.jobTitle}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.jobTitle 
+                    ? 'border-red-300 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                }`}
+                aria-invalid={fieldErrors.jobTitle ? 'true' : 'false'}
+                aria-describedby={fieldErrors.jobTitle ? 'jobTitle-error' : undefined}
               />
+              {fieldErrors.jobTitle && (
+                <p id="jobTitle-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {fieldErrors.jobTitle}
+                </p>
+              )}
             </div>
           </div>
 
@@ -374,8 +686,9 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
           </button>
           <button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || Object.keys(fieldErrors).some(key => fieldErrors[key])}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            title={Object.keys(fieldErrors).some(key => fieldErrors[key]) ? 'Please fix validation errors before submitting' : ''}
           >
             {loading ? 'Creating...' : 'Create User'}
           </button>
