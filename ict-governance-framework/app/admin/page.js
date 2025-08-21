@@ -15,7 +15,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 function AdminDashboard() {
-  const { apiClient, user: currentUser } = useAuth();
+  const { apiClient, user: currentUser, hasAllPermissions } = useAuth();
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -66,28 +66,33 @@ function AdminDashboard() {
       description: 'Add, edit, and manage user accounts',
       icon: UserGroupIcon,
       href: '/admin/users',
-      color: 'bg-blue-500'
+      color: 'bg-blue-500',
+      requiredPermissions: ['user.read']
+
     },
     {
       title: 'Role Management',
       description: 'Configure roles and permissions',
       icon: ShieldCheckIcon,
       href: '/admin/roles',
-      color: 'bg-green-500'
+      color: 'bg-green-500',
+      requiredPermissions: ['role.read']
     },
     {
       title: 'System Policies',
       description: 'Manage governance policies',
       icon: DocumentTextIcon,
       href: '/policies',
-      color: 'bg-purple-500'
+      color: 'bg-purple-500',
+      requiredPermissions: ['governance.read']
     },
     {
       title: 'Analytics',
       description: 'View system analytics and reports',
       icon: ChartBarIcon,
       href: '/analytics',
-      color: 'bg-orange-500'
+      color: 'bg-orange-500',
+      requiredPermissions: ['reporting.read']
     }
   ];
 
@@ -201,26 +206,33 @@ function AdminDashboard() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {quickActions.map((action, index) => (
-              <Link
-                key={index}
-                href={action.href}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow p-6 block"
-              >
-                <div className="flex items-center mb-4">
-                  <div className={`flex-shrink-0 p-3 rounded-lg ${action.color}`}>
-                    <action.icon className="h-6 w-6 text-white" />
+            {quickActions
+              .filter(action => !action.requiredPermissions || hasAllPermissions(action.requiredPermissions))
+              .map((action, index) => (
+                <Link
+                  key={index}
+                  href={action.href}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow p-6 block"
+                >
+                  <div className="flex items-center mb-4">
+                    <div className={`flex-shrink-0 p-3 rounded-lg ${action.color}`}>
+                      <action.icon className="h-6 w-6 text-white" />
+                    </div>
                   </div>
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  {action.title}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {action.description}
-                </p>
-              </Link>
-            ))}
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    {action.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {action.description}
+                  </p>
+                </Link>
+              ))}
           </div>
+          {quickActions.filter(action => !action.requiredPermissions || hasAllPermissions(action.requiredPermissions)).length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-500 dark:text-gray-400">No actions available with your current permissions.</p>
+            </div>
+          )}
         </div>
 
         {/* System Health */}
@@ -246,4 +258,5 @@ function AdminDashboard() {
 }
 
 // Export with authentication and permission requirements
-export default withAuth(AdminDashboard, ['admin.read'], ['admin', 'super_admin']);
+export default withAuth(AdminDashboard, ['system.admin'], ['admin', 'super_admin']);
+
