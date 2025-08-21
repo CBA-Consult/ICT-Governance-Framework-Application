@@ -21,67 +21,128 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 // Validation rules
 const createUserValidation = [
   body('username')
+    .notEmpty()
+    .withMessage('Username is required')
     .isLength({ min: 3, max: 50 })
+    .withMessage('Username must be 3-50 characters')
     .matches(/^[a-zA-Z0-9_-]+$/)
-    .withMessage('Username must be 3-50 characters and contain only letters, numbers, underscores, and hyphens'),
-  body('email')
-    .isEmail()
-    .normalizeEmail()
-    .withMessage('Valid email is required'),
-  body('password')
-    .isLength({ min: 8 })
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
-    .withMessage('Password must be at least 8 characters with uppercase, lowercase, number, and special character'),
-  body('first_name')
-    .isLength({ min: 1, max: 100 })
-    .trim()
-    .withMessage('First name is required'),
-  body('last_name')
-    .isLength({ min: 1, max: 100 })
-    .trim()
-    .withMessage('Last name is required'),
-  body('department')
-    .optional()
-    .isLength({ max: 100 })
+    .withMessage('Username can only contain letters, numbers, underscores, and hyphens')
     .trim(),
-  body('job_title')
-    .optional()
+  body('email')
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Please enter a valid email address')
+    .normalizeEmail()
+    .isLength({ max: 255 })
+    .withMessage('Email must be less than 255 characters'),
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required')
+    .isLength({ min: 8, max: 128 })
+    .withMessage('Password must be 8-128 characters')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Password must contain uppercase, lowercase, number, and special character'),
+  body('firstName')
+    .notEmpty()
+    .withMessage('First name is required')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('First name must be 1-100 characters')
+    .trim()
+    .matches(/^[a-zA-Z\s'-]+$/)
+    .withMessage('First name can only contain letters, spaces, hyphens, and apostrophes'),
+  body('lastName')
+    .notEmpty()
+    .withMessage('Last name is required')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Last name must be 1-100 characters')
+    .trim()
+    .matches(/^[a-zA-Z\s'-]+$/)
+    .withMessage('Last name can only contain letters, spaces, hyphens, and apostrophes'),
+  body('department')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 100 })
+    .withMessage('Department must be less than 100 characters')
+    .trim(),
+  body('jobTitle')
+    .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 150 })
+    .withMessage('Job title must be less than 150 characters')
+    .trim(),
+  body('phone')
+    .optional({ nullable: true, checkFalsy: true })
+    .isMobilePhone()
+    .withMessage('Please enter a valid phone number'),
+  body('employeeId')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 50 })
+    .withMessage('Employee ID must be less than 50 characters')
     .trim(),
   body('roles')
     .optional()
     .isArray()
     .withMessage('Roles must be an array')
+    .custom((roles) => {
+      if (roles && roles.length > 10) {
+        throw new Error('Cannot assign more than 10 roles to a user');
+      }
+      return true;
+    }),
+  body('status')
+    .optional()
+    .isIn(['Active', 'Inactive', 'Pending', 'Suspended'])
+    .withMessage('Invalid status value')
 ];
 
 const updateUserValidation = [
   body('email')
     .optional()
     .isEmail()
+    .withMessage('Please enter a valid email address')
     .normalizeEmail()
-    .withMessage('Valid email is required'),
-  body('first_name')
+    .isLength({ max: 255 })
+    .withMessage('Email must be less than 255 characters'),
+  body('firstName')
     .optional()
     .isLength({ min: 1, max: 100 })
+    .withMessage('First name must be 1-100 characters')
     .trim()
-    .withMessage('First name must be 1-100 characters'),
-  body('last_name')
+    .matches(/^[a-zA-Z\s'-]+$/)
+    .withMessage('First name can only contain letters, spaces, hyphens, and apostrophes'),
+  body('lastName')
     .optional()
     .isLength({ min: 1, max: 100 })
+    .withMessage('Last name must be 1-100 characters')
     .trim()
-    .withMessage('Last name must be 1-100 characters'),
+    .matches(/^[a-zA-Z\s'-]+$/)
+    .withMessage('Last name can only contain letters, spaces, hyphens, and apostrophes'),
   body('department')
-    .optional()
+    .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 100 })
+    .withMessage('Department must be less than 100 characters')
     .trim(),
-  body('job_title')
-    .optional()
+  body('jobTitle')
+    .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 150 })
+    .withMessage('Job title must be less than 150 characters')
+    .trim(),
+  body('phone')
+    .optional({ nullable: true, checkFalsy: true })
+    .isMobilePhone()
+    .withMessage('Please enter a valid phone number'),
+  body('employeeId')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 50 })
+    .withMessage('Employee ID must be less than 50 characters')
     .trim(),
   body('status')
     .optional()
     .isIn(['Active', 'Inactive', 'Suspended', 'Pending'])
-    .withMessage('Invalid status')
+    .withMessage('Invalid status value'),
+  body('preferences')
+    .optional()
+    .isJSON()
+    .withMessage('Preferences must be valid JSON')
 ];
 
 /**
@@ -296,10 +357,19 @@ router.post('/',
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        // Format errors for better client-side handling
+        const formattedErrors = errors.array().map(error => ({
+          field: error.path || error.param,
+          message: error.msg,
+          value: error.value,
+          location: error.location
+        }));
+        
         return res.status(400).json({
           error: 'Validation failed',
           code: 'VALIDATION_ERROR',
-          details: errors.array()
+          details: formattedErrors,
+          message: 'Please correct the validation errors and try again'
         });
       }
 
@@ -323,17 +393,26 @@ router.post('/',
       const existingUserQuery = `
         SELECT user_id, username, email 
         FROM users 
-        WHERE username = $1 OR email = $2
+        WHERE LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($2)
       `;
       const existingUser = await client.query(existingUserQuery, [username, email]);
 
       if (existingUser.rows.length > 0) {
         const existing = existingUser.rows[0];
-        const field = existing.username === username ? 'username' : 'email';
+        const conflicts = [];
+        
+        if (existing.username.toLowerCase() === username.toLowerCase()) {
+          conflicts.push({ field: 'username', message: 'Username already exists' });
+        }
+        if (existing.email.toLowerCase() === email.toLowerCase()) {
+          conflicts.push({ field: 'email', message: 'Email already exists' });
+        }
+        
         return res.status(409).json({
-          error: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`,
+          error: 'User already exists',
           code: 'USER_EXISTS',
-          field
+          details: conflicts,
+          message: 'A user with this username or email already exists'
         });
       }
 
@@ -430,10 +509,19 @@ router.put('/:userId',
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        // Format errors for better client-side handling
+        const formattedErrors = errors.array().map(error => ({
+          field: error.path || error.param,
+          message: error.msg,
+          value: error.value,
+          location: error.location
+        }));
+        
         return res.status(400).json({
           error: 'Validation failed',
           code: 'VALIDATION_ERROR',
-          details: errors.array()
+          details: formattedErrors,
+          message: 'Please correct the validation errors and try again'
         });
       }
 
