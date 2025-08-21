@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth, withAuth } from '../../contexts/AuthContext';
+import AddUserModal from '../../components/admin/AddUserModal';
+import EditUserModal from '../../components/admin/EditUserModal';
 import { 
   UserIcon, 
   PlusIcon, 
@@ -28,6 +30,9 @@ function UserManagementPage() {
     total: 0,
     totalPages: 0
   });
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetch users
   const fetchUsers = async (page = 1, search = '', status = '', role = '') => {
@@ -87,6 +92,36 @@ function UserManagementPage() {
     }
   };
 
+  // Handle user actions
+  const handleAddUser = () => {
+    setShowAddModal(true);
+  };
+
+  const handleEditUser = (user) => {
+    setSelectedUser(user);
+    setShowEditModal(true);
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      try {
+        await apiClient.delete(`/users/${userId}`);
+        fetchUsers(pagination.page, searchTerm, statusFilter, roleFilter);
+      } catch (err) {
+        setError('Failed to delete user');
+        console.error('Delete user error:', err);
+      }
+    }
+  };
+
+  const handleUserAdded = () => {
+    fetchUsers(pagination.page, searchTerm, statusFilter, roleFilter);
+  };
+
+  const handleUserUpdated = () => {
+    fetchUsers(pagination.page, searchTerm, statusFilter, roleFilter);
+  };
+
   const getStatusBadgeColor = (status) => {
     switch (status) {
       case 'Active':
@@ -134,7 +169,10 @@ function UserManagementPage() {
                 Manage user accounts, roles, and permissions
               </p>
             </div>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
+            <button 
+              onClick={handleAddUser}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+            >
               <PlusIcon className="h-5 w-5 mr-2" />
               Add User
             </button>
@@ -296,11 +334,19 @@ function UserManagementPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
-                          <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                          <button 
+                            onClick={() => handleEditUser(user)}
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                            title="Edit user"
+                          >
                             <PencilIcon className="h-4 w-4" />
                           </button>
                           {user.user_id !== currentUser?.userId && (
-                            <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                            <button 
+                              onClick={() => handleDeleteUser(user.user_id)}
+                              className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                              title="Delete user"
+                            >
                               <TrashIcon className="h-4 w-4" />
                             </button>
                           )}
@@ -385,6 +431,22 @@ function UserManagementPage() {
             </div>
           )}
         </div>
+
+        {/* Modals */}
+        <AddUserModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onUserAdded={handleUserAdded}
+          apiClient={apiClient}
+        />
+
+        <EditUserModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onUserUpdated={handleUserUpdated}
+          user={selectedUser}
+          apiClient={apiClient}
+        />
       </div>
     </div>
   );
