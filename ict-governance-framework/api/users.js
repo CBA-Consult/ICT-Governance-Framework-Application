@@ -32,11 +32,11 @@ const createUserValidation = [
     .isLength({ min: 8 })
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .withMessage('Password must be at least 8 characters with uppercase, lowercase, number, and special character'),
-  body('firstName')
+  body('first_name')
     .isLength({ min: 1, max: 100 })
     .trim()
     .withMessage('First name is required'),
-  body('lastName')
+  body('last_name')
     .isLength({ min: 1, max: 100 })
     .trim()
     .withMessage('Last name is required'),
@@ -44,7 +44,7 @@ const createUserValidation = [
     .optional()
     .isLength({ max: 100 })
     .trim(),
-  body('jobTitle')
+  body('job_title')
     .optional()
     .isLength({ max: 150 })
     .trim(),
@@ -60,12 +60,12 @@ const updateUserValidation = [
     .isEmail()
     .normalizeEmail()
     .withMessage('Valid email is required'),
-  body('firstName')
+  body('first_name')
     .optional()
     .isLength({ min: 1, max: 100 })
     .trim()
     .withMessage('First name must be 1-100 characters'),
-  body('lastName')
+  body('last_name')
     .optional()
     .isLength({ min: 1, max: 100 })
     .trim()
@@ -74,7 +74,7 @@ const updateUserValidation = [
     .optional()
     .isLength({ max: 100 })
     .trim(),
-  body('jobTitle')
+  body('job_title')
     .optional()
     .isLength({ max: 150 })
     .trim(),
@@ -309,10 +309,10 @@ router.post('/',
         username,
         email,
         password,
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
         department,
-        jobTitle,
+        job_title: jobTitle,
         phone,
         employeeId,
         managerId,
@@ -440,10 +440,10 @@ router.put('/:userId',
       const { userId } = req.params;
       const {
         email,
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
         department,
-        jobTitle,
+        job_title: jobTitle,
         phone,
         employeeId,
         managerId,
