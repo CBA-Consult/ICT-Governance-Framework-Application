@@ -43,8 +43,15 @@ const dataAnalyticsRouter = require('./api/data-analytics');
 const { router: predictiveAnalyticsRouter } = require('./api/predictive-analytics-engine');
 const { router: insightsGeneratorRouter } = require('./api/insights-generator');
 
+// Import monitoring and diagnostic API routes
+const { router: monitoringRouter } = require('./api/monitoring');
+const { router: diagnosticRouter } = require('./api/diagnostic-tools');
+
 // Import Enterprise API Framework
 const EnterpriseAPI = require('./api/enterprise-api');
+
+// Import monitoring initialization
+const { initializeMonitoring } = require('./api/initialize-monitoring');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -123,6 +130,10 @@ app.use('/api/data-analytics', dataAnalyticsRouter);
 app.use('/api/predictive-analytics', predictiveAnalyticsRouter);
 app.use('/api/insights', insightsGeneratorRouter);
 
+// Monitoring and diagnostic routes
+app.use('/api/monitoring', monitoringRouter);
+app.use('/api/diagnostics', diagnosticRouter);
+
 // Initialize and mount Enterprise API Framework
 const enterpriseAPI = new EnterpriseAPI({
   version: '2.0.0',
@@ -156,10 +167,22 @@ app.get('/api/health', (req, res) => res.json({
     insightsGenerator: 'enabled',
     enterpriseIntegration: 'enabled',
     apiManagement: 'enabled',
-    workflowOrchestrator: 'enabled'
+    workflowOrchestrator: 'enabled',
+    monitoring: 'enabled',
+    healthChecks: 'enabled',
+    diagnostics: 'enabled',
+    alerting: 'enabled'
   }
 }));
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Express server running on http://localhost:${PORT}`);
+  
+  // Initialize monitoring and health checks
+  try {
+    await initializeMonitoring();
+    console.log('✓ Monitoring and health check capabilities initialized');
+  } catch (error) {
+    console.error('✗ Failed to initialize monitoring:', error.message);
+  }
 });
