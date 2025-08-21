@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ChartBarIcon, 
-  TrendingUpIcon, 
-  TrendingDownIcon, 
+  ArrowTrendingUpIcon, 
+  ArrowTrendingDownIcon, 
   ExclamationTriangleIcon,
   CurrencyDollarIcon,
   ShieldCheckIcon,
@@ -49,7 +49,7 @@ export default function ExecutiveDashboard({ timeRange = 30, onDrillDown }) {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`/api/data-processing/dashboard-data?dashboard_type=executive&time_range_days=${timeRange}`, {
+  const response = await fetch(`http://localhost:4000/api/data-processing/dashboard-data?dashboard_type=executive&time_range_days=${timeRange}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -77,6 +77,13 @@ export default function ExecutiveDashboard({ timeRange = 30, onDrillDown }) {
       const token = localStorage.getItem('token');
       
       // Fetch detailed drill-down data
+      // Calculate dates on client side only
+      let startDate = '';
+      let endDate = '';
+      if (typeof window !== 'undefined') {
+        startDate = new Date(Date.now() - timeRange * 24 * 60 * 60 * 1000).toISOString();
+        endDate = new Date().toISOString();
+      }
       const response = await fetch('/api/data-analytics/multidimensional-analysis', {
         method: 'POST',
         headers: {
@@ -86,8 +93,8 @@ export default function ExecutiveDashboard({ timeRange = 30, onDrillDown }) {
         body: JSON.stringify({
           metrics: [metricName],
           time_range: {
-            start_date: new Date(Date.now() - timeRange * 24 * 60 * 60 * 1000).toISOString(),
-            end_date: new Date().toISOString()
+            start_date: startDate,
+            end_date: endDate
           },
           dimensions: ['department', 'category', 'priority']
         })

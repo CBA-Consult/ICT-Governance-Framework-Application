@@ -2,6 +2,7 @@
 // Main Enterprise API Router - Unified API for all enterprise integrations
 
 const express = require('express');
+const { body, param, query } = require('express-validator');
 const APIFrameworkCore = require('./framework/api-framework-core');
 const { EnterpriseIntegration } = require('./framework/enterprise-integration');
 const APIManagement = require('./framework/api-management');
@@ -196,10 +197,10 @@ class EnterpriseAPI {
 
     router.post('/servicenow/incidents',
       this.apiFramework.middlewares.validation([
-        this.apiFramework.getValidationRules().body('short_description').notEmpty(),
-        this.apiFramework.getValidationRules().body('description').optional(),
-        this.apiFramework.getValidationRules().body('priority').optional().isIn(['1', '2', '3', '4', '5']),
-        this.apiFramework.getValidationRules().body('category').optional()
+  body('short_description').notEmpty(),
+  body('description').optional(),
+  body('priority').optional().isIn(['1', '2', '3', '4', '5']),
+  body('category').optional()
       ]),
       async (req, res, next) => {
         try {
@@ -296,8 +297,8 @@ class EnterpriseAPI {
     // Legacy Systems Integration
     router.post('/legacy/file-transfer',
       this.apiFramework.middlewares.validation([
-        this.apiFramework.getValidationRules().body('files').isArray(),
-        this.apiFramework.getValidationRules().body('operation').isIn(['upload', 'download', 'process'])
+  body('files').isArray(),
+  body('operation').isIn(['upload', 'download', 'process'])
       ]),
       async (req, res, next) => {
         try {
@@ -352,9 +353,9 @@ class EnterpriseAPI {
     // Execute workflow
     router.post('/execute/:workflowName',
       this.apiFramework.middlewares.validation([
-        this.apiFramework.getValidationRules().param('workflowName').notEmpty(),
-        this.apiFramework.getValidationRules().body('inputData').optional().isObject(),
-        this.apiFramework.getValidationRules().body('context').optional().isObject()
+        param('workflowName').notEmpty(),
+        body('inputData').optional().isObject(),
+        body('context').optional().isObject()
       ]),
       async (req, res, next) => {
         try {
@@ -383,7 +384,7 @@ class EnterpriseAPI {
     // Get workflow execution status
     router.get('/executions/:executionId',
       this.apiFramework.middlewares.validation([
-        this.apiFramework.getValidationRules().param('executionId').isUUID()
+        param('executionId').isUUID()
       ]),
       async (req, res, next) => {
         try {
@@ -425,8 +426,8 @@ class EnterpriseAPI {
     router.get('/executions',
       this.apiFramework.middlewares.validation([
         ...this.apiFramework.getValidationRules().pagination,
-        this.apiFramework.getValidationRules().query('status').optional().isIn(['pending', 'running', 'completed', 'failed', 'timeout']),
-        this.apiFramework.getValidationRules().query('workflowName').optional()
+        query('status').optional().isIn(['pending', 'running', 'completed', 'failed', 'timeout']),
+        query('workflowName').optional()
       ]),
       async (req, res, next) => {
         try {
@@ -490,10 +491,10 @@ class EnterpriseAPI {
     router.post('/register',
       this.apiFramework.createAuthorizationMiddleware(['workflow:manage']),
       this.apiFramework.middlewares.validation([
-        this.apiFramework.getValidationRules().body('name').notEmpty(),
-        this.apiFramework.getValidationRules().body('description').optional(),
-        this.apiFramework.getValidationRules().body('steps').isArray(),
-        this.apiFramework.getValidationRules().body('version').optional()
+  body('name').notEmpty(),
+  body('description').optional(),
+  body('steps').isArray(),
+  body('version').optional()
       ]),
       async (req, res, next) => {
         try {

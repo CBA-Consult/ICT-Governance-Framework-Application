@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChartBarIcon, TrendingUpIcon, ExclamationTriangleIcon, BeakerIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, ArrowTrendingUpIcon, ExclamationTriangleIcon, BeakerIcon } from '@heroicons/react/24/outline';
 
 export default function AnalyticsPage() {
   const [metrics, setMetrics] = useState([]);
@@ -24,7 +24,7 @@ export default function AnalyticsPage() {
   const fetchAvailableMetrics = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/data-collection/metrics?limit=100', {
+  const response = await fetch('http://localhost:4000/api/data-collection/metrics?limit=100', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -210,7 +210,7 @@ export default function AnalyticsPage() {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold mb-4 flex items-center">
-          <TrendingUpIcon className="h-5 w-5 mr-2 text-blue-600" />
+          <ArrowTrendingUpIcon className="h-5 w-5 mr-2 text-blue-600" />
           Predictive Analysis: {data.metric_name}
         </h3>
         
@@ -487,7 +487,7 @@ export default function AnalyticsPage() {
               disabled={loading || !analysisParams.metric_name}
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
-              <TrendingUpIcon className="h-4 w-4 mr-2" />
+              <ArrowTrendingUpIcon className="h-4 w-4 mr-2" />
               Predictive Analysis
             </button>
             

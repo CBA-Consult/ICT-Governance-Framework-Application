@@ -5,7 +5,7 @@
 
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
-const { authenticateToken, requirePermission, logActivity } = require('./auth');
+const { authenticateToken, requirePermissions, logActivity } = require('../middleware/auth');
 const DataSynchronizationService = require('../services/data-synchronization-service');
 
 const router = express.Router();
@@ -21,7 +21,7 @@ syncService.initialize().catch(console.error);
  */
 router.get('/sources', 
   authenticateToken,
-  requirePermission('data_sync_read'),
+  requirePermissions(['data_sync_read']),
   [
     query('source_type').optional().isString(),
     query('sync_status').optional().isString(),
@@ -74,7 +74,7 @@ router.get('/sources',
  */
 router.post('/sources',
   authenticateToken,
-  requirePermission('data_sync_write'),
+  requirePermissions(['data_sync_write']),
   [
     body('source_name').notEmpty().isString().withMessage('Source name is required'),
     body('source_type').isIn(['database', 'api', 'file', 'stream', 'cloud_service']).withMessage('Invalid source type'),
@@ -132,7 +132,7 @@ router.post('/sources',
  */
 router.get('/jobs',
   authenticateToken,
-  requirePermission('data_sync_read'),
+  requirePermissions(['data_sync_read']),
   [
     query('status').optional().isString(),
     query('source_id').optional().isUUID(),
@@ -178,7 +178,7 @@ router.get('/jobs',
  */
 router.post('/jobs',
   authenticateToken,
-  requirePermission('data_sync_write'),
+  requirePermissions(['data_sync_write']),
   [
     body('job_name').notEmpty().isString().withMessage('Job name is required'),
     body('source_id').isUUID().withMessage('Valid source ID is required'),
@@ -236,7 +236,7 @@ router.post('/jobs',
  */
 router.post('/jobs/:jobId/execute',
   authenticateToken,
-  requirePermission('data_sync_execute'),
+  requirePermissions(['data_sync_execute']),
   [
     body('options').optional().isObject()
   ],
@@ -286,7 +286,7 @@ router.post('/jobs/:jobId/execute',
  */
 router.get('/jobs/:jobId/status',
   authenticateToken,
-  requirePermission('data_sync_read'),
+  requirePermissions(['data_sync_read']),
   async (req, res) => {
     try {
       const { jobId } = req.params;
@@ -322,7 +322,7 @@ router.get('/jobs/:jobId/status',
  */
 router.get('/jobs/:jobId/history',
   authenticateToken,
-  requirePermission('data_sync_read'),
+  requirePermissions(['data_sync_read']),
   [
     query('limit').optional().isInt({ min: 1, max: 1000 })
   ],
@@ -365,7 +365,7 @@ router.get('/jobs/:jobId/history',
  */
 router.post('/jobs/:jobId/cancel',
   authenticateToken,
-  requirePermission('data_sync_execute'),
+  requirePermissions(['data_sync_execute']),
   async (req, res) => {
     try {
       const { jobId } = req.params;
@@ -405,7 +405,7 @@ router.post('/jobs/:jobId/cancel',
  */
 router.put('/sources/:sourceId/status',
   authenticateToken,
-  requirePermission('data_sync_write'),
+  requirePermissions(['data_sync_write']),
   [
     body('status').isIn(['active', 'inactive', 'error', 'syncing']).withMessage('Invalid status'),
     body('error_message').optional().isString()
@@ -461,7 +461,7 @@ router.put('/sources/:sourceId/status',
  */
 router.post('/cleanup',
   authenticateToken,
-  requirePermission('data_sync_admin'),
+  requirePermissions(['data_sync_admin']),
   [
     body('retention_days').optional().isInt({ min: 1, max: 365 })
   ],
@@ -511,7 +511,7 @@ router.post('/cleanup',
  */
 router.get('/dashboard',
   authenticateToken,
-  requirePermission('data_sync_read'),
+  requirePermissions(['data_sync_read']),
   async (req, res) => {
     try {
       // This would typically aggregate data from various sync operations
