@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "server": "node server.js",
+    "setup-db": "psql $DATABASE_URL -f db-schema.sql",
+    "setup-users": "node setup-dashboard-access.js",
+    "verify-access": "node verify-dashboard-access.js",
+    "test-access": "node test-dashboard-access.js",
+    "setup-complete": "npm run setup-db && npm run setup-users && npm run verify-access && npm run test-access"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
