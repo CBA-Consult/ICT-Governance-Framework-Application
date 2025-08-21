@@ -187,7 +187,7 @@ function UserManagementPage() {
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
               >
                 <PlusIcon className="h-5 w-5 mr-2" />
-                Add User
+                New User
               </button>
             )}
           </div>
