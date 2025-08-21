@@ -3,7 +3,7 @@
 
 const { monitoringService } = require('./monitoring');
 const { diagnosticTools } = require('./diagnostic-tools');
-const EnterpriseIntegration = require('./framework/enterprise-integration');
+const { EnterpriseIntegration } = require('./framework/enterprise-integration');
 
 /**
  * Initialize monitoring for all enterprise integrations

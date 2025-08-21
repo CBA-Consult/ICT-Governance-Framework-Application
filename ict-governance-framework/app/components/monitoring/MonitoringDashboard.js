@@ -20,8 +20,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Tabs, 
   TabsContent, 
-  TabsList, 
-  TabsItem 
+  TabsList
 } from '@/components/ui/tabs';
 import {
   LineChart,
