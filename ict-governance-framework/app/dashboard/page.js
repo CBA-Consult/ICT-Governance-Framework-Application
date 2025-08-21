@@ -1,72 +1,163 @@
 "use client";
-import React, { useState } from "react";
-import EnhancedDashboardPage from "../components/dashboards/EnhancedDashboardPage";
-import { ChartBarIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect } from "react";
+import EnhancedDashboard from "../components/EnhancedDashboard";
+import { ChartBarIcon, Cog6ToothIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+
+const kpiData = [
+  {
+    label: 'Governance Maturity Level',
+    value: 'Level 3 → 4',
+    target: 'Level 4 (Managed)',
+    trend: 'progressing',
+    description: 'Current maturity level based on annual assessment.'
+  },
+  {
+    label: 'Policy Compliance Rate',
+    value: '94%',
+    target: '>95%',
+    trend: 'up',
+    description: 'Percentage of technology assets compliant with governance policies.'
+  },
+  {
+    label: 'Risk Remediation Rate',
+    value: '91%',
+    target: '>90%',
+    trend: 'up',
+    description: 'Percentage of identified risks remediated within SLA.'
+  },
+  {
+    label: 'Stakeholder Satisfaction',
+    value: '82%',
+    target: '>85%',
+    trend: 'up',
+    description: 'Overall satisfaction with governance services.'
+  },
+  {
+    label: 'Process Automation Rate',
+    value: '68%',
+    target: '>70%',
+    trend: 'up',
+    description: 'Percentage of governance processes with automation.'
+  },
+  {
+    label: 'Business Value Realization',
+    value: '$2.3M',
+    target: '$2.3M+',
+    trend: 'steady',
+    description: 'Annual value delivered by governance initiatives.'
+  },
+  {
+    label: 'Incident Rate',
+    value: '↓',
+    target: 'Decreasing',
+    trend: 'down',
+    description: 'Number of incidents related to governance failures.'
+  },
+  {
+    label: 'Mean Time to Resolve (MTTR)',
+    value: '18h',
+    target: '<24h',
+    trend: 'up',
+    description: 'Average time to resolve governance-related incidents.'
+  },
+];
 
 export default function DashboardPage() {
   const [viewMode, setViewMode] = useState('enhanced');
+  const [userPermissions, setUserPermissions] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [accessError, setAccessError] = useState(null);
 
-  const kpiData = [
-    {
-      label: 'Governance Maturity Level',
-      value: 'Level 3 → 4',
-      target: 'Level 4 (Managed)',
-      trend: 'progressing',
-      description: 'Current maturity level based on annual assessment.'
-    },
-    {
-      label: 'Policy Compliance Rate',
-      value: '94%',
-      target: '>95%',
-      trend: 'up',
-      description: 'Percentage of technology assets compliant with governance policies.'
-    },
-    {
-      label: 'Risk Remediation Rate',
-      value: '91%',
-      target: '>90%',
-      trend: 'up',
-      description: 'Percentage of identified risks remediated within SLA.'
-    },
-    {
-      label: 'Stakeholder Satisfaction',
-      value: '82%',
-      target: '>85%',
-      trend: 'up',
-      description: 'Overall satisfaction with governance services.'
-    },
-    {
-      label: 'Process Automation Rate',
-      value: '68%',
-      target: '>70%',
-      trend: 'up',
-      description: 'Percentage of governance processes with automation.'
-    },
-    {
-      label: 'Business Value Realization',
-      value: '$2.3M',
-      target: '$2.3M+',
-      trend: 'steady',
-      description: 'Annual value delivered by governance initiatives.'
-    },
-    {
-      label: 'Incident Rate',
-      value: '↓',
-      target: 'Decreasing',
-      trend: 'down',
-      description: 'Number of incidents related to governance failures.'
-    },
-    {
-      label: 'Mean Time to Resolve (MTTR)',
-      value: '18h',
-      target: '<24h',
-      trend: 'up',
-      description: 'Average time to resolve governance-related incidents.'
-    },
-  ];
+  useEffect(() => {
+    checkDashboardAccess();
+  }, []);
+
+  const checkDashboardAccess = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setAccessError('Authentication required');
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch('/api/dashboard-access/permissions', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to check dashboard permissions');
+      }
+
+      const result = await response.json();
+      setUserPermissions(result.data.dashboardAccess);
+      setAccessError(null);
+    } catch (err) {
+      console.error('Error checking dashboard access:', err);
+      setAccessError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Checking dashboard access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (accessError) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <LockClosedIcon className="h-12 w-12 text-red-500 mx-auto" />
+          <p className="mt-4 text-red-600">Access Error: {accessError}</p>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Please contact your administrator to request dashboard access.
+          </p>
+          <button 
+            onClick={checkDashboardAccess}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has any dashboard permissions
+  const hasAnyDashboardAccess = userPermissions && (
+    userPermissions.executive || 
+    userPermissions.operational || 
+    userPermissions.compliance || 
+    userPermissions.analytics
+  );
+
+  if (!hasAnyDashboardAccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <LockClosedIcon className="h-12 w-12 text-red-500 mx-auto" />
+          <p className="mt-4 text-red-600">No Dashboard Access</p>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            You don't have permission to access any dashboards. Please contact your administrator.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (viewMode === 'enhanced') {
-    return <EnhancedDashboardPage />;
+    return <EnhancedDashboard />;
   }
 
   return (
@@ -101,6 +192,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <h1 className="text-3xl font-bold mb-6">ICT Governance KPI Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {kpiData.map((kpi) => (
             <div key={kpi.label} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex flex-col justify-between">

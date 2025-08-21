@@ -747,13 +747,13 @@ INSERT INTO permissions (permission_id, permission_name, display_name, descripti
 ('PERM_APP_PROCUREMENT', 'app.procurement', 'Application Procurement', 'Request and manage application procurement', 'applications', 'procurement', TRUE),
 ('PERM_APP_MANAGE', 'app.manage', 'Manage Applications', 'Manage application catalog and registrations', 'applications', 'manage', TRUE),
 
--- Reporting
-('PERM_REPORTING_READ', 'reporting.read', 'View Reports', 'View and access reports', 'reporting', 'read', TRUE),
-('PERM_REPORTING_WRITE', 'reporting.write', 'Generate Reports', 'Generate and create reports', 'reporting', 'write', TRUE),
-('PERM_REPORTING_MANAGE', 'reporting.manage', 'Manage Reports', 'Manage report templates and schedules', 'reporting', 'manage', TRUE),
-('PERM_REPORTING_ADMIN', 'reporting.admin', 'Reporting Administration', 'Full reporting system administration', 'reporting', 'admin', TRUE),
-('PERM_CUSTOM_REPORTS', 'reporting.custom', 'Custom Reports', 'Create and manage custom report templates', 'reporting', 'custom', TRUE),
-('PERM_REPORT_SCHEDULE', 'reporting.schedule', 'Schedule Reports', 'Create and manage scheduled reports', 'reporting', 'schedule', TRUE)
+-- Dashboard Access
+('PERM_DASHBOARD_EXECUTIVE', 'dashboard.executive', 'Executive Dashboard Access', 'Access to executive-level dashboards and strategic metrics', 'dashboards', 'executive', TRUE),
+('PERM_DASHBOARD_OPERATIONAL', 'dashboard.operational', 'Operational Dashboard Access', 'Access to operational dashboards and detailed metrics', 'dashboards', 'operational', TRUE),
+('PERM_DASHBOARD_COMPLIANCE', 'dashboard.compliance', 'Compliance Dashboard Access', 'Access to compliance dashboards and regulatory metrics', 'dashboards', 'compliance', TRUE),
+('PERM_DASHBOARD_ANALYTICS', 'dashboard.analytics', 'Analytics Dashboard Access', 'Access to advanced analytics and data visualization features', 'dashboards', 'analytics', TRUE),
+('PERM_DASHBOARD_EXPORT', 'dashboard.export', 'Dashboard Export', 'Export dashboard data and reports', 'dashboards', 'export', TRUE),
+('PERM_DASHBOARD_ADMIN', 'dashboard.admin', 'Dashboard Administration', 'Manage dashboard configurations and user access', 'dashboards', 'admin', TRUE)
 ON CONFLICT (permission_id) DO NOTHING;
 
 -- Assign permissions to default roles
@@ -784,12 +784,12 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_SUPER_ADMIN', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_SUPER_ADMIN', 'PERM_APP_PROCUREMENT'),
 ('ROLE_SUPER_ADMIN', 'PERM_APP_MANAGE'),
-('ROLE_SUPER_ADMIN', 'PERM_REPORTING_READ'),
-('ROLE_SUPER_ADMIN', 'PERM_REPORTING_WRITE'),
-('ROLE_SUPER_ADMIN', 'PERM_REPORTING_MANAGE'),
-('ROLE_SUPER_ADMIN', 'PERM_REPORTING_ADMIN'),
-('ROLE_SUPER_ADMIN', 'PERM_CUSTOM_REPORTS'),
-('ROLE_SUPER_ADMIN', 'PERM_REPORT_SCHEDULE'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_EXECUTIVE'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_EXPORT'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_ADMIN'),
 
 -- Admin - Most permissions except user/role management
 ('ROLE_ADMIN', 'PERM_USER_READ'),
@@ -809,11 +809,11 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_ADMIN', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_ADMIN', 'PERM_APP_PROCUREMENT'),
 ('ROLE_ADMIN', 'PERM_APP_MANAGE'),
-('ROLE_ADMIN', 'PERM_REPORTING_READ'),
-('ROLE_ADMIN', 'PERM_REPORTING_WRITE'),
-('ROLE_ADMIN', 'PERM_REPORTING_MANAGE'),
-('ROLE_ADMIN', 'PERM_CUSTOM_REPORTS'),
-('ROLE_ADMIN', 'PERM_REPORT_SCHEDULE'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_EXECUTIVE'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_EXPORT'),
 
 -- Governance Manager
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_USER_READ'),
@@ -829,11 +829,11 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_APP_PROCUREMENT'),
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_APP_MANAGE'),
-('ROLE_GOVERNANCE_MANAGER', 'PERM_REPORTING_READ'),
-('ROLE_GOVERNANCE_MANAGER', 'PERM_REPORTING_WRITE'),
-('ROLE_GOVERNANCE_MANAGER', 'PERM_REPORTING_MANAGE'),
-('ROLE_GOVERNANCE_MANAGER', 'PERM_CUSTOM_REPORTS'),
-('ROLE_GOVERNANCE_MANAGER', 'PERM_REPORT_SCHEDULE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_EXECUTIVE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_EXPORT'),
 
 -- Compliance Officer
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_USER_READ'),
@@ -846,9 +846,10 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_WORKFLOW_CREATE'),
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_WORKFLOW_READ'),
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_APP_PROCUREMENT'),
-('ROLE_COMPLIANCE_OFFICER', 'PERM_REPORTING_READ'),
-('ROLE_COMPLIANCE_OFFICER', 'PERM_REPORTING_WRITE'),
-('ROLE_COMPLIANCE_OFFICER', 'PERM_CUSTOM_REPORTS'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_DASHBOARD_EXPORT'),
 
 -- IT Manager
 ('ROLE_IT_MANAGER', 'PERM_USER_READ'),
@@ -863,9 +864,9 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_IT_MANAGER', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_IT_MANAGER', 'PERM_APP_PROCUREMENT'),
 ('ROLE_IT_MANAGER', 'PERM_APP_MANAGE'),
-('ROLE_IT_MANAGER', 'PERM_REPORTING_READ'),
-('ROLE_IT_MANAGER', 'PERM_REPORTING_WRITE'),
-('ROLE_IT_MANAGER', 'PERM_CUSTOM_REPORTS'),
+('ROLE_IT_MANAGER', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_IT_MANAGER', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_IT_MANAGER', 'PERM_DASHBOARD_EXPORT'),
 
 -- Security Analyst
 ('ROLE_SECURITY_ANALYST', 'PERM_USER_READ'),
@@ -878,8 +879,9 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_SECURITY_ANALYST', 'PERM_WORKFLOW_CREATE'),
 ('ROLE_SECURITY_ANALYST', 'PERM_WORKFLOW_READ'),
 ('ROLE_SECURITY_ANALYST', 'PERM_APP_PROCUREMENT'),
-('ROLE_SECURITY_ANALYST', 'PERM_REPORTING_READ'),
-('ROLE_SECURITY_ANALYST', 'PERM_REPORTING_WRITE'),
+('ROLE_SECURITY_ANALYST', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_SECURITY_ANALYST', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_SECURITY_ANALYST', 'PERM_DASHBOARD_ANALYTICS'),
 
 -- Auditor
 ('ROLE_AUDITOR', 'PERM_USER_READ'),
@@ -891,8 +893,8 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_AUDITOR', 'PERM_FEEDBACK_READ'),
 ('ROLE_AUDITOR', 'PERM_WORKFLOW_READ'),
 ('ROLE_AUDITOR', 'PERM_APP_PROCUREMENT'),
-('ROLE_AUDITOR', 'PERM_REPORTING_READ'),
-('ROLE_AUDITOR', 'PERM_REPORTING_WRITE'),
+('ROLE_AUDITOR', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_AUDITOR', 'PERM_DASHBOARD_ANALYTICS'),
 
 -- Employee
 ('ROLE_EMPLOYEE', 'PERM_GOVERNANCE_READ'),

@@ -29,6 +29,9 @@ const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
 const rolesRouter = require('./api/roles');
 
+// Import dashboard access management API routes
+const dashboardAccessRouter = require('./api/dashboard-access');
+
 // Import document management API routes
 const documentsRouter = require('./api/documents');
 const documentWorkflowsRouter = require('./api/document-workflows');
@@ -105,6 +108,9 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/roles', rolesRouter);
 
+// Dashboard access management routes
+app.use('/api/dashboard-access', dashboardAccessRouter);
+
 // Document management routes
 app.use('/api/documents', documentsRouter);
 app.use('/api/document-workflows', documentWorkflowsRouter);
@@ -162,6 +168,7 @@ app.get('/api/health', (req, res) => res.json({
     database: 'connected',
     authentication: 'enabled',
     userManagement: 'enabled',
+    dashboardAccess: 'enabled',
     documentManagement: 'enabled',
     workflowEngine: 'enabled',
     notifications: 'enabled',
