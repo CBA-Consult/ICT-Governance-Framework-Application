@@ -113,7 +113,7 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
         status: formData.status
       };
 
-      await apiClient.post('/users', userData);
+      const response = await apiClient.post('/users', userData);
       
       // Reset form
       setFormData({
@@ -129,7 +129,13 @@ export default function AddUserModal({ isOpen, onClose, onUserAdded, apiClient }
         status: 'Active'
       });
       
-      onUserAdded();
+      // Pass user information back to parent for success message
+      onUserAdded({
+        username: userData.username,
+        email: userData.email,
+        firstName: userData.first_name,
+        lastName: userData.last_name
+      });
       onClose();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create user');

@@ -117,7 +117,13 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user, ap
         });
       }
       
-      onUserUpdated();
+      // Pass user information back to parent for success message
+      onUserUpdated({
+        username: userData.username,
+        email: userData.email,
+        firstName: userData.first_name,
+        lastName: userData.last_name
+      });
       onClose();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update user');
