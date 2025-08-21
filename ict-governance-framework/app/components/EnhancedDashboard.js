@@ -1,7 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChartBarIcon, TrendingUpIcon, TrendingDownIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { 
+  ChartBarIcon, 
+  TrendingUpIcon, 
+  TrendingDownIcon, 
+  ExclamationTriangleIcon,
+  LockClosedIcon,
+  UserGroupIcon,
+  Cog6ToothIcon,
+  ShieldCheckIcon
+} from '@heroicons/react/24/outline';
 
 export default function EnhancedDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
@@ -9,15 +18,72 @@ export default function EnhancedDashboard() {
   const [error, setError] = useState(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState(30);
   const [dashboardType, setDashboardType] = useState('executive');
+  const [userPermissions, setUserPermissions] = useState(null);
+  const [accessError, setAccessError] = useState(null);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [selectedTimeRange, dashboardType]);
+    checkUserPermissions();
+  }, []);
+
+  useEffect(() => {
+    if (userPermissions) {
+      fetchDashboardData();
+    }
+  }, [selectedTimeRange, dashboardType, userPermissions]);
+
+  const checkUserPermissions = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setAccessError('Authentication required');
+        return;
+      }
+
+      const response = await fetch('/api/dashboard-access/permissions', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to check dashboard permissions');
+      }
+
+      const result = await response.json();
+      setUserPermissions(result.data.dashboardAccess);
+      setAccessError(null);
+
+      // Set default dashboard type based on available permissions
+      const permissions = result.data.dashboardAccess;
+      if (permissions.executive) {
+        setDashboardType('executive');
+      } else if (permissions.operational) {
+        setDashboardType('operational');
+      } else if (permissions.compliance) {
+        setDashboardType('compliance');
+      } else if (permissions.analytics) {
+        setDashboardType('analytics');
+      } else {
+        setAccessError('No dashboard access permissions found');
+      }
+    } catch (err) {
+      console.error('Error checking permissions:', err);
+      setAccessError(err.message);
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+      
+      // Check if user has permission for this dashboard type
+      if (!hasPermissionForDashboard(dashboardType)) {
+        setError(`Access denied: You don't have permission to view ${dashboardType} dashboard`);
+        setLoading(false);
+        return;
+      }
       
       const response = await fetch(`/api/data-processing/dashboard-data?dashboard_type=${dashboardType}&time_range_days=${selectedTimeRange}`, {
         headers: {
@@ -25,6 +91,12 @@ export default function EnhancedDashboard() {
           'Content-Type': 'application/json'
         }
       });
+
+      if (response.status === 403) {
+        setError('Access denied: Insufficient permissions for this dashboard');
+        setLoading(false);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error('Failed to fetch dashboard data');
@@ -38,6 +110,23 @@ export default function EnhancedDashboard() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const hasPermissionForDashboard = (type) => {
+    if (!userPermissions) return false;
+    
+    switch (type) {
+      case 'executive':
+        return userPermissions.executive;
+      case 'operational':
+        return userPermissions.operational;
+      case 'compliance':
+        return userPermissions.compliance;
+      case 'analytics':
+        return userPermissions.analytics;
+      default:
+        return false;
     }
   };
 
@@ -137,6 +226,26 @@ export default function EnhancedDashboard() {
     );
   };
 
+  if (accessError) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <LockClosedIcon className="h-12 w-12 text-red-500 mx-auto" />
+          <p className="mt-4 text-red-600">Access Error: {accessError}</p>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Please contact your administrator to request dashboard access.
+          </p>
+          <button 
+            onClick={checkUserPermissions}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -183,10 +292,10 @@ export default function EnhancedDashboard() {
                 onChange={(e) => setDashboardType(e.target.value)}
                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               >
-                <option value="executive">Executive</option>
-                <option value="operational">Operational</option>
-                <option value="compliance">Compliance</option>
-                <option value="risk">Risk</option>
+                {userPermissions?.executive && <option value="executive">Executive</option>}
+                {userPermissions?.operational && <option value="operational">Operational</option>}
+                {userPermissions?.compliance && <option value="compliance">Compliance</option>}
+                {userPermissions?.analytics && <option value="analytics">Analytics</option>}
               </select>
               <select
                 value={selectedTimeRange}
