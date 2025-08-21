@@ -68,6 +68,7 @@ function AdminDashboard() {
       href: '/admin/users',
       color: 'bg-blue-500',
       requiredPermissions: ['user.read']
+
     },
     {
       title: 'Role Management',
@@ -258,3 +259,4 @@ function AdminDashboard() {
 
 // Export with authentication and permission requirements
 export default withAuth(AdminDashboard, ['system.admin'], ['admin', 'super_admin']);
+
