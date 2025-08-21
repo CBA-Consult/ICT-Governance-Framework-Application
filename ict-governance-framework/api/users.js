@@ -741,6 +741,110 @@ router.post('/:userId/roles',
 );
 
 /**
+ * PUT /api/users/:userId/roles
+ * Update user roles (replace all roles)
+ */
+router.put('/:userId/roles',
+  authenticateToken,
+  requirePermissions(['user.manage_roles']),
+  logActivity('USER_ROLE_UPDATE', (req) => `Updated roles for user ${req.params.userId}`),
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      const { userId } = req.params;
+      const { roles, reason } = req.body;
+
+      if (!roles || !Array.isArray(roles)) {
+        return res.status(400).json({
+          error: 'Roles array is required',
+          code: 'ROLES_REQUIRED'
+        });
+      }
+
+      await client.query('BEGIN');
+
+      // Check if user exists
+      const userQuery = 'SELECT user_id FROM users WHERE user_id = $1';
+      const userResult = await client.query(userQuery, [userId]);
+
+      if (userResult.rows.length === 0) {
+        return res.status(404).json({
+          error: 'User not found',
+          code: 'USER_NOT_FOUND'
+        });
+      }
+
+      // Validate roles exist
+      if (roles.length > 0) {
+        const roleQuery = 'SELECT role_id, role_name FROM roles WHERE role_name = ANY($1) AND is_active = true';
+        const roleResult = await client.query(roleQuery, [roles]);
+
+        if (roleResult.rows.length !== roles.length) {
+          const foundRoles = roleResult.rows.map(r => r.role_name);
+          const missingRoles = roles.filter(r => !foundRoles.includes(r));
+          return res.status(400).json({
+            error: 'Some roles not found',
+            code: 'ROLES_NOT_FOUND',
+            missingRoles
+          });
+        }
+      }
+
+      // Deactivate all current roles
+      await client.query(
+        'UPDATE user_roles SET is_active = false WHERE user_id = $1',
+        [userId]
+      );
+
+      // Assign new roles
+      const assignedRoles = [];
+      if (roles.length > 0) {
+        const roleQuery = 'SELECT role_id, role_name FROM roles WHERE role_name = ANY($1) AND is_active = true';
+        const roleResult = await client.query(roleQuery, [roles]);
+
+        for (const role of roleResult.rows) {
+          const assignQuery = `
+            INSERT INTO user_roles (user_id, role_id, assigned_by, assignment_reason)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (user_id, role_id) 
+            DO UPDATE SET is_active = true, assigned_by = $3, assigned_at = CURRENT_TIMESTAMP
+            RETURNING role_id
+          `;
+
+          await client.query(assignQuery, [
+            userId,
+            role.role_id,
+            req.user.user_id,
+            reason || 'Role updated via API'
+          ]);
+
+          assignedRoles.push(role.role_name);
+        }
+      }
+
+      await client.query('COMMIT');
+
+      res.json({
+        message: 'User roles updated successfully',
+        userId,
+        roles: assignedRoles
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Update user roles error:', error);
+      res.status(500).json({
+        error: 'Failed to update user roles',
+        code: 'ROLE_UPDATE_ERROR'
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+/**
  * DELETE /api/users/:userId/roles/:roleId
  * Remove a role from a user
  */
