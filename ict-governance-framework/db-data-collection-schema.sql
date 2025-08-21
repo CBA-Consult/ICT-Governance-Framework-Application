@@ -57,6 +57,14 @@ CREATE TABLE IF NOT EXISTS data_processing_jobs (
     FOREIGN KEY (created_by) REFERENCES users(user_id)
 );
 
+-- Workflow instances table - tracks workflow executions
+CREATE TABLE IF NOT EXISTS workflow_instances (
+    id VARCHAR(50) PRIMARY KEY,
+    workflow_type VARCHAR(50) NOT NULL,
+    title VARCHAR(200) NOT NULL DEFAULT '',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Generated reports table - stores generated reports
 CREATE TABLE IF NOT EXISTS generated_reports (
     id SERIAL PRIMARY KEY,
@@ -191,6 +199,26 @@ CREATE TABLE IF NOT EXISTS data_collection_schedules (
     FOREIGN KEY (updated_by) REFERENCES users(user_id)
 );
 
+-- Workflow approvals table - tracks workflow approval processes
+CREATE TABLE IF NOT EXISTS workflow_approvals (
+    id SERIAL PRIMARY KEY,
+    approval_id VARCHAR(50) UNIQUE NOT NULL,
+    workflow_id VARCHAR(50) NOT NULL,
+    approver_id VARCHAR(50) NOT NULL,
+    approval_status VARCHAR(50) DEFAULT 'pending' CHECK (approval_status IN ('pending', 'approved', 'rejected', 'skipped')),
+    due_date TIMESTAMP,
+    comments TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    workflow_instance_id VARCHAR(50),
+    escalated_at TIMESTAMP,
+    FOREIGN KEY (workflow_id) REFERENCES workflows(workflow_id),
+    FOREIGN KEY (approver_id) REFERENCES users(user_id)
+);
+
+-- Alter workflow_instances table to add workflow_type column
+ALTER TABLE workflow_instances ADD COLUMN workflow_type VARCHAR(50);
+
 -- Create indexes for performance optimization
 CREATE INDEX IF NOT EXISTS idx_metric_data_metric_name ON metric_data(metric_name);
 CREATE INDEX IF NOT EXISTS idx_metric_data_category ON metric_data(metric_category);
@@ -222,6 +250,10 @@ CREATE INDEX IF NOT EXISTS idx_automated_insights_created_at ON automated_insigh
 CREATE INDEX IF NOT EXISTS idx_data_quality_metrics_source_id ON data_quality_metrics(data_source_id);
 CREATE INDEX IF NOT EXISTS idx_data_quality_metrics_check_type ON data_quality_metrics(check_type);
 CREATE INDEX IF NOT EXISTS idx_data_quality_metrics_timestamp ON data_quality_metrics(check_timestamp);
+
+CREATE INDEX IF NOT EXISTS idx_workflow_approvals_workflow_id ON workflow_approvals(workflow_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_approvals_approver_id ON workflow_approvals(approver_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_approvals_status ON workflow_approvals(approval_status);
 
 -- Insert default data sources
 INSERT INTO data_sources (data_source_id, source_name, source_type, data_category, description, collection_frequency, is_active, created_by, updated_by)
@@ -285,3 +317,4 @@ CREATE TRIGGER update_dashboard_configurations_updated_at BEFORE UPDATE ON dashb
 CREATE TRIGGER update_data_collection_schedules_updated_at BEFORE UPDATE ON data_collection_schedules FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_data_processing_jobs_updated_at BEFORE UPDATE ON data_processing_jobs FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_generated_reports_updated_at BEFORE UPDATE ON generated_reports FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_workflow_approvals_updated_at BEFORE UPDATE ON workflow_approvals FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

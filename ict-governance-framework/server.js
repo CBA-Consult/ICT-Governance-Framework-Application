@@ -42,6 +42,25 @@ const dataProcessingRouter = require('./api/data-processing');
 const reportingRouter = require('./api/reporting');
 const dataAnalyticsRouter = require('./api/data-analytics');
 
+// Import data management API routes
+const dataSynchronizationRouter = require('./api/data-synchronization');
+const dataTransformationRouter = require('./api/data-transformation');
+const masterDataManagementRouter = require('./api/master-data-management');
+
+// Import enhanced predictive analytics and insights API routes
+const { router: predictiveAnalyticsRouter } = require('./api/predictive-analytics-engine');
+const { router: insightsGeneratorRouter } = require('./api/insights-generator');
+
+// Import monitoring and diagnostic API routes
+const { router: monitoringRouter } = require('./api/monitoring');
+const { router: diagnosticRouter } = require('./api/diagnostic-tools');
+
+// Import Enterprise API Framework
+const EnterpriseAPI = require('./api/enterprise-api');
+
+// Import monitoring initialization
+const { initializeMonitoring } = require('./api/initialize-monitoring');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -118,6 +137,28 @@ app.use('/api/data-processing', dataProcessingRouter);
 app.use('/api/reporting', reportingRouter);
 app.use('/api/data-analytics', dataAnalyticsRouter);
 
+// Data management routes
+app.use('/api/data-synchronization', dataSynchronizationRouter);
+app.use('/api/data-transformation', dataTransformationRouter);
+app.use('/api/master-data-management', masterDataManagementRouter);
+
+// Enhanced predictive analytics and insights routes
+app.use('/api/predictive-analytics', predictiveAnalyticsRouter);
+app.use('/api/insights', insightsGeneratorRouter);
+
+// Monitoring and diagnostic routes
+app.use('/api/monitoring', monitoringRouter);
+app.use('/api/diagnostics', diagnosticRouter);
+
+// Initialize and mount Enterprise API Framework
+const enterpriseAPI = new EnterpriseAPI({
+  version: '2.0.0',
+  enableMetrics: true,
+  enableCaching: true,
+  enableWorkflows: true
+});
+app.use('/api/v2/enterprise', enterpriseAPI.getRouter());
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ 
   status: 'ok',
@@ -138,10 +179,30 @@ app.get('/api/health', (req, res) => res.json({
     dataCollection: 'enabled',
     dataProcessing: 'enabled',
     reporting: 'enabled',
-    dataAnalytics: 'enabled'
+    dataAnalytics: 'enabled',
+    dataSynchronization: 'enabled',
+    dataTransformation: 'enabled',
+    masterDataManagement: 'enabled',
+    predictiveAnalytics: 'enabled',
+    insightsGenerator: 'enabled',
+    enterpriseIntegration: 'enabled',
+    apiManagement: 'enabled',
+    workflowOrchestrator: 'enabled',
+    monitoring: 'enabled',
+    healthChecks: 'enabled',
+    diagnostics: 'enabled',
+    alerting: 'enabled'
   }
 }));
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Express server running on http://localhost:${PORT}`);
+  
+  // Initialize monitoring and health checks
+  try {
+    await initializeMonitoring();
+    console.log('✓ Monitoring and health check capabilities initialized');
+  } catch (error) {
+    console.error('✗ Failed to initialize monitoring:', error.message);
+  }
 });

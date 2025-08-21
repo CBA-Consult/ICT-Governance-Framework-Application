@@ -5,7 +5,8 @@ const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult, query } = require('express-validator');
-const { authenticateToken, requirePermission, logActivity } = require('./auth');
+const { authenticateToken, logActivity } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissions');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -477,7 +478,7 @@ class ReportGenerator {
 // GET /api/reporting/templates - List available report templates
 router.get('/templates',
   authenticateToken,
-  requirePermission('reporting_read'),
+  requirePermission('reporting.read'),
   async (req, res) => {
     try {
       await logActivity(
@@ -509,7 +510,7 @@ router.get('/templates',
 // POST /api/reporting/generate - Generate a report
 router.post('/generate',
   authenticateToken,
-  requirePermission('reporting_write'),
+  requirePermission('reporting.write'),
   [
     body('report_type').isIn(Object.keys(REPORT_TEMPLATES)).withMessage('Invalid report type'),
     body('time_range.start_date').isISO8601().withMessage('Invalid start date'),
@@ -611,7 +612,7 @@ router.post('/generate',
 // GET /api/reporting/reports - List generated reports
 router.get('/reports',
   authenticateToken,
-  requirePermission('reporting_read'),
+  requirePermission('reporting.read'),
   async (req, res) => {
     try {
       const { page = 1, limit = 20, report_type, status } = req.query;
@@ -695,7 +696,7 @@ router.get('/reports',
 // GET /api/reporting/reports/:id - Get specific report
 router.get('/reports/:id',
   authenticateToken,
-  requirePermission('reporting_read'),
+  requirePermission('reporting.read'),
   async (req, res) => {
     try {
       const { id } = req.params;
@@ -739,6 +740,714 @@ router.get('/reports/:id',
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve report',
+        error: error.message
+      });
+    }
+  }
+);
+
+// ============================================================================
+// CUSTOM REPORT TEMPLATES MANAGEMENT
+// ============================================================================
+
+// GET /api/reporting/custom-templates - List custom report templates
+router.get('/custom-templates',
+  authenticateToken,
+  requirePermission('reporting.read'),
+  async (req, res) => {
+    try {
+      const { page = 1, limit = 20, category, is_public, created_by } = req.query;
+      const offset = (page - 1) * limit;
+
+      let whereConditions = ['is_active = true'];
+      let queryParams = [];
+      let paramCount = 0;
+
+      if (category) {
+        paramCount++;
+        whereConditions.push(`category = $${paramCount}`);
+        queryParams.push(category);
+      }
+
+      if (is_public !== undefined) {
+        paramCount++;
+        whereConditions.push(`is_public = $${paramCount}`);
+        queryParams.push(is_public === 'true');
+      }
+
+      if (created_by) {
+        paramCount++;
+        whereConditions.push(`created_by = $${paramCount}`);
+        queryParams.push(created_by);
+      }
+
+      // If not public, only show user's own templates or public ones
+      if (is_public !== 'true') {
+        paramCount++;
+        whereConditions.push(`(is_public = true OR created_by = $${paramCount})`);
+        queryParams.push(req.user.user_id);
+      }
+
+      const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
+
+      const templatesQuery = `
+        SELECT 
+          template_id,
+          template_name,
+          description,
+          category,
+          tags,
+          is_public,
+          created_at,
+          last_used_at,
+          usage_count,
+          u.username as created_by_username
+        FROM custom_report_templates crt
+        LEFT JOIN users u ON crt.created_by = u.user_id
+        ${whereClause}
+        ORDER BY usage_count DESC, created_at DESC
+        LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}
+      `;
+
+      queryParams.push(limit, offset);
+
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM custom_report_templates crt
+        ${whereClause}
+      `;
+
+      const [templatesResult, countResult] = await Promise.all([
+        pool.query(templatesQuery, queryParams),
+        pool.query(countQuery, queryParams.slice(0, -2))
+      ]);
+
+      const templates = templatesResult.rows;
+      const total = parseInt(countResult.rows[0].total);
+      const totalPages = Math.ceil(total / limit);
+
+      res.json({
+        success: true,
+        data: {
+          templates,
+          pagination: {
+            current_page: parseInt(page),
+            total_pages: totalPages,
+            total_items: total,
+            items_per_page: parseInt(limit)
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('Error listing custom templates:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to list custom templates',
+        error: error.message
+      });
+    }
+  }
+);
+
+// POST /api/reporting/custom-templates - Create custom report template
+router.post('/custom-templates',
+  authenticateToken,
+  requirePermission('reporting.custom'),
+  [
+    body('template_name').isLength({ min: 1, max: 255 }).withMessage('Template name is required'),
+    body('template_config').isObject().withMessage('Template configuration is required'),
+    body('data_sources').isArray().withMessage('Data sources must be an array')
+  ],
+  async (req, res) => {
+    const client = await pool.connect();
+    
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array()
+        });
+      }
+
+      const {
+        template_name,
+        description,
+        template_config,
+        data_sources,
+        visualization_config = {},
+        filters_config = {},
+        parameters_config = {},
+        output_format = 'json',
+        category,
+        tags = [],
+        is_public = false
+      } = req.body;
+
+      await client.query('BEGIN');
+
+      const templateId = `TPL-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+      const insertQuery = `
+        INSERT INTO custom_report_templates (
+          template_id, template_name, description, created_by, is_public,
+          template_config, data_sources, visualization_config, filters_config,
+          parameters_config, output_format, category, tags
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        RETURNING *
+      `;
+
+      const values = [
+        templateId,
+        template_name,
+        description,
+        req.user.user_id,
+        is_public,
+        JSON.stringify(template_config),
+        data_sources,
+        JSON.stringify(visualization_config),
+        JSON.stringify(filters_config),
+        JSON.stringify(parameters_config),
+        output_format,
+        category,
+        tags
+      ];
+
+      const result = await client.query(insertQuery, values);
+      const savedTemplate = result.rows[0];
+
+      await client.query('COMMIT');
+
+      await logActivity(
+        req.user.user_id,
+        'custom_template_created',
+        `Custom report template created: ${template_name}`,
+        req.ip,
+        req.get('User-Agent'),
+        { template_id: templateId, template_name }
+      );
+
+      res.status(201).json({
+        success: true,
+        message: 'Custom report template created successfully',
+        data: { template: savedTemplate }
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Error creating custom template:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to create custom template',
+        error: error.message
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+// GET /api/reporting/custom-templates/:id - Get specific custom template
+router.get('/custom-templates/:id',
+  authenticateToken,
+  requirePermission('reporting.read'),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const query = `
+        SELECT 
+          crt.*,
+          u.username as created_by_username
+        FROM custom_report_templates crt
+        LEFT JOIN users u ON crt.created_by = u.user_id
+        WHERE template_id = $1 AND is_active = true
+          AND (is_public = true OR created_by = $2)
+      `;
+
+      const result = await pool.query(query, [id, req.user.user_id]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Custom template not found or access denied'
+        });
+      }
+
+      const template = result.rows[0];
+
+      // Update usage tracking
+      await pool.query(
+        'UPDATE custom_report_templates SET last_used_at = CURRENT_TIMESTAMP, usage_count = usage_count + 1 WHERE template_id = $1',
+        [id]
+      );
+
+      res.json({
+        success: true,
+        data: { template }
+      });
+
+    } catch (error) {
+      console.error('Error retrieving custom template:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to retrieve custom template',
+        error: error.message
+      });
+    }
+  }
+);
+
+// PUT /api/reporting/custom-templates/:id - Update custom template
+router.put('/custom-templates/:id',
+  authenticateToken,
+  requirePermission('reporting.custom'),
+  async (req, res) => {
+    const client = await pool.connect();
+    
+    try {
+      const { id } = req.params;
+      const updateFields = req.body;
+
+      // Check if user owns the template or has admin permissions
+      const checkQuery = `
+        SELECT created_by FROM custom_report_templates 
+        WHERE template_id = $1 AND is_active = true
+      `;
+      const checkResult = await client.query(checkQuery, [id]);
+
+      if (checkResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Template not found'
+        });
+      }
+
+      const template = checkResult.rows[0];
+      if (template.created_by !== req.user.user_id && !req.user.permissions.includes('reporting.admin')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied'
+        });
+      }
+
+      await client.query('BEGIN');
+
+      // Build dynamic update query
+      const allowedFields = [
+        'template_name', 'description', 'template_config', 'data_sources',
+        'visualization_config', 'filters_config', 'parameters_config',
+        'output_format', 'category', 'tags', 'is_public'
+      ];
+
+      const updatePairs = [];
+      const values = [];
+      let paramCount = 0;
+
+      Object.keys(updateFields).forEach(field => {
+        if (allowedFields.includes(field)) {
+          paramCount++;
+          updatePairs.push(`${field} = $${paramCount}`);
+          
+          if (typeof updateFields[field] === 'object' && !Array.isArray(updateFields[field])) {
+            values.push(JSON.stringify(updateFields[field]));
+          } else {
+            values.push(updateFields[field]);
+          }
+        }
+      });
+
+      if (updatePairs.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No valid fields to update'
+        });
+      }
+
+      updatePairs.push(`updated_at = CURRENT_TIMESTAMP`);
+      updatePairs.push(`version = version + 1`);
+
+      const updateQuery = `
+        UPDATE custom_report_templates 
+        SET ${updatePairs.join(', ')}
+        WHERE template_id = $${paramCount + 1}
+        RETURNING *
+      `;
+
+      values.push(id);
+
+      const result = await client.query(updateQuery, values);
+      const updatedTemplate = result.rows[0];
+
+      await client.query('COMMIT');
+
+      await logActivity(
+        req.user.user_id,
+        'custom_template_updated',
+        `Custom report template updated: ${id}`,
+        req.ip,
+        req.get('User-Agent'),
+        { template_id: id }
+      );
+
+      res.json({
+        success: true,
+        message: 'Custom template updated successfully',
+        data: { template: updatedTemplate }
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Error updating custom template:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update custom template',
+        error: error.message
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+// DELETE /api/reporting/custom-templates/:id - Delete custom template
+router.delete('/custom-templates/:id',
+  authenticateToken,
+  requirePermission('reporting.custom'),
+  async (req, res) => {
+    const client = await pool.connect();
+    
+    try {
+      const { id } = req.params;
+
+      // Check if user owns the template or has admin permissions
+      const checkQuery = `
+        SELECT created_by, template_name FROM custom_report_templates 
+        WHERE template_id = $1 AND is_active = true
+      `;
+      const checkResult = await client.query(checkQuery, [id]);
+
+      if (checkResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Template not found'
+        });
+      }
+
+      const template = checkResult.rows[0];
+      if (template.created_by !== req.user.user_id && !req.user.permissions.includes('reporting.admin')) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied'
+        });
+      }
+
+      await client.query('BEGIN');
+
+      // Soft delete
+      await client.query(
+        'UPDATE custom_report_templates SET is_active = false, updated_at = CURRENT_TIMESTAMP WHERE template_id = $1',
+        [id]
+      );
+
+      await client.query('COMMIT');
+
+      await logActivity(
+        req.user.user_id,
+        'custom_template_deleted',
+        `Custom report template deleted: ${template.template_name}`,
+        req.ip,
+        req.get('User-Agent'),
+        { template_id: id }
+      );
+
+      res.json({
+        success: true,
+        message: 'Custom template deleted successfully'
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Error deleting custom template:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to delete custom template',
+        error: error.message
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+// ============================================================================
+// REPORT EXPORT AND DOWNLOAD
+// ============================================================================
+
+// GET /api/reporting/reports/:id/export - Export report in various formats
+router.get('/reports/:id/export',
+  authenticateToken,
+  requirePermission('reporting.read'),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { format = 'json' } = req.query;
+
+      // Get the report
+      const reportQuery = `
+        SELECT * FROM generated_reports 
+        WHERE report_id = $1 AND status = 'completed'
+      `;
+      const reportResult = await pool.query(reportQuery, [id]);
+
+      if (reportResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Report not found or not completed'
+        });
+      }
+
+      const report = reportResult.rows[0];
+      const reportData = JSON.parse(report.report_data);
+
+      // Update download count
+      await pool.query(
+        'UPDATE generated_reports SET download_count = download_count + 1 WHERE report_id = $1',
+        [id]
+      );
+
+      await logActivity(
+        req.user.user_id,
+        'report_exported',
+        `Report exported: ${id} (${format})`,
+        req.ip,
+        req.get('User-Agent'),
+        { report_id: id, export_format: format }
+      );
+
+      switch (format.toLowerCase()) {
+        case 'json':
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Content-Disposition', `attachment; filename="report-${id}.json"`);
+          res.json(reportData);
+          break;
+
+        case 'csv':
+          // Convert report data to CSV format
+          const csvData = convertToCSV(reportData);
+          res.setHeader('Content-Type', 'text/csv');
+          res.setHeader('Content-Disposition', `attachment; filename="report-${id}.csv"`);
+          res.send(csvData);
+          break;
+
+        case 'pdf':
+          // For PDF generation, you would typically use a library like puppeteer or jsPDF
+          // For now, return a placeholder response
+          res.status(501).json({
+            success: false,
+            message: 'PDF export not yet implemented'
+          });
+          break;
+
+        default:
+          res.status(400).json({
+            success: false,
+            message: 'Unsupported export format'
+          });
+      }
+
+    } catch (error) {
+      console.error('Error exporting report:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to export report',
+        error: error.message
+      });
+    }
+  }
+);
+
+// Helper function to convert JSON to CSV
+function convertToCSV(data) {
+  if (!data || typeof data !== 'object') {
+    return '';
+  }
+
+  const flattenObject = (obj, prefix = '') => {
+    const flattened = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const newKey = prefix ? `${prefix}.${key}` : key;
+        if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+          Object.assign(flattened, flattenObject(obj[key], newKey));
+        } else {
+          flattened[newKey] = obj[key];
+        }
+      }
+    }
+    return flattened;
+  };
+
+  const flattened = flattenObject(data);
+  const headers = Object.keys(flattened);
+  const values = Object.values(flattened);
+
+  const csvHeaders = headers.join(',');
+  const csvValues = values.map(value => 
+    typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : value
+  ).join(',');
+
+  return `${csvHeaders}\n${csvValues}`;
+}
+
+// ============================================================================
+// REPORT SHARING AND COLLABORATION
+// ============================================================================
+
+// POST /api/reporting/reports/:id/share - Share report with other users
+router.post('/reports/:id/share',
+  authenticateToken,
+  requirePermission('reporting.read'),
+  [
+    body('shared_with').isArray().withMessage('shared_with must be an array of user IDs'),
+    body('share_type').isIn(['view', 'download', 'edit']).withMessage('Invalid share type')
+  ],
+  async (req, res) => {
+    const client = await pool.connect();
+    
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array()
+        });
+      }
+
+      const { id } = req.params;
+      const { shared_with, share_type, expires_at } = req.body;
+
+      // Check if report exists and user has access
+      const reportQuery = `
+        SELECT * FROM generated_reports 
+        WHERE report_id = $1 AND (generated_by = $2 OR $2 = ANY(
+          SELECT shared_with FROM report_sharing WHERE report_id = $1 AND share_type IN ('edit', 'download')
+        ))
+      `;
+      const reportResult = await client.query(reportQuery, [id, req.user.user_id]);
+
+      if (reportResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Report not found or access denied'
+        });
+      }
+
+      await client.query('BEGIN');
+
+      const sharePromises = shared_with.map(async (userId) => {
+        const sharingId = `SHR-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        
+        const insertQuery = `
+          INSERT INTO report_sharing (
+            sharing_id, report_id, shared_by, shared_with, share_type, expires_at
+          ) VALUES ($1, $2, $3, $4, $5, $6)
+          ON CONFLICT (report_id, shared_with) 
+          DO UPDATE SET 
+            share_type = EXCLUDED.share_type,
+            expires_at = EXCLUDED.expires_at,
+            created_at = CURRENT_TIMESTAMP
+          RETURNING *
+        `;
+
+        return client.query(insertQuery, [
+          sharingId, id, req.user.user_id, userId, share_type, expires_at
+        ]);
+      });
+
+      await Promise.all(sharePromises);
+      await client.query('COMMIT');
+
+      await logActivity(
+        req.user.user_id,
+        'report_shared',
+        `Report shared: ${id}`,
+        req.ip,
+        req.get('User-Agent'),
+        { report_id: id, shared_with, share_type }
+      );
+
+      res.json({
+        success: true,
+        message: 'Report shared successfully'
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Error sharing report:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to share report',
+        error: error.message
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+// GET /api/reporting/reports/:id/shares - Get report sharing information
+router.get('/reports/:id/shares',
+  authenticateToken,
+  requirePermission('reporting.read'),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // Check if user has access to the report
+      const accessQuery = `
+        SELECT 1 FROM generated_reports 
+        WHERE report_id = $1 AND (
+          generated_by = $2 OR 
+          $2 = ANY(SELECT shared_with FROM report_sharing WHERE report_id = $1)
+        )
+      `;
+      const accessResult = await pool.query(accessQuery, [id, req.user.user_id]);
+
+      if (accessResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Report not found or access denied'
+        });
+      }
+
+      const sharesQuery = `
+        SELECT 
+          rs.*,
+          u1.username as shared_by_username,
+          u2.username as shared_with_username
+        FROM report_sharing rs
+        LEFT JOIN users u1 ON rs.shared_by = u1.user_id
+        LEFT JOIN users u2 ON rs.shared_with = u2.user_id
+        WHERE rs.report_id = $1
+        ORDER BY rs.created_at DESC
+      `;
+
+      const result = await pool.query(sharesQuery, [id]);
+
+      res.json({
+        success: true,
+        data: { shares: result.rows }
+      });
+
+    } catch (error) {
+      console.error('Error retrieving report shares:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to retrieve report shares',
         error: error.message
       });
     }

@@ -1,7 +1,8 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const express = require('express');
 const { Pool } = require('pg');
-const { authenticateToken, requirePermission } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissions');
 const EscalationService = require('../services/escalation-service');
 
 const router = express.Router();

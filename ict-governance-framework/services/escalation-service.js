@@ -174,17 +174,17 @@ class EscalationService {
     
     try {
       // Get workflow approvals that are overdue
-      const query = `
-        SELECT 
-          wa.*,
-          wi.workflow_type,
-          wi.title as workflow_title
-        FROM workflow_approvals wa
-        JOIN workflow_instances wi ON wa.workflow_instance_id = wi.id
-        WHERE wa.approval_status = 'pending'
-          AND wa.due_date < NOW()
-          AND wa.escalated_at IS NULL
-      `;
+        const query = `
+          SELECT 
+            wa.*,
+            wi.workflow_type,
+            wi.title as workflow_title
+          FROM workflow_approvals wa
+          JOIN workflow_instances wi ON wa.workflow_instance_id::VARCHAR = wi.id::VARCHAR
+          WHERE wa.approval_status = 'pending'
+            AND wa.due_date < NOW()
+            AND wa.escalated_at IS NULL
+        `;
 
       const result = await client.query(query);
 

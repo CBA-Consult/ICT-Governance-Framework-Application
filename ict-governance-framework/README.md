@@ -286,6 +286,41 @@ Then assign the super_admin role using the SQL command above.
 - Error tracking and alerting
 - Performance monitoring
 
+
+## 🔧 Security & Configuration
+
+### Environment Security
+- Use strong, unique JWT secrets in production
+- Enable HTTPS in production
+- Use environment variables for all secrets
+- Regular security updates
+
+### Database Security
+- Use connection pooling
+- Enable SSL for database connections
+- Regular backups and encryption at rest
+- Principle of least privilege for database users
+
+### Application Security
+- Input validation on all endpoints
+- SQL injection prevention with parameterized queries
+- XSS protection with content security policy
+- Regular dependency updates
+
+## 📈 Monitoring & Maintenance
+
+### Health Checks
+- API health endpoint: `GET /api/health`
+- Database connectivity monitoring
+- Session cleanup automation
+- Failed login attempt monitoring
+
+### Logging
+- Application logs with structured format
+- Audit trail in database
+- Error tracking and alerting
+- Performance monitoring
+
 ## Next Steps / Roadmap
 
 To continue enhancing the framework and dashboard:
@@ -370,6 +405,36 @@ npm run db:reset
 ```
 
 **Note:** This framework and dashboard are under active development with production-ready user management. For authoritative framework content, refer to the Markdown files in the repository root or the [Table of Contents](../Table-of-Contents.md).
+
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see the main repository documentation for guidelines and priorities. Focus areas include:
+- Enhancing user management features
+- Improving UI/UX design
+- Integrating documentation and compliance tools
+- Adding automated testing
+- Performance optimization
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## 🆘 Support
+
+For support and questions:
+- Check the comprehensive documentation above
+- Review the API endpoints and authentication flow
+- Check the audit logs for troubleshooting
+- Refer to the [Repository Table of Contents](../Table-of-Contents.md)
+- Contact the development team
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 
 ## 🤝 Contributing
