@@ -16,7 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 function UserManagementPage() {
-  const { apiClient, user: currentUser } = useAuth();
+  const { apiClient, user: currentUser, hasAllPermissions } = useAuth();
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,15 +94,27 @@ function UserManagementPage() {
 
   // Handle user actions
   const handleAddUser = () => {
+    if (!hasAllPermissions(['user.create'])) {
+      setError('You do not have permission to create users');
+      return;
+    }
     setShowAddModal(true);
   };
 
   const handleEditUser = (user) => {
+    if (!hasAllPermissions(['user.update'])) {
+      setError('You do not have permission to edit users');
+      return;
+    }
     setSelectedUser(user);
     setShowEditModal(true);
   };
 
   const handleDeleteUser = async (userId) => {
+    if (!hasAllPermissions(['user.delete'])) {
+      setError('You do not have permission to delete users');
+      return;
+    }
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
         await apiClient.delete(`/users/${userId}`);
@@ -169,13 +181,15 @@ function UserManagementPage() {
                 Manage user accounts, roles, and permissions
               </p>
             </div>
-            <button 
-              onClick={handleAddUser}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
-            >
-              <PlusIcon className="h-5 w-5 mr-2" />
-              Add User
-            </button>
+            {hasAllPermissions(['user.create']) && (
+              <button 
+                onClick={handleAddUser}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+              >
+                <PlusIcon className="h-5 w-5 mr-2" />
+                Add User
+              </button>
+            )}
           </div>
         </div>
 
@@ -334,14 +348,16 @@ function UserManagementPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
-                          <button 
-                            onClick={() => handleEditUser(user)}
-                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                            title="Edit user"
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </button>
-                          {user.user_id !== currentUser?.userId && (
+                          {hasAllPermissions(['user.update']) && (
+                            <button 
+                              onClick={() => handleEditUser(user)}
+                              className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                              title="Edit user"
+                            >
+                              <PencilIcon className="h-4 w-4" />
+                            </button>
+                          )}
+                          {hasAllPermissions(['user.delete']) && user.user_id !== currentUser?.userId && (
                             <button 
                               onClick={() => handleDeleteUser(user.user_id)}
                               className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
@@ -349,6 +365,9 @@ function UserManagementPage() {
                             >
                               <TrashIcon className="h-4 w-4" />
                             </button>
+                          )}
+                          {!hasAllPermissions(['user.update']) && !hasAllPermissions(['user.delete']) && (
+                            <span className="text-gray-400 text-sm">No actions available</span>
                           )}
                         </div>
                       </td>
@@ -453,4 +472,4 @@ function UserManagementPage() {
 }
 
 // Export with authentication and permission requirements
-export default withAuth(UserManagementPage, ['user.read'], ['admin', 'super_admin']);
+export default withAuth(UserManagementPage, ['user.read', 'user.create', 'user.update', 'user.delete', 'user.manage_roles'], ['admin', 'super_admin']);
