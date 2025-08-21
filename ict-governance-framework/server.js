@@ -43,6 +43,9 @@ const dataAnalyticsRouter = require('./api/data-analytics');
 const { router: predictiveAnalyticsRouter } = require('./api/predictive-analytics-engine');
 const { router: insightsGeneratorRouter } = require('./api/insights-generator');
 
+// Import Enterprise API Framework
+const EnterpriseAPI = require('./api/enterprise-api');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -120,6 +123,15 @@ app.use('/api/data-analytics', dataAnalyticsRouter);
 app.use('/api/predictive-analytics', predictiveAnalyticsRouter);
 app.use('/api/insights', insightsGeneratorRouter);
 
+// Initialize and mount Enterprise API Framework
+const enterpriseAPI = new EnterpriseAPI({
+  version: '2.0.0',
+  enableMetrics: true,
+  enableCaching: true,
+  enableWorkflows: true
+});
+app.use('/api/v2/enterprise', enterpriseAPI.getRouter());
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ 
   status: 'ok',
@@ -141,7 +153,10 @@ app.get('/api/health', (req, res) => res.json({
     reporting: 'enabled',
     dataAnalytics: 'enabled',
     predictiveAnalytics: 'enabled',
-    insightsGenerator: 'enabled'
+    insightsGenerator: 'enabled',
+    enterpriseIntegration: 'enabled',
+    apiManagement: 'enabled',
+    workflowOrchestrator: 'enabled'
   }
 }));
 
