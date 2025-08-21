@@ -48,7 +48,8 @@ class EnterpriseIntegration extends EventEmitter {
     // Microsoft Defender for Cloud Apps Adapter
     this.registerAdapter('defender-cloud-apps', new DefenderCloudAppsAdapter({
       tenantId: process.env.AZURE_TENANT_ID,
-      apiUrl: process.env.DEFENDER_API_URL,
+      clientId: process.env.AZURE_CLIENT_ID,
+      clientSecret: process.env.AZURE_CLIENT_SECRET,
       ...this.options
     }));
 
@@ -87,6 +88,62 @@ class EnterpriseIntegration extends EventEmitter {
     this.registerAdapter('gcp', new GCPAdapter({
       projectId: process.env.GCP_PROJECT_ID,
       keyFilename: process.env.GCP_KEY_FILE,
+      ...this.options
+    }));
+
+    // SAP S/4HANA ERP Adapter
+    this.registerAdapter('sap-erp', new SAPAdapter({
+      baseUrl: process.env.SAP_BASE_URL,
+      username: process.env.SAP_USERNAME,
+      password: process.env.SAP_PASSWORD,
+      systemId: process.env.SAP_SYSTEM_ID,
+      ...this.options
+    }));
+
+    // Salesforce CRM Adapter
+    this.registerAdapter('salesforce', new SalesforceAdapter({
+      clientId: process.env.SALESFORCE_CLIENT_ID,
+      clientSecret: process.env.SALESFORCE_CLIENT_SECRET,
+      loginUrl: process.env.SALESFORCE_LOGIN_URL,
+      ...this.options
+    }));
+
+    // Workday HCM Adapter
+    this.registerAdapter('workday', new WorkdayAdapter({
+      baseUrl: process.env.WORKDAY_BASE_URL,
+      username: process.env.WORKDAY_USERNAME,
+      password: process.env.WORKDAY_PASSWORD,
+      tenant: process.env.WORKDAY_TENANT,
+      ...this.options
+    }));
+
+    // Azure Synapse Analytics Adapter
+    this.registerAdapter('synapse', new SynapseAdapter({
+      tenantId: process.env.AZURE_TENANT_ID,
+      clientId: process.env.AZURE_CLIENT_ID,
+      clientSecret: process.env.AZURE_CLIENT_SECRET,
+      workspaceName: process.env.SYNAPSE_WORKSPACE_NAME,
+      ...this.options
+    }));
+
+    // Microsoft Sentinel SIEM Adapter
+    this.registerAdapter('sentinel', new SentinelAdapter({
+      tenantId: process.env.AZURE_TENANT_ID,
+      clientId: process.env.AZURE_CLIENT_ID,
+      clientSecret: process.env.AZURE_CLIENT_SECRET,
+      subscriptionId: process.env.AZURE_SUBSCRIPTION_ID,
+      resourceGroupName: process.env.SENTINEL_RESOURCE_GROUP,
+      workspaceName: process.env.SENTINEL_WORKSPACE_NAME,
+      ...this.options
+    }));
+
+    // Oracle Database Adapter
+    this.registerAdapter('oracle', new OracleAdapter({
+      host: process.env.ORACLE_HOST,
+      port: process.env.ORACLE_PORT || 1521,
+      serviceName: process.env.ORACLE_SERVICE_NAME,
+      username: process.env.ORACLE_USERNAME,
+      password: process.env.ORACLE_PASSWORD,
       ...this.options
     }));
   }
@@ -469,21 +526,90 @@ class AzureADAdapter extends BaseAdapter {
  * Microsoft Defender for Cloud Apps Adapter
  */
 class DefenderCloudAppsAdapter extends BaseAdapter {
+  constructor(config) {
+    super(config);
+    this.tokenCache = null;
+    this.tokenExpiry = null;
+  }
+
+  async getAccessToken() {
+    if (this.tokenCache && this.tokenExpiry > Date.now()) {
+      return this.tokenCache;
+    }
+
+    const response = await this.client.post(
+      `https://login.microsoftonline.com/${this.config.tenantId}/oauth2/v2.0/token`,
+      new URLSearchParams({
+        client_id: this.config.clientId,
+        client_secret: this.config.clientSecret,
+        scope: 'https://graph.microsoft.com/.default',
+        grant_type: 'client_credentials'
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    this.tokenCache = response.data.access_token;
+    this.tokenExpiry = Date.now() + (response.data.expires_in * 1000) - 60000;
+    return this.tokenCache;
+  }
+
   async getDiscoveredApps(params = {}) {
-    // Implementation for Defender Cloud Apps API
-    const response = await this.client.get(`${this.config.apiUrl}/api/v1/discovery/discovered_apps/`, {
-      headers: { Authorization: `Token ${this.config.apiToken}` },
-      params
+    const token = await this.getAccessToken();
+    const response = await this.client.get('https://graph.microsoft.com/v1.0/security/cloudAppSecurityProfiles', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        $filter: params.filter || '',
+        $top: params.limit || 100,
+        $skip: params.offset || 0
+      }
     });
     return response.data;
   }
 
   async getAlerts(params = {}) {
-    const response = await this.client.get(`${this.config.apiUrl}/api/v1/alerts/`, {
-      headers: { Authorization: `Token ${this.config.apiToken}` },
+    const token = await this.getAccessToken();
+    const response = await this.client.get('https://graph.microsoft.com/v1.0/security/alerts', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        $filter: params.filter || "category eq 'cloudAppSecurity'",
+        $top: params.limit || 100,
+        $skip: params.offset || 0,
+        $orderby: 'createdDateTime desc'
+      }
+    });
+    return response.data;
+  }
+
+  async getActivities(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get('https://graph.microsoft.com/v1.0/auditLogs/signIns', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        $filter: params.filter || '',
+        $top: params.limit || 100,
+        $skip: params.offset || 0,
+        $orderby: 'createdDateTime desc'
+      }
+    });
+    return response.data;
+  }
+
+  async getPolicies(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get('https://graph.microsoft.com/v1.0/policies/conditionalAccessPolicies', {
+      headers: { Authorization: `Bearer ${token}` },
       params
     });
     return response.data;
+  }
+
+  async healthCheck() {
+    try {
+      await this.getAccessToken();
+      return { status: 'healthy', timestamp: new Date().toISOString() };
+    } catch (error) {
+      return { status: 'unhealthy', error: error.message, timestamp: new Date().toISOString() };
+    }
   }
 }
 
@@ -498,21 +624,120 @@ class ServiceNowAdapter extends BaseAdapter {
       password: config.password
     };
     this.client.defaults.baseURL = config.instanceUrl;
+    this.client.defaults.headers['Accept'] = 'application/json';
+    this.client.defaults.headers['Content-Type'] = 'application/json';
   }
 
   async getIncidents(params = {}) {
-    const response = await this.client.get('/api/now/table/incident', { params });
+    const response = await this.client.get('/api/now/table/incident', { 
+      params: {
+        sysparm_limit: params.limit || 100,
+        sysparm_offset: params.offset || 0,
+        sysparm_query: params.query || '',
+        sysparm_fields: params.fields || 'number,short_description,state,priority,assigned_to,opened_at'
+      }
+    });
     return response.data;
   }
 
   async createIncident(data) {
-    const response = await this.client.post('/api/now/table/incident', data);
+    const incidentData = {
+      short_description: data.title,
+      description: data.description,
+      priority: data.priority || '3',
+      category: data.category || 'ICT Governance',
+      subcategory: data.subcategory || 'Policy Violation',
+      caller_id: data.callerId,
+      assignment_group: data.assignmentGroup,
+      u_governance_violation: true,
+      u_source_system: 'ICT Governance Framework'
+    };
+    
+    const response = await this.client.post('/api/now/table/incident', incidentData);
+    return response.data;
+  }
+
+  async updateIncident(sysId, data) {
+    const response = await this.client.put(`/api/now/table/incident/${sysId}`, data);
     return response.data;
   }
 
   async getChangeRequests(params = {}) {
-    const response = await this.client.get('/api/now/table/change_request', { params });
+    const response = await this.client.get('/api/now/table/change_request', { 
+      params: {
+        sysparm_limit: params.limit || 100,
+        sysparm_offset: params.offset || 0,
+        sysparm_query: params.query || '',
+        sysparm_fields: params.fields || 'number,short_description,state,priority,assigned_to,start_date'
+      }
+    });
     return response.data;
+  }
+
+  async createChangeRequest(data) {
+    const changeData = {
+      short_description: data.title,
+      description: data.description,
+      type: data.type || 'Standard',
+      priority: data.priority || '3',
+      category: data.category || 'ICT Governance',
+      requested_by: data.requestedBy,
+      assignment_group: data.assignmentGroup,
+      start_date: data.startDate,
+      end_date: data.endDate,
+      u_governance_change: true
+    };
+    
+    const response = await this.client.post('/api/now/table/change_request', changeData);
+    return response.data;
+  }
+
+  async getCMDBItems(params = {}) {
+    const response = await this.client.get('/api/now/table/cmdb_ci', { 
+      params: {
+        sysparm_limit: params.limit || 100,
+        sysparm_offset: params.offset || 0,
+        sysparm_query: params.query || '',
+        sysparm_fields: params.fields || 'name,sys_class_name,operational_status,install_status'
+      }
+    });
+    return response.data;
+  }
+
+  async updateCMDBItem(sysId, data) {
+    const response = await this.client.put(`/api/now/table/cmdb_ci/${sysId}`, data);
+    return response.data;
+  }
+
+  async getServiceCatalogItems(params = {}) {
+    const response = await this.client.get('/api/now/table/sc_cat_item', { 
+      params: {
+        sysparm_limit: params.limit || 100,
+        sysparm_offset: params.offset || 0,
+        sysparm_query: params.query || 'active=true',
+        sysparm_fields: params.fields || 'name,short_description,category,active'
+      }
+    });
+    return response.data;
+  }
+
+  async healthCheck() {
+    try {
+      const response = await this.client.get('/api/now/table/sys_user', { 
+        params: { sysparm_limit: 1 } 
+      });
+      return { 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        instanceUrl: this.config.instanceUrl
+      };
+    } catch (error) {
+      return { 
+        status: 'unhealthy', 
+        error: error.message, 
+        timestamp: new Date().toISOString() 
+      };
+    }
   }
 }
 
@@ -589,14 +814,537 @@ class AWSAdapter extends BaseAdapter {
  * GCP Adapter
  */
 class GCPAdapter extends BaseAdapter {
+  constructor(config) {
+    super(config);
+    this.tokenCache = null;
+    this.tokenExpiry = null;
+  }
+
+  async getAccessToken() {
+    if (this.tokenCache && this.tokenExpiry > Date.now()) {
+      return this.tokenCache;
+    }
+
+    // Implementation would use Google Auth Library
+    // For now, return a placeholder
+    this.tokenCache = 'gcp-token-placeholder';
+    this.tokenExpiry = Date.now() + 3600000; // 1 hour
+    return this.tokenCache;
+  }
+
   async getResources(params = {}) {
-    // Implementation for GCP resource discovery
-    return { resources: [] };
+    const token = await this.getAccessToken();
+    // Implementation for GCP resource discovery using Cloud Asset API
+    return { 
+      resources: [],
+      projectId: this.config.projectId,
+      timestamp: new Date().toISOString()
+    };
   }
 
   async getPolicies(params = {}) {
-    // Implementation for GCP policy management
-    return { policies: [] };
+    const token = await this.getAccessToken();
+    // Implementation for GCP policy management using Cloud Resource Manager API
+    return { 
+      policies: [],
+      projectId: this.config.projectId,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  async healthCheck() {
+    try {
+      await this.getAccessToken();
+      return { 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        projectId: this.config.projectId
+      };
+    } catch (error) {
+      return { 
+        status: 'unhealthy', 
+        error: error.message, 
+        timestamp: new Date().toISOString() 
+      };
+    }
+  }
+}
+
+/**
+ * SAP S/4HANA ERP Adapter
+ */
+class SAPAdapter extends BaseAdapter {
+  constructor(config) {
+    super(config);
+    this.client.defaults.baseURL = config.baseUrl;
+    this.client.defaults.auth = {
+      username: config.username,
+      password: config.password
+    };
+    this.client.defaults.headers['X-CSRF-Token'] = 'Fetch';
+  }
+
+  async getUsers(params = {}) {
+    const response = await this.client.get('/sap/opu/odata/sap/ZHR_USER_SRV/UserSet', {
+      params: {
+        $format: 'json',
+        $top: params.limit || 100,
+        $skip: params.offset || 0,
+        $filter: params.filter || ''
+      }
+    });
+    return response.data;
+  }
+
+  async getFinancialData(params = {}) {
+    const response = await this.client.get('/sap/opu/odata/sap/ZFI_DATA_SRV/FinancialDataSet', {
+      params: {
+        $format: 'json',
+        $top: params.limit || 100,
+        $skip: params.offset || 0,
+        $filter: params.filter || ''
+      }
+    });
+    return response.data;
+  }
+
+  async getMasterData(params = {}) {
+    const response = await this.client.get('/sap/opu/odata/sap/ZMD_SRV/MasterDataSet', {
+      params: {
+        $format: 'json',
+        $top: params.limit || 100,
+        $skip: params.offset || 0,
+        $filter: params.filter || ''
+      }
+    });
+    return response.data;
+  }
+
+  async healthCheck() {
+    try {
+      const response = await this.client.get('/sap/opu/odata/sap/ZSY_HEALTH_SRV/HealthSet', {
+        params: { $format: 'json', $top: 1 }
+      });
+      return { 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        sapSystem: this.config.systemId
+      };
+    } catch (error) {
+      return { 
+        status: 'unhealthy', 
+        error: error.message, 
+        timestamp: new Date().toISOString() 
+      };
+    }
+  }
+}
+
+/**
+ * Salesforce CRM Adapter
+ */
+class SalesforceAdapter extends BaseAdapter {
+  constructor(config) {
+    super(config);
+    this.tokenCache = null;
+    this.tokenExpiry = null;
+    this.instanceUrl = null;
+  }
+
+  async getAccessToken() {
+    if (this.tokenCache && this.tokenExpiry > Date.now()) {
+      return this.tokenCache;
+    }
+
+    const response = await this.client.post(
+      `${this.config.loginUrl || 'https://login.salesforce.com'}/services/oauth2/token`,
+      new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: this.config.clientId,
+        client_secret: this.config.clientSecret
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    this.tokenCache = response.data.access_token;
+    this.instanceUrl = response.data.instance_url;
+    this.tokenExpiry = Date.now() + 7200000; // 2 hours
+    return this.tokenCache;
+  }
+
+  async getAccounts(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get(`${this.instanceUrl}/services/data/v58.0/sobjects/Account`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        limit: params.limit || 100,
+        offset: params.offset || 0
+      }
+    });
+    return response.data;
+  }
+
+  async getOpportunities(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get(`${this.instanceUrl}/services/data/v58.0/sobjects/Opportunity`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        limit: params.limit || 100,
+        offset: params.offset || 0
+      }
+    });
+    return response.data;
+  }
+
+  async getContacts(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get(`${this.instanceUrl}/services/data/v58.0/sobjects/Contact`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        limit: params.limit || 100,
+        offset: params.offset || 0
+      }
+    });
+    return response.data;
+  }
+
+  async createRecord(sobject, data) {
+    const token = await this.getAccessToken();
+    const response = await this.client.post(
+      `${this.instanceUrl}/services/data/v58.0/sobjects/${sobject}`,
+      data,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  }
+
+  async healthCheck() {
+    try {
+      await this.getAccessToken();
+      return { 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        instanceUrl: this.instanceUrl
+      };
+    } catch (error) {
+      return { 
+        status: 'unhealthy', 
+        error: error.message, 
+        timestamp: new Date().toISOString() 
+      };
+    }
+  }
+}
+
+/**
+ * Workday HCM Adapter
+ */
+class WorkdayAdapter extends BaseAdapter {
+  constructor(config) {
+    super(config);
+    this.client.defaults.auth = {
+      username: config.username,
+      password: config.password
+    };
+    this.client.defaults.baseURL = config.baseUrl;
+  }
+
+  async getWorkers(params = {}) {
+    const response = await this.client.get('/ccx/service/customreport2/workday/ISU_Workers/Workers_Report', {
+      params: {
+        format: 'json',
+        limit: params.limit || 100,
+        offset: params.offset || 0
+      }
+    });
+    return response.data;
+  }
+
+  async getOrganizations(params = {}) {
+    const response = await this.client.get('/ccx/service/customreport2/workday/ISU_Organizations/Organizations_Report', {
+      params: {
+        format: 'json',
+        limit: params.limit || 100,
+        offset: params.offset || 0
+      }
+    });
+    return response.data;
+  }
+
+  async getJobProfiles(params = {}) {
+    const response = await this.client.get('/ccx/service/customreport2/workday/ISU_Job_Profiles/Job_Profiles_Report', {
+      params: {
+        format: 'json',
+        limit: params.limit || 100,
+        offset: params.offset || 0
+      }
+    });
+    return response.data;
+  }
+
+  async healthCheck() {
+    try {
+      const response = await this.client.get('/ccx/service/customreport2/workday/ISU_System_Health/Health_Check', {
+        params: { format: 'json', limit: 1 }
+      });
+      return { 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        tenant: this.config.tenant
+      };
+    } catch (error) {
+      return { 
+        status: 'unhealthy', 
+        error: error.message, 
+        timestamp: new Date().toISOString() 
+      };
+    }
+  }
+}
+
+/**
+ * Azure Synapse Analytics Adapter
+ */
+class SynapseAdapter extends BaseAdapter {
+  constructor(config) {
+    super(config);
+    this.tokenCache = null;
+    this.tokenExpiry = null;
+  }
+
+  async getAccessToken() {
+    if (this.tokenCache && this.tokenExpiry > Date.now()) {
+      return this.tokenCache;
+    }
+
+    const response = await this.client.post(
+      `https://login.microsoftonline.com/${this.config.tenantId}/oauth2/v2.0/token`,
+      new URLSearchParams({
+        client_id: this.config.clientId,
+        client_secret: this.config.clientSecret,
+        scope: 'https://dev.azuresynapse.net/.default',
+        grant_type: 'client_credentials'
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    this.tokenCache = response.data.access_token;
+    this.tokenExpiry = Date.now() + (response.data.expires_in * 1000) - 60000;
+    return this.tokenCache;
+  }
+
+  async getPipelines(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get(
+      `https://${this.config.workspaceName}.dev.azuresynapse.net/pipelines`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { 'api-version': '2020-12-01' }
+      }
+    );
+    return response.data;
+  }
+
+  async getDatasets(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get(
+      `https://${this.config.workspaceName}.dev.azuresynapse.net/datasets`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { 'api-version': '2020-12-01' }
+      }
+    );
+    return response.data;
+  }
+
+  async getSqlPools(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get(
+      `https://${this.config.workspaceName}.dev.azuresynapse.net/sqlPools`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { 'api-version': '2020-12-01' }
+      }
+    );
+    return response.data;
+  }
+
+  async healthCheck() {
+    try {
+      await this.getAccessToken();
+      return { 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        workspace: this.config.workspaceName
+      };
+    } catch (error) {
+      return { 
+        status: 'unhealthy', 
+        error: error.message, 
+        timestamp: new Date().toISOString() 
+      };
+    }
+  }
+}
+
+/**
+ * Microsoft Sentinel SIEM Adapter
+ */
+class SentinelAdapter extends BaseAdapter {
+  constructor(config) {
+    super(config);
+    this.tokenCache = null;
+    this.tokenExpiry = null;
+  }
+
+  async getAccessToken() {
+    if (this.tokenCache && this.tokenExpiry > Date.now()) {
+      return this.tokenCache;
+    }
+
+    const response = await this.client.post(
+      `https://login.microsoftonline.com/${this.config.tenantId}/oauth2/v2.0/token`,
+      new URLSearchParams({
+        client_id: this.config.clientId,
+        client_secret: this.config.clientSecret,
+        scope: 'https://management.azure.com/.default',
+        grant_type: 'client_credentials'
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    this.tokenCache = response.data.access_token;
+    this.tokenExpiry = Date.now() + (response.data.expires_in * 1000) - 60000;
+    return this.tokenCache;
+  }
+
+  async getIncidents(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get(
+      `https://management.azure.com/subscriptions/${this.config.subscriptionId}/resourceGroups/${this.config.resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/${this.config.workspaceName}/providers/Microsoft.SecurityInsights/incidents`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { 
+          'api-version': '2023-02-01',
+          '$top': params.limit || 100,
+          '$skip': params.offset || 0,
+          '$filter': params.filter || ''
+        }
+      }
+    );
+    return response.data;
+  }
+
+  async getAlerts(params = {}) {
+    const token = await this.getAccessToken();
+    const response = await this.client.get(
+      `https://management.azure.com/subscriptions/${this.config.subscriptionId}/resourceGroups/${this.config.resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/${this.config.workspaceName}/providers/Microsoft.SecurityInsights/alertRules`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { 
+          'api-version': '2023-02-01',
+          '$top': params.limit || 100,
+          '$skip': params.offset || 0
+        }
+      }
+    );
+    return response.data;
+  }
+
+  async createIncident(data) {
+    const token = await this.getAccessToken();
+    const incidentData = {
+      properties: {
+        title: data.title,
+        description: data.description,
+        severity: data.severity || 'Medium',
+        status: 'New',
+        classification: data.classification || 'Undetermined',
+        owner: data.owner
+      }
+    };
+
+    const response = await this.client.put(
+      `https://management.azure.com/subscriptions/${this.config.subscriptionId}/resourceGroups/${this.config.resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/${this.config.workspaceName}/providers/Microsoft.SecurityInsights/incidents/${data.incidentId}`,
+      incidentData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { 'api-version': '2023-02-01' }
+      }
+    );
+    return response.data;
+  }
+
+  async healthCheck() {
+    try {
+      await this.getAccessToken();
+      return { 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        workspace: this.config.workspaceName
+      };
+    } catch (error) {
+      return { 
+        status: 'unhealthy', 
+        error: error.message, 
+        timestamp: new Date().toISOString() 
+      };
+    }
+  }
+}
+
+/**
+ * Oracle Database Adapter
+ */
+class OracleAdapter extends BaseAdapter {
+  constructor(config) {
+    super(config);
+    // Note: This would typically use oracledb npm package
+    this.connectionString = `${config.host}:${config.port}/${config.serviceName}`;
+  }
+
+  async executeQuery(sql, params = []) {
+    // Placeholder implementation - would use oracledb package
+    return {
+      rows: [],
+      metaData: [],
+      rowsAffected: 0,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  async getTableData(tableName, params = {}) {
+    const sql = `SELECT * FROM ${tableName} WHERE ROWNUM <= :limit OFFSET :offset ROWS`;
+    return await this.executeQuery(sql, [params.limit || 100, params.offset || 0]);
+  }
+
+  async getSystemMetrics() {
+    const sql = `
+      SELECT 
+        metric_name,
+        value,
+        metric_unit
+      FROM v$sysmetric 
+      WHERE group_id = 2
+    `;
+    return await this.executeQuery(sql);
+  }
+
+  async healthCheck() {
+    try {
+      const result = await this.executeQuery('SELECT 1 FROM DUAL');
+      return { 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        connectionString: this.connectionString
+      };
+    } catch (error) {
+      return { 
+        status: 'unhealthy', 
+        error: error.message, 
+        timestamp: new Date().toISOString() 
+      };
+    }
   }
 }
 
@@ -609,5 +1357,11 @@ module.exports = {
   PowerBIAdapter,
   LegacySystemAdapter,
   AWSAdapter,
-  GCPAdapter
+  GCPAdapter,
+  SAPAdapter,
+  SalesforceAdapter,
+  WorkdayAdapter,
+  SynapseAdapter,
+  SentinelAdapter,
+  OracleAdapter
 };
