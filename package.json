@@ -13,5 +13,12 @@
     "@playwright/test": "^1.54.2",
     "@types/node": "^24.2.1"
   },
-  "scripts": {}
+  "scripts": {
+    "test": "playwright test",
+    "test:user-management": "playwright test tests/user-management.spec.ts",
+    "test:user-management:headed": "playwright test tests/user-management.spec.ts --headed",
+    "test:user-management:debug": "playwright test tests/user-management.spec.ts --debug",
+    "test:validate-env": "node tests/validate-test-environment.js",
+    "test:report": "playwright show-report"
+  }
 }
