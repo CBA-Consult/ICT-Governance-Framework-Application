@@ -39,6 +39,11 @@ const dataProcessingRouter = require('./api/data-processing');
 const reportingRouter = require('./api/reporting');
 const dataAnalyticsRouter = require('./api/data-analytics');
 
+// Import data management API routes
+const dataSynchronizationRouter = require('./api/data-synchronization');
+const dataTransformationRouter = require('./api/data-transformation');
+const masterDataManagementRouter = require('./api/master-data-management');
+
 // Import enhanced predictive analytics and insights API routes
 const { router: predictiveAnalyticsRouter } = require('./api/predictive-analytics-engine');
 const { router: insightsGeneratorRouter } = require('./api/insights-generator');
@@ -119,6 +124,11 @@ app.use('/api/data-processing', dataProcessingRouter);
 app.use('/api/reporting', reportingRouter);
 app.use('/api/data-analytics', dataAnalyticsRouter);
 
+// Data management routes
+app.use('/api/data-synchronization', dataSynchronizationRouter);
+app.use('/api/data-transformation', dataTransformationRouter);
+app.use('/api/master-data-management', masterDataManagementRouter);
+
 // Enhanced predictive analytics and insights routes
 app.use('/api/predictive-analytics', predictiveAnalyticsRouter);
 app.use('/api/insights', insightsGeneratorRouter);
@@ -152,6 +162,9 @@ app.get('/api/health', (req, res) => res.json({
     dataProcessing: 'enabled',
     reporting: 'enabled',
     dataAnalytics: 'enabled',
+    dataSynchronization: 'enabled',
+    dataTransformation: 'enabled',
+    masterDataManagement: 'enabled',
     predictiveAnalytics: 'enabled',
     insightsGenerator: 'enabled',
     enterpriseIntegration: 'enabled',
