@@ -16,10 +16,11 @@ jobs:
 
     # PowerShell is pre-installed on windows-latest runners, so no setup step is needed.
 
-    - name: Install Pester
+    - name: Install Pester (major version 5)
       shell: pwsh
       run: |
-        Install-Module -Name Pester -RequiredVersion '5' -Force -Scope CurrentUser -AllowClobber -SkipPublisherCheck
+        # Install any Pester release within major version 5 (>=5.0.0 and <6.0.0)
+        Install-Module -Name Pester -MinimumVersion '5.0.0' -MaximumVersion '5.9999.9999' -Force -Scope CurrentUser -AllowClobber -SkipPublisherCheck
 
     - name: Run Pester tests
       shell: pwsh
