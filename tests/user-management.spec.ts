@@ -460,3 +460,281 @@ test.describe('User Management - Integration Tests', () => {
     await expect(userRow).toBeVisible();
   });
 });
+
+// Edit User Tests
+test.describe('Edit User Functionality', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsAdmin(page);
+    await page.goto('/admin/users');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should display edit button for users with proper permissions', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Check if edit buttons are visible
+    const editButtons = page.locator('button[title="Edit user"]');
+    const editButtonCount = await editButtons.count();
+    
+    expect(editButtonCount).toBeGreaterThan(0);
+    
+    // Verify edit button has pencil icon
+    const firstEditButton = editButtons.first();
+    await expect(firstEditButton).toBeVisible();
+    
+    // Check for pencil icon (PencilIcon from Heroicons)
+    const pencilIcon = firstEditButton.locator('svg');
+    await expect(pencilIcon).toBeVisible();
+  });
+
+  test('should open edit modal when edit button is clicked', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Click the first edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Verify edit modal opens
+    const editModal = page.locator('h2:has-text("Edit User")');
+    await expect(editModal).toBeVisible();
+    
+    // Verify modal has proper structure
+    const modal = page.locator('.fixed.inset-0');
+    await expect(modal).toBeVisible();
+  });
+
+  test('should populate form fields with existing user data', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Get user data from the first row
+    const firstRow = page.locator('tbody tr').first();
+    const userEmail = await firstRow.locator('td').nth(0).locator('div').nth(1).textContent();
+    const userName = await firstRow.locator('td').nth(0).locator('div').nth(2).textContent();
+    
+    // Click edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Wait for modal to open
+    await page.waitForSelector('h2:has-text("Edit User")');
+    
+    // Verify form fields are populated
+    const emailField = page.locator('[name="email"]');
+    const usernameField = page.locator('[name="username"]');
+    
+    await expect(emailField).toHaveValue(userEmail?.trim() || '');
+    
+    // Extract username from @username format and verify it's populated and read-only
+    const extractedUsername = userName?.replace('@', '') || '';
+    await expect(usernameField).toHaveValue(extractedUsername);
+    await expect(usernameField).toHaveAttribute('readonly');
+  });
+
+  test('should validate required fields in edit form', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Click edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Wait for modal to open
+    await page.waitForSelector('h2:has-text("Edit User")');
+    
+    // Clear required fields (username is read-only, so skip it)
+    await page.fill('[name="email"]', '');
+    await page.fill('[name="firstName"]', '');
+    await page.fill('[name="lastName"]', '');
+    
+    // Try to submit
+    const updateButton = page.locator('button:has-text("Update User")');
+    await updateButton.click();
+    
+    // Verify error message appears
+    const errorMessage = page.locator('.bg-red-50, .text-red-800');
+    await expect(errorMessage).toBeVisible();
+  });
+
+  test('should successfully update user details', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Click edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Wait for modal to open
+    await page.waitForSelector('h2:has-text("Edit User")');
+    
+    // Update user details
+    const timestamp = Date.now();
+    const updatedDepartment = `Updated Dept ${timestamp}`;
+    const updatedJobTitle = `Updated Title ${timestamp}`;
+    
+    await page.fill('[name="department"]', updatedDepartment);
+    await page.fill('[name="jobTitle"]', updatedJobTitle);
+    
+    // Submit the form
+    const updateButton = page.locator('button:has-text("Update User")');
+    await updateButton.click();
+    
+    // Wait for success message
+    const successMessage = page.locator('.bg-green-50, .text-green-800');
+    await expect(successMessage).toBeVisible();
+    
+    // Verify modal closes
+    const modal = page.locator('h2:has-text("Edit User")');
+    await expect(modal).not.toBeVisible();
+  });
+
+  test('should update user status', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Click edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Wait for modal to open
+    await page.waitForSelector('h2:has-text("Edit User")');
+    
+    // Change status
+    const statusSelect = page.locator('[name="status"]');
+    await statusSelect.selectOption('Inactive');
+    
+    // Submit the form
+    const updateButton = page.locator('button:has-text("Update User")');
+    await updateButton.click();
+    
+    // Wait for success message
+    const successMessage = page.locator('.bg-green-50, .text-green-800');
+    await expect(successMessage).toBeVisible();
+  });
+
+  test('should update user roles', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Click edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Wait for modal to open
+    await page.waitForSelector('h2:has-text("Edit User")');
+    
+    // Wait for roles to load
+    await page.waitForSelector('input[type="checkbox"]');
+    
+    // Toggle a role checkbox
+    const roleCheckboxes = page.locator('input[type="checkbox"]');
+    const firstCheckbox = roleCheckboxes.first();
+    await firstCheckbox.click();
+    
+    // Submit the form
+    const updateButton = page.locator('button:has-text("Update User")');
+    await updateButton.click();
+    
+    // Wait for success message
+    const successMessage = page.locator('.bg-green-50, .text-green-800');
+    await expect(successMessage).toBeVisible();
+  });
+
+  test('should close modal when cancel button is clicked', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Click edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Wait for modal to open
+    await page.waitForSelector('h2:has-text("Edit User")');
+    
+    // Click cancel button
+    const cancelButton = page.locator('button:has-text("Cancel")');
+    await cancelButton.click();
+    
+    // Verify modal closes
+    const modal = page.locator('h2:has-text("Edit User")');
+    await expect(modal).not.toBeVisible();
+  });
+
+  test('should close modal when X button is clicked', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Click edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Wait for modal to open
+    await page.waitForSelector('h2:has-text("Edit User")');
+    
+    // Click X button (close button with XMarkIcon)
+    const closeButton = page.locator('button').filter({ has: page.locator('svg') }).first();
+    await closeButton.click();
+    
+    // Verify modal closes
+    const modal = page.locator('h2:has-text("Edit User")');
+    await expect(modal).not.toBeVisible();
+  });
+
+  test('should display loading state during update', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Click edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Wait for modal to open
+    await page.waitForSelector('h2:has-text("Edit User")');
+    
+    // Make a small change
+    await page.fill('[name="department"]', 'Test Department');
+    
+    // Submit the form and immediately check for loading state
+    const updateButton = page.locator('button:has-text("Update User")');
+    await updateButton.click();
+    
+    // Check for loading state (button should show "Updating...")
+    const loadingButton = page.locator('button:has-text("Updating...")');
+    await expect(loadingButton).toBeVisible();
+  });
+
+  test('should handle validation errors gracefully', async ({ page }) => {
+    // Wait for users table to load
+    await page.waitForSelector('tbody tr');
+    
+    // Click edit button
+    const firstEditButton = page.locator('button[title="Edit user"]').first();
+    await firstEditButton.click();
+    
+    // Wait for modal to open
+    await page.waitForSelector('h2:has-text("Edit User")');
+    
+    // Enter invalid email
+    await page.fill('[name="email"]', 'invalid-email');
+    
+    // Submit the form
+    const updateButton = page.locator('button:has-text("Update User")');
+    await updateButton.click();
+    
+    // Verify error message appears
+    const errorMessage = page.locator('.bg-red-50, .text-red-800');
+    await expect(errorMessage).toBeVisible();
+    
+    // Verify modal stays open
+    const modal = page.locator('h2:has-text("Edit User")');
+    await expect(modal).toBeVisible();
+  });
+
+  test('should not show edit button for users without edit permissions', async ({ page }) => {
+    // This test would need to be run with a user that doesn't have edit permissions
+    // For now, we'll skip this test as it requires different authentication setup
+    test.skip();
+  });
+});

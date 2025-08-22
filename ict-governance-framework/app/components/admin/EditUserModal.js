@@ -63,10 +63,6 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user, ap
   };
 
   const validateForm = () => {
-    if (!formData.username.trim()) {
-      setError('Username is required');
-      return false;
-    }
     if (!formData.email.trim()) {
       setError('Email is required');
       return false;
@@ -79,10 +75,25 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user, ap
       setError('Last name is required');
       return false;
     }
-    if (!formData.email.includes('@')) {
+    
+    // Enhanced email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
       setError('Please enter a valid email address');
       return false;
     }
+    
+    // Name validation
+    const nameRegex = /^[a-zA-Z\s'-]+$/;
+    if (!nameRegex.test(formData.firstName.trim())) {
+      setError('First name can only contain letters, spaces, hyphens, and apostrophes');
+      return false;
+    }
+    if (!nameRegex.test(formData.lastName.trim())) {
+      setError('Last name can only contain letters, spaces, hyphens, and apostrophes');
+      return false;
+    }
+    
     return true;
   };
 
@@ -94,10 +105,17 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user, ap
       return;
     }
 
+    // Confirm status changes that could affect user access
+    if (user.status === 'Active' && formData.status !== 'Active') {
+      const confirmMessage = `Are you sure you want to change this user's status to "${formData.status}"? This may affect their access to the system.`;
+      if (!window.confirm(confirmMessage)) {
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const userData = {
-        username: formData.username.trim(),
         email: formData.email.trim(),
         first_name: formData.firstName.trim(),
         last_name: formData.lastName.trim(),
@@ -119,15 +137,35 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user, ap
       
       // Pass user information back to parent for success message
       onUserUpdated({
-        username: userData.username,
+        username: formData.username, // Use form data since we don't send username to API
         email: userData.email,
         firstName: userData.first_name,
         lastName: userData.last_name
       });
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update user');
       console.error('Update user error:', err);
+      
+      // Enhanced error handling
+      if (err.response?.status === 409) {
+        setError('Email address is already in use by another user');
+      } else if (err.response?.status === 400) {
+        const errorDetails = err.response?.data?.details;
+        if (errorDetails && Array.isArray(errorDetails)) {
+          const errorMessages = errorDetails.map(detail => detail.message).join(', ');
+          setError(errorMessages);
+        } else {
+          setError(err.response?.data?.message || 'Invalid data provided');
+        }
+      } else if (err.response?.status === 403) {
+        setError('You do not have permission to update this user');
+      } else if (err.response?.status === 404) {
+        setError('User not found');
+      } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+        setError('Network error. Please check your connection and try again.');
+      } else {
+        setError(err.response?.data?.message || 'Failed to update user. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -135,6 +173,20 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user, ap
 
   const handleClose = () => {
     setError('');
+    setLoading(false);
+    // Reset form to original user data
+    if (user) {
+      setFormData({
+        username: user.username || '',
+        email: user.email || '',
+        firstName: user.first_name || '',
+        lastName: user.last_name || '',
+        department: user.department || '',
+        jobTitle: user.job_title || '',
+        roles: user.roles || [],
+        status: user.status || 'Active'
+      });
+    }
     onClose();
   };
 
@@ -164,16 +216,17 @@ export default function EditUserModal({ isOpen, onClose, onUserUpdated, user, ap
             {/* Username */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Username *
+                Username
               </label>
               <input
                 type="text"
                 name="username"
                 value={formData.username}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 dark:bg-gray-600 dark:border-gray-600 dark:text-gray-300 cursor-not-allowed"
+                title="Username cannot be changed"
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Username cannot be changed after creation</p>
             </div>
 
             {/* Email */}
