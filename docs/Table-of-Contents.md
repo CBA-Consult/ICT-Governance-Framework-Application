@@ -27,39 +27,31 @@ This document lists all major documents and directories in the repository for ea
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - [SECURITY.md](SECURITY.md)
 
-## 📁 Organized Documentation Structure
 
-### 🎯 Project Management
-- **Requirements**: [A006-A030 Requirements Documents](docs/project-management/requirements/)
-- **Stakeholder Management**: [A003, A009, A011 Stakeholder Documents](docs/project-management/stakeholder-management/)
-- **Team Management**: [A012-A020 Team Formation Documents](docs/project-management/team-management/)
+## 📁 Updated Documentation Structure
 
-### 🏛️ Governance Framework
-- **Core Framework**: [ICT Governance Framework](docs/governance-framework/core-framework/)
-- **Target Framework**: [Enhanced Framework Documents](docs/governance-framework/target-framework/)
-- **Assessment**: [A021-A023 Assessment Documents](docs/governance-framework/assessment/)
-- **Metrics**: [KPIs and Measurement Framework](docs/governance-framework/metrics/)
-
-### 🏗️ Architecture
-- **Current State**: [A024-A026 Current Architecture](docs/architecture/current-state/)
-- **Target State**: [Future Architecture Designs](docs/architecture/target-state/)
-- **Integration**: [A027-A028 Integration Requirements](docs/architecture/integration/)
-- **Infrastructure**: [IaC and Infrastructure Documents](docs/architecture/infrastructure/)
-
-### 📋 Policies
-- **Governance Policies**: [Core governance and role definitions](docs/policies/governance/)
-- **Security Policies**: [Security and compliance policies](docs/policies/security/)
-- **Operational Policies**: [Day-to-day operational procedures](docs/policies/operational/)
-
-### 🚀 Implementation
-- **Guides**: [Step-by-step implementation guidance](docs/implementation/guides/)
-  - **[CLI/API Usage Guide](docs/implementation/guides/CLI-API-Usage-Guide.md)** - Comprehensive technical implementation guide
-  - **[AI Prompt Engineering Framework](docs/implementation/guides/AI-Prompt-Engineering-Framework.md)** - PMBOK-aligned AI prompt optimization
-  - **[Human-in-the-Loop Verification Framework](docs/implementation/guides/Human-in-the-Loop-Verification-Framework.md)** - SME review and validation processes
-  - **[Enhanced Feedback Mechanisms Framework](docs/implementation/guides/Enhanced-Feedback-Mechanisms-Framework.md)** - PM contribution and improvement workflows
-- **Summaries**: [Implementation status and completion](docs/implementation/summaries/)
-  - **[RGA Enhancement Implementation Summary](docs/implementation/summaries/RGA-Enhancement-Implementation-Summary.md)** - Comprehensive enhancement overview
-- **Deployment**: [Deployment strategies and plans](docs/implementation/deployment/)
+### docs/
+- [architecture/](architecture/) — Technical architecture documentation
+- [charter/](charter/) — Project charter documents
+- [checklists/](checklists/) — Project and governance checklists
+- [communication/](communication/) — Communication plans and templates
+- [compliance/](compliance/) — Compliance and audit documentation
+- [escalation/](escalation/) — Escalation procedures and logs
+- [foundation/](foundation/) — Foundation phase documentation
+- [governance/](governance/) — Governance process documentation
+- [governance-framework/](governance-framework/) — Core governance documentation
+- [implementation/](implementation/) — Implementation guides and summaries
+- [logs/](logs/) — Governance logs
+- [policies/](policies/) — Governance and operational policies
+- [project-management/](project-management/) — Project artifacts and planning
+- [references/](references/) — Reference materials
+- [reports/](reports/) — Governance and compliance reports
+- [stakeholders/](stakeholders/) — Stakeholder registers and analysis
+- [summaries/](summaries/) — Summary documents
+- [team/](team/) — Team norms and orientation
+- [templates/](templates/) — Reusable templates and methodologies
+- [training/](training/) — Training and communication materials
+- [Table-of-Contents.md](Table-of-Contents.md) — Documentation table of contents
 
 ## Legacy Document References (A001-A030 Series)
 > **Note**: These documents have been reorganized into the structured documentation above.
