@@ -48,14 +48,6 @@ if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
     }
 }
         
-        return $complianceSummary
-    }
-    catch {
-        Write-GovLog -Message "Failed to retrieve policy compliance summary: $_" -Level "Error"
-        throw
-    }
-}
-
 # Get Non-Compliant Resources
 function Get-GovNonCompliantResources {
     param (

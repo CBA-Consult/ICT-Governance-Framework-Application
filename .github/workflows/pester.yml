@@ -1,0 +1,35 @@
+name: Pester Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # PowerShell is pre-installed on windows-latest runners, so no setup step is needed.
+
+    - name: Install Pester
+      shell: pwsh
+      run: |
+        Install-Module -Name Pester -RequiredVersion '5' -Force -Scope CurrentUser -AllowClobber -SkipPublisherCheck
+
+    - name: Run Pester tests
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        Invoke-Pester -Script .\tests -OutputFormat NUnitXml -OutputFile pester-results.xml -Passthru
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pester-results
+        path: pester-results.xml

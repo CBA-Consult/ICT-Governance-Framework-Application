@@ -35,11 +35,59 @@ if ($missingModules.Count -gt 0) {
     }
 }
 
-# Import ICT Governance Framework module
-. ./ICT-Governance-Framework.ps1
+# Import ICT Governance Framework module (manifest) from module folder reliably
+try {
+    $modulePath = Join-Path -Path $PSScriptRoot -ChildPath 'ICT-Governance-Framework.psd1'
+    if (Test-Path -Path $modulePath) {
+        Import-Module -Name $modulePath -Force -ErrorAction Stop
+    }
+    else {
+        Write-Host "Module manifest not found at $modulePath" -ForegroundColor Yellow
+    }
+}
+catch {
+    Write-Host "Failed to import ICT Governance Framework module: $_" -ForegroundColor Red
+}
 
-# Initialize the framework
-Initialize-GovFramework
+# Initialize the framework if the function is available
+if (Get-Command -Name Initialize-GovFramework -ErrorAction SilentlyContinue) {
+    Initialize-GovFramework
+} else {
+    Write-Host 'Initialize-GovFramework not available; ensure the module imported successfully.' -ForegroundColor Yellow
+}
+
+# CHANGE: minimal append-only logging setup
+$logDir = Join-Path -Path $PSScriptRoot -ChildPath 'governance-logs'
+if (-not (Test-Path -Path $logDir)) { New-Item -Path $logDir -ItemType Directory -Force | Out-Null }
+$logFile = Join-Path -Path $logDir -ChildPath ("menu-log-$(Get-Date -Format 'yyyy-MM-dd').log")
+
+function Write-Activity {
+    param(
+        [Parameter(Mandatory=$false)][ValidateSet('Info','Warning','Error','Success')][string]$Level = 'Info',
+        [Parameter(Mandatory=$true)][string]$Message
+    )
+    $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    $entry = "[$ts] [$Level] - $Message"
+    # Prefer module-provided Write-GovLog when available, fallback to file append
+    if (Get-Command -Name Write-GovLog -ErrorAction SilentlyContinue) {
+        try { Write-GovLog -Level $Level -Message $Message -ErrorAction Stop } catch {
+            # Guard against $logFile being null or the log directory missing
+            if (-not $logFile) { $logFile = Join-Path -Path $PSScriptRoot -ChildPath ("menu-log-$(Get-Date -Format 'yyyy-MM-dd').log") }
+            $logDirLocal = Split-Path -Path $logFile -Parent
+            if (-not (Test-Path -Path $logDirLocal)) { New-Item -Path $logDirLocal -ItemType Directory -Force | Out-Null }
+            Add-Content -Path $logFile -Value $entry -ErrorAction SilentlyContinue
+        }
+    }
+    else {
+        if (-not $logFile) { $logFile = Join-Path -Path $PSScriptRoot -ChildPath ("menu-log-$(Get-Date -Format 'yyyy-MM-dd').log") }
+        $logDirLocal = Split-Path -Path $logFile -Parent
+        if (-not (Test-Path -Path $logDirLocal)) { New-Item -Path $logDirLocal -ItemType Directory -Force | Out-Null }
+        Add-Content -Path $logFile -Value $entry -ErrorAction SilentlyContinue
+    }
+}
+
+# Log startup
+Write-Activity -Level Info -Message "Menu started (user=$env:USERNAME)"
 
 # Main menu function
 function Show-MainMenu {
@@ -70,36 +118,32 @@ function Connect-ToAzure {
     Write-Host "                CONNECT TO AZURE                       " -ForegroundColor Cyan
     Write-Host "=======================================================" -ForegroundColor Cyan
     Write-Host "                                                       "
-    Write-Host "1. Interactive Login" -ForegroundColor White
-    Write-Host "2. Use Managed Identity" -ForegroundColor White
-    Write-Host "3. Connect to Specific Tenant" -ForegroundColor White
-    Write-Host "4. Back to Main Menu" -ForegroundColor White
+    Write-Host "1. Connect to a Pre-Configured Subscription (Fastest)" -ForegroundColor White
+    Write-Host "2. Discover All Subscriptions (Audit / First Time)" -ForegroundColor White
+    Write-Host "3. Connect to a Specific Tenant ID" -ForegroundColor White
+    Write-Host "4. Use Managed Identity" -ForegroundColor White
+    Write-Host "5. Back to Main Menu" -ForegroundColor White
     Write-Host "                                                       "
     
-    $choice = Read-Host "Enter your choice (1-4)"
-    
-    switch ($choice) {
-        "1" {
-            Connect-GovAzure
-            Pause
-        }
-        "2" {
-            Connect-GovAzure -UseManagedIdentity
-            Pause
-        }
-        "3" {
-            $tenantId = Read-Host "Enter Tenant ID"
-            Connect-GovAzure -TenantId $tenantId
-            Pause
-        }
-        "4" {
-            return
-        }
-        default {
-            Write-Host "Invalid choice. Please try again." -ForegroundColor Red
-            Pause
+    $choice = Read-Host "Enter your choice (1-5)"
+
+    try {
+        switch ($choice) {
+            "1" { Connect-GovAzure -FromConfig }
+            "2" { Connect-GovAzure -AuditAll | Out-Host }
+            "3" {
+                $tenantId = Read-Host "Enter Tenant ID"
+                if (-not [string]::IsNullOrWhiteSpace($tenantId)) { Connect-GovAzure -TenantId $tenantId }
+            }
+            "4" { Connect-GovAzure -UseManagedIdentity }
+            "5" { return }
+            default { Write-Host "Invalid choice." -ForegroundColor Red }
         }
     }
+    catch {
+        Write-Host "`nAn error occurred during the connection process: $_" -ForegroundColor Red
+    }
+    Read-Host -Prompt 'Press Enter to continue'
 }
 
 # Function to handle deployment
@@ -140,13 +184,23 @@ function Invoke-Infrastructure {
     
     $confirm = Read-Host "Proceed with deployment? (Y/N)"
     
-    if ($confirm -eq 'Y' -or $confirm -eq 'y') {
-        & ./Deploy-ICTGovernanceFramework.ps1 -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName `
-            -Location $location -EnvironmentName $environmentName -OrganizationName $organizationName `
-            -EnableDiagnostics $enableDiagnostics -EnableRemediation $enableRemediation
-        
-        Pause
+    if ($confirm -match '^[Yy]') {
+        try {
+            $deployScript = Join-Path -Path $PSScriptRoot -ChildPath 'Deploy-ICTGovernanceFramework.ps1'
+            if (Test-Path -Path $deployScript) {
+                & $deployScript -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName `
+                    -Location $location -EnvironmentName $environmentName -OrganizationName $organizationName `
+                    -EnableDiagnostics $enableDiagnostics -EnableRemediation $enableRemediation
+            }
+            else {
+                Write-Host "Deploy script not found at $deployScript" -ForegroundColor Red
+            }
+        }
+        catch {
+            Write-Host "Deployment failed: $_" -ForegroundColor Red
+        }
     }
+    Read-Host -Prompt 'Press Enter to continue'
 }
 
 # Function to handle compliance reports
@@ -162,19 +216,27 @@ function Get-ComplianceReports {
     
     $outputPath = Read-Host "Enter Output Path (press Enter for default path)"
     if ([string]::IsNullOrWhiteSpace($outputPath)) {
-        $outputPath = "./governance-reports/compliance-summary-$(Get-Date -Format 'yyyy-MM-dd').json"
+        $defaultDir = Join-Path -Path $PSScriptRoot -ChildPath 'governance-reports'
+        if (-not (Test-Path -Path $defaultDir)) { New-Item -Path $defaultDir -ItemType Directory -Force | Out-Null }
+        $outputPath = Join-Path -Path $defaultDir -ChildPath ("compliance-summary-$(Get-Date -Format 'yyyy-MM-dd').json")
     }
     
     Write-Host "Running compliance report..." -ForegroundColor Yellow
-    
-    if (![string]::IsNullOrWhiteSpace($subscriptionId) -and ![string]::IsNullOrWhiteSpace($resourceGroupName)) {
-        $compliance = Get-GovPolicyComplianceSummary -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -OutputPath $outputPath
+    try {
+        if (![string]::IsNullOrWhiteSpace($subscriptionId) -and ![string]::IsNullOrWhiteSpace($resourceGroupName)) {
+            $compliance = Get-GovPolicyComplianceSummary -SubscriptionId $subscriptionId -ResourceGroupName $resourceGroupName -OutputPath $outputPath
+        }
+        elseif (![string]::IsNullOrWhiteSpace($subscriptionId)) {
+            $compliance = Get-GovPolicyComplianceSummary -SubscriptionId $subscriptionId -OutputPath $outputPath
+        }
+        else {
+            $compliance = Get-GovPolicyComplianceSummary -OutputPath $outputPath
+        }
     }
-    elseif (![string]::IsNullOrWhiteSpace($subscriptionId)) {
-        $compliance = Get-GovPolicyComplianceSummary -SubscriptionId $subscriptionId -OutputPath $outputPath
-    }
-    else {
-        $compliance = Get-GovPolicyComplianceSummary -OutputPath $outputPath
+    catch {
+        Write-Host "Failed to run compliance report: $_" -ForegroundColor Red
+        Read-Host -Prompt 'Press Enter to continue'
+        return
     }
     
     Write-Host "                                                       "
@@ -187,7 +249,7 @@ function Get-ComplianceReports {
     Write-Host "                                                       "
     Write-Host "Report saved to: $outputPath" -ForegroundColor Green
     
-    Pause
+    Read-Host -Prompt 'Press Enter to continue'
 }
 
 # Function to generate dashboard
@@ -202,16 +264,25 @@ function New-Dashboard {
     
     $outputPath = Read-Host "Enter Output Path (press Enter for default path)"
     if ([string]::IsNullOrWhiteSpace($outputPath)) {
-        $outputPath = "./governance-reports/dashboard-$(Get-Date -Format 'yyyy-MM-dd').html"
+        $defaultDir = Join-Path -Path $PSScriptRoot -ChildPath 'governance-reports'
+        if (-not (Test-Path -Path $defaultDir)) { New-Item -Path $defaultDir -ItemType Directory -Force | Out-Null }
+        $outputPath = Join-Path -Path $defaultDir -ChildPath ("dashboard-$(Get-Date -Format 'yyyy-MM-dd').html")
     }
     
     Write-Host "Generating dashboard..." -ForegroundColor Yellow
     
-    if (![string]::IsNullOrWhiteSpace($subscriptionId)) {
-        $dashboardPath = New-GovDashboardReport -SubscriptionId $subscriptionId -OutputPath $outputPath
+    try {
+        if (![string]::IsNullOrWhiteSpace($subscriptionId)) {
+            $dashboardPath = New-GovDashboardReport -SubscriptionId $subscriptionId -OutputPath $outputPath
+        }
+        else {
+            $dashboardPath = New-GovDashboardReport -OutputPath $outputPath
+        }
     }
-    else {
-        $dashboardPath = New-GovDashboardReport -OutputPath $outputPath
+    catch {
+        Write-Host "Failed to generate dashboard: $_" -ForegroundColor Red
+        Read-Host -Prompt 'Press Enter to continue'
+        return
     }
     
     Write-Host "                                                       "
@@ -221,12 +292,11 @@ function New-Dashboard {
     
     $openDashboard = Read-Host "Do you want to open the dashboard in your browser? (Y/N)"
     
-    if ($openDashboard -eq 'Y' -or $openDashboard -eq 'y') {
-        # Open the dashboard in the default browser
-        Start-Process $dashboardPath
+    if ($openDashboard -match '^[Yy]') {
+        # Open the dashboard in the default browser (cross-platform)
+        try { Invoke-Item -Path $dashboardPath } catch { Start-Process -FilePath $dashboardPath }
     }
-    
-    Pause
+    Read-Host -Prompt 'Press Enter to continue'
 }
 
 # Function to run governance assessment
@@ -241,25 +311,26 @@ function Invoke-GovernanceAssessment {
     
     if ([string]::IsNullOrWhiteSpace($subscriptionId)) {
         Write-Host "Subscription ID is required." -ForegroundColor Red
-        Pause
+        Read-Host -Prompt 'Press Enter to continue'
         return
     }
     
     $outputPath = Read-Host "Enter Output Path (press Enter for default path)"
     if ([string]::IsNullOrWhiteSpace($outputPath)) {
-        $outputPath = "./governance-reports/assessment-$(Get-Date -Format 'yyyy-MM-dd').csv"
+        $defaultDir = Join-Path -Path $PSScriptRoot -ChildPath 'governance-reports'
+        if (-not (Test-Path -Path $defaultDir)) { New-Item -Path $defaultDir -ItemType Directory -Force | Out-Null }
+        $outputPath = Join-Path -Path $defaultDir -ChildPath ("assessment-$(Get-Date -Format 'yyyy-MM-dd').csv")
     }
-    
     Write-Host "Running governance assessment..." -ForegroundColor Yellow
-    
-    $assessmentPath = New-GovAssessmentReport -SubscriptionId $subscriptionId -OutputPath $outputPath
-    
-    Write-Host "                                                       "
-    Write-Host "Assessment completed successfully!" -ForegroundColor Green
-    Write-Host "Assessment report saved to: $assessmentPath" -ForegroundColor Green
-    Write-Host "                                                       "
-    
-    Pause
+    try {
+        $assessmentPath = New-GovAssessmentReport -SubscriptionId $subscriptionId -OutputPath $outputPath
+        Write-Host "`nAssessment completed successfully!" -ForegroundColor Green
+        Write-Host "Assessment report saved to: $assessmentPath" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "An error occurred during the assessment: $_" -ForegroundColor Red
+    }
+    Read-Host -Prompt 'Press Enter to continue'
 }
 
 # Function to view documentation
@@ -294,7 +365,7 @@ function Show-Documentation {
             Write-Host "The framework consists of PowerShell scripts and Bicep templates"
             Write-Host "for deploying and managing governance controls in Azure."
             Write-Host "                                                       "
-            Pause
+        Read-Host -Prompt 'Press Enter to continue'
         }
         "2" {
             Clear-Host
@@ -313,7 +384,7 @@ function Show-Documentation {
             Write-Host "4. Connect to Azure using the provided connection functions"
             Write-Host "5. Deploy the infrastructure using the deployment script"
             Write-Host "                                                       "
-            Pause
+        Read-Host -Prompt 'Press Enter to continue'
         }
         "3" {
             Clear-Host
@@ -335,54 +406,48 @@ function Show-Documentation {
             Write-Host "3. Run a compliance scan: Get-GovPolicyComplianceSummary"
             Write-Host "4. Generate a dashboard: New-GovDashboardReport"
             Write-Host "                                                       "
-            Pause
+        Read-Host -Prompt 'Press Enter to continue'
         }
         "4" {
             return
         }
         default {
             Write-Host "Invalid choice. Please try again." -ForegroundColor Red
-            Pause
+            Read-Host -Prompt 'Press Enter to continue'
         }
     }
 }
 
-# Main program loop
+# Main program loop (wrapped to ensure a clean exit)
 $exit = $false
+try {
+    while (-not $exit) {
+        $choice = Show-MainMenu
 
-while (-not $exit) {
-    $choice = Show-MainMenu
-    
-    switch ($choice) {
-        "1" {
-            Connect-ToAzure
-        }
-        "2" {
-            Invoke-Infrastructure
-        }
-        "3" {
-            Get-ComplianceReports
-        }
-        "4" {
-            New-Dashboard
-        }
-        "5" {
-            Invoke-GovernanceAssessment
-        }
-        "6" {
-            Show-Documentation
-        }
-        "7" {
-            $exit = $true
-        }
-        default {
-            Write-Host "Invalid choice. Please try again." -ForegroundColor Red
-            Pause
+        switch ($choice) {
+                "1" { Write-Activity -Level Info -Message 'User selected Connect-ToAzure'; Connect-ToAzure }
+                "2" { Write-Activity -Level Info -Message 'User selected Invoke-Infrastructure'; Invoke-Infrastructure }
+                "3" { Write-Activity -Level Info -Message 'User selected Get-ComplianceReports'; Get-ComplianceReports }
+                "4" { Write-Activity -Level Info -Message 'User selected New-Dashboard'; New-Dashboard }
+                "5" { Write-Activity -Level Info -Message 'User selected Invoke-GovernanceAssessment'; Invoke-GovernanceAssessment }
+                "6" { Write-Activity -Level Info -Message 'User selected Show-Documentation'; Show-Documentation }
+                "7" { Write-Activity -Level Info -Message 'User selected Exit'; $exit = $true }
+            default {
+                Write-Host "Invalid choice. Please try again." -ForegroundColor Red
+                Read-Host -Prompt 'Press Enter to continue'
+            }
         }
     }
 }
-
-Clear-Host
-Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "Thank you for using ICT Governance Framework Automation" -ForegroundColor Cyan
-Write-Host "=======================================================" -ForegroundColor Cyan
+catch {
+    Write-Host "An unexpected error occurred: $_" -ForegroundColor Red
+    Write-Activity -Level Error -Message "Unexpected error in menu loop: $_"
+    exit 1
+}
+finally {
+    Clear-Host
+    Write-Host "=======================================================" -ForegroundColor Cyan
+    Write-Host "Thank you for using ICT Governance Framework Automation" -ForegroundColor Cyan
+    Write-Host "=======================================================" -ForegroundColor Cyan
+    exit 0
+}

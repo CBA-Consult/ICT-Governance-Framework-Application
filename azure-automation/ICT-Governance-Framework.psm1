@@ -1,48 +1,31 @@
 # ICT Governance Framework - Azure Policy and Governance Automation (Module)
 # Author: GitHub Copilot & Gemini
-# Date: August 22, 2025
+# --- ROBUST CONFIGURATION ---
+# This block defensively constructs the $CONFIG object to avoid property-setting exceptions.
 
-# --- CONFIGURATION ---
-# The default configuration is loaded from the PrivateData section of the accompanying .psd1 manifest file.
-# Load the manifest file from the same folder as this module in a robust way so import-time doesn't fail.
-$psd1Path = Join-Path -Path $PSScriptRoot -ChildPath 'ICT-Governance-Framework.psd1'
-$manifestData = $null
-if (Test-Path -Path $psd1Path) {
-    # Prefer Import-PowerShellDataFile when available (safe parse of PSD1)
-    if (Get-Command -Name Import-PowerShellDataFile -ErrorAction SilentlyContinue) {
-        try { $manifestData = Import-PowerShellDataFile -Path $psd1Path } catch { $manifestData = $null }
+# Prefer reading the module manifest file directly so we don't depend on runtime module naming.
+$manifestPath = Join-Path -Path $PSScriptRoot -ChildPath 'ICT-Governance-Framework.psd1'
+$configFromManifest = $null
+if (Test-Path -Path $manifestPath) {
+    try {
+        $manifestData = Import-PowerShellDataFile -Path $manifestPath
+        if ($manifestData -and $manifestData.PrivateData -and $manifestData.PrivateData.ContainsKey('CONFIG')) {
+            $configFromManifest = $manifestData.PrivateData['CONFIG']
+        }
     }
-    # Fallback: read file text and evaluate the hashtable literal (only used if Import-PowerShellDataFile is unavailable)
-    if (-not $manifestData) {
-        try {
-            $psd1Text = Get-Content -Path $psd1Path -Raw
-            # The PSD1 is a PowerShell data file that returns a hashtable when executed. Evaluate in a child scope.
-            $manifestData = Invoke-Expression "& { $psd1Text }"
-        }
-        catch {
-            $manifestData = $null
-        }
+    catch {
+        Write-Warning "Unable to read module manifest at '$manifestPath'. Falling back to defaults. Error: $_"
+        $configFromManifest = $null
     }
 }
 
-# Extract CONFIG from PrivateData if present; otherwise use sensible defaults.
-if ($manifestData -and $manifestData.ContainsKey('PrivateData') -and $manifestData.PrivateData.ContainsKey('CONFIG')) {
-    $CONFIG = $manifestData.PrivateData.CONFIG
-} else {
-    $CONFIG = @{
-        LogPath = 'governance-logs'
-        ReportPath = 'governance-reports'
-        TemplatesPath = 'governance-templates'
-        PolicyDefinitionsPath = 'policy-definitions'
-    }
+# Build a NEW, guaranteed-writable PSCustomObject for our configuration using manifest values when available.
+$CONFIG = [PSCustomObject]@{
+    LogPath               = if ($configFromManifest -and $configFromManifest.LogPath) { Join-Path -Path $PSScriptRoot -ChildPath $configFromManifest.LogPath } else { Join-Path -Path $PSScriptRoot -ChildPath 'governance-logs' }
+    ReportPath            = if ($configFromManifest -and $configFromManifest.ReportPath) { Join-Path -Path $PSScriptRoot -ChildPath $configFromManifest.ReportPath } else { Join-Path -Path $PSScriptRoot -ChildPath 'governance-reports' }
+    TemplatesPath         = if ($configFromManifest -and $configFromManifest.TemplatesPath) { Join-Path -Path $PSScriptRoot -ChildPath $configFromManifest.TemplatesPath } else { Join-Path -Path $PSScriptRoot -ChildPath 'governance-templates' }
+    PolicyDefinitionsPath = if ($configFromManifest -and $configFromManifest.PolicyDefinitionsPath) { Join-Path -Path $PSScriptRoot -ChildPath $configFromManifest.PolicyDefinitionsPath } else { Join-Path -Path $PSScriptRoot -ChildPath 'policy-definitions' }
 }
-
-# Construct full paths for logs and reports relative to the module's location.
-$CONFIG.LogPath = Join-Path -Path $PSScriptRoot -ChildPath $CONFIG.LogPath
-$CONFIG.ReportPath = Join-Path -Path $PSScriptRoot -ChildPath $CONFIG.ReportPath
-$CONFIG.TemplatesPath = Join-Path -Path $PSScriptRoot -ChildPath $CONFIG.TemplatesPath
-$CONFIG.PolicyDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath $CONFIG.PolicyDefinitionsPath
-
 
 # --- PUBLIC FUNCTIONS ---
 
@@ -65,9 +48,43 @@ function Initialize-GovFramework {
     if ($CustomConfigPath -and (Test-Path -Path $CustomConfigPath)) {
         $customConfig = Get-Content -Path $CustomConfigPath -Raw | ConvertFrom-Json
         foreach ($key in $customConfig.PSObject.Properties.Name) {
-            $CONFIG[$key] = $customConfig.$key
+            try {
+                $value = $customConfig.$key
+                if ($CONFIG.PSObject.Properties.Match($key).Count -gt 0) {
+                    # Property exists - assign directly
+                    $CONFIG.$key = $value
+                }
+                else {
+                    # Property missing - add it safely
+                    $CONFIG | Add-Member -NotePropertyName $key -NotePropertyValue $value -Force
+                }
+            }
+            catch {
+                Write-Host "Warning: failed to apply custom config key '$key': $_" -ForegroundColor Yellow
+            }
         }
         Write-Host "Custom configuration loaded from: $CustomConfigPath" -ForegroundColor Yellow
+    }
+
+    # --- ADD: create a template governance-config.json if it doesn't exist ---
+    $configFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'governance-config.json'
+    if (-not (Test-Path -Path $configFilePath)) {
+        $templateConfig = @{
+            tenants = @(
+                @{
+                    name = "Example Tenant Name"
+                    tenantId = "00000000-0000-0000-0000-000000000000"
+                    subscriptions = @(
+                        @{
+                            name = "Example Subscription Name"
+                            subscriptionId = "11111111-1111-1111-1111-111111111111"
+                        }
+                    )
+                }
+            )
+        }
+        $templateConfig | ConvertTo-Json -Depth 6 | Out-File -FilePath $configFilePath -Encoding utf8 -Force
+        Write-Host "Template 'governance-config.json' created at: $configFilePath`nPlease update it with your tenant and subscription details." -ForegroundColor Yellow
     }
 }
 
@@ -87,35 +104,138 @@ function Write-GovLog {
         "Error"   { Write-Host $logEntry -ForegroundColor Red }
         "Success" { Write-Host $logEntry -ForegroundColor Green }
     }
-    $logFile = Join-Path -Path $CONFIG.LogPath -ChildPath "governance-$(Get-Date -Format 'yyyy-MM-dd').log"
-    Add-Content -Path $logFile -Value $logEntry
+
+    # Resolve log path locally without attempting to modify $CONFIG (which may be non-writable)
+    $resolvedLogPath = $null
+    try {
+        if ($CONFIG -and $CONFIG.PSObject.Properties['LogPath']) {
+            $candidate = [string]$CONFIG.LogPath
+            if (-not [string]::IsNullOrWhiteSpace($candidate)) { $resolvedLogPath = $candidate }
+        }
+    } catch { $resolvedLogPath = $null }
+    if ([string]::IsNullOrWhiteSpace($resolvedLogPath)) {
+        $resolvedLogPath = Join-Path -Path $PSScriptRoot -ChildPath 'governance-logs'
+    }
+
+    try {
+        if (-not (Test-Path -Path $resolvedLogPath)) {
+            New-Item -Path $resolvedLogPath -ItemType Directory -Force | Out-Null
+        }
+        $logFile = Join-Path -Path $resolvedLogPath -ChildPath "governance-$(Get-Date -Format 'yyyy-MM-dd').log"
+        Add-Content -Path $logFile -Value $logEntry -ErrorAction Stop
+    }
+    catch {
+        # If file logging fails, write a warning to the host but do not throw.
+        Write-Host "[Warning] Failed to write log to file: $_" -ForegroundColor Yellow
+    }
 }
 
 function Connect-GovAzure {
+    [CmdletBinding(DefaultParameterSetName = 'FromConfig')]
     param (
-        [Parameter(Mandatory = $false)]
-        [switch]$UseManagedIdentity,
-        [Parameter(Mandatory = $false)]
-        [string]$TenantId
+        [Parameter(Mandatory = $false, ParameterSetName = 'FromConfig')]
+        [switch]$FromConfig,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'AuditAll')]
+        [switch]$AuditAll,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'SingleTenant')]
+        [string]$TenantId,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'ManagedIdentity')]
+        [switch]$UseManagedIdentity
     )
+
     try {
-        if ($UseManagedIdentity) {
-            Connect-AzAccount -Identity
-            Write-GovLog -Message "Connected to Azure using Managed Identity" -Level "Success"
+        # Ensure interactive login if required by these modes
+        if ($PSCmdlet.ParameterSetName -in @('FromConfig', 'AuditAll', 'SingleTenant') -and -not (Get-AzContext -ErrorAction SilentlyContinue)) {
+            Write-GovLog -Message "No active Azure context. Initiating interactive login..." -Level "Info"
+            Connect-AzAccount | Out-Null
+            if (-not (Get-AzContext -ErrorAction SilentlyContinue)) {
+                Write-GovLog -Message "Login failed or was cancelled. Aborting." -Level "Error"
+                return $null
+            }
         }
-        elseif ($TenantId) {
-            Connect-AzAccount -TenantId $TenantId
-            Write-GovLog -Message "Connected to Azure tenant: $TenantId" -Level "Success"
+
+        switch ($PSCmdlet.ParameterSetName) {
+            'FromConfig' {
+                $configPath = Join-Path -Path $PSScriptRoot -ChildPath 'governance-config.json'
+                if (-not (Test-Path -Path $configPath)) {
+                    throw "Configuration file not found at '$configPath'. Please run Initialize-GovFramework to create a template."
+                }
+                $config = Get-Content -Path $configPath -Raw | ConvertFrom-Json
+
+                # Build a flat list for user selection
+                $selectionList = @()
+                foreach ($tenant in $config.tenants) {
+                    foreach ($sub in $tenant.subscriptions) {
+                        $selectionList += [PSCustomObject]@{
+                            DisplayText = "$($tenant.name) - $($sub.name)"
+                            TenantId = $tenant.tenantId
+                            SubscriptionId = $sub.subscriptionId
+                        }
+                    }
+                }
+
+                if ($selectionList.Count -eq 0) {
+                    throw "No tenants or subscriptions found in '$configPath'. Please configure it."
+                }
+
+                # Present menu and get selection
+                Write-Host "`nPlease select a subscription to connect to:" -ForegroundColor Cyan
+                for ($i = 0; $i -lt $selectionList.Count; $i++) {
+                    Write-Host ("{0,3}: {1}" -f ($i + 1), $selectionList[$i].DisplayText)
+                }
+
+                $choice = Read-Host "`nEnter your choice"
+                $index = [int]$choice - 1
+
+                if ($index -ge 0 -and $index -lt $selectionList.Count) {
+                    $selection = $selectionList[$index]
+                    Set-AzContext -TenantId $selection.TenantId -SubscriptionId $selection.SubscriptionId | Out-Null
+                    Write-GovLog -Message "Successfully set context to subscription '$($selection.DisplayText)'" -Level "Success"
+                } else {
+                    Write-GovLog -Message "Invalid selection. No context was changed." -Level "Warning"
+                }
+            }
+
+            'AuditAll' {
+                Write-GovLog -Message "AUDIT MODE: Discovering all accessible tenants and subscriptions..." -Level "Warning"
+                $tenants = Get-AzTenant -ErrorAction SilentlyContinue
+                $allSubscriptions = @()
+                foreach ($tenant in $tenants) {
+                    try {
+                        $subs = Get-AzSubscription -TenantId $tenant.Id -ErrorAction Stop
+                        foreach ($s in $subs) {
+                            $allSubscriptions += [PSCustomObject]@{ Tenant = $tenant; Subscription = $s }
+                        }
+                    }
+                    catch {
+                        Write-GovLog -Message "Skipping tenant $($tenant.Id) due to error: $_" -Level "Warning"
+                    }
+                }
+                Write-GovLog -Message "Audit complete. Found $($allSubscriptions.Count) subscriptions across $($tenants.Count) tenants." -Level "Success"
+                return $allSubscriptions
+            }
+
+            'SingleTenant' {
+                Connect-AzAccount -TenantId $TenantId
+                Write-GovLog -Message "Connected to Azure tenant: $TenantId" -Level "Success"
+                return Get-AzContext -ErrorAction SilentlyContinue
+            }
+
+            'ManagedIdentity' {
+                Connect-AzAccount -Identity
+                Write-GovLog -Message "Connected to Azure using Managed Identity" -Level "Success"
+                return Get-AzContext -ErrorAction SilentlyContinue
+            }
         }
-        else {
-            Connect-AzAccount
-            Write-GovLog -Message "Connected to Azure interactively" -Level "Success"
-        }
-        $context = Get-AzContext
-        Write-GovLog -Message "Current context: Subscription - $($context.Subscription.Name), Tenant - $($context.Tenant.Id)" -Level "Info"
+
+        # Default: return current context
+        return Get-AzContext -ErrorAction SilentlyContinue
     }
     catch {
-        Write-GovLog -Message "Failed to connect to Azure: $_" -Level "Error"
+        Write-GovLog -Level 'Error' -Message ("An error occurred in Connect-GovAzure: {0}" -f $_.Exception.Message) -ErrorAction SilentlyContinue
         throw
     }
 }
