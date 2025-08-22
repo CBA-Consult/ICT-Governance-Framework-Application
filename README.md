@@ -60,21 +60,47 @@ Last Updated: January 15, 2024 | Original Creation: October 22, 2020, Amsterdam,
 ```
 📁 Repository Root
 ├── 📖 docs/                          # Organized documentation structure
-│   ├── 🎯 project-management/        # Project artifacts and planning
-│   ├── 🏛️ governance-framework/      # Core governance documentation
-│   ├── 📋 policies/                  # Governance and operational policies
-│   ├── 🚀 implementation/            # Implementation guides and summaries
-│   ├── 🏗️ architecture/             # Technical architecture documentation
-│   ├── ✅ compliance/               # Compliance and audit documentation
-│   ├── 📚 training/                 # Training and communication materials
-│   └── 📄 templates/                # Reusable templates and methodologies
-├── 🔧 azure-automation/             # Azure automation scripts and configs
-├── 📋 blueprint-templates/          # Infrastructure and policy templates
-├── 🌐 ict-governance-framework/     # Web application and APIs
-├── 🤖 implementation-automation/    # Deployment automation scripts
-├── ☁️ multi-cloud-governance/      # Multi-cloud specific documentation
-├── 🔍 framework-evaluation/        # Framework assessment tools
-└── 📊 generated-documents/         # Auto-generated documentation
+│   ├── architecture/                 # Technical architecture documentation
+│   ├── charter/                      # Project charter documents
+│   ├── checklists/                   # Project and governance checklists
+│   ├── communication/                # Communication plans and templates
+│   ├── compliance/                   # Compliance and audit documentation
+│   ├── escalation/                   # Escalation procedures and logs
+│   ├── foundation/                   # Foundation phase documentation
+│   ├── governance/                   # Governance process documentation
+│   ├── governance-framework/         # Core governance documentation
+│   ├── implementation/               # Implementation guides and summaries
+│   ├── logs/                         # Governance logs
+│   ├── policies/                     # Governance and operational policies
+│   ├── project-management/           # Project artifacts and planning
+│   ├── references/                   # Reference materials
+│   ├── reports/                      # Governance and compliance reports
+│   ├── stakeholders/                 # Stakeholder registers and analysis
+│   ├── summaries/                    # Summary documents
+│   ├── team/                         # Team norms and orientation
+│   ├── templates/                    # Reusable templates and methodologies
+│   ├── training/                     # Training and communication materials
+│   └── Table-of-Contents.md          # Documentation table of contents
+├── 🔧 azure-automation/               # Azure automation scripts and configs
+├── 📋 blueprint-templates/            # Infrastructure and policy templates
+├── 🌐 ict-governance-framework/       # Web application and APIs
+├── framework-evaluation/              # Framework assessment tools
+├── generated-documents/               # Auto-generated documentation
+├── implementation-guides/             # Implementation standards and guides
+├── management-plans/                  # Requirements and management plans
+├── quality-assurance/                 # Quality assurance and testing
+├── scope-management/                  # Scope and risk management
+├── strategic-statements/              # Company values and purpose
+├── technical-design/                  # Technical design documentation
+├── tests/                             # Test scripts and documentation
+├── tests-examples/                    # Example test scripts
+├── src/                               # Source code modules
+│   └── modules/
+│       └── documentGenerator/         # Document generation processor
+├── .github/                           # GitHub workflows and config
+├── LICENSE                            # License file
+├── README.md                          # Main project readme
+└── ...                                # Additional config and scripts
 ```
 
 ## Framework Components

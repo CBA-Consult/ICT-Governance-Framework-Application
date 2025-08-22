@@ -103,7 +103,7 @@ function Connect-ToAzure {
 }
 
 # Function to handle deployment
-function Deploy-Infrastructure {
+function Invoke-Infrastructure {
     Clear-Host
     Write-Host "=======================================================" -ForegroundColor Cyan
     Write-Host "     DEPLOY ICT GOVERNANCE FRAMEWORK INFRASTRUCTURE    " -ForegroundColor Cyan
@@ -358,7 +358,7 @@ while (-not $exit) {
             Connect-ToAzure
         }
         "2" {
-            Deploy-Infrastructure
+            Invoke-Infrastructure
         }
         "3" {
             Get-ComplianceReports
