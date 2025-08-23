@@ -16,6 +16,11 @@ import {
   XCircleIcon
 } from '@heroicons/react/24/outline';
 
+// Import modal components
+import CreateRoleModal from '../../components/admin/CreateRoleModal';
+import EditRoleModal from '../../components/admin/EditRoleModal';
+import ManagePermissionsModal from '../../components/admin/ManagePermissionsModal';
+
 function RoleManagementPage() {
   const { apiClient, user: currentUser, hasAllPermissions } = useAuth();
   const [roles, setRoles] = useState([]);
@@ -154,6 +159,24 @@ function RoleManagementPage() {
   const clearMessages = () => {
     setError('');
     setSuccessMessage('');
+  };
+
+  // Callback functions for real-time updates
+  const handleRoleCreated = (newRole) => {
+    setSuccessMessage(`Role "${newRole.display_name}" created successfully`);
+    fetchRoles(pagination.page, searchTerm, typeFilter);
+    fetchPermissions(); // Refresh permissions in case new ones were added
+  };
+
+  const handleRoleUpdated = (updatedRole) => {
+    setSuccessMessage(`Role "${updatedRole.display_name}" updated successfully`);
+    fetchRoles(pagination.page, searchTerm, typeFilter);
+  };
+
+  const handlePermissionsUpdated = () => {
+    setSuccessMessage('Role permissions updated successfully');
+    fetchRoles(pagination.page, searchTerm, typeFilter);
+    fetchPermissions(); // Refresh permissions data
   };
 
   const getRoleTypeColor = (type) => {
@@ -512,8 +535,26 @@ function RoleManagementPage() {
         )}
       </div>
 
-      {/* Modals would go here - CreateRoleModal, EditRoleModal, ManagePermissionsModal */}
-      {/* For now, these are placeholders as they would require additional components */}
+      {/* Modals */}
+      <CreateRoleModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onRoleCreated={handleRoleCreated}
+      />
+
+      <EditRoleModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        role={selectedRole}
+        onRoleUpdated={handleRoleUpdated}
+      />
+
+      <ManagePermissionsModal
+        isOpen={showPermissionsModal}
+        onClose={() => setShowPermissionsModal(false)}
+        role={selectedRole}
+        onPermissionsUpdated={handlePermissionsUpdated}
+      />
     </div>
   );
 }
