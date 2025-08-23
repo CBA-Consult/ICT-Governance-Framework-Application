@@ -518,3 +518,58 @@ function New-GovAssessmentReport {
     }
 }
 
+# Diagnostic helper to validate environment (PowerShell / Az modules)
+function Test-GovFrameworkEnvironment {
+    [CmdletBinding()]
+    param()
+
+    Write-Host "--- ICT Governance Framework Environment Check ---" -ForegroundColor Cyan
+    $allChecksPassed = $true
+
+    # Check 1: PowerShell Version
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        Write-Host "[FAIL] PowerShell Version: $($PSVersionTable.PSVersion). Recommended: 7.2 or higher." -ForegroundColor Red
+        $allChecksPassed = $false
+    }
+    else {
+        Write-Host "[PASS] PowerShell Version: $($PSVersionTable.PSVersion)" -ForegroundColor Green
+    }
+
+    # Check 2: Az Module Dependencies
+    $requiredModules = @(
+        @{ Name = 'Az.Accounts'; Version = '6.0.0' },
+        @{ Name = 'Az.Resources'; Version = '6.0.0' },
+        @{ Name = 'Az.PolicyInsights'; Version = '1.6.0' }
+    )
+
+    Write-Host "`n--- Checking Required Az Modules ---" -ForegroundColor Cyan
+    foreach ($reqModule in $requiredModules) {
+        $installed = Get-Module -Name $reqModule.Name -ListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1
+        if (-not $installed) {
+            Write-Host "[FAIL] Module '$($reqModule.Name)' is not installed." -ForegroundColor Red
+            $allChecksPassed = $false
+        }
+        elseif ($installed.Version -lt [System.Version]$reqModule.Version) {
+            Write-Host "[FAIL] Module '$($reqModule.Name)' is version $($installed.Version), but version $($reqModule.Version) or greater is required." -ForegroundColor Red
+            $allChecksPassed = $false
+        }
+        else {
+            Write-Host "[PASS] Module '$($reqModule.Name)' is version $($installed.Version)." -ForegroundColor Green
+        }
+    }
+
+    # Final Summary and Remediation Steps
+    if (-not $allChecksPassed) {
+        Write-Host "`n[DIAGNOSIS] Your environment has one or more issues." -ForegroundColor Yellow
+        Write-Host "To resolve Azure PowerShell module issues, it is highly recommended to run the following commands in a new, elevated PowerShell 7 terminal:" -ForegroundColor Yellow
+        Write-Host "1. Get-InstalledModule -Name Az.* | Uninstall-Module -AllVersions -Force" -ForegroundColor White
+        Write-Host "2. Install-Module -Name Az -Scope AllUsers -Repository PSGallery -Force" -ForegroundColor White
+    }
+    else {
+        Write-Host "`n[SUCCESS] Your environment appears to be configured correctly." -ForegroundColor Green
+    }
+}
+
+# Export public functions so Import-Module will make them available to the importing scope
+Export-ModuleMember -Function Initialize-GovFramework, Connect-GovAzure, Get-GovPolicyComplianceSummary, Get-GovNonCompliantResources, New-GovDashboardReport, New-GovAssessmentReport, Write-GovLog
+

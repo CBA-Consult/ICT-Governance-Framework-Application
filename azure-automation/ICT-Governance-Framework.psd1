@@ -16,12 +16,14 @@
         'Get-GovNonCompliantResources',
         'New-GovDashboardReport',
         'New-GovAssessmentReport',
-        'Write-GovLog'
+    'Write-GovLog',
+    'Test-GovFrameworkEnvironment'
     )
     RequiredModules = @(
-        @{ModuleName = 'Az.Accounts'; ModuleVersion = '2.12.3'},
-        @{ModuleName = 'Az.Resources'; ModuleVersion = '6.7.0'},
-        @{ModuleName = 'Az.PolicyInsights'; ModuleVersion = '1.6.2'}
+        # Minimum compatible versions to ensure the module loads deterministically
+        @{ModuleName = 'Az.Accounts'; ModuleVersion = '6.0.0'},
+        @{ModuleName = 'Az.Resources'; ModuleVersion = '6.0.0'},
+        @{ModuleName = 'Az.PolicyInsights'; ModuleVersion = '1.6.0'}
     )
     PrivateData = @{
         CONFIG = @{

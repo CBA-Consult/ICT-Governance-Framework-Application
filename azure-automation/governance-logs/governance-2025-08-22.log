@@ -104,3 +104,64 @@
 [2025-08-22 20:48:48] [Info] - Retrieved non-compliant policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
 [2025-08-22 20:48:49] [Info] - Dashboard data summary: Policies=590, Compliant=19, NonCompliantPolicies=79; NonCompliantResources=8; ResourceGroups=6; Resources=25; TopResourceTypes=Microsoft.Web/connections:7, Microsoft.CognitiveServices/accounts:4, Microsoft.CognitiveServices/accounts/projects:3, Microsoft.Logic/workflows:2, Microsoft.DevCenter/projects/pools:1
 [2025-08-22 20:48:49] [Success] - Governance dashboard report generated at: .\governance-reports\smoke-dashboard-test.html
+[2025-08-22 21:03:59] [Info] - Menu started (user=MennoDrescher)
+[2025-08-22 21:04:01] [Info] - User selected Connect-ToAzure
+[2025-08-22 21:04:10] [Success] - Successfully set context to subscription 'CBA - CBA Subscription'
+[2025-08-22 21:04:17] [Info] - User selected Invoke-Infrastructure
+[2025-08-22 21:05:03] [Info] - User selected Invoke-Infrastructure
+[2025-08-22 21:08:24] [Info] - User selected Exit
+[2025-08-22 21:13:43] [Info] - Retrieved policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:13:44] [Info] - Retrieved non-compliant policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:13:44] [Info] - Dashboard data summary: Policies=590, Compliant=19, NonCompliantPolicies=79; NonCompliantResources=8; ResourceGroups=6; Resources=25; TopResourceTypes=Microsoft.Web/connections:7, Microsoft.CognitiveServices/accounts:4, Microsoft.CognitiveServices/accounts/projects:3, Microsoft.Logic/workflows:2, Microsoft.DevCenter/projects/pools:1
+[2025-08-22 21:13:44] [Success] - Governance dashboard report generated at: C:\Users\MennoDrescher\source\repos\ICT-Governance-Framework-Application\tests\TestOutputs\test-dashboard.html
+[2025-08-22 21:13:58] [Info] - Retrieved policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:14:00] [Info] - Retrieved non-compliant policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:14:00] [Info] - Dashboard data summary: Policies=590, Compliant=19, NonCompliantPolicies=79; NonCompliantResources=8; ResourceGroups=6; Resources=25; TopResourceTypes=Microsoft.Web/connections:7, Microsoft.CognitiveServices/accounts:4, Microsoft.CognitiveServices/accounts/projects:3, Microsoft.Logic/workflows:2, Microsoft.DevCenter/projects/pools:1
+[2025-08-22 21:14:00] [Success] - Governance dashboard report generated at: C:\Users\MennoDrescher\source\repos\ICT-Governance-Framework-Application\tests\TestOutputs\test-dashboard.html
+[2025-08-22 21:17:44] [Info] - Retrieved policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:17:45] [Info] - Retrieved non-compliant policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:17:46] [Info] - Dashboard data summary: Policies=590, Compliant=19, NonCompliantPolicies=79; NonCompliantResources=8; ResourceGroups=6; Resources=25; TopResourceTypes=Microsoft.Web/connections:7, Microsoft.CognitiveServices/accounts:4, Microsoft.CognitiveServices/accounts/projects:3, Microsoft.Logic/workflows:2, Microsoft.DevCenter/projects/pools:1
+[2025-08-22 21:17:46] [Success] - Governance dashboard report generated at: C:\Users\MennoDrescher\source\repos\ICT-Governance-Framework-Application\tests\TestOutputs\test-dashboard.html
+[2025-08-22 21:24:00] [Info] - Retrieved policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:24:02] [Info] - Retrieved non-compliant policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:24:03] [Info] - Dashboard data summary: Policies=590, Compliant=19, NonCompliantPolicies=79; NonCompliantResources=8; ResourceGroups=6; Resources=25; TopResourceTypes=Microsoft.Web/connections:7, Microsoft.CognitiveServices/accounts:4, Microsoft.CognitiveServices/accounts/projects:3, Microsoft.Logic/workflows:2, Microsoft.DevCenter/projects/pools:1
+[2025-08-22 21:24:03] [Success] - Governance dashboard report generated at: C:\Users\MennoDrescher\source\repos\ICT-Governance-Framework-Application\tests\TestOutputs\test-dashboard.html
+[2025-08-22 21:26:59] [Info] - Retrieved policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:27:01] [Info] - Retrieved non-compliant policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:27:01] [Info] - Dashboard data summary: Policies=590, Compliant=19, NonCompliantPolicies=79; NonCompliantResources=8; ResourceGroups=6; Resources=25; TopResourceTypes=Microsoft.Web/connections:7, Microsoft.CognitiveServices/accounts:4, Microsoft.CognitiveServices/accounts/projects:3, Microsoft.Logic/workflows:2, Microsoft.DevCenter/projects/pools:1
+[2025-08-22 21:27:01] [Success] - Governance dashboard report generated at: C:\Users\MennoDrescher\source\repos\ICT-Governance-Framework-Application\tests\TestOutputs\test-dashboard.html
+[2025-08-22 21:35:53] [Info] - Retrieved policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:35:54] [Info] - Retrieved non-compliant policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:35:55] [Info] - Dashboard data summary: Policies=590, Compliant=19, NonCompliantPolicies=79; NonCompliantResources=8; ResourceGroups=6; Resources=25; TopResourceTypes=Microsoft.Web/connections:7, Microsoft.CognitiveServices/accounts:4, Microsoft.CognitiveServices/accounts/projects:3, Microsoft.Logic/workflows:2, Microsoft.DevCenter/projects/pools:1
+[2025-08-22 21:35:55] [Success] - Governance dashboard report generated at: C:\Users\MennoDrescher\source\repos\ICT-Governance-Framework-Application\tests\TestOutputs\test-dashboard.html
+[2025-08-22 21:36:21] [Info] - Retrieved policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:36:22] [Info] - Retrieved non-compliant policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:36:23] [Info] - Dashboard data summary: Policies=590, Compliant=19, NonCompliantPolicies=79; NonCompliantResources=8; ResourceGroups=6; Resources=25; TopResourceTypes=Microsoft.Web/connections:7, Microsoft.CognitiveServices/accounts:4, Microsoft.CognitiveServices/accounts/projects:3, Microsoft.Logic/workflows:2, Microsoft.DevCenter/projects/pools:1
+[2025-08-22 21:36:23] [Success] - Governance dashboard report generated at: C:\Users\MennoDrescher\source\repos\ICT-Governance-Framework-Application\tests\TestOutputs\test-dashboard.html
+[2025-08-22 21:45:39] [Info] - Retrieved policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:45:40] [Info] - Retrieved non-compliant policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 21:45:40] [Info] - Dashboard data summary: Policies=590, Compliant=19, NonCompliantPolicies=79; NonCompliantResources=8; ResourceGroups=6; Resources=25; TopResourceTypes=Microsoft.Web/connections:7, Microsoft.CognitiveServices/accounts:4, Microsoft.CognitiveServices/accounts/projects:3, Microsoft.Logic/workflows:2, Microsoft.DevCenter/projects/pools:1
+[2025-08-22 21:45:40] [Success] - Governance dashboard report generated at: C:\Users\MennoDrescher\source\repos\ict-governance-framework-application\tests\TestOutputs\test-dashboard.html
+[2025-08-22 21:53:55] [Info] - Menu started (user=MennoDrescher)
+[2025-08-22 21:53:58] [Info] - User selected Connect-ToAzure
+[2025-08-22 21:54:03] [Success] - Successfully set context to subscription 'CBA - CBA Subscription'
+[2025-08-22 21:54:06] [Info] - User selected Invoke-Infrastructure
+[2025-08-22 22:01:54] [Info] - User selected Exit
+[2025-08-22 22:10:55] [Info] - Menu started (user=MennoDrescher)
+[2025-08-22 22:11:07] [Info] - User selected Connect-ToAzure
+[2025-08-22 22:11:11] [Success] - Successfully set context to subscription 'CBA - CBA Subscription'
+[2025-08-22 22:11:14] [Info] - User selected Invoke-Infrastructure
+[2025-08-22 22:12:12] [Info] - User selected Exit
+[2025-08-22 22:12:30] [Info] - Menu started (user=MennoDrescher)
+[2025-08-22 22:12:32] [Info] - User selected Connect-ToAzure
+[2025-08-22 22:12:36] [Success] - Successfully set context to subscription 'CBA - CBA Subscription'
+[2025-08-22 22:12:39] [Info] - User selected Invoke-Infrastructure
+[2025-08-22 22:14:23] [Info] - User selected Exit
+[2025-08-22 22:50:14] [Info] - Menu started (user=MennoDrescher)
+[2025-08-22 22:50:38] [Info] - User selected Connect-ToAzure
+[2025-08-22 22:50:42] [Success] - Successfully set context to subscription 'CBA - CBA Subscription'
+[2025-08-22 22:50:51] [Info] - User selected Get-ComplianceReports
+[2025-08-22 22:51:01] [Info] - Retrieved policy states for subscription: e759446b-8bb7-4065-a0ed-9d5273a05c46
+[2025-08-22 22:51:01] [Success] - Compliance summary exported to: C:\Users\MennoDrescher\source\repos\ICT-Governance-Framework-Application\azure-automation\governance-reports\compliance-summary-2025-08-22.json
+[2025-08-22 22:51:25] [Info] - User selected Invoke-Infrastructure
+[2025-08-22 22:52:57] [Info] - User selected Exit
