@@ -327,4 +327,66 @@ Tests are configured to run on:
 
 ## Conclusion
 
-This comprehensive test suite ensures that the 'New User' button and user creation workflow meet all acceptance criteria and provide a robust, accessible, and user-friendly experience for admin users in the ICT Governance Framework application.
+This comprehensive test suite ensures that both the 'New User' button and user creation workflow, as well as the 'Edit User' functionality, meet all acceptance criteria and provide a robust, accessible, and user-friendly experience for admin users in the ICT Governance Framework application.
+
+## Edit User Functionality Tests
+
+### Test Objectives for Edit User
+
+The edit user tests verify:
+
+1. **Admin users can edit existing user details without issues**
+2. **The 'Edit User' button is responsive and accessible**
+3. **Form validation works correctly for user updates**
+4. **User data is properly populated and updated**
+5. **Error handling works for various scenarios**
+6. **Security measures are in place (username immutability, status change confirmations)**
+
+### Edit User Test Categories
+
+#### 1. Edit Button Visibility and Access
+- ✅ Display edit button for users with proper permissions
+- ✅ Edit button has proper accessibility attributes
+- ✅ Edit button opens modal when clicked
+
+#### 2. Form Population and Validation
+- ✅ Form fields are populated with existing user data
+- ✅ Username field is read-only (cannot be changed)
+- ✅ Required field validation works correctly
+- ✅ Email format validation
+- ✅ Name format validation (letters, spaces, hyphens, apostrophes only)
+
+#### 3. User Data Updates
+- ✅ Successfully update user details (department, job title, etc.)
+- ✅ Update user status with confirmation for access-affecting changes
+- ✅ Update user roles
+- ✅ Changes are reflected immediately after update
+
+#### 4. Modal Behavior
+- ✅ Modal closes when cancel button is clicked
+- ✅ Modal closes when X button is clicked
+- ✅ Form resets to original data when modal is closed
+- ✅ Loading state is displayed during updates
+
+#### 5. Error Handling
+- ✅ Handle validation errors gracefully
+- ✅ Display appropriate error messages for different scenarios:
+  - Email already in use (409 error)
+  - Invalid data (400 error)
+  - Permission denied (403 error)
+  - User not found (404 error)
+  - Network errors
+- ✅ Modal stays open when errors occur
+
+#### 6. Security and Permissions
+- ✅ Username cannot be modified (read-only field)
+- ✅ Confirmation required for status changes that affect access
+- ✅ Proper permission checks for edit functionality
+
+### Key Features Implemented
+
+1. **Enhanced Validation**: Client-side validation for email format and name fields
+2. **Error Handling**: Comprehensive error handling for various API response codes
+3. **User Experience**: Loading states, confirmation dialogs, and form reset functionality
+4. **Security**: Username immutability and status change confirmations
+5. **Accessibility**: Proper ARIA labels and keyboard navigation support
