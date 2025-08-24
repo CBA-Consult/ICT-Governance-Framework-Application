@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth, withAuth } from '../../contexts/AuthContext';
+import CreateRoleModal from '../../components/admin/CreateRoleModal';
 import { 
   ShieldCheckIcon,
   PlusIcon, 
@@ -153,6 +154,13 @@ function RoleManagementPage() {
       setError('Failed to delete role');
       console.error('Delete role error:', err);
     }
+  };
+
+  // Handle role created successfully
+  const handleRoleCreated = (newRole) => {
+    setSuccessMessage('Role created successfully');
+    fetchRoles(pagination.page, searchTerm, typeFilter);
+    setShowCreateModal(false);
   };
 
   // Clear messages
@@ -535,25 +543,14 @@ function RoleManagementPage() {
         )}
       </div>
 
-      {/* Modals */}
+      {/* Modals would go here - CreateRoleModal, EditRoleModal, ManagePermissionsModal */}
+      {/* For now, these are placeholders as they would require additional components */}
+      {/* Create Role Modal */}
       <CreateRoleModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onRoleCreated={handleRoleCreated}
-      />
-
-      <EditRoleModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        role={selectedRole}
-        onRoleUpdated={handleRoleUpdated}
-      />
-
-      <ManagePermissionsModal
-        isOpen={showPermissionsModal}
-        onClose={() => setShowPermissionsModal(false)}
-        role={selectedRole}
-        onPermissionsUpdated={handlePermissionsUpdated}
+        apiClient={apiClient}
       />
     </div>
   );

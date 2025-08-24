@@ -1,81 +1,55 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import {
-  XMarkIcon,
-  PlusIcon,
-  ExclamationTriangleIcon,
-  UserGroupIcon
-} from '@heroicons/react/24/outline';
 
-export default function CreateRoleModal({ 
-  isOpen, 
-  onClose, 
-  onRoleCreated 
-}) {
-  const { apiClient } = useAuth();
+import React, { useState, useEffect } from 'react';
+import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
+
+export default function CreateRoleModal({ isOpen, onClose, onRoleCreated, apiClient }) {
+
   const [formData, setFormData] = useState({
     roleName: '',
     displayName: '',
     description: '',
     roleType: 'Custom',
-    roleHierarchyLevel: 0,
-    parentRoleId: '',
+    roleHierarchyLevel: 1,
     permissions: []
   });
-  const [allPermissions, setAllPermissions] = useState([]);
+  const [availablePermissions, setAvailablePermissions] = useState([]);
   const [groupedPermissions, setGroupedPermissions] = useState({});
-  const [selectedPermissions, setSelectedPermissions] = useState(new Set());
-  const [availableRoles, setAvailableRoles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [validationErrors, setValidationErrors] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [selectedPermissions, setSelectedPermissions] = useState(new Set());
 
-  // Fetch permissions and roles when modal opens
+  // Fetch available permissions
+  const fetchPermissions = async () => {
+    try {
+      const response = await apiClient.get('/roles/permissions/all');
+      setAvailablePermissions(response.data.permissions || []);
+      setGroupedPermissions(response.data.groupedPermissions || {});
+    } catch (err) {
+      console.error('Failed to fetch permissions:', err);
+      setError('Failed to load permissions');
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       fetchPermissions();
-      fetchAvailableRoles();
-      resetForm();
+      // Reset form when modal opens
+      setFormData({
+        roleName: '',
+        displayName: '',
+        description: '',
+        roleType: 'Custom',
+        roleHierarchyLevel: 1,
+        permissions: []
+      });
+      setSelectedPermissions(new Set());
+      setError('');
+      setFieldErrors({});
     }
   }, [isOpen]);
-
-  const fetchPermissions = async () => {
-    try {
-      const response = await apiClient.get('/user-permissions/permissions');
-      setAllPermissions(response.data.permissions || []);
-      setGroupedPermissions(response.data.groupedPermissions || {});
-    } catch (err) {
-      setError('Failed to fetch permissions');
-      console.error('Fetch permissions error:', err);
-    }
-  };
-
-  const fetchAvailableRoles = async () => {
-    try {
-      const response = await apiClient.get('/roles?limit=100');
-      setAvailableRoles(response.data.roles || []);
-    } catch (err) {
-      console.error('Fetch roles error:', err);
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      roleName: '',
-      displayName: '',
-      description: '',
-      roleType: 'Custom',
-      roleHierarchyLevel: 0,
-      parentRoleId: '',
-      permissions: []
-    });
-    setSelectedPermissions(new Set());
-    setError('');
-    setValidationErrors({});
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -84,47 +58,86 @@ export default function CreateRoleModal({
       [name]: value
     }));
     
-    // Clear validation error for this field
-    if (validationErrors[name]) {
-      setValidationErrors(prev => ({
+    // Clear field-specific error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({
         ...prev,
         [name]: ''
       }));
     }
+    
+    // Auto-generate role name from display name if role name is empty
+    if (name === 'displayName' && !formData.roleName) {
+      const generatedRoleName = value
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, '_')
+        .substring(0, 50);
+      setFormData(prev => ({
+        ...prev,
+        roleName: generatedRoleName
+      }));
+    }
   };
 
-  const handlePermissionToggle = (permissionName) => {
-    const newSelected = new Set(selectedPermissions);
-    if (newSelected.has(permissionName)) {
-      newSelected.delete(permissionName);
+  const handlePermissionChange = (permissionName, checked) => {
+    const newSelectedPermissions = new Set(selectedPermissions);
+    if (checked) {
+      newSelectedPermissions.add(permissionName);
     } else {
-      newSelected.add(permissionName);
+      newSelectedPermissions.delete(permissionName);
     }
-    setSelectedPermissions(newSelected);
+    setSelectedPermissions(newSelectedPermissions);
+    
+    setFormData(prev => ({
+      ...prev,
+      permissions: Array.from(newSelectedPermissions)
+    }));
+  };
+
+  const handleSelectAllPermissions = (resource, checked) => {
+    const resourcePermissions = groupedPermissions[resource] || [];
+    const newSelectedPermissions = new Set(selectedPermissions);
+    
+    resourcePermissions.forEach(permission => {
+      if (checked) {
+        newSelectedPermissions.add(permission.permission_name);
+      } else {
+        newSelectedPermissions.delete(permission.permission_name);
+      }
+    });
+    
+    setSelectedPermissions(newSelectedPermissions);
+    setFormData(prev => ({
+      ...prev,
+      permissions: Array.from(newSelectedPermissions)
+    }));
   };
 
   const validateForm = () => {
     const errors = {};
-
+    
     if (!formData.roleName.trim()) {
       errors.roleName = 'Role name is required';
+    } else if (formData.roleName.length < 3 || formData.roleName.length > 100) {
+      errors.roleName = 'Role name must be 3-100 characters';
     } else if (!/^[a-zA-Z0-9_-]+$/.test(formData.roleName)) {
       errors.roleName = 'Role name can only contain letters, numbers, underscores, and hyphens';
-    } else if (formData.roleName.length < 3 || formData.roleName.length > 100) {
-      errors.roleName = 'Role name must be between 3 and 100 characters';
     }
-
+    
     if (!formData.displayName.trim()) {
       errors.displayName = 'Display name is required';
-    } else if (formData.displayName.length > 150) {
-      errors.displayName = 'Display name must be less than 150 characters';
     }
-
-    if (formData.description && formData.description.length > 500) {
-      errors.description = 'Description must be less than 500 characters';
+    
+    if (!formData.roleType) {
+      errors.roleType = 'Role type is required';
     }
-
-    setValidationErrors(errors);
+    
+    if (formData.roleHierarchyLevel < 1 || formData.roleHierarchyLevel > 10) {
+      errors.roleHierarchyLevel = 'Role hierarchy level must be between 1 and 10';
+    }
+    
+    setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
@@ -134,288 +147,292 @@ export default function CreateRoleModal({
     if (!validateForm()) {
       return;
     }
-
+    
+    setLoading(true);
+    setError('');
+    
     try {
-      setSaving(true);
-      setError('');
-
       const roleData = {
-        ...formData,
-        permissions: Array.from(selectedPermissions),
-        roleHierarchyLevel: parseInt(formData.roleHierarchyLevel) || 0
+        roleName: formData.roleName.trim(),
+        displayName: formData.displayName.trim(),
+        description: formData.description.trim(),
+        roleType: formData.roleType,
+        roleHierarchyLevel: parseInt(formData.roleHierarchyLevel),
+        permissions: formData.permissions
       };
-
-      // Remove empty parentRoleId
-      if (!roleData.parentRoleId) {
-        delete roleData.parentRoleId;
-      }
-
+      
       const response = await apiClient.post('/roles', roleData);
-
+      
       if (onRoleCreated) {
         onRoleCreated(response.data.role);
       }
-
+      
       onClose();
     } catch (err) {
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
-      } else {
-        setError('Failed to create role');
-      }
       console.error('Create role error:', err);
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.response?.data?.errors) {
+        setFieldErrors(err.response.data.errors);
+      } else {
+        setError('Failed to create role. Please try again.');
+      }
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
   const handleClose = () => {
-    resetForm();
-    onClose();
+    if (!loading) {
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        {/* Background overlay */}
-        <div 
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-          onClick={handleClose}
-        ></div>
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            Create New Role
+          </h3>
+          <button
+            onClick={handleClose}
+            disabled={loading}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
+          >
+            <XMarkIcon className="h-6 w-6" />
+          </button>
+        </div>
 
-        {/* Modal */}
-        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-          {/* Header */}
-          <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <UserGroupIcon className="h-6 w-6 text-blue-600 mr-2" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  Create New Role
-                </h3>
-              </div>
-              <button
-                onClick={handleClose}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                <XMarkIcon className="h-6 w-6" />
-              </button>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+            <div className="text-red-800 text-sm">{error}</div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Role Name */}
+            <div>
+              <label htmlFor="roleName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Role Name *
+              </label>
+              <input
+                type="text"
+                id="roleName"
+                name="roleName"
+                value={formData.roleName}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.roleName ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
+                }`}
+                placeholder="e.g., content_manager or Content-Manager"
+                disabled={loading}
+              />
+              {fieldErrors.roleName && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.roleName}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Letters, numbers, underscores, and hyphens only (3-100 characters)
+              </p>
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-                <div className="flex">
-                  <ExclamationTriangleIcon className="h-5 w-5 text-red-400 mr-2" />
-                  <div className="text-red-800 text-sm">{error}</div>
-                </div>
-              </div>
-            )}
+            {/* Display Name */}
+            <div>
+              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Display Name *
+              </label>
+              <input
+                type="text"
+                id="displayName"
+                name="displayName"
+                value={formData.displayName}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.displayName ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
+                }`}
+                placeholder="e.g., Content Manager"
+                disabled={loading}
+              />
+              {fieldErrors.displayName && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.displayName}</p>
+              )}
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Basic Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="roleName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Role Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="roleName"
-                    name="roleName"
-                    value={formData.roleName}
-                    onChange={handleInputChange}
-                    className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
-                      validationErrors.roleName ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
-                    }`}
-                    placeholder="e.g., data_analyst"
-                  />
-                  {validationErrors.roleName && (
-                    <p className="mt-1 text-sm text-red-600">{validationErrors.roleName}</p>
-                  )}
-                </div>
+            {/* Role Type */}
+            <div>
+              <label htmlFor="roleType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Role Type *
+              </label>
+              <select
+                id="roleType"
+                name="roleType"
+                value={formData.roleType}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.roleType ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
+                }`}
+                disabled={loading}
+              >
+                <option value="Custom">Custom</option>
+                <option value="Functional">Functional</option>
+                <option value="Organizational">Organizational</option>
+              </select>
+              {fieldErrors.roleType && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.roleType}</p>
+              )}
+            </div>
 
-                <div>
-                  <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Display Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="displayName"
-                    name="displayName"
-                    value={formData.displayName}
-                    onChange={handleInputChange}
-                    className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
-                      validationErrors.displayName ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
-                    }`}
-                    placeholder="e.g., Data Analyst"
-                  />
-                  {validationErrors.displayName && (
-                    <p className="mt-1 text-sm text-red-600">{validationErrors.displayName}</p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  rows={3}
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white ${
-                    validationErrors.description ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
-                  }`}
-                  placeholder="Describe the role's purpose and responsibilities"
-                />
-                {validationErrors.description && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.description}</p>
-                )}
-              </div>
-
-              {/* Role Configuration */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label htmlFor="roleType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Role Type
-                  </label>
-                  <select
-                    id="roleType"
-                    name="roleType"
-                    value={formData.roleType}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="Custom">Custom</option>
-                    <option value="Functional">Functional</option>
-                    <option value="Organizational">Organizational</option>
-                    <option value="System">System</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="roleHierarchyLevel" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Hierarchy Level
-                  </label>
-                  <input
-                    type="number"
-                    id="roleHierarchyLevel"
-                    name="roleHierarchyLevel"
-                    min="0"
-                    max="10"
-                    value={formData.roleHierarchyLevel}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="parentRoleId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Parent Role
-                  </label>
-                  <select
-                    id="parentRoleId"
-                    name="parentRoleId"
-                    value={formData.parentRoleId}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="">No Parent Role</option>
-                    {availableRoles.map(role => (
-                      <option key={role.role_id} value={role.role_id}>
-                        {role.display_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Permissions Selection */}
-              <div>
-                <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">
-                  Assign Permissions
-                </h4>
-                <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                  {Object.keys(groupedPermissions).length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                      No permissions available
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {Object.entries(groupedPermissions).map(([resource, permissions]) => (
-                        <div key={resource}>
-                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
-                            {resource} Permissions
-                          </h5>
-                          <div className="space-y-1 ml-4">
-                            {permissions.map((permission) => (
-                              <label
-                                key={permission.permission_id}
-                                className="flex items-center cursor-pointer"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedPermissions.has(permission.permission_name)}
-                                  onChange={() => handlePermissionToggle(permission.permission_name)}
-                                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                />
-                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                  {permission.display_name}
-                                </span>
-                                {permission.is_system_permission && (
-                                  <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                                    System
-                                  </span>
-                                )}
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  Selected {selectedPermissions.size} permission(s)
-                </p>
-              </div>
-
-              {/* Footer */}
-              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  disabled={saving}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-600 dark:text-white dark:border-gray-500 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {saving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <PlusIcon className="h-4 w-4 mr-2" />
-                      Create Role
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
+            {/* Role Hierarchy Level */}
+            <div>
+              <label htmlFor="roleHierarchyLevel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Hierarchy Level *
+              </label>
+              <input
+                type="number"
+                id="roleHierarchyLevel"
+                name="roleHierarchyLevel"
+                value={formData.roleHierarchyLevel}
+                onChange={handleInputChange}
+                min="1"
+                max="10"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
+                  fieldErrors.roleHierarchyLevel ? 'border-red-300' : 'border-gray-300 dark:border-gray-600'
+                }`}
+                disabled={loading}
+              />
+              {fieldErrors.roleHierarchyLevel && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.roleHierarchyLevel}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                1 = Highest level, 10 = Lowest level
+              </p>
+            </div>
           </div>
-        </div>
+
+          {/* Description */}
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              placeholder="Describe the role's purpose and responsibilities..."
+              disabled={loading}
+            />
+          </div>
+
+          {/* Permissions */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Permissions ({selectedPermissions.size} selected)
+            </label>
+            <div className="border border-gray-300 dark:border-gray-600 rounded-md max-h-96 overflow-y-auto">
+              {Object.keys(groupedPermissions).length === 0 ? (
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                  Loading permissions...
+                </div>
+              ) : (
+                <div className="space-y-4 p-4">
+                  {Object.entries(groupedPermissions).map(([resource, resourcePermissions]) => {
+                    const allSelected = resourcePermissions.every(p => selectedPermissions.has(p.permission_name));
+                    const someSelected = resourcePermissions.some(p => selectedPermissions.has(p.permission_name));
+                    
+                    return (
+                      <div key={resource} className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                            {resource} Permissions
+                          </h4>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={allSelected}
+                              ref={input => {
+                                if (input) input.indeterminate = someSelected && !allSelected;
+                              }}
+                              onChange={(e) => handleSelectAllPermissions(resource, e.target.checked)}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                              disabled={loading}
+                            />
+                            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                              Select All
+                            </span>
+                          </label>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {resourcePermissions.map((permission) => (
+                            <label key={permission.permission_id} className="flex items-start">
+                              <input
+                                type="checkbox"
+                                checked={selectedPermissions.has(permission.permission_name)}
+                                onChange={(e) => handlePermissionChange(permission.permission_name, e.target.checked)}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5"
+                                disabled={loading}
+                              />
+                              <div className="ml-2 flex-1">
+                                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {permission.display_name}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  {permission.permission_name}
+                                </div>
+                                {permission.description && (
+                                  <div className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                                    {permission.description}
+                                  </div>
+                                )}
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={loading}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <CheckIcon className="h-4 w-4 mr-2" />
+                  Create Role
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
