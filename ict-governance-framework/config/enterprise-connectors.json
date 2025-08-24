@@ -58,6 +58,47 @@
         "initialDelay": 2000
       }
     },
+    "secure-score": {
+      "name": "Microsoft Secure Score",
+      "type": "security",
+      "priority": "high",
+      "enabled": true,
+      "description": "Microsoft Graph Secure Score integration for security posture monitoring",
+      "capabilities": [
+        "secure-score-monitoring",
+        "control-profiles",
+        "security-recommendations",
+        "compliance-mapping",
+        "trend-analysis"
+      ],
+      "endpoints": {
+        "secureScores": "/v1.0/security/secureScores",
+        "controlProfiles": "/v1.0/security/secureScoreControlProfiles",
+        "recommendations": "/v1.0/security/secureScoreControlProfiles",
+        "history": "/v1.0/security/secureScores"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "burstLimit": 20
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1000
+      },
+      "syncSettings": {
+        "autoSync": true,
+        "syncInterval": 3600000,
+        "alertThreshold": 5,
+        "lowScoreThreshold": 60,
+        "criticalThreshold": 40
+      },
+      "dataRetention": {
+        "historicalData": 365,
+        "recommendations": 90,
+        "alerts": 180
+      }
+    },
     "servicenow": {
       "name": "ServiceNow ITSM",
       "type": "itsm",
