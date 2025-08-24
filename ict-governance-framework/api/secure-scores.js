@@ -11,6 +11,330 @@ const axios = require('axios');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Microsoft Graph API configuration
+const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL || 'https://graph.microsoft.com';
+const GRAPH_API_VERSION = 'v1.0';
+
+/**
+ * Get Microsoft Graph API access token
+ */
+async function getGraphAccessToken() {
+  try {
+    const tokenEndpoint = `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/token`;
+    
+    const params = new URLSearchParams();
+    params.append('client_id', process.env.AZURE_CLIENT_ID);
+    params.append('client_secret', process.env.AZURE_CLIENT_SECRET);
+    params.append('scope', 'https://graph.microsoft.com/.default');
+    params.append('grant_type', 'client_credentials');
+
+    const response = await axios.post(tokenEndpoint, params, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    return response.data.access_token;
+  } catch (error) {
+    console.error('Error getting Graph API access token:', error);
+    throw new Error('Failed to authenticate with Microsoft Graph API');
+  }
+}
+
+/**
+ * GET /api/secure-scores
+ * Retrieve current secure scores from Microsoft Graph API
+ */
+router.get('/', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
+  try {
+    const { 
+      timeRange = '30',
+      includeHistory = 'false',
+      includeControlScores = 'false'
+    } = req.query;
+
+    const accessToken = await getGraphAccessToken();
+    
+    // Fetch current secure score
+    const secureScoreUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/security/secureScores`;
+    const params = new URLSearchParams();
+    
+    if (timeRange !== 'all') {
+      const daysAgo = parseInt(timeRange);
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - daysAgo);
+      params.append('$filter', `createdDateTime ge ${startDate.toISOString()}`);
+    }
+    
+    params.append('$top', '50');
+    params.append('$orderby', 'createdDateTime desc');
+
+    const response = await axios.get(`${secureScoreUrl}?${params.toString()}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const secureScores = response.data.value;
+    
+    // Store in database for historical tracking
+    await storeSecureScoreData(secureScores);
+
+    // Get control scores if requested
+    let controlScores = null;
+    if (includeControlScores === 'true' && secureScores.length > 0) {
+      controlScores = await getSecureScoreControlProfiles(accessToken);
+    }
+
+    // Get historical data from database if requested
+    let historicalData = null;
+    if (includeHistory === 'true') {
+      historicalData = await getHistoricalSecureScores(parseInt(timeRange));
+    }
+
+    const result = {
+      current: secureScores[0] || null,
+      history: secureScores,
+      controlScores,
+      historicalData,
+      summary: generateSecureScoreSummary(secureScores),
+      recommendations: await generateRecommendations(secureScores[0])
+    };
+
+    res.json({
+      success: true,
+      data: result,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Error fetching secure scores:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch secure scores',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/secure-scores/control-profiles
+ * Get secure score control profiles
+ */
+router.get('/control-profiles', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
+  try {
+    const accessToken = await getGraphAccessToken();
+    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
+
+    res.json({
+      success: true,
+      data: controlProfiles,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Error fetching control profiles:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch control profiles',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/secure-scores/dashboard
+ * Get dashboard data for secure scores
+ */
+router.get('/dashboard', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
+  try {
+    const { timeRange = '30' } = req.query;
+    
+    // Get current secure score data
+    const accessToken = await getGraphAccessToken();
+    const currentScores = await getCurrentSecureScores(accessToken);
+    
+    // Get historical trends
+    const historicalData = await getHistoricalSecureScores(parseInt(timeRange));
+    
+    // Get control profiles for detailed analysis
+    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
+    
+    // Generate dashboard metrics
+    const dashboardData = {
+      overview: {
+        currentScore: currentScores[0]?.currentScore || 0,
+        maxScore: currentScores[0]?.maxScore || 0,
+        percentage: currentScores[0] ? Math.round((currentScores[0].currentScore / currentScores[0].maxScore) * 100) : 0,
+        trend: calculateTrend(historicalData),
+        lastUpdated: currentScores[0]?.createdDateTime || new Date().toISOString()
+      },
+      trends: processTrendData(historicalData),
+      controlCategories: processControlCategories(controlProfiles),
+      topRecommendations: await getTopRecommendations(controlProfiles),
+      riskAreas: identifyRiskAreas(controlProfiles),
+      complianceImpact: calculateComplianceImpact(currentScores[0], controlProfiles)
+    };
+
+    res.json({
+      success: true,
+      data: dashboardData,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Error generating dashboard data:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate dashboard data',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/secure-scores/sync
+ * Manually trigger sync with Microsoft Graph API
+ */
+router.post('/sync', authenticateToken, requirePermission('manage_security_metrics'), async (req, res) => {
+  try {
+    const accessToken = await getGraphAccessToken();
+    
+    // Fetch latest secure scores
+    const secureScores = await getCurrentSecureScores(accessToken);
+    
+    // Fetch control profiles
+    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
+    
+    // Store in database
+    await storeSecureScoreData(secureScores);
+    await storeControlProfileData(controlProfiles);
+    
+    // Generate alerts for significant changes
+    await checkForSecureScoreAlerts(secureScores[0]);
+
+    res.json({
+      success: true,
+      message: 'Secure score data synchronized successfully',
+      data: {
+        scoresUpdated: secureScores.length,
+        controlProfilesUpdated: controlProfiles.length,
+        lastSync: new Date().toISOString()
+      }
+    });
+
+  } catch (error) {
+    console.error('Error syncing secure scores:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to sync secure scores',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/secure-scores/recommendations
+ * Get actionable recommendations based on secure score
+ */
+router.get('/recommendations', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
+  try {
+    const { priority = 'all', category = 'all' } = req.query;
+    
+    const accessToken = await getGraphAccessToken();
+    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
+    
+    let recommendations = await generateDetailedRecommendations(controlProfiles);
+    
+    // Filter by priority
+    if (priority !== 'all') {
+      recommendations = recommendations.filter(rec => rec.priority === priority);
+    }
+    
+    // Filter by category
+    if (category !== 'all') {
+      recommendations = recommendations.filter(rec => rec.category === category);
+    }
+    
+    // Sort by impact score
+    recommendations.sort((a, b) => b.impactScore - a.impactScore);
+
+    res.json({
+      success: true,
+      data: {
+        recommendations,
+        summary: {
+          total: recommendations.length,
+          byPriority: groupBy(recommendations, 'priority'),
+          byCategory: groupBy(recommendations, 'category'),
+          estimatedImpact: recommendations.reduce((sum, rec) => sum + rec.impactScore, 0)
+        }
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Error fetching recommendations:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch recommendations',
+      details: error.message
+    });
+  }
+});
+
+// Helper functions
+
+async function getCurrentSecureScores(accessToken) {
+  const secureScoreUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/security/secureScores`;
+  const response = await axios.get(`${secureScoreUrl}?$top=10&$orderby=createdDateTime desc`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  return response.data.value;
+}
+
+async function getSecureScoreControlProfiles(accessToken) {
+  const controlProfilesUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/security/secureScoreControlProfiles`;
+  const response = await axios.get(`${controlProfilesUrl}?$top=100`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  return response.data.value;
+}
+
+async function storeSecureScoreData(secureScores) {
+  const client = await pool.connect();
+  try {
+    for (const score of secureScores) {
+      await client.query(`
+        INSERT INTO secure_scores (
+          id, current_score, max_score, percentage, created_date_time, 
+          active_user_count, enabled_services, licensed_user_count, raw_data
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ON CONFLICT (id) DO UPDATE SET
+          current_score = EXCLUDED.current_score,
+          max_score = EXCLUDED.max_score,
+          percentage = EXCLUDED.percentage,
+          updated_at = CURRENT_TIMESTAMP,
+          raw_data = EXCLUDED.raw_data
+      `, [
+        score.id,
+        score.currentScore,
+        score.maxScore,
+        Math.round((score.currentScore / score.maxScore) * 100),
+        score.createdDateTime,
+        score.activeUserCount,
+        score.enabledServices?.length || 0,
+        score.licensedUserCount,
+        JSON.stringify(score)
+      ]);
+    }
 
 // Microsoft Graph API configuration
 const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL || 'https://graph.microsoft.com';
