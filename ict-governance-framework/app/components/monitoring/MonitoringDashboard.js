@@ -20,7 +20,8 @@ import { Button } from '@/components/ui/button';
 import { 
   Tabs, 
   TabsContent, 
-  TabsList
+  TabsList,
+  TabsTrigger
 } from '@/components/ui/tabs';
 import {
   LineChart,
@@ -73,7 +74,7 @@ const MonitoringDashboard = () => {
       setLoading(true);
       
       // Fetch comprehensive health status
-      const healthResponse = await fetch('/api/monitoring/health');
+  const healthResponse = await fetch('http://localhost:4000/api/monitoring/health');
       const healthResult = await healthResponse.json();
       
       if (healthResult.success) {
@@ -81,7 +82,7 @@ const MonitoringDashboard = () => {
       }
 
       // Fetch metrics data
-      const metricsResponse = await fetch(`/api/monitoring/metrics?timeRange=${selectedTimeRange}`);
+  const metricsResponse = await fetch(`http://localhost:4000/api/monitoring/metrics?timeRange=${selectedTimeRange}`);
       const metricsResult = await metricsResponse.json();
       
       if (metricsResult.success) {
@@ -89,7 +90,7 @@ const MonitoringDashboard = () => {
       }
 
       // Fetch alerts
-      const alertsResponse = await fetch('/api/monitoring/alerts?status=active&limit=50');
+  const alertsResponse = await fetch('http://localhost:4000/api/monitoring/alerts?status=active&limit=50');
       const alertsResult = await alertsResponse.json();
       
       if (alertsResult.success) {
@@ -97,7 +98,7 @@ const MonitoringDashboard = () => {
       }
 
       // Fetch dashboard data
-      const dashboardResponse = await fetch(`/api/monitoring/dashboard?timeRange=${selectedTimeRange}`);
+  const dashboardResponse = await fetch(`http://localhost:4000/api/monitoring/dashboard?timeRange=${selectedTimeRange}`);
       const dashboardResult = await dashboardResponse.json();
       
       if (dashboardResult.success) {
@@ -261,11 +262,11 @@ const MonitoringDashboard = () => {
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
-          <TabsItem value="overview">Overview</TabsItem>
-          <TabsItem value="integrations">Integrations</TabsItem>
-          <TabsItem value="alerts">Alerts</TabsItem>
-          <TabsItem value="performance">Performance</TabsItem>
-          <TabsItem value="diagnostics">Diagnostics</TabsItem>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
+          <TabsTrigger value="alerts">Alerts</TabsTrigger>
+          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="diagnostics">Diagnostics</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}

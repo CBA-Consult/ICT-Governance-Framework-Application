@@ -1,3 +1,33 @@
+/**
+ * Admin Dashboard - Main Entry Point for Administrative Functions
+ * 
+ * This component serves as the central hub for all administrative functions
+ * within the ICT Governance Framework. It provides:
+ * 
+ * - Real-time system statistics and health monitoring
+ * - Quick access to key administrative functions
+ * - Permission-based access control for admin features
+ * - Comprehensive dashboard for system management
+ * 
+ * Features:
+ * - User management and role administration
+ * - Dashboard access control
+ * - System policies and governance management
+ * - Analytics and reporting access
+ * - Audit logs and system monitoring
+ * - Notification management
+ * - System-wide configuration settings
+ * 
+ * Security:
+ * - Requires admin or super_admin role
+ * - Permission-based feature access
+ * - Authenticated API calls for all data operations
+ * 
+ * @author ICT Governance Framework Team
+ * @version 1.0.0
+ * @since 2025-01-22
+ */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -11,7 +41,11 @@ import {
   ExclamationTriangleIcon,
   CheckCircleIcon,
   ClockIcon,
-  CogIcon
+  CogIcon,
+  ComputerDesktopIcon,
+  ClipboardDocumentListIcon,
+  BellIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 function AdminDashboard() {
@@ -68,7 +102,14 @@ function AdminDashboard() {
       href: '/admin/users',
       color: 'bg-blue-500',
       requiredPermissions: ['user.read']
-
+    },
+    {
+      title: 'Dashboard Access',
+      description: 'Manage dashboard access permissions',
+      icon: ComputerDesktopIcon,
+      href: '/admin/dashboard-access',
+      color: 'bg-indigo-500',
+      requiredPermissions: ['dashboard.manage']
     },
     {
       title: 'Role Management',
@@ -87,12 +128,36 @@ function AdminDashboard() {
       requiredPermissions: ['governance.read']
     },
     {
-      title: 'Analytics',
+      title: 'Analytics & Reports',
       description: 'View system analytics and reports',
       icon: ChartBarIcon,
       href: '/analytics',
       color: 'bg-orange-500',
       requiredPermissions: ['reporting.read']
+    },
+    {
+      title: 'Audit Logs',
+      description: 'Review system audit logs and activities',
+      icon: ClipboardDocumentListIcon,
+      href: '/admin/audit-logs',
+      color: 'bg-gray-500',
+      requiredPermissions: ['audit.read']
+    },
+    {
+      title: 'Notifications',
+      description: 'Manage system notifications and alerts',
+      icon: BellIcon,
+      href: '/notifications',
+      color: 'bg-yellow-500',
+      requiredPermissions: ['notifications.manage']
+    },
+    {
+      title: 'System Settings',
+      description: 'Configure system-wide settings',
+      icon: CogIcon,
+      href: '/admin/settings',
+      color: 'bg-red-500',
+      requiredPermissions: ['system.configure']
     }
   ];
 
@@ -127,13 +192,25 @@ function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-            <CogIcon className="h-8 w-8 mr-3" />
-            Admin Dashboard
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Welcome back, {currentUser?.firstName}. Manage your ICT governance system.
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+                <CogIcon className="h-8 w-8 mr-3" />
+                Admin Dashboard
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">
+                Welcome back, {currentUser?.firstName}. Manage your ICT governance system.
+              </p>
+            </div>
+            <button
+              onClick={fetchDashboardStats}
+              disabled={loading}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ArrowPathIcon className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
         </div>
 
         {/* Error Message */}
@@ -204,7 +281,12 @@ function AdminDashboard() {
 
         {/* Quick Actions */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Administrative Functions
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Access key administrative functions and management tools for the ICT governance system.
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickActions
               .filter(action => !action.requiredPermissions || hasAllPermissions(action.requiredPermissions))
@@ -212,14 +294,14 @@ function AdminDashboard() {
                 <Link
                   key={index}
                   href={action.href}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow p-6 block"
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 p-6 block group"
                 >
                   <div className="flex items-center mb-4">
-                    <div className={`flex-shrink-0 p-3 rounded-lg ${action.color}`}>
+                    <div className={`flex-shrink-0 p-3 rounded-lg ${action.color} group-hover:scale-110 transition-transform duration-200`}>
                       <action.icon className="h-6 w-6 text-white" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {action.title}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -230,7 +312,8 @@ function AdminDashboard() {
           </div>
           {quickActions.filter(action => !action.requiredPermissions || hasAllPermissions(action.requiredPermissions)).length === 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400">No actions available with your current permissions.</p>
+              <p className="text-gray-500 dark:text-gray-400">No administrative functions available with your current permissions.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">Contact your system administrator to request additional access.</p>
             </div>
           )}
         </div>
