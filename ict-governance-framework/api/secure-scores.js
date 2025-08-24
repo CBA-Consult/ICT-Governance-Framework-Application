@@ -1005,4 +1005,165 @@ function groupBy(array, key) {
   }, {});
 }
 
+/**
+ * GET /api/secure-scores/executive-summary
+ * Get CISO executive overview dashboard data
+ */
+router.get('/executive-summary', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
+  try {
+    const { timeRange = '30' } = req.query;
+    
+    // Get current secure score data
+    const accessToken = await getGraphAccessToken();
+    const currentScores = await getCurrentSecureScores(accessToken);
+    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
+    const historicalData = await getHistoricalSecureScores(parseInt(timeRange));
+    
+    // Calculate executive metrics
+    const currentScore = currentScores[0];
+    const previousScore = historicalData.length > 1 ? historicalData[1] : null;
+    
+    // Calculate score delta
+    const scoreDelta = previousScore ? 
+      currentScore.currentScore - previousScore.current_score : 0;
+    const percentageDelta = previousScore ? 
+      ((currentScore.currentScore / currentScore.maxScore) * 100) - previousScore.percentage : 0;
+    
+    // Calculate projected score with top recommendations
+    const topRecommendations = await getTopRecommendations(controlProfiles);
+    const projectedScoreIncrease = topRecommendations.slice(0, 5)
+      .reduce((sum, rec) => sum + (rec.impactScore * 0.1), 0);
+    const projectedScore = currentScore.currentScore + projectedScoreIncrease;
+    
+    // Calculate controls implementation percentage
+    const implementedControls = controlProfiles.filter(profile => {
+      if (profile.controlStateUpdates && profile.controlStateUpdates.length > 0) {
+        const latestState = profile.controlStateUpdates[profile.controlStateUpdates.length - 1];
+        return latestState.state === 'On' || latestState.state === 'Reviewed';
+      }
+      return false;
+    }).length;
+    const controlsImplementationRate = Math.round((implementedControls / controlProfiles.length) * 100);
+    
+    // Generate trend analysis
+    const trend = calculateTrend(historicalData);
+    const trendData = processTrendData(historicalData.slice(0, 30)); // Last 30 days
+    
+    // Identify critical areas needing attention
+    const riskAreas = identifyRiskAreas(controlProfiles);
+    const criticalAlerts = riskAreas.filter(area => area.riskLevel === 'high').length;
+    
+    // Calculate compliance impact
+    const complianceFrameworks = calculateComplianceImpact(currentScore, controlProfiles);
+    const avgComplianceScore = complianceFrameworks.length > 0 ? 
+      Math.round(complianceFrameworks.reduce((sum, fw) => sum + fw.score, 0) / complianceFrameworks.length) : 0;
+    
+    // Executive summary data structure
+    const executiveSummary = {
+      // Key Performance Indicators
+      securityPosture: {
+        currentScore: currentScore?.currentScore || 0,
+        maxScore: currentScore?.maxScore || 0,
+        percentage: currentScore ? Math.round((currentScore.currentScore / currentScore.maxScore) * 100) : 0,
+        scoreDelta: Math.round(scoreDelta),
+        percentageDelta: Math.round(percentageDelta * 10) / 10,
+        trend: trend.direction,
+        lastUpdated: currentScore?.createdDateTime || new Date().toISOString(),
+        projectedScore: Math.round(projectedScore),
+        projectedPercentage: currentScore ? Math.round((projectedScore / currentScore.maxScore) * 100) : 0
+      },
+      
+      // Controls Implementation Status
+      controlsStatus: {
+        totalControls: controlProfiles.length,
+        implementedControls: implementedControls,
+        implementationRate: controlsImplementationRate,
+        pendingImplementation: controlProfiles.length - implementedControls,
+        criticalGaps: riskAreas.filter(area => area.riskLevel === 'high').length
+      },
+      
+      // Compliance Overview
+      complianceOverview: {
+        averageScore: avgComplianceScore,
+        frameworks: complianceFrameworks.map(fw => ({
+          name: fw.name,
+          score: fw.score,
+          status: fw.score >= 95 ? 'excellent' : fw.score >= 85 ? 'good' : fw.score >= 70 ? 'needs_improvement' : 'critical'
+        })),
+        criticalFrameworks: complianceFrameworks.filter(fw => fw.score < 70).length
+      },
+      
+      // Risk and Threat Landscape
+      riskLandscape: {
+        totalRiskAreas: riskAreas.length,
+        highRiskAreas: riskAreas.filter(area => area.riskLevel === 'high').length,
+        mediumRiskAreas: riskAreas.filter(area => area.riskLevel === 'medium').length,
+        riskTrend: trend.direction === 'improving' ? 'decreasing' : trend.direction === 'declining' ? 'increasing' : 'stable',
+        criticalAlerts: criticalAlerts
+      },
+      
+      // Top Priority Actions
+      priorityActions: topRecommendations.slice(0, 5).map(rec => ({
+        id: rec.id,
+        title: rec.title,
+        category: rec.category,
+        priority: rec.priority,
+        impactScore: rec.impactScore,
+        estimatedImprovement: Math.round(rec.impactScore * 0.1) + ' points'
+      })),
+      
+      // Historical Trends (for charts)
+      trends: {
+        scoreHistory: trendData.slice(-30), // Last 30 days
+        complianceTrends: complianceFrameworks.map(fw => ({
+          framework: fw.name,
+          currentScore: fw.score,
+          trend: 'stable' // Would need historical compliance data for real trends
+        }))
+      },
+      
+      // Executive Alerts
+      executiveAlerts: [
+        ...(scoreDelta < -5 ? [{
+          type: 'score_decline',
+          severity: 'high',
+          message: `Security score declined by ${Math.abs(scoreDelta)} points`,
+          action: 'Review recent security changes and implement top recommendations'
+        }] : []),
+        ...(criticalAlerts > 0 ? [{
+          type: 'critical_risks',
+          severity: 'high',
+          message: `${criticalAlerts} critical risk areas identified`,
+          action: 'Immediate attention required for high-risk security controls'
+        }] : []),
+        ...(controlsImplementationRate < 70 ? [{
+          type: 'low_implementation',
+          severity: 'medium',
+          message: `Only ${controlsImplementationRate}% of security controls implemented`,
+          action: 'Accelerate security controls implementation program'
+        }] : [])
+      ]
+    };
+
+    res.json({
+      success: true,
+      data: executiveSummary,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        timeRange: timeRange,
+        dataFreshness: 'real-time',
+        nextUpdate: new Date(Date.now() + 3600000).toISOString() // Next hour
+      }
+    });
+
+  } catch (error) {
+    console.error('Error generating CISO executive summary:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate executive summary',
+      details: error.message
+    });
+  }
+});
+
 module.exports = router;
