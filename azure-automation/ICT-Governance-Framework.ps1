@@ -5,8 +5,71 @@
 # Author: GitHub Copilot
 # Date: August 7, 2025
 
-# Import the module
-Import-Module "$PSScriptRoot\ICT-Governance-Framework.psm1"
+# --- ROBUST MODULE IMPORT (REVISED) ---
+try {
+    # Construct the full path to the module manifest
+    $moduleManifest = Join-Path -Path $PSScriptRoot -ChildPath 'ICT-Governance-Framework.psd1'
+
+    # Check if the manifest file actually exists before trying to import it
+    if (-not (Test-Path -Path $moduleManifest)) {
+        throw "Critical Error: The module manifest 'ICT-Governance-Framework.psd1' was not found in the script directory '$PSScriptRoot'."
+    }
+
+    # Import the module. -ErrorAction Stop ensures that any failure will be caught by the catch block.
+    Import-Module -Name $moduleManifest -Force -ErrorAction Stop
+    Write-Host "ICT Governance Framework module loaded successfully." -ForegroundColor Green
+}
+catch {
+    Write-Host "`nFATAL: Could not load the ICT Governance Framework module." -ForegroundColor Red
+    Write-Host "REASON: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "`nPlease ensure all script files are present and that you have the required Az modules installed." -ForegroundColor Yellow
+    Read-Host -Prompt 'Press Enter to exit'
+    exit 1
+}
+
+# Initialize the framework if the function is available
+if (Get-Command -Name Initialize-GovFramework -ErrorAction SilentlyContinue) {
+    Initialize-GovFramework
+} else {
+    Write-Host 'Initialize-GovFramework not available; module may not have loaded correctly.' -ForegroundColor Yellow
+    # Attempt a targeted import of the .psm1 in case the manifest import didn't surface functions
+    $psm1Path = Join-Path -Path $PSScriptRoot -ChildPath 'ICT-Governance-Framework.psm1'
+    if (Test-Path -Path $psm1Path) {
+        try {
+            Import-Module -Name $psm1Path -Force -ErrorAction Stop
+            Write-Host "Imported module directly from $psm1Path" -ForegroundColor Green
+        }
+        catch {
+            Write-Host "Direct import of .psm1 failed: $($_.Exception.Message)" -ForegroundColor Red
+        }
+    }
+
+    # Final availability check for Connect-GovAzure
+    if (-not (Get-Command -Name Connect-GovAzure -ErrorAction SilentlyContinue)) {
+        Write-Host 'FATAL: Required function Connect-GovAzure is not available in the session.' -ForegroundColor Red
+        Write-Host 'Module import appears to have failed or the module did not export functions as expected.' -ForegroundColor Yellow
+
+        # Diagnostic info
+        Write-Host "Loaded modules:" -ForegroundColor Cyan
+        Get-Module | Select-Object Name,Path,Version | Format-Table -AutoSize
+        Write-Host "`nAttempting to show exported commands for ICT-Governance-Framework (if loaded):" -ForegroundColor Cyan
+        try {
+            $mod = Get-Module -Name 'ICT-Governance-Framework' -ErrorAction SilentlyContinue
+            if ($mod) {
+                Write-Host ($mod.ExportedCommands.Keys -join ', ')
+            } else {
+                Write-Host 'Module not present in session.' -ForegroundColor Yellow
+            }
+        }
+        catch {
+            Write-Host "Could not enumerate module exports: $($_)" -ForegroundColor Yellow
+        }
+
+        Read-Host -Prompt 'Press Enter to exit'
+        exit 1
+    }
+}
+# --- END REVISED IMPORT ---
 
 if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
     Write-Host "ICT Governance Framework Automation" -ForegroundColor Cyan
@@ -17,6 +80,7 @@ if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
     Write-Host "4. Get Non-Compliant Resources"
     Write-Host "5. Generate Dashboard Report"
     Write-Host "6. Run Governance Assessment"
+    Write-Host "7. Check Environment"
     Write-Host "Q. Quit"
     Write-Host ""
     $choice = Read-Host "Enter your choice"
@@ -42,6 +106,11 @@ if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
             $sub = Read-Host "Enter subscription ID"
             if ($sub) { New-GovAssessmentReport -SubscriptionId $sub }
             else { Write-Host "Subscription ID is required" -ForegroundColor Red }
+        }
+        "7" {
+            Clear-Host
+            Test-GovFrameworkEnvironment
+            Read-Host -Prompt 'Press Enter to continue'
         }
         "Q" { return }
         default { Write-Host "Invalid choice" -ForegroundColor Red }
@@ -438,8 +507,7 @@ function New-GovAssessmentReport {
     }
 }
 
-# Export ICT Governance Framework module functions
-Export-ModuleMember -Function Initialize-GovFramework, Connect-GovAzure, Get-GovPolicyComplianceSummary, Get-GovNonCompliantResources, New-GovDashboardReport, New-GovAssessmentReport
+# Note: Module exports are handled in the .psm1 file. Do not call Export-ModuleMember from a script.
 
 # Sample usage
 if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {

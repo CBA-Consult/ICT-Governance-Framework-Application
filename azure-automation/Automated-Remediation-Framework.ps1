@@ -105,7 +105,7 @@ function Write-RemediationLog {
     Add-Content -Path $LogFile -Value $logEntry
 }
 
-function Load-RemediationConfig {
+function Get-RemediationConfig {
     param([string]$ConfigPath)
     
     try {
@@ -760,8 +760,8 @@ try {
     Write-RemediationLog "Environment: $Environment" "INFO"
     Write-RemediationLog "Dry Run: $($DryRun.IsPresent)" "INFO"
     
-    # Load configuration
-    $config = Load-RemediationConfig -ConfigPath $ConfigPath
+    # Get configuration
+    $config = Get-RemediationConfig -ConfigPath $ConfigPath
     
     # Connect to Azure
     Connect-ToAzureForRemediation -Config $config

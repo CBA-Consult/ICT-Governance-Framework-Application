@@ -28,6 +28,7 @@ const escalationManagementRouter = require('./api/escalation-management');
 const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
 const rolesRouter = require('./api/roles');
+const userPermissionsRouter = require('./api/user-permissions');
 
 // Import dashboard access management API routes
 const dashboardAccessRouter = require('./api/dashboard-access');
@@ -110,6 +111,7 @@ app.set('trust proxy', 1);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/roles', rolesRouter);
+app.use('/api/user-permissions', userPermissionsRouter);
 
 // Dashboard access management routes
 app.use('/api/dashboard-access', dashboardAccessRouter);

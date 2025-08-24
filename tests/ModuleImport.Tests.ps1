@@ -1,4 +1,10 @@
 # tests/ModuleImport.Tests.ps1
+# Ensure running under Pester v5+; fail fast with clear message if not.
+$pesterModule = Get-Module -ListAvailable Pester | Sort-Object Version -Descending | Select-Object -First 1
+if (-not $pesterModule -or $pesterModule.Version.Major -lt 5) {
+    Throw "Pester v5 or later is required to run these tests. Install with: Install-Module -Name Pester -RequiredVersion 5 -Scope CurrentUser"
+}
+
 Describe 'ICT-Governance-Framework Module' {
     BeforeAll {
         # Mock Azure login/context so module import and functions do not require an actual Azure login in CI

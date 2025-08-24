@@ -1,88 +1,114 @@
-# Deploy ICT Governance Framework Infrastructure
-# This script deploys the core infrastructure and policy assignments for the ICT Governance Framework
+<#
+Deploy-ICTGovernanceFramework.ps1
 
-# Parameters
+Consolidated deployment script that:
+- validates Bicep is installed
+- validates Azure location against Get-AzLocation
+- creates resource group if missing
+- deploys core infrastructure and policy assignments with WhatIf previews
+- runs a best-effort initial compliance scan
+#>
+
+[CmdletBinding(SupportsShouldProcess = $true)]
 param (
     [Parameter(Mandatory = $true)]
     [string]$SubscriptionId,
-    
+
     [Parameter(Mandatory = $true)]
     [string]$ResourceGroupName,
-    
+
     [Parameter(Mandatory = $false)]
     [string]$Location = "eastus",
-    
+
     [Parameter(Mandatory = $false)]
-    [string]$EnvironmentName = "dev",
-    
+    [ValidateSet('dev','test','prod')]
+    [string]$EnvironmentName = 'dev',
+
     [Parameter(Mandatory = $false)]
-    [string]$OrganizationName = "contoso",
-    
+    [string]$OrganizationName = 'contoso',
+
     [Parameter(Mandatory = $false)]
     [bool]$EnableDiagnostics = $true,
-    
+
     [Parameter(Mandatory = $false)]
     [bool]$EnableRemediation = $false,
-    
+
     [Parameter(Mandatory = $false)]
-    [string]$OwnerName = "IT Governance Team",
-    
+    [string]$OwnerName = 'IT Governance Team',
+
     [Parameter(Mandatory = $false)]
-    [string]$CostCenter = "IT-12345"
+    [string]$CostCenter = 'IT-12345'
 )
 
-# Import required modules
-Import-Module Az.Accounts
-Import-Module Az.Resources
-
-# Connect to Azure and set subscription context
-try {
-    # Check if already connected
-    $context = Get-AzContext
-    
-    if (!$context -or $context.Subscription.Id -ne $SubscriptionId) {
-        # Connect or set context to the specified subscription
-        if (!$context) {
-            Connect-AzAccount
+# Auto-add common user bicep folder to PATH for this session if present
+$userBicepDir = Join-Path $env:USERPROFILE '.Azure\bin'
+if (-not (Get-Command bicep -ErrorAction SilentlyContinue)) {
+    $userBicepExe = Join-Path $userBicepDir 'bicep.exe'
+    if (Test-Path $userBicepExe) {
+        if (-not ($env:Path.Split(';') -contains $userBicepDir)) {
+            $env:Path = "$env:Path;$userBicepDir"
+            Write-Host "Added $userBicepDir to PATH for current session." -ForegroundColor Green
         }
-        
-        Set-AzContext -SubscriptionId $SubscriptionId
-        Write-Host "Set context to subscription: $SubscriptionId" -ForegroundColor Green
     }
 }
-catch {
-    Write-Error "Failed to connect to Azure or set subscription context: $_"
-    exit 1
+
+# Ensure Bicep CLI is available
+if (-not (Get-Command bicep -ErrorAction SilentlyContinue)) {
+    Write-Error "Bicep CLI is not installed or not in your PATH. Please visit https://aka.ms/bicep-install to install it before running this script."
+    return
 }
 
-# Create resource group if it doesn't exist
+# Import Az modules (will throw if not installed)
+Import-Module Az.Accounts -ErrorAction Stop
+Import-Module Az.Resources -ErrorAction Stop
+
 try {
-    $resourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
-    
-    if (!$resourceGroup) {
-        Write-Host "Creating resource group: $ResourceGroupName in $Location" -ForegroundColor Yellow
-        $resourceGroup = New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{
-            Environment = $EnvironmentName
-            Owner = $OwnerName
-            CostCenter = $CostCenter
-            Application = "ICT Governance Framework"
-            ManagedBy = "PowerShell"
+    Write-Host "Setting context to subscription: $SubscriptionId" -ForegroundColor Cyan
+    Set-AzContext -SubscriptionId $SubscriptionId -ErrorAction Stop | Out-Null
+}
+catch {
+    Write-Error "Failed to set Az context to subscription ${SubscriptionId}: $($_)"
+    throw
+}
+
+# Validate location
+$availableLocations = (Get-AzLocation).Location
+while ($availableLocations -notcontains $Location) {
+    Write-Warning "The location '$Location' is not valid for this subscription."
+    Write-Host "Please choose from the following available locations:"
+    Write-Host ($availableLocations -join ', ')
+    $Location = Read-Host "Enter a valid location"
+}
+Write-Host "Using valid location: $Location" -ForegroundColor Green
+
+# Create resource group if missing
+try {
+    $rg = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
+    if (-not $rg) {
+        Write-Host "Creating resource group: $ResourceGroupName in $Location" -ForegroundColor Cyan
+        if ($PSCmdlet.ShouldProcess("resource group '$ResourceGroupName'", "Create")) {
+            New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{
+                Environment = $EnvironmentName
+                Owner = $OwnerName
+                CostCenter = $CostCenter
+                Application = 'ICT Governance Framework'
+                ManagedBy = 'PowerShell'
+            } -ErrorAction Stop | Out-Null
         }
     }
     else {
-        Write-Host "Resource group already exists: $ResourceGroupName" -ForegroundColor Cyan
+        Write-Host "Resource group already exists: $ResourceGroupName" -ForegroundColor Yellow
     }
 }
 catch {
     Write-Error "Failed to create or get resource group: $_"
-    exit 1
+    throw
 }
 
 # Deploy core infrastructure
 try {
-    Write-Host "Deploying core infrastructure..." -ForegroundColor Yellow
-    
-    $coreDeploymentParams = @{
+    Write-Host "Deploying core infrastructure..." -ForegroundColor Cyan
+    $coreParams = @{
         location = $Location
         environmentName = $EnvironmentName
         organizationName = $OrganizationName
@@ -90,136 +116,120 @@ try {
         costCenter = $CostCenter
         enableDiagnostics = $EnableDiagnostics
     }
-    
-    # What-if deployment to preview changes
-    Write-Host "Previewing core infrastructure deployment..." -ForegroundColor Cyan
-    New-AzResourceGroupDeployment -Name "ICTGov-Core-WhatIf" -ResourceGroupName $ResourceGroupName `
-        -TemplateFile "./infra/core-infrastructure.bicep" -TemplateParameterObject $coreDeploymentParams `
-        -WhatIf
-    
-    # Prompt for confirmation
-    $confirmation = Read-Host "Do you want to proceed with the core infrastructure deployment? (Y/N)"
-    if ($confirmation -ne 'Y' -and $confirmation -ne 'y') {
-        Write-Host "Core infrastructure deployment cancelled." -ForegroundColor Yellow
-        exit 0
+
+    $coreTemplate = Join-Path $PSScriptRoot 'infra/core-infrastructure.bicep'
+    if (-not (Test-Path $coreTemplate)) {
+        Write-Error "Core template not found: $coreTemplate"
+        throw "Missing template"
     }
-    
-    # Actual deployment
-    $coreDeployment = New-AzResourceGroupDeployment -Name "ICTGov-Core-Deployment" -ResourceGroupName $ResourceGroupName `
-        -TemplateFile "./infra/core-infrastructure.bicep" -TemplateParameterObject $coreDeploymentParams
-    
-    Write-Host "Core infrastructure deployed successfully." -ForegroundColor Green
-    Write-Host "Log Analytics Workspace: $($coreDeployment.Outputs.logAnalyticsWorkspaceName.Value)" -ForegroundColor Green
-    Write-Host "Storage Account: $($coreDeployment.Outputs.storageAccountName.Value)" -ForegroundColor Green
-    Write-Host "Key Vault: $($coreDeployment.Outputs.keyVaultName.Value)" -ForegroundColor Green
+
+    New-AzResourceGroupDeployment -Name 'ICTGov-Core-WhatIf' -ResourceGroupName $ResourceGroupName -TemplateFile $coreTemplate -TemplateParameterObject $coreParams -WhatIf
+
+    $confirm = Read-Host "Do you want to proceed with the core infrastructure deployment? (Y/N)";
+    if ($confirm -ne 'Y' -and $confirm -ne 'y') {
+        Write-Host "Core infrastructure deployment cancelled by user." -ForegroundColor Yellow
+    }
+    else {
+        $coreDeployment = New-AzResourceGroupDeployment -Name 'ICTGov-Core-Deployment' -ResourceGroupName $ResourceGroupName -TemplateFile $coreTemplate -TemplateParameterObject $coreParams -ErrorAction Stop
+        if ($coreDeployment.ProvisioningState -ne 'Succeeded') {
+            throw "Core deployment failed"
+        }
+        Write-Host "Core infrastructure deployed successfully." -ForegroundColor Green
+    }
 }
 catch {
     Write-Error "Failed to deploy core infrastructure: $_"
-    exit 1
+    throw
 }
 
 # Deploy policy assignments
 try {
-    Write-Host "Deploying policy assignments..." -ForegroundColor Yellow
-    
-    $policyDeploymentParams = @{
+    Write-Host "Deploying policy assignments..." -ForegroundColor Cyan
+    $policyParams = @{
         location = $Location
         policyAssignmentScope = "/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroupName"
         enableRemediation = $EnableRemediation
-        requiredTags = @("Owner", "CostCenter", "Environment", "Application")
+        requiredTags = @('Owner','CostCenter','Environment','Application')
         commonTags = @{
             Environment = $EnvironmentName
             Owner = $OwnerName
             CostCenter = $CostCenter
-            Application = "ICT Governance Framework"
-            ManagedBy = "PowerShell"
+            Application = 'ICT Governance Framework'
+            ManagedBy = 'PowerShell'
         }
     }
-    
-    # What-if deployment to preview changes
-    Write-Host "Previewing policy assignments deployment..." -ForegroundColor Cyan
-    New-AzResourceGroupDeployment -Name "ICTGov-Policy-WhatIf" -ResourceGroupName $ResourceGroupName `
-        -TemplateFile "./infra/policy-assignments.bicep" -TemplateParameterObject $policyDeploymentParams `
-        -WhatIf
-    
-    # Prompt for confirmation
-    $confirmation = Read-Host "Do you want to proceed with the policy assignments deployment? (Y/N)"
-    if ($confirmation -ne 'Y' -and $confirmation -ne 'y') {
-        Write-Host "Policy assignments deployment cancelled." -ForegroundColor Yellow
-        exit 0
+
+    $policyTemplate = Join-Path $PSScriptRoot 'infra/policy-assignments.bicep'
+    if (-not (Test-Path $policyTemplate)) {
+        Write-Error "Policy template not found: $policyTemplate"
+        throw "Missing template"
     }
-    
-    # Actual deployment
-    $policyDeployment = New-AzResourceGroupDeployment -Name "ICTGov-Policy-Deployment" -ResourceGroupName $ResourceGroupName `
-        -TemplateFile "./infra/policy-assignments.bicep" -TemplateParameterObject $policyDeploymentParams
-    
-    # Store policy deployment outputs for later use
-    $policyAssignmentIds = @{
-        RequiredTags = $policyDeployment.Outputs.requiredTagsPolicyAssignmentId.Value
-        HttpsStorage = $policyDeployment.Outputs.httpsStoragePolicyAssignmentId.Value
-        KeyVaultNetwork = $policyDeployment.Outputs.keyVaultNetworkPolicyAssignmentId.Value
-        ResourceLocks = $policyDeployment.Outputs.resourceLocksPolicyAssignmentId.Value
-        VmVulnerability = $policyDeployment.Outputs.vmVulnerabilityPolicyAssignmentId.Value
+
+    New-AzResourceGroupDeployment -Name 'ICTGov-Policy-WhatIf' -ResourceGroupName $ResourceGroupName -TemplateFile $policyTemplate -TemplateParameterObject $policyParams -WhatIf
+
+    $confirm = Read-Host "Do you want to proceed with the policy assignments deployment? (Y/N)";
+    if ($confirm -ne 'Y' -and $confirm -ne 'y') {
+        Write-Host "Policy assignments deployment cancelled by user." -ForegroundColor Yellow
     }
-    
-    Write-Host "Policy assignments deployed successfully." -ForegroundColor Green
+    else {
+        $policyDeployment = New-AzResourceGroupDeployment -Name 'ICTGov-Policy-Deployment' -ResourceGroupName $ResourceGroupName -TemplateFile $policyTemplate -TemplateParameterObject $policyParams -ErrorAction Stop
+        Write-Host "Policy assignments deployed successfully." -ForegroundColor Green
+
+        # capture outputs if present
+        $policyAssignmentIds = @{}
+        if ($policyDeployment.Outputs) {
+            foreach ($k in $policyDeployment.Outputs.Keys) {
+                $policyAssignmentIds[$k] = $policyDeployment.Outputs[$k].Value
+            }
+        }
+    }
 }
 catch {
     Write-Error "Failed to deploy policy assignments: $_"
-    exit 1
+    throw
 }
 
-# Wait for policy assignments to be created before checking compliance
-Start-Sleep -Seconds 60
+# Wait briefly for policies to register
+Start-Sleep -Seconds 30
 
-# Run initial compliance scan
+# Run initial compliance scan (best-effort)
 try {
-    Write-Host "Running initial compliance scan..." -ForegroundColor Yellow
-    
-    # Import ICT Governance Framework PowerShell module
-    . ./ICT-Governance-Framework.ps1
-    
-    # Initialize the framework
-    Initialize-GovFramework
-    
-    # Get policy compliance summary
-    $complianceSummary = Get-GovPolicyComplianceSummary -SubscriptionId $SubscriptionId `
-        -OutputPath "./governance-reports/initial-compliance-summary.json"
-    
-    # Get non-compliant resources
-    Get-GovNonCompliantResources -SubscriptionId $SubscriptionId `
-        -OutputPath "./governance-reports/initial-non-compliant-resources.json"
-    
-    # Generate dashboard report
-    $dashboardPath = New-GovDashboardReport -SubscriptionId $SubscriptionId `
-        -OutputPath "./governance-reports/initial-dashboard.html"
-    
-    Write-Host "Initial compliance scan completed." -ForegroundColor Green
-    Write-Host "Compliance Rate: $($complianceSummary.ComplianceRate)%" -ForegroundColor Cyan
-    Write-Host "Dashboard Report: $dashboardPath" -ForegroundColor Cyan
+    Write-Host "Running initial compliance scan..." -ForegroundColor Cyan
+    # Import the local module if available
+    $modulePath = Join-Path $PSScriptRoot 'ICT-Governance-Framework.ps1'
+    if (Test-Path $modulePath) {
+        . $modulePath
+        if (Get-Command -Name Initialize-GovFramework -ErrorAction SilentlyContinue) {
+            Initialize-GovFramework
+        }
+    }
+
+    $compliancePath = Join-Path $PSScriptRoot 'governance-reports/initial-compliance-summary.json'
+    $nonCompliantPath = Join-Path $PSScriptRoot 'governance-reports/initial-non-compliant-resources.json'
+
+    Get-GovPolicyComplianceSummary -SubscriptionId $SubscriptionId -OutputPath $compliancePath -ErrorAction SilentlyContinue | Out-Null
+    Get-GovNonCompliantResources -SubscriptionId $SubscriptionId -OutputPath $nonCompliantPath -ErrorAction SilentlyContinue | Out-Null
+
+    New-GovDashboardReport -SubscriptionId $SubscriptionId -OutputPath (Join-Path $PSScriptRoot 'governance-reports/initial-dashboard.html') -ErrorAction SilentlyContinue
+    Write-Host "Initial compliance scan (best-effort) completed." -ForegroundColor Green
 }
 catch {
-    Write-Warning "Failed to run initial compliance scan: $_"
-    # Continue execution even if compliance scan fails
+    Write-Warning "Initial compliance scan failed or tools not available: $_"
 }
 
-# Display completion message
-Write-Host "ICT Governance Framework infrastructure deployed successfully!" -ForegroundColor Green
-Write-Host "Subscription: $SubscriptionId" -ForegroundColor Green
-Write-Host "Resource Group: $ResourceGroupName" -ForegroundColor Green
-Write-Host "Log Analytics Workspace: $($coreDeployment.Outputs.logAnalyticsWorkspaceName.Value)" -ForegroundColor Green
-Write-Host "Storage Account: $($coreDeployment.Outputs.storageAccountName.Value)" -ForegroundColor Green
-Write-Host "Key Vault: $($coreDeployment.Outputs.keyVaultName.Value)" -ForegroundColor Green
+# Summary output
+Write-Host "ICT Governance Framework infrastructure process completed." -ForegroundColor Green
+Write-Host "Subscription: $SubscriptionId" -ForegroundColor Cyan
+Write-Host "Resource Group: $ResourceGroupName" -ForegroundColor Cyan
+if ($coreDeployment -and $coreDeployment.Outputs) {
+    Write-Host "Log Analytics Workspace: $($coreDeployment.Outputs.logAnalyticsWorkspaceName.Value)" -ForegroundColor Cyan
+    Write-Host "Storage Account: $($coreDeployment.Outputs.storageAccountName.Value)" -ForegroundColor Cyan
+    Write-Host "Key Vault: $($coreDeployment.Outputs.keyVaultName.Value)" -ForegroundColor Cyan
+}
 
-Write-Host "`nPolicy Assignments:" -ForegroundColor Cyan
-Write-Host "Required Tags Policy: $($policyAssignmentIds.RequiredTags)" -ForegroundColor Cyan
-Write-Host "HTTPS Storage Policy: $($policyAssignmentIds.HttpsStorage)" -ForegroundColor Cyan
-Write-Host "Key Vault Network Policy: $($policyAssignmentIds.KeyVaultNetwork)" -ForegroundColor Cyan
-Write-Host "Resource Locks Policy: $($policyAssignmentIds.ResourceLocks)" -ForegroundColor Cyan
-Write-Host "VM Vulnerability Policy: $($policyAssignmentIds.VmVulnerability)" -ForegroundColor Cyan
+if ($policyAssignmentIds) {
+    Write-Host "Policy Assignments:" -ForegroundColor Cyan
+    $policyAssignmentIds.GetEnumerator() | ForEach-Object { Write-Host " - $($_.Key): $($_.Value)" }
+}
 
-Write-Host "`nNext Steps:" -ForegroundColor Yellow
-Write-Host "1. Review the initial compliance dashboard" -ForegroundColor Yellow
-Write-Host "2. Set up scheduled tasks for regular compliance reporting" -ForegroundColor Yellow
-Write-Host "3. Configure alerting for non-compliant resources" -ForegroundColor Yellow
-Write-Host "4. Customize policy assignments for your organization's requirements" -ForegroundColor Yellow
+Write-Host "Next Steps: Review governance reports in the governance-reports folder." -ForegroundColor Yellow

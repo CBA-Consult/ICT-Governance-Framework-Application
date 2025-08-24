@@ -77,6 +77,8 @@ The Multi-Cloud Multi-Tenant ICT Governance Framework is a comprehensive solutio
 │       └── documentGenerator/         # Document generation processor
 ├── .github/                           # GitHub workflows and config
 ├── LICENSE                            # License file
+
+
 The Multi-Cloud Multi-Tenant ICT Governance Framework consists of the following core components:
 
 ### Core Framework Documents
