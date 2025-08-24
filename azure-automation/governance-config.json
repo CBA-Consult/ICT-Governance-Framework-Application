@@ -1,0 +1,14 @@
+{
+  "tenants": [
+    {
+      "name": "CBA",
+      "tenantId": "20cb7a52-c98f-424c-9b33-58a5877bd23b",
+      "subscriptions": [
+        {
+          "name": "CBA Subscription",
+          "subscriptionId": "e759446b-8bb7-4065-a0ed-9d5273a05c46"
+        }
+      ]
+    }
+  ]
+}

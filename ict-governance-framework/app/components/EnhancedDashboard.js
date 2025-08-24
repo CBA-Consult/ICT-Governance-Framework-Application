@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ChartBarIcon, 
-  TrendingUpIcon, 
-  TrendingDownIcon, 
+  ArrowTrendingUpIcon, 
+  ArrowTrendingDownIcon, 
   ExclamationTriangleIcon,
   LockClosedIcon,
   UserGroupIcon,
@@ -151,9 +151,9 @@ export default function EnhancedDashboard() {
   const getTrendIcon = (direction) => {
     switch (direction) {
       case 'increasing':
-        return <TrendingUpIcon className="h-5 w-5 text-green-500" />;
+        return <ArrowTrendingUpIcon className="h-5 w-5 text-green-500" />;
       case 'decreasing':
-        return <TrendingDownIcon className="h-5 w-5 text-red-500" />;
+        return <ArrowTrendingDownIcon className="h-5 w-5 text-red-500" />;
       case 'stable':
         return <div className="h-5 w-5 bg-yellow-500 rounded-full" />;
       default:

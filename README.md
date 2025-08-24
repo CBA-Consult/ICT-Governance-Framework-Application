@@ -2,6 +2,8 @@
 
 # Multi-Cloud Multi-Tenant ICT Governance Framework
 
+[![Pester Tests](https://github.com/CBA-Consult/ICT-Governance-Framework-Application/actions/workflows/pester.yml/badge.svg)](https://github.com/CBA-Consult/ICT-Governance-Framework-Application/actions/workflows/pester.yml)
+
 **[See: Table of Contents](Table-of-Contents.md)** | **[📁 Documentation Structure](docs/README.md)**
 
 ## 🚀 Quick Start
@@ -51,33 +53,31 @@ The Multi-Cloud Multi-Tenant ICT Governance Framework is a comprehensive solutio
 - **Automated Lifecycle Management**: Streamlined tenant onboarding, management, and offboarding
 - **Compliance Automation**: Tenant-specific regulatory compliance and monitoring
 - **Cost Optimization**: Advanced multi-tenant cost allocation and optimization
-- **Security by Design**: Zero-trust security with comprehensive tenant isolation
-
-Last Updated: January 15, 2024 | Original Creation: October 22, 2020, Amsterdam, The Netherlands
-
 ## Repository Structure
 
 ```
 📁 Repository Root
-├── 📖 docs/                          # Organized documentation structure
-│   ├── 🎯 project-management/        # Project artifacts and planning
-│   ├── 🏛️ governance-framework/      # Core governance documentation
-│   ├── 📋 policies/                  # Governance and operational policies
-│   ├── 🚀 implementation/            # Implementation guides and summaries
-│   ├── 🏗️ architecture/             # Technical architecture documentation
-│   ├── ✅ compliance/               # Compliance and audit documentation
-│   ├── 📚 training/                 # Training and communication materials
-│   └── 📄 templates/                # Reusable templates and methodologies
-├── 🔧 azure-automation/             # Azure automation scripts and configs
-├── 📋 blueprint-templates/          # Infrastructure and policy templates
-├── 🌐 ict-governance-framework/     # Web application and APIs
-├── 🤖 implementation-automation/    # Deployment automation scripts
-├── ☁️ multi-cloud-governance/      # Multi-cloud specific documentation
-├── 🔍 framework-evaluation/        # Framework assessment tools
-└── 📊 generated-documents/         # Auto-generated documentation
-```
+│   ├── communication/                # Communication plans and templates
+│   ├── compliance/                   # Compliance and audit documentation
+│   ├── implementation/               # Implementation guides and summaries
+│   ├── logs/                         # Governance logs
+│   ├── stakeholders/                 # Stakeholder registers and analysis
+│   ├── summaries/                    # Summary documents
+│   ├── team/                         # Team norms and orientation
+├── 📋 blueprint-templates/            # Infrastructure and policy templates
+├── 🌐 ict-governance-framework/       # Web application and APIs
+├── framework-evaluation/              # Framework assessment tools
+├── generated-documents/               # Auto-generated documentation
+├── strategic-statements/              # Company values and purpose
+├── technical-design/                  # Technical design documentation
+├── tests/                             # Test scripts and documentation
+├── tests-examples/                    # Example test scripts
+├── src/                               # Source code modules
+│   └── modules/
+│       └── documentGenerator/         # Document generation processor
+├── .github/                           # GitHub workflows and config
+├── LICENSE                            # License file
 
-## Framework Components
 
 The Multi-Cloud Multi-Tenant ICT Governance Framework consists of the following core components:
 
@@ -85,16 +85,12 @@ The Multi-Cloud Multi-Tenant ICT Governance Framework consists of the following 
 
 1. **[Multi-Cloud Multi-Tenant ICT Governance Framework](docs/governance-framework/core-framework/Multi-Cloud-Multi-Tenant-ICT-Governance-Framework.md)** - The comprehensive framework document defining multi-tenant governance structure, tenant lifecycle management, and cross-cloud operations.
 
-2. **[ICT Governance Framework](docs/governance-framework/core-framework/ICT-Governance-Framework.md)** - The foundational document defining the governance structure, roles, responsibilities, and operating model.
 
 3. **[Strategic and Tactical IT Governance Overview](docs/governance-framework/core-framework/Strategic-Tactical-IT-Governance-Overview.md)** - Comprehensive overview of strategic vs tactical governance tasks and responsibilities with clear role definitions and escalation frameworks.
 
 4. **[Target Governance Framework](docs/governance-framework/target-framework/Target-Governance-Framework.md)** - Enhanced governance framework with industry-leading practices from ISO/IEC 38500, ITIL 4, COBIT 2019, CMMI, and FAIR frameworks.
 
-5. **[ICT Governance Policies](docs/policies/governance/ICT-Governance-Policies.md)** - Detailed policies covering technology selection, security, architecture, change management, asset lifecycle, and vendor management.
-
 ### Multi-Tenant Infrastructure and Automation
-
 5. **[Multi-Tenant Infrastructure Blueprint](blueprint-templates/infrastructure-blueprints/multi-tenant-infrastructure.bicep)** - Comprehensive Bicep template for deploying tenant-isolated infrastructure with security and compliance controls.
 
 6. **[Tenant Lifecycle Management Automation](implementation-automation/tenant-lifecycle-management.ps1)** - PowerShell automation for complete tenant lifecycle including onboarding, management, and secure offboarding.
