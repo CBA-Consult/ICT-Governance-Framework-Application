@@ -219,8 +219,6 @@ app.listen(PORT, async () => {
   }
 });
 
-const secureScoresRouter = require('./api/secure-scores');
-app.use('/api/secure-scores', secureScoresRouter);
 // Scheduled Secure Score sync job
 const ONE_HOUR_MS = 60 * 60 * 1000;
 const secureScoresSync = require('./api/secure-scores');

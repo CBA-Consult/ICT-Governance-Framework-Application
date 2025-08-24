@@ -4,14 +4,13 @@ import { useState, useEffect } from 'react';
 import { 
   ShieldCheckIcon, 
   ExclamationTriangleIcon, 
-  TrendingUpIcon, 
-  TrendingDownIcon,
   ChartBarIcon,
   ClockIcon,
   CheckCircleIcon,
   XCircleIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
+import { TrendingUpIcon, TrendingDownIcon } from '@heroicons/react/24/solid';
 import { 
   LineChart, 
   Line, 

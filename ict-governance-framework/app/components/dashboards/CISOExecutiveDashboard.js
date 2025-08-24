@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../contexts/AuthContext';
 import { 
   ShieldCheckIcon, 
   ExclamationTriangleIcon,
@@ -46,6 +47,16 @@ export default function CISOExecutiveDashboard({ timeRange = 30 }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
+  const { state } = useContext(AuthContext);
+
+  // Guard: show loading or error if context is not ready
+  if (!state || !state.tokens) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <span className="text-gray-500">Authentication not initialized. Please log in.</span>
+      </div>
+    );
+  }
 
   useEffect(() => {
     fetchExecutiveSummary();
@@ -57,19 +68,21 @@ export default function CISOExecutiveDashboard({ timeRange = 30 }) {
   const fetchExecutiveSummary = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      
+      const token = state.tokens?.accessToken;
+      if (!token) {
+        setError('No access token available. Please log in.');
+        setLoading(false);
+        return;
+      }
       const response = await fetch(`/api/secure-scores/executive-summary?timeRange=${timeRange}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-
       if (!response.ok) {
         throw new Error('Failed to fetch CISO executive summary');
       }
-
       const result = await response.json();
       setDashboardData(result.data);
       setLastRefresh(new Date());
