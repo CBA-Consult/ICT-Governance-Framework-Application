@@ -92,8 +92,10 @@ export default function DashboardPage() {
         throw new Error('Failed to check dashboard permissions');
       }
 
-      const result = await response.json();
-      setUserPermissions(result.data.dashboardAccess);
+  const result = await response.json();
+  // tolerate multiple possible shapes returned by the API
+  const dashboardAccess = result?.data?.dashboardAccess ?? result?.dashboardAccess ?? result?.data ?? result;
+  setUserPermissions(dashboardAccess);
       setAccessError(null);
     } catch (err) {
       console.error('Error checking dashboard access:', err);
@@ -134,13 +136,31 @@ export default function DashboardPage() {
     );
   }
 
-  // Check if user has any dashboard permissions
-  const hasAnyDashboardAccess = userPermissions && (
-    userPermissions.executive || 
-    userPermissions.operational || 
-    userPermissions.compliance || 
-    userPermissions.analytics
-  );
+  // Helper to normalize permission shapes and recognise super-admins
+  const hasPermissionFlag = (perms) => {
+    if (!perms) return false;
+    // array of role names
+    if (Array.isArray(perms)) {
+      return perms.includes('superAdmin') || perms.includes('super_admin') || perms.includes('administrator') || perms.length > 0;
+    }
+    // object with boolean flags
+    if (typeof perms === 'object') {
+      return Boolean(
+        perms.superAdmin || perms.superadmin || perms.super_admin || perms.admin || perms.administrator ||
+        perms.executive || perms.operational || perms.compliance || perms.analytics ||
+        // any truthy key (e.g., { executive: true })
+        Object.keys(perms).some(k => !!perms[k])
+      );
+    }
+    // string single role
+    if (typeof perms === 'string') {
+      return perms === 'superAdmin' || perms === 'administrator' || perms === 'admin';
+    }
+    return false;
+  };
+
+  // Check if user has any dashboard permissions (including super-admin)
+  const hasAnyDashboardAccess = hasPermissionFlag(userPermissions);
 
   if (!hasAnyDashboardAccess) {
     return (
