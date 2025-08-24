@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from './contexts/AuthContext';
 import OverviewCards from './components/OverviewCards';
 import FrameworkStatus from './components/FrameworkStatus';
 import GovernanceMetrics from './components/GovernanceMetrics';
@@ -9,6 +11,8 @@ import RecentActivities from './components/RecentActivities';
 import QuickActions from './components/QuickActions';
 
 export default function Home() {
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const router = useRouter();
   const [governanceMetrics, setGovernanceMetrics] = useState({
     complianceScore: 87,
     riskLevel: 'Medium',
@@ -33,8 +37,56 @@ export default function Home() {
     task5: { name: 'Evaluate Effectiveness', progress: 60, status: 'in-progress' }
   });
 
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/auth');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Welcome Message */}
+      <div className="bg-white dark:bg-gray-800 shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Welcome back, {user?.firstName || user?.username}!
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                {user?.jobTitle && user?.department 
+                  ? `${user.jobTitle} - ${user.department}`
+                  : user?.jobTitle || user?.department || 'ICT Governance Framework Dashboard'
+                }
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Last login: {user?.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'First time'}
+              </div>
+              <div className="text-xs text-gray-400 dark:text-gray-500">
+                Roles: {user?.roles?.join(', ') || 'None'}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <OverviewCards governanceMetrics={governanceMetrics} />

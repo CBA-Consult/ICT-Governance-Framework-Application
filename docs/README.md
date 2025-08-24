@@ -4,60 +4,33 @@ This directory contains the complete documentation for the Multi-Cloud Multi-Ten
 
 ## 📁 Directory Structure
 
-### 🎯 Project Management (`project-management/`)
-Contains all project management artifacts, stakeholder information, and planning documents.
 
-- **`requirements/`** - Business requirements, governance requirements, and compliance specifications
-- **`stakeholder-management/`** - Stakeholder identification, engagement strategies, and communication plans
-- **`team-management/`** - Team formation, roles, responsibilities, and collaboration protocols
-- **`planning/`** - Project planning artifacts and execution strategies
+## 📁 Updated Directory Structure
 
-### 🏛️ Governance Framework (`governance-framework/`)
-Core governance framework documentation and strategic guidance.
-
-- **`core-framework/`** - Primary governance framework documents and strategic statements
-- **`target-framework/`** - Future state governance architecture and enhancement plans
-- **`assessment/`** - Current state assessments, gap analyses, and benchmarking reports
-- **`metrics/`** - KPIs, measurement frameworks, and success criteria
-
-### 📋 Policies (`policies/`)
-Comprehensive policy documentation across all governance domains.
-
-- **`governance/`** - Core governance policies and role definitions
-- **`security/`** - Security policies and compliance requirements
-- **`compliance/`** - Regulatory compliance and audit policies
-- **`operational/`** - Day-to-day operational policies and procedures
-
-### 🚀 Implementation (`implementation/`)
-Implementation guidance, automation, and deployment documentation.
-
-- **`guides/`** - Step-by-step implementation guides
-- **`summaries/`** - Implementation status and completion summaries
-- **`automation/`** - Automation scripts and configuration files
-- **`deployment/`** - Deployment strategies and execution plans
-
-### 🏗️ Architecture (`architecture/`)
-Technical architecture documentation and design specifications.
-
-- **`current-state/`** - Current architecture assessments and inventories
-- **`target-state/`** - Future architecture designs and specifications
-- **`integration/`** - Integration requirements and API specifications
-- **`infrastructure/`** - Infrastructure as Code and deployment templates
-
-### ✅ Compliance (`compliance/`)
-Compliance monitoring, audit, and regulatory documentation.
-
-- **`audit/`** - Audit frameworks and assessment procedures
-- **`regulatory/`** - Regulatory requirements and compliance matrices
-- **`assessment/`** - Compliance assessments and gap analyses
-- **`monitoring/`** - Real-time monitoring and violation detection
-
-### 📚 Training (`training/`)
-Training materials, communication plans, and onboarding resources.
-
-- **`materials/`** - Training content and educational resources
-- **`communication/`** - Communication strategies and presentation materials
-- **`onboarding/`** - New team member onboarding and orientation
+```
+docs/
+├── architecture/                 # Technical architecture documentation
+├── charter/                      # Project charter documents
+├── checklists/                   # Project and governance checklists
+├── communication/                # Communication plans and templates
+├── compliance/                   # Compliance and audit documentation
+├── escalation/                   # Escalation procedures and logs
+├── foundation/                   # Foundation phase documentation
+├── governance/                   # Governance process documentation
+├── governance-framework/         # Core governance documentation
+├── implementation/               # Implementation guides and summaries
+├── logs/                         # Governance logs
+├── policies/                     # Governance and operational policies
+├── project-management/           # Project artifacts and planning
+├── references/                   # Reference materials
+├── reports/                      # Governance and compliance reports
+├── stakeholders/                 # Stakeholder registers and analysis
+├── summaries/                    # Summary documents
+├── team/                         # Team norms and orientation
+├── templates/                    # Reusable templates and methodologies
+├── training/                     # Training and communication materials
+├── Table-of-Contents.md          # Documentation table of contents
+```
 
 ### 📄 Templates (`templates/`)
 Reusable templates and methodologies for governance activities.
@@ -87,16 +60,28 @@ Reusable templates and methodologies for governance activities.
 
 ## 📊 Document Categories
 
-| Category | Count | Description |
-|----------|-------|-------------|
-| Project Management | 30+ | Requirements, stakeholder management, team formation |
-| Governance Framework | 25+ | Core framework, assessments, metrics |
-| Policies | 20+ | Governance, security, compliance, operational |
-| Implementation | 15+ | Guides, summaries, automation |
-| Architecture | 12+ | Current state, target state, integration |
-| Compliance | 10+ | Audit, regulatory, monitoring |
-| Training | 8+ | Materials, communication, onboarding |
-| Templates | 5+ | Reusable templates and methodologies |
+| Category              | Count | Description |
+|-----------------------|-------|------------------------------------------------------------|
+| Architecture          | 12+   | Technical architecture, integration, infrastructure         |
+| Charter               | 5+    | Project charter documents                                   |
+| Checklists            | 8+    | Project and governance checklists                           |
+| Communication         | 10+   | Communication plans, templates, and strategies              |
+| Compliance            | 10+   | Compliance, audit, regulatory, monitoring                   |
+| Escalation            | 4+    | Escalation procedures and logs                              |
+| Foundation            | 6+    | Foundation phase documentation                              |
+| Governance            | 15+   | Governance process documentation                            |
+| Governance Framework  | 25+   | Core governance documentation, strategic guidance           |
+| Implementation        | 15+   | Implementation guides, summaries, automation                |
+| Logs                  | 5+    | Governance logs                                             |
+| Policies              | 20+   | Governance and operational policies                         |
+| Project Management    | 30+   | Project artifacts, planning, requirements, stakeholders     |
+| References            | 5+    | Reference materials                                         |
+| Reports               | 8+    | Governance and compliance reports                           |
+| Stakeholders          | 10+   | Stakeholder registers and analysis                          |
+| Summaries             | 6+    | Summary documents                                           |
+| Team                  | 5+    | Team norms and orientation                                  |
+| Templates             | 5+    | Reusable templates and methodologies                        |
+| Training              | 8+    | Training and communication materials                        |
 
 ## 🔄 Document Lifecycle
 

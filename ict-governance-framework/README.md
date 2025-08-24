@@ -156,6 +156,14 @@ Then assign the super_admin role using the SQL command above.
 - Bulk user operations
 - User status management (Active, Inactive, Suspended, Pending)
 
+### **Document & Policy Management**
+- Comprehensive document management with version control
+- Approval workflows for governance documents
+- Document categorization and metadata management
+- Advanced search and filtering capabilities
+- Document relationships and compliance tracking
+
+
 ### **Activity Logging & Audit Trail**
 - Comprehensive user activity logging
 - API request/response tracking
@@ -212,6 +220,23 @@ Then assign the super_admin role using the SQL command above.
 - `POST /api/users/:userId/roles` - Assign roles to user
 - `DELETE /api/users/:userId/roles/:roleId` - Remove role from user
 
+### Document Management Endpoints
+- `GET /api/documents` - List documents with filtering and pagination
+- `GET /api/documents/categories` - Get document categories
+- `GET /api/documents/:id` - Get specific document with versions
+- `POST /api/documents` - Create new document
+- `PUT /api/documents/:id` - Update document
+- `DELETE /api/documents/:id` - Delete document
+- `POST /api/documents/:id/versions` - Create new version
+
+### Workflow Management Endpoints
+- `GET /api/document-workflows` - List workflows with filtering
+- `GET /api/document-workflows/:id` - Get specific workflow with steps
+- `POST /api/document-workflows` - Create new approval workflow
+- `POST /api/document-workflows/:id/approve/:stepId` - Approve/reject workflow step
+- `DELETE /api/document-workflows/:id` - Cancel workflow
+- `GET /api/document-workflows/my-tasks` - Get tasks assigned to current user
+
 ### Role Management Endpoints
 - `GET /api/roles` - List roles
 - `GET /api/roles/:roleId` - Get role details
@@ -227,6 +252,40 @@ Then assign the super_admin role using the SQL command above.
 - `GET /api/defender-files/sync` - Sync Defender files
 - `POST /api/feedback` - Submit feedback
 - `GET /api/escalations` - View escalations
+
+## 🔧 Security & Configuration
+
+### Environment Security
+- Use strong, unique JWT secrets in production
+- Enable HTTPS in production
+- Use environment variables for all secrets
+- Regular security updates
+
+### Database Security
+- Use connection pooling
+- Enable SSL for database connections
+- Regular backups and encryption at rest
+- Principle of least privilege for database users
+
+### Application Security
+- Input validation on all endpoints
+- SQL injection prevention with parameterized queries
+- XSS protection with content security policy
+- Regular dependency updates
+
+## 📈 Monitoring & Maintenance
+
+### Health Checks
+- API health endpoint: `GET /api/health`
+- Database connectivity monitoring
+- Session cleanup automation
+- Failed login attempt monitoring
+
+### Logging
+- Application logs with structured format
+- Audit trail in database
+- Error tracking and alerting
+- Performance monitoring
 
 ## 🔧 Security & Configuration
 
@@ -346,6 +405,35 @@ npm run db:reset
 ```
 
 **Note:** This framework and dashboard are under active development with production-ready user management. For authoritative framework content, refer to the Markdown files in the repository root or the [Table of Contents](../Table-of-Contents.md).
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see the main repository documentation for guidelines and priorities. Focus areas include:
+- Enhancing user management features
+- Improving UI/UX design
+- Integrating documentation and compliance tools
+- Adding automated testing
+- Performance optimization
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## 🆘 Support
+
+For support and questions:
+- Check the comprehensive documentation above
+- Review the API endpoints and authentication flow
+- Check the audit logs for troubleshooting
+- Refer to the [Repository Table of Contents](../Table-of-Contents.md)
+- Contact the development team
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 
 ## 🤝 Contributing
