@@ -1,180 +1,122 @@
 # ICT Governance Framework - Azure Policy and Governance Automation
 # This script helps manage and automate governance controls for Azure resources
+
+# ICT Governance Framework - Azure Policy and Governance Automation (Launcher)
 # Author: GitHub Copilot
 # Date: August 7, 2025
 
-# Import required modules
-Import-Module Az.Accounts
-Import-Module Az.Resources
-Import-Module Az.PolicyInsights
+# --- ROBUST MODULE IMPORT (REVISED) ---
+try {
+    # Construct the full path to the module manifest
+    $moduleManifest = Join-Path -Path $PSScriptRoot -ChildPath 'ICT-Governance-Framework.psd1'
 
-# Configuration variables
-$CONFIG = @{
-    LogPath = ".\governance-logs\"
-    ReportPath = ".\governance-reports\"
-    TemplatesPath = ".\governance-templates\"
-    PolicyDefinitionsPath = ".\policy-definitions\"
+    # Check if the manifest file actually exists before trying to import it
+    if (-not (Test-Path -Path $moduleManifest)) {
+        throw "Critical Error: The module manifest 'ICT-Governance-Framework.psd1' was not found in the script directory '$PSScriptRoot'."
+    }
+
+    # Import the module. -ErrorAction Stop ensures that any failure will be caught by the catch block.
+    Import-Module -Name $moduleManifest -Force -ErrorAction Stop
+    Write-Host "ICT Governance Framework module loaded successfully." -ForegroundColor Green
+}
+catch {
+    Write-Host "`nFATAL: Could not load the ICT Governance Framework module." -ForegroundColor Red
+    Write-Host "REASON: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "`nPlease ensure all script files are present and that you have the required Az modules installed." -ForegroundColor Yellow
+    Read-Host -Prompt 'Press Enter to exit'
+    exit 1
 }
 
-# Initialize logging
-function Initialize-GovFramework {
-    param (
-        [Parameter(Mandatory = $false)]
-        [string]$CustomConfigPath
-    )
-    
-    # Create directories if they don't exist
-    if (!(Test-Path -Path $CONFIG.LogPath)) {
-        New-Item -Path $CONFIG.LogPath -ItemType Directory -Force
-    }
-    
-    if (!(Test-Path -Path $CONFIG.ReportPath)) {
-        New-Item -Path $CONFIG.ReportPath -ItemType Directory -Force
-    }
-    
-    Write-Host "ICT Governance Framework initialized successfully." -ForegroundColor Green
-    Write-Host "Log Path: $($CONFIG.LogPath)" -ForegroundColor Cyan
-    Write-Host "Report Path: $($CONFIG.ReportPath)" -ForegroundColor Cyan
-    
-    # Load custom configuration if provided
-    if ($CustomConfigPath -and (Test-Path -Path $CustomConfigPath)) {
-        $customConfig = Get-Content -Path $CustomConfigPath -Raw | ConvertFrom-Json
-        # Merge configurations
-        foreach ($key in $customConfig.PSObject.Properties.Name) {
-            $CONFIG[$key] = $customConfig.$key
+# Initialize the framework if the function is available
+if (Get-Command -Name Initialize-GovFramework -ErrorAction SilentlyContinue) {
+    Initialize-GovFramework
+} else {
+    Write-Host 'Initialize-GovFramework not available; module may not have loaded correctly.' -ForegroundColor Yellow
+    # Attempt a targeted import of the .psm1 in case the manifest import didn't surface functions
+    $psm1Path = Join-Path -Path $PSScriptRoot -ChildPath 'ICT-Governance-Framework.psm1'
+    if (Test-Path -Path $psm1Path) {
+        try {
+            Import-Module -Name $psm1Path -Force -ErrorAction Stop
+            Write-Host "Imported module directly from $psm1Path" -ForegroundColor Green
         }
-        Write-Host "Custom configuration loaded from: $CustomConfigPath" -ForegroundColor Yellow
+        catch {
+            Write-Host "Direct import of .psm1 failed: $($_.Exception.Message)" -ForegroundColor Red
+        }
     }
-}
 
-# Log function
-function Write-GovLog {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$Message,
-        
-        [Parameter(Mandatory = $false)]
-        [ValidateSet("Info", "Warning", "Error", "Success")]
-        [string]$Level = "Info"
-    )
-    
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$timestamp] [$Level] - $Message"
-    
-    # Write to console with color
-    switch ($Level) {
-        "Info" { Write-Host $logEntry -ForegroundColor White }
-        "Warning" { Write-Host $logEntry -ForegroundColor Yellow }
-        "Error" { Write-Host $logEntry -ForegroundColor Red }
-        "Success" { Write-Host $logEntry -ForegroundColor Green }
-    }
-    
-    # Write to log file
-    $logFile = Join-Path -Path $CONFIG.LogPath -ChildPath "governance-$(Get-Date -Format 'yyyy-MM-dd').log"
-    Add-Content -Path $logFile -Value $logEntry
-}
+    # Final availability check for Connect-GovAzure
+    if (-not (Get-Command -Name Connect-GovAzure -ErrorAction SilentlyContinue)) {
+        Write-Host 'FATAL: Required function Connect-GovAzure is not available in the session.' -ForegroundColor Red
+        Write-Host 'Module import appears to have failed or the module did not export functions as expected.' -ForegroundColor Yellow
 
-# Connect to Azure
-function Connect-GovAzure {
-    param (
-        [Parameter(Mandatory = $false)]
-        [switch]$UseManagedIdentity,
-        
-        [Parameter(Mandatory = $false)]
-        [string]$TenantId
-    )
-    
-    try {
-        if ($UseManagedIdentity) {
-            # Connect using Managed Identity
-            Connect-AzAccount -Identity
-            Write-GovLog -Message "Connected to Azure using Managed Identity" -Level "Success"
-        }
-        elseif ($TenantId) {
-            # Connect with specific tenant
-            Connect-AzAccount -TenantId $TenantId
-            Write-GovLog -Message "Connected to Azure tenant: $TenantId" -Level "Success"
-        }
-        else {
-            # Interactive login
-            Connect-AzAccount
-            Write-GovLog -Message "Connected to Azure interactively" -Level "Success"
-        }
-        
-        # Display current context
-        $context = Get-AzContext
-        Write-GovLog -Message "Current context: Subscription - $($context.Subscription.Name), Tenant - $($context.Tenant.Id)" -Level "Info"
-    }
-    catch {
-        Write-GovLog -Message "Failed to connect to Azure: $_" -Level "Error"
-        throw
-    }
-}
-
-# Get Azure Policy Compliance Summary
-function Get-GovPolicyComplianceSummary {
-    param (
-        [Parameter(Mandatory = $false)]
-        [string]$SubscriptionId,
-        
-        [Parameter(Mandatory = $false)]
-        [string]$ResourceGroupName,
-        
-        [Parameter(Mandatory = $false)]
-        [string]$OutputPath
-    )
-    
-    try {
-        # Set context if subscription is provided
-        if ($SubscriptionId) {
-            Set-AzContext -SubscriptionId $SubscriptionId | Out-Null
-            Write-GovLog -Message "Set context to subscription: $SubscriptionId" -Level "Info"
-        }
-        
-        # Get policy states
-        if ($ResourceGroupName) {
-            $scope = "/subscriptions/$($context.Subscription.Id)/resourceGroups/$ResourceGroupName"
-            $policyStates = Get-AzPolicyState -ResourceGroupName $ResourceGroupName
-            Write-GovLog -Message "Retrieved policy states for resource group: $ResourceGroupName" -Level "Info"
-        }
-        else {
-            $scope = "/subscriptions/$($context.Subscription.Id)"
-            $policyStates = Get-AzPolicyState
-            Write-GovLog -Message "Retrieved policy states for subscription: $($context.Subscription.Id)" -Level "Info"
-        }
-        
-        # Summarize compliance
-        $compliantCount = ($policyStates | Where-Object { $_.ComplianceState -eq "Compliant" }).Count
-        $nonCompliantCount = ($policyStates | Where-Object { $_.ComplianceState -eq "NonCompliant" }).Count
-        $totalCount = $policyStates.Count
-        
-        $complianceSummary = [PSCustomObject]@{
-            Scope = $scope
-            TotalPolicies = $totalCount
-            CompliantPolicies = $compliantCount
-            NonCompliantPolicies = $nonCompliantCount
-            ComplianceRate = if ($totalCount -gt 0) { [math]::Round(($compliantCount / $totalCount) * 100, 2) } else { 0 }
-            Timestamp = Get-Date
-        }
-        
-        # Export to file if path is provided
-        if ($OutputPath) {
-            if (!(Test-Path -Path (Split-Path -Path $OutputPath -Parent))) {
-                New-Item -Path (Split-Path -Path $OutputPath -Parent) -ItemType Directory -Force
+        # Diagnostic info
+        Write-Host "Loaded modules:" -ForegroundColor Cyan
+        Get-Module | Select-Object Name,Path,Version | Format-Table -AutoSize
+        Write-Host "`nAttempting to show exported commands for ICT-Governance-Framework (if loaded):" -ForegroundColor Cyan
+        try {
+            $mod = Get-Module -Name 'ICT-Governance-Framework' -ErrorAction SilentlyContinue
+            if ($mod) {
+                Write-Host ($mod.ExportedCommands.Keys -join ', ')
+            } else {
+                Write-Host 'Module not present in session.' -ForegroundColor Yellow
             }
-            
-            $complianceSummary | ConvertTo-Json | Out-File -FilePath $OutputPath -Force
-            Write-GovLog -Message "Compliance summary exported to: $OutputPath" -Level "Success"
         }
-        
-        return $complianceSummary
-    }
-    catch {
-        Write-GovLog -Message "Failed to retrieve policy compliance summary: $_" -Level "Error"
-        throw
+        catch {
+            Write-Host "Could not enumerate module exports: $($_)" -ForegroundColor Yellow
+        }
+
+        Read-Host -Prompt 'Press Enter to exit'
+        exit 1
     }
 }
+# --- END REVISED IMPORT ---
 
+if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {
+    Write-Host "ICT Governance Framework Automation" -ForegroundColor Cyan
+    Write-Host "===============================" -ForegroundColor Cyan
+    Write-Host "1. Initialize"
+    Write-Host "2. Connect to Azure"
+    Write-Host "3. Get Policy Compliance Summary"
+    Write-Host "4. Get Non-Compliant Resources"
+    Write-Host "5. Generate Dashboard Report"
+    Write-Host "6. Run Governance Assessment"
+    Write-Host "7. Check Environment"
+    Write-Host "Q. Quit"
+    Write-Host ""
+    $choice = Read-Host "Enter your choice"
+    switch ($choice) {
+        "1" { Initialize-GovFramework }
+        "2" { Connect-GovAzure }
+        "3" {
+            $sub = Read-Host "Enter subscription ID (leave blank for current)"
+            if ($sub) { Get-GovPolicyComplianceSummary -SubscriptionId $sub }
+            else { Get-GovPolicyComplianceSummary }
+        }
+        "4" {
+            $sub = Read-Host "Enter subscription ID (leave blank for current)"
+            if ($sub) { Get-GovNonCompliantResources -SubscriptionId $sub }
+            else { Get-GovNonCompliantResources }
+        }
+        "5" {
+            $sub = Read-Host "Enter subscription ID (leave blank for current)"
+            if ($sub) { New-GovDashboardReport -SubscriptionId $sub }
+            else { New-GovDashboardReport }
+        }
+        "6" {
+            $sub = Read-Host "Enter subscription ID"
+            if ($sub) { New-GovAssessmentReport -SubscriptionId $sub }
+            else { Write-Host "Subscription ID is required" -ForegroundColor Red }
+        }
+        "7" {
+            Clear-Host
+            Test-GovFrameworkEnvironment
+            Read-Host -Prompt 'Press Enter to continue'
+        }
+        "Q" { return }
+        default { Write-Host "Invalid choice" -ForegroundColor Red }
+    }
+}
+        
 # Get Non-Compliant Resources
 function Get-GovNonCompliantResources {
     param (
@@ -565,8 +507,7 @@ function New-GovAssessmentReport {
     }
 }
 
-# Export ICT Governance Framework module functions
-Export-ModuleMember -Function Initialize-GovFramework, Connect-GovAzure, Get-GovPolicyComplianceSummary, Get-GovNonCompliantResources, New-GovDashboardReport, New-GovAssessmentReport
+# Note: Module exports are handled in the .psm1 file. Do not call Export-ModuleMember from a script.
 
 # Sample usage
 if ($MyInvocation.InvocationName -eq $MyInvocation.MyCommand.Name) {

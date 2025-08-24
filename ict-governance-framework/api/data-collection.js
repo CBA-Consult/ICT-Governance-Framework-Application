@@ -5,7 +5,8 @@ const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult, query } = require('express-validator');
-const { authenticateToken, requirePermission, logActivity } = require('./auth');
+const { requirePermission } = require('../middleware/permissions');
+const { authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });

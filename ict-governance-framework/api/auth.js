@@ -502,6 +502,7 @@ router.post('/logout', authenticateToken, async (req, res) => {
 });
 
 /**
+
  * POST /api/auth/logout-all
  * Logout from all devices
  */
@@ -570,6 +571,7 @@ router.get('/me', authenticateToken, async (req, res) => {
 });
 
 /**
+
  * POST /api/auth/verify-email
  * Verify user email address
  */

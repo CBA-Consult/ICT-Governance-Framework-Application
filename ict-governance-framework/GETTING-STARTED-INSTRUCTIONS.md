@@ -90,32 +90,6 @@ curl -X POST http://localhost:4000/api/auth/register \
   }'
 ```
 
-INSERT INTO users (
-  username,
-  email,
-  password_hash,
-  first_name,
-  last_name,
-  department,
-  job_title,
-  status,
-  email_verified,
-  created_at
-) VALUES (
-  'menno',
-  'menno@cbadmin.onmicrosoft.com',
-  'QueIQ4CBA$', -- bcrypt hash
-  'Menno',
-  'Drescher',
-  'CEO',
-  'CEO',
-  'Active',
-  TRUE,
-  CURRENT_TIMESTAMP
-);
-
-
-
 Then assign the super_admin role using the SQL command above.
 
 ## 🔐 Key Features

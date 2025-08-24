@@ -5,7 +5,7 @@
 
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
-const { authenticateToken, requirePermission, logActivity } = require('./auth');
+const { authenticateToken, requirePermissions, logActivity } = require('../middleware/auth');
 const DataTransformationService = require('../services/data-transformation-service');
 
 const router = express.Router();
@@ -21,7 +21,7 @@ transformationService.initialize().catch(console.error);
  */
 router.get('/rules',
   authenticateToken,
-  requirePermission('data_transformation_read'),
+  requirePermissions(['data_transformation_read']),
   [
     query('rule_type').optional().isString(),
     query('is_active').optional().isBoolean(),
@@ -74,7 +74,7 @@ router.get('/rules',
  */
 router.post('/rules',
   authenticateToken,
-  requirePermission('data_transformation_write'),
+  requirePermissions(['data_transformation_write']),
   [
     body('rule_name').notEmpty().isString().withMessage('Rule name is required'),
     body('rule_type').isIn(['mapping', 'validation', 'enrichment', 'aggregation', 'filtering']).withMessage('Invalid rule type'),
@@ -132,7 +132,7 @@ router.post('/rules',
  */
 router.put('/rules/:ruleId',
   authenticateToken,
-  requirePermission('data_transformation_write'),
+  requirePermissions(['data_transformation_write']),
   [
     body('rule_name').optional().isString(),
     body('rule_type').optional().isIn(['mapping', 'validation', 'enrichment', 'aggregation', 'filtering']),
@@ -195,7 +195,7 @@ router.put('/rules/:ruleId',
  */
 router.delete('/rules/:ruleId',
   authenticateToken,
-  requirePermission('data_transformation_delete'),
+  requirePermissions(['data_transformation_delete']),
   async (req, res) => {
     try {
       const { ruleId } = req.params;
@@ -235,7 +235,7 @@ router.delete('/rules/:ruleId',
  */
 router.post('/transform',
   authenticateToken,
-  requirePermission('data_transformation_execute'),
+  requirePermissions(['data_transformation_execute']),
   [
     body('data').isArray().withMessage('Data must be an array'),
     body('rule_ids').optional().isArray().withMessage('Rule IDs must be an array'),
@@ -285,7 +285,7 @@ router.post('/transform',
  */
 router.post('/validate',
   authenticateToken,
-  requirePermission('data_transformation_execute'),
+  requirePermissions(['data_transformation_execute']),
   [
     body('data').isArray().withMessage('Data must be an array'),
     body('rule_id').isUUID().withMessage('Valid rule ID is required'),
@@ -337,7 +337,7 @@ router.post('/validate',
  */
 router.post('/test-rule',
   authenticateToken,
-  requirePermission('data_transformation_execute'),
+  requirePermissions(['data_transformation_execute']),
   [
     body('rule').isObject().withMessage('Rule configuration is required'),
     body('sample_data').isArray().withMessage('Sample data must be an array'),
@@ -398,7 +398,7 @@ router.post('/test-rule',
  */
 router.get('/rule-types',
   authenticateToken,
-  requirePermission('data_transformation_read'),
+  requirePermissions(['data_transformation_read']),
   async (req, res) => {
     try {
       const ruleTypes = {
@@ -503,7 +503,7 @@ router.get('/rule-types',
  */
 router.get('/dashboard',
   authenticateToken,
-  requirePermission('data_transformation_read'),
+  requirePermissions(['data_transformation_read']),
   async (req, res) => {
     try {
       // This would typically aggregate data from transformation operations
@@ -548,7 +548,7 @@ router.get('/dashboard',
  */
 router.post('/bulk-transform',
   authenticateToken,
-  requirePermission('data_transformation_execute'),
+  requirePermissions(['data_transformation_execute']),
   [
     body('data_source').isObject().withMessage('Data source configuration is required'),
     body('rule_ids').isArray().withMessage('Rule IDs must be an array'),

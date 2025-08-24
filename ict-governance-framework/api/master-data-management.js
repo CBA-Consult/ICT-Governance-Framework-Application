@@ -5,7 +5,7 @@
 
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
-const { authenticateToken, requirePermission, logActivity } = require('./auth');
+const { authenticateToken, requirePermissions, logActivity } = require('../middleware/auth');
 const MasterDataManagementService = require('../services/master-data-management-service');
 
 const router = express.Router();
@@ -21,7 +21,7 @@ mdmService.initialize().catch(console.error);
  */
 router.get('/entities',
   authenticateToken,
-  requirePermission('master_data_read'),
+  requirePermissions(['master_data_read']),
   [
     query('entity_type').optional().isString(),
     query('is_active').optional().isBoolean(),
@@ -74,7 +74,7 @@ router.get('/entities',
  */
 router.post('/entities',
   authenticateToken,
-  requirePermission('master_data_write'),
+  requirePermissions(['master_data_write']),
   [
     body('entity_name').notEmpty().isString().withMessage('Entity name is required'),
     body('entity_type').isIn(['customer', 'product', 'employee', 'vendor', 'location', 'application']).withMessage('Invalid entity type'),
@@ -132,7 +132,7 @@ router.post('/entities',
  */
 router.put('/entities/:entityId',
   authenticateToken,
-  requirePermission('master_data_write'),
+  requirePermissions(['master_data_write']),
   [
     body('entity_name').optional().isString(),
     body('entity_type').optional().isIn(['customer', 'product', 'employee', 'vendor', 'location', 'application']),
@@ -195,7 +195,7 @@ router.put('/entities/:entityId',
  */
 router.get('/entities/:entityId/records',
   authenticateToken,
-  requirePermission('master_data_read'),
+  requirePermissions(['master_data_read']),
   [
     query('status').optional().isString(),
     query('source_system').optional().isString(),
@@ -258,7 +258,7 @@ router.get('/entities/:entityId/records',
  */
 router.post('/entities/:entityId/records',
   authenticateToken,
-  requirePermission('master_data_write'),
+  requirePermissions(['master_data_write']),
   [
     body('master_id').notEmpty().isString().withMessage('Master ID is required'),
     body('record_data').isObject().withMessage('Record data must be an object'),
@@ -318,7 +318,7 @@ router.post('/entities/:entityId/records',
  */
 router.delete('/entities/:entityId/records/:masterId',
   authenticateToken,
-  requirePermission('master_data_delete'),
+  requirePermissions(['master_data_delete']),
   async (req, res) => {
     try {
       const { entityId, masterId } = req.params;
@@ -360,7 +360,7 @@ router.delete('/entities/:entityId/records/:masterId',
  */
 router.get('/quality-issues',
   authenticateToken,
-  requirePermission('data_quality_read'),
+  requirePermissions(['data_quality_read']),
   [
     query('entity_id').optional().isUUID(),
     query('issue_type').optional().isString(),
@@ -421,7 +421,7 @@ router.get('/quality-issues',
  */
 router.put('/quality-issues/:issueId/resolve',
   authenticateToken,
-  requirePermission('data_quality_write'),
+  requirePermissions(['data_quality_write']),
   [
     body('status').isIn(['resolved', 'false_positive']).withMessage('Invalid status'),
     body('resolution_notes').optional().isString()
@@ -480,7 +480,7 @@ router.put('/quality-issues/:issueId/resolve',
  */
 router.get('/lineage/:entityName',
   authenticateToken,
-  requirePermission('data_lineage_read'),
+  requirePermissions(['data_lineage_read']),
   [
     query('field_name').optional().isString()
   ],
@@ -529,7 +529,7 @@ router.get('/lineage/:entityName',
  */
 router.post('/lineage',
   authenticateToken,
-  requirePermission('data_lineage_write'),
+  requirePermissions(['data_lineage_write']),
   [
     body('source_entity').notEmpty().isString().withMessage('Source entity is required'),
     body('target_entity').notEmpty().isString().withMessage('Target entity is required'),
@@ -584,7 +584,7 @@ router.post('/lineage',
  */
 router.get('/quality-metrics',
   authenticateToken,
-  requirePermission('data_quality_read'),
+  requirePermissions(['data_quality_read']),
   [
     query('entity_id').optional().isUUID()
   ],
@@ -631,7 +631,7 @@ router.get('/quality-metrics',
  */
 router.get('/dashboard',
   authenticateToken,
-  requirePermission('master_data_read'),
+  requirePermissions(['master_data_read']),
   async (req, res) => {
     try {
       const entities = await mdmService.getMasterDataEntities({ is_active: true });
@@ -677,7 +677,7 @@ router.get('/dashboard',
  */
 router.post('/validate-record',
   authenticateToken,
-  requirePermission('master_data_read'),
+  requirePermissions(['master_data_read']),
   [
     body('entity_id').isUUID().withMessage('Valid entity ID is required'),
     body('record_data').isObject().withMessage('Record data must be an object')
