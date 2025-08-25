@@ -56,6 +56,9 @@ const { router: insightsGeneratorRouter } = require('./api/insights-generator');
 const { router: monitoringRouter } = require('./api/monitoring');
 const { router: diagnosticRouter } = require('./api/diagnostic-tools');
 
+// Import secure score API routes
+const secureScoresRouter = require('./api/secure-scores');
+
 // Import Enterprise API Framework
 const EnterpriseAPI = require('./api/enterprise-api');
 
@@ -154,6 +157,9 @@ app.use('/api/insights', insightsGeneratorRouter);
 // Monitoring and diagnostic routes
 app.use('/api/monitoring', monitoringRouter);
 app.use('/api/diagnostics', diagnosticRouter);
+
+// Secure score routes
+app.use('/api/secure-scores', secureScoresRouter);
 
 // Initialize and mount Enterprise API Framework
 const enterpriseAPI = new EnterpriseAPI({

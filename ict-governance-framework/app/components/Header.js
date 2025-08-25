@@ -95,6 +95,12 @@ export default function Header() {
                   </>
                 )}
 
+                {hasPermission('view_security_metrics') && (
+                  <Link href="/secure-score" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                    Secure Score
+                  </Link>
+                )}
+
                 {hasPermission('system.audit') && (
                   <Link href="/defender-activities" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                     Defender Activities
