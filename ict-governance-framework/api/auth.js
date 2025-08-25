@@ -534,7 +534,8 @@ router.post('/logout-all', authenticateToken, async (req, res) => {
 
 /**
  * GET /api/auth/me
- * Get current user information
+ * Get current user information (basic profile data)
+ * Note: For complete profile data, use GET /api/profile
  */
 router.get('/me', authenticateToken, async (req, res) => {
   try {
@@ -557,7 +558,8 @@ router.get('/me', authenticateToken, async (req, res) => {
         lastLogin: user.last_login,
         roles: user.roles,
         permissions: user.permissions,
-        createdAt: user.created_at
+        createdAt: user.created_at,
+        profilePictureUrl: user.profile_picture_url
       }
     });
 
