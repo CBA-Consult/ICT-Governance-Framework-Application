@@ -4,7 +4,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
 
 // Create the authentication context
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 // Authentication action types
 const AUTH_ACTIONS = {
@@ -471,4 +471,3 @@ export function withAuth(WrappedComponent, requiredPermissions = [], requiredRol
   };
 }
 
-export default AuthContext;

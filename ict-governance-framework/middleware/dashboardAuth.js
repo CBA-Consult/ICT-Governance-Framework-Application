@@ -221,6 +221,7 @@ const requireAnyDashboardAccess = (dashboardTypes) => {
  */
 const getUserDashboardPermissions = async (userId) => {
   try {
+    // Get dashboard permissions
     const permissionQuery = `
       SELECT DISTINCT p.permission_name, p.display_name, p.description
       FROM users u
@@ -237,8 +238,30 @@ const getUserDashboardPermissions = async (userId) => {
         AND p.resource = 'dashboards'
     `;
 
-    const result = await pool.query(permissionQuery, [userId]);
-    const permissions = result.rows;
+    // Get user roles to check for admin/super admin status
+    const roleQuery = `
+      SELECT DISTINCT r.role_name, r.role_type, r.role_hierarchy_level
+      FROM users u
+      JOIN user_roles ur ON u.user_id = ur.user_id
+      JOIN roles r ON ur.role_id = r.role_id
+      WHERE u.user_id = $1 
+        AND u.status = 'Active'
+        AND ur.is_active = true
+        AND r.is_active = true
+    `;
+
+    const [permissionResult, roleResult] = await Promise.all([
+      pool.query(permissionQuery, [userId]),
+      pool.query(roleQuery, [userId])
+    ]);
+
+    const permissions = permissionResult.rows;
+    const roles = roleResult.rows;
+
+    // Check if user has super admin or admin roles
+    const isSuperAdmin = roles.some(r => r.role_name === 'super_admin');
+    const isAdmin = roles.some(r => r.role_name === 'admin');
+    const hasHighLevelRole = roles.some(r => r.role_hierarchy_level >= 80); // Governance Manager level and above
 
     return {
       executive: permissions.some(p => p.permission_name === 'dashboard.executive'),
@@ -247,6 +270,12 @@ const getUserDashboardPermissions = async (userId) => {
       analytics: permissions.some(p => p.permission_name === 'dashboard.analytics'),
       export: permissions.some(p => p.permission_name === 'dashboard.export'),
       admin: permissions.some(p => p.permission_name === 'dashboard.admin'),
+      // Include role-based flags for dashboard access logic
+      super_admin: isSuperAdmin,
+      superAdmin: isSuperAdmin, // Alternative naming
+      administrator: isAdmin,
+      hasHighLevelAccess: hasHighLevelRole,
+      roles: roles.map(r => r.role_name),
       permissions: permissions
     };
   } catch (error) {

@@ -29,6 +29,7 @@ const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
 const rolesRouter = require('./api/roles');
 const userPermissionsRouter = require('./api/user-permissions');
+const profileRouter = require('./api/profile');
 
 // Import dashboard access management API routes
 const dashboardAccessRouter = require('./api/dashboard-access');
@@ -106,6 +107,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Serve static files for uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Trust proxy for accurate IP addresses
 app.set('trust proxy', 1);
 
@@ -115,6 +119,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/roles', rolesRouter);
 app.use('/api/user-permissions', userPermissionsRouter);
+app.use('/api/profile', profileRouter);
 
 // Dashboard access management routes
 app.use('/api/dashboard-access', dashboardAccessRouter);
@@ -202,7 +207,8 @@ app.get('/api/health', (req, res) => res.json({
     monitoring: 'enabled',
     healthChecks: 'enabled',
     diagnostics: 'enabled',
-    alerting: 'enabled'
+    alerting: 'enabled',
+    secureScore: 'enabled'
   }
 }));
 
@@ -217,3 +223,21 @@ app.listen(PORT, async () => {
     console.error('✗ Failed to initialize monitoring:', error.message);
   }
 });
+
+// Scheduled Secure Score sync job
+const ONE_HOUR_MS = 60 * 60 * 1000;
+const secureScoresSync = require('./api/secure-scores');
+
+async function runSecureScoreSync() {
+  try {
+    await secureScoresSync.scheduledSync(process.env.DATABASE_URL);
+    console.log('Secure Score sync completed.');
+  } catch (err) {
+    console.error('Secure Score sync failed:', err);
+  }
+}
+
+// Run once on server start
+runSecureScoreSync();
+// Repeat every hour
+setInterval(runSecureScoreSync, ONE_HOUR_MS);

@@ -187,6 +187,7 @@ const requireRoles = (requiredRoles) => {
 };
 
 /**
+
  * Middleware to check if user is admin (has admin or super_admin role)
  */
 const requireAdmin = requireRoles(['admin', 'super_admin']);
