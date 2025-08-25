@@ -5,6 +5,7 @@ const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
+const { authenticateToken, requirePermission } = require('../middleware/auth');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -44,7 +45,7 @@ const upload = multer({
 });
 
 // POST /api/feedback/submit - Submit new feedback
-router.post('/submit', upload.array('attachments', 5), async (req, res) => {
+router.post('/submit', requirePermission('feedback.create'), upload.array('attachments', 5), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -155,7 +156,7 @@ router.post('/submit', upload.array('attachments', 5), async (req, res) => {
 });
 
 // GET /api/feedback/list - Get feedback items (with optional filters)
-router.get('/list', async (req, res) => {
+router.get('/list', requirePermission('feedback.read'), async (req, res) => {
   try {
     const { status, priority, category, limit = 50, offset = 0 } = req.query;
     
@@ -206,7 +207,7 @@ router.get('/list', async (req, res) => {
 });
 
 // GET /api/feedback/:id - Get specific feedback item
-router.get('/:id', async (req, res) => {
+router.get('/:id', requirePermission('feedback.read'), async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -244,7 +245,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/feedback/:id/response - Add response to feedback
-router.post('/:id/response', async (req, res) => {
+router.post('/:id/response', requirePermission('feedback.manage'), async (req, res) => {
   const client = await pool.connect();
   
   try {
