@@ -140,8 +140,10 @@ export function AuthProvider({ children }) {
                 payload: { tokens: newTokens }
               });
 
-              // Update localStorage
+
+              // Update localStorage with latest tokens and accessToken
               localStorage.setItem('tokens', JSON.stringify(newTokens));
+              localStorage.setItem('token', newTokens.accessToken);
 
               // Retry original request with new token
               originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
@@ -259,9 +261,11 @@ export function AuthProvider({ children }) {
 
       const { user, tokens } = response.data;
 
-      // Store in localStorage
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('tokens', JSON.stringify(tokens));
+
+  // Store in localStorage with extra consistency
+  localStorage.setItem('user', JSON.stringify(user));
+  localStorage.setItem('tokens', JSON.stringify(tokens));
+  localStorage.setItem('token', tokens.accessToken);
 
       dispatch({
         type: AUTH_ACTIONS.LOGIN_SUCCESS,
