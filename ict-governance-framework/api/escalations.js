@@ -2,12 +2,16 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }
 const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
+const { authenticateToken, requirePermission } = require('../middleware/auth');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
+// Apply authentication middleware to all routes
+router.use(authenticateToken);
+
 // GET /api/escalations/list - Get all escalations
-router.get('/list', async (req, res) => {
+router.get('/list', requirePermission('escalation.read'), async (req, res) => {
   try {
     const { status, priority, level, limit = 50, offset = 0 } = req.query;
     
@@ -60,7 +64,7 @@ router.get('/list', async (req, res) => {
 });
 
 // GET /api/escalations/:id - Get specific escalation
-router.get('/:id', async (req, res) => {
+router.get('/:id', requirePermission('escalation.read'), async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -102,7 +106,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/escalations/:id/action - Perform action on escalation
-router.post('/:id/action', async (req, res) => {
+router.post('/:id/action', requirePermission('escalation.manage'), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -241,7 +245,7 @@ router.post('/:id/action', async (req, res) => {
 });
 
 // POST /api/escalations/create - Create new escalation
-router.post('/create', async (req, res) => {
+router.post('/create', requirePermission('escalation.create'), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -331,7 +335,7 @@ router.post('/create', async (req, res) => {
 });
 
 // GET /api/escalations/metrics - Get escalation metrics
-router.get('/metrics', async (req, res) => {
+router.get('/metrics', requirePermission('escalation.read'), async (req, res) => {
   try {
     const metricsQuery = `
       SELECT 
