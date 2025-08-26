@@ -392,7 +392,7 @@ router.patch('/:id/acknowledge', async (req, res) => {
 });
 
 // Bulk notification operations
-router.post('/bulk-action', requirePermission('notification.manage'), async (req, res) => {
+router.post('/bulk-action', requirePermissions('notification.manage'), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -463,7 +463,7 @@ router.post('/bulk-action', requirePermission('notification.manage'), async (req
 });
 
 // Get notification analytics
-router.get('/analytics', requirePermission('notification.read'), async (req, res) => {
+router.get('/analytics', requirePermissions('notification.read'), async (req, res) => {
   try {
     const { timeframe = '30', user_id } = req.query;
     const currentUserId = user_id || req.user.id;
@@ -526,7 +526,7 @@ router.get('/analytics', requirePermission('notification.read'), async (req, res
 });
 
 // Schedule notification
-router.post('/schedule', requirePermission('notification.create'), async (req, res) => {
+router.post('/schedule', requirePermissions('notification.create'), async (req, res) => {
   const client = await pool.connect();
   
   try {
