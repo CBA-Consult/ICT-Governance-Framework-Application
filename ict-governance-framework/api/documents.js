@@ -10,7 +10,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 
-const { authenticateToken, requirePermission, logActivity } = require('./auth');
+const { authenticateToken, requirePermissions, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -110,7 +110,7 @@ async function logDocumentActivity(documentId, versionId, activityType, descript
 }
 
 // GET /api/documents - List documents with filtering and pagination
-router.get('/', authenticateToken, requirePermission('document.read'), [
+router.get('/', authenticateToken, requirePermissions(['document.read']), [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('category').optional().trim(),
@@ -255,7 +255,7 @@ router.get('/', authenticateToken, requirePermission('document.read'), [
 });
 
 // GET /api/documents/categories - Get document categories
-router.get('/categories', authenticateToken, requirePermission('document.read'), async (req, res) => {
+router.get('/categories', authenticateToken, requirePermissions(['document.read']), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -291,7 +291,7 @@ router.get('/categories', authenticateToken, requirePermission('document.read'),
 });
 
 // GET /api/documents/:id - Get specific document with versions
-router.get('/:id', authenticateToken, requirePermission('document.read'), async (req, res) => {
+router.get('/:id', authenticateToken, requirePermissions(['document.read']), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -409,7 +409,7 @@ router.get('/:id', authenticateToken, requirePermission('document.read'), async 
 });
 
 // POST /api/documents - Create new document
-router.post('/', authenticateToken, requirePermission('document.create'), documentValidation, async (req, res) => {
+router.post('/', authenticateToken, requirePermissions(['document.create']), documentValidation, async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -496,7 +496,7 @@ router.post('/', authenticateToken, requirePermission('document.create'), docume
 });
 
 // POST /api/documents/:id/versions - Create new version
-router.post('/:id/versions', authenticateToken, requirePermission('version.create'), upload.single('file'), versionValidation, async (req, res) => {
+router.post('/:id/versions', authenticateToken, requirePermissions(['version.create']), upload.single('file'), versionValidation, async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -618,7 +618,7 @@ router.post('/:id/versions', authenticateToken, requirePermission('version.creat
 });
 
 // PUT /api/documents/:id - Update document
-router.put('/:id', authenticateToken, requirePermission('document.edit'), documentValidation, async (req, res) => {
+router.put('/:id', authenticateToken, requirePermissions(['document.edit']), documentValidation, async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -719,7 +719,7 @@ router.put('/:id', authenticateToken, requirePermission('document.edit'), docume
 });
 
 // DELETE /api/documents/:id - Delete document
-router.delete('/:id', authenticateToken, requirePermission('document.delete'), async (req, res) => {
+router.delete('/:id', authenticateToken, requirePermissions(['document.delete']), async (req, res) => {
   const client = await pool.connect();
   
   try {

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth, withAuth } from '../../contexts/AuthContext';
+import AddUserModal from '../../components/admin/AddUserModal';
+import EditUserModal from '../../components/admin/EditUserModal';
 import { 
   UserIcon, 
   PlusIcon, 
@@ -14,11 +16,12 @@ import {
 } from '@heroicons/react/24/outline';
 
 function UserManagementPage() {
-  const { apiClient, user: currentUser } = useAuth();
+  const { apiClient, user: currentUser, hasAllPermissions } = useAuth();
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -28,6 +31,9 @@ function UserManagementPage() {
     total: 0,
     totalPages: 0
   });
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetch users
   const fetchUsers = async (page = 1, search = '', status = '', role = '') => {
@@ -81,10 +87,79 @@ function UserManagementPage() {
     try {
       await apiClient.put(`/users/${userId}`, { status: newStatus });
       fetchUsers(pagination.page, searchTerm, statusFilter, roleFilter);
+      setSuccessMessage(`User status updated to ${newStatus} successfully.`);
+      setError('');
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(''), 5000);
     } catch (err) {
       setError('Failed to update user status');
+      setSuccessMessage('');
       console.error('Update status error:', err);
     }
+  };
+
+  // Handle user actions
+  const handleAddUser = () => {
+    if (!hasAllPermissions(['user.create'])) {
+      setError('You do not have permission to create users');
+      setSuccessMessage('');
+      return;
+    }
+    // Clear any existing messages when opening modal
+    setError('');
+    setSuccessMessage('');
+    setShowAddModal(true);
+  };
+
+  const handleEditUser = (user) => {
+    if (!hasAllPermissions(['user.update'])) {
+      setError('You do not have permission to edit users');
+      setSuccessMessage('');
+      return;
+    }
+    // Clear any existing messages when opening modal
+    setError('');
+    setSuccessMessage('');
+    setSelectedUser(user);
+    setShowEditModal(true);
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!hasAllPermissions(['user.delete'])) {
+      setError('You do not have permission to delete users');
+      setSuccessMessage('');
+      return;
+    }
+    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      try {
+        await apiClient.delete(`/users/${userId}`);
+        fetchUsers(pagination.page, searchTerm, statusFilter, roleFilter);
+        setSuccessMessage('User has been deactivated successfully.');
+        setError('');
+        // Clear success message after 5 seconds
+        setTimeout(() => setSuccessMessage(''), 5000);
+      } catch (err) {
+        setError('Failed to delete user');
+        setSuccessMessage('');
+        console.error('Delete user error:', err);
+      }
+    }
+  };
+
+  const handleUserAdded = (userInfo) => {
+    fetchUsers(pagination.page, searchTerm, statusFilter, roleFilter);
+    setSuccessMessage(`User "${userInfo?.username || 'new user'}" has been created successfully.`);
+    setError('');
+    // Clear success message after 5 seconds
+    setTimeout(() => setSuccessMessage(''), 5000);
+  };
+
+  const handleUserUpdated = (userInfo) => {
+    fetchUsers(pagination.page, searchTerm, statusFilter, roleFilter);
+    setSuccessMessage(`User "${userInfo?.username || 'user'}" has been updated successfully.`);
+    setError('');
+    // Clear success message after 5 seconds
+    setTimeout(() => setSuccessMessage(''), 5000);
   };
 
   const getStatusBadgeColor = (status) => {
@@ -134,10 +209,15 @@ function UserManagementPage() {
                 Manage user accounts, roles, and permissions
               </p>
             </div>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
-              <PlusIcon className="h-5 w-5 mr-2" />
-              Add User
-            </button>
+            {hasAllPermissions(['user.create']) && (
+              <button 
+                onClick={handleAddUser}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+              >
+                <PlusIcon className="h-5 w-5 mr-2" />
+                New User
+              </button>
+            )}
           </div>
         </div>
 
@@ -191,10 +271,61 @@ function UserManagementPage() {
           </div>
         </div>
 
+        {/* Success Message */}
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <div className="text-green-800">{successMessage}</div>
+              </div>
+              <div className="ml-auto pl-3">
+                <div className="-mx-1.5 -my-1.5">
+                  <button
+                    onClick={() => setSuccessMessage('')}
+                    className="inline-flex bg-green-50 rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600"
+                  >
+                    <span className="sr-only">Dismiss</span>
+                    <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Error Message */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-            <div className="text-red-800">{error}</div>
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <div className="text-red-800">{error}</div>
+              </div>
+              <div className="ml-auto pl-3">
+                <div className="-mx-1.5 -my-1.5">
+                  <button
+                    onClick={() => setError('')}
+                    className="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600"
+                  >
+                    <span className="sr-only">Dismiss</span>
+                    <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -296,13 +427,26 @@ function UserManagementPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
-                          <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                            <PencilIcon className="h-4 w-4" />
-                          </button>
-                          {user.user_id !== currentUser?.userId && (
-                            <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                          {hasAllPermissions(['user.update']) && (
+                            <button 
+                              onClick={() => handleEditUser(user)}
+                              className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                              title="Edit user"
+                            >
+                              <PencilIcon className="h-4 w-4" />
+                            </button>
+                          )}
+                          {hasAllPermissions(['user.delete']) && user.user_id !== currentUser?.userId && (
+                            <button 
+                              onClick={() => handleDeleteUser(user.user_id)}
+                              className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                              title="Delete user"
+                            >
                               <TrashIcon className="h-4 w-4" />
                             </button>
+                          )}
+                          {!hasAllPermissions(['user.update']) && !hasAllPermissions(['user.delete']) && (
+                            <span className="text-gray-400 text-sm">No actions available</span>
                           )}
                         </div>
                       </td>
@@ -385,10 +529,26 @@ function UserManagementPage() {
             </div>
           )}
         </div>
+
+        {/* Modals */}
+        <AddUserModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onUserAdded={handleUserAdded}
+          apiClient={apiClient}
+        />
+
+        <EditUserModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onUserUpdated={handleUserUpdated}
+          user={selectedUser}
+          apiClient={apiClient}
+        />
       </div>
     </div>
   );
 }
 
 // Export with authentication and permission requirements
-export default withAuth(UserManagementPage, ['user.read'], ['admin', 'super_admin']);
+export default withAuth(UserManagementPage, ['user.read', 'user.create', 'user.update', 'user.delete', 'user.manage_roles'], ['admin', 'super_admin']);

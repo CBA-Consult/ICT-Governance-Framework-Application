@@ -148,6 +148,188 @@ CREATE INDEX IF NOT EXISTS idx_escalations_date ON escalations(escalation_date);
 -- );
 
 -- ============================================================================
+-- REPORTING SYSTEM TABLES
+-- ============================================================================
+
+-- Generated reports table - stores completed reports
+CREATE TABLE IF NOT EXISTS generated_reports (
+    report_id VARCHAR(50) PRIMARY KEY,
+    report_type VARCHAR(100) NOT NULL,
+    report_name VARCHAR(255),
+    report_data JSONB NOT NULL,
+    time_range_start TIMESTAMP,
+    time_range_end TIMESTAMP,
+    generated_by VARCHAR(50) REFERENCES users(user_id),
+    generation_options JSONB DEFAULT '{}',
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'generating', 'completed', 'failed')),
+    file_path VARCHAR(500),
+    file_size BIGINT,
+    export_format VARCHAR(20) DEFAULT 'json',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    download_count INTEGER DEFAULT 0,
+    is_scheduled BOOLEAN DEFAULT FALSE,
+    schedule_id VARCHAR(50),
+    tags TEXT[],
+    metadata JSONB DEFAULT '{}'
+);
+
+-- Custom report templates table - stores user-defined report templates
+CREATE TABLE IF NOT EXISTS custom_report_templates (
+    template_id VARCHAR(50) PRIMARY KEY,
+    template_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_by VARCHAR(50) REFERENCES users(user_id),
+    is_public BOOLEAN DEFAULT FALSE,
+    template_config JSONB NOT NULL,
+    data_sources TEXT[] NOT NULL,
+    visualization_config JSONB DEFAULT '{}',
+    filters_config JSONB DEFAULT '{}',
+    parameters_config JSONB DEFAULT '{}',
+    output_format VARCHAR(20) DEFAULT 'json',
+    category VARCHAR(100),
+    tags TEXT[],
+    version INTEGER DEFAULT 1,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_used_at TIMESTAMP,
+    usage_count INTEGER DEFAULT 0
+);
+
+-- Report schedules table - stores automated report generation schedules
+CREATE TABLE IF NOT EXISTS report_schedules (
+    schedule_id VARCHAR(50) PRIMARY KEY,
+    schedule_name VARCHAR(255) NOT NULL,
+    report_type VARCHAR(100),
+    template_id VARCHAR(50) REFERENCES custom_report_templates(template_id),
+    created_by VARCHAR(50) REFERENCES users(user_id),
+    recipients TEXT[] NOT NULL,
+    schedule_expression VARCHAR(100) NOT NULL, -- Cron expression
+    time_range_config JSONB NOT NULL,
+    generation_options JSONB DEFAULT '{}',
+    output_formats TEXT[] DEFAULT ARRAY['pdf'],
+    delivery_method VARCHAR(50) DEFAULT 'email',
+    delivery_config JSONB DEFAULT '{}',
+    is_active BOOLEAN DEFAULT TRUE,
+    next_run_at TIMESTAMP,
+    last_run_at TIMESTAMP,
+    last_run_status VARCHAR(20),
+    run_count INTEGER DEFAULT 0,
+    failure_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Metric data table - stores all metrics for reporting
+CREATE TABLE IF NOT EXISTS metric_data (
+    metric_id VARCHAR(50) PRIMARY KEY,
+    metric_name VARCHAR(255) NOT NULL,
+    metric_category VARCHAR(100) NOT NULL,
+    value DECIMAL(15,4) NOT NULL,
+    target_value DECIMAL(15,4),
+    unit VARCHAR(50),
+    data_source VARCHAR(100),
+    collection_timestamp TIMESTAMP NOT NULL,
+    collection_method VARCHAR(50),
+    metadata JSONB DEFAULT '{}',
+    tags TEXT[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(50) REFERENCES users(user_id)
+);
+
+-- Report sharing table - manages report access and sharing
+CREATE TABLE IF NOT EXISTS report_sharing (
+    sharing_id VARCHAR(50) PRIMARY KEY,
+    report_id VARCHAR(50) REFERENCES generated_reports(report_id) ON DELETE CASCADE,
+    shared_by VARCHAR(50) REFERENCES users(user_id),
+    shared_with VARCHAR(50) REFERENCES users(user_id),
+    share_type VARCHAR(20) DEFAULT 'view' CHECK (share_type IN ('view', 'download', 'edit')),
+    expires_at TIMESTAMP,
+    access_count INTEGER DEFAULT 0,
+    last_accessed_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Report comments table - allows commenting on reports
+CREATE TABLE IF NOT EXISTS report_comments (
+    comment_id VARCHAR(50) PRIMARY KEY,
+    report_id VARCHAR(50) REFERENCES generated_reports(report_id) ON DELETE CASCADE,
+    user_id VARCHAR(50) REFERENCES users(user_id),
+    comment_text TEXT NOT NULL,
+    parent_comment_id VARCHAR(50) REFERENCES report_comments(comment_id),
+    is_resolved BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Report bookmarks table - allows users to bookmark reports
+CREATE TABLE IF NOT EXISTS report_bookmarks (
+    bookmark_id VARCHAR(50) PRIMARY KEY,
+    user_id VARCHAR(50) REFERENCES users(user_id),
+    report_id VARCHAR(50) REFERENCES generated_reports(report_id) ON DELETE CASCADE,
+    bookmark_name VARCHAR(255),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, report_id)
+);
+
+-- Create indexes for reporting system performance
+CREATE INDEX IF NOT EXISTS idx_generated_reports_type ON generated_reports(report_type);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_status ON generated_reports(status);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_created_by ON generated_reports(generated_by);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_created_at ON generated_reports(created_at);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_time_range ON generated_reports(time_range_start, time_range_end);
+CREATE INDEX IF NOT EXISTS idx_generated_reports_tags ON generated_reports USING GIN(tags);
+
+CREATE INDEX IF NOT EXISTS idx_custom_report_templates_created_by ON custom_report_templates(created_by);
+CREATE INDEX IF NOT EXISTS idx_custom_report_templates_category ON custom_report_templates(category);
+CREATE INDEX IF NOT EXISTS idx_custom_report_templates_is_public ON custom_report_templates(is_public);
+CREATE INDEX IF NOT EXISTS idx_custom_report_templates_tags ON custom_report_templates USING GIN(tags);
+
+CREATE INDEX IF NOT EXISTS idx_report_schedules_next_run ON report_schedules(next_run_at);
+CREATE INDEX IF NOT EXISTS idx_report_schedules_is_active ON report_schedules(is_active);
+CREATE INDEX IF NOT EXISTS idx_report_schedules_created_by ON report_schedules(created_by);
+
+CREATE INDEX IF NOT EXISTS idx_metric_data_name_category ON metric_data(metric_name, metric_category);
+CREATE INDEX IF NOT EXISTS idx_metric_data_collection_timestamp ON metric_data(collection_timestamp);
+CREATE INDEX IF NOT EXISTS idx_metric_data_category ON metric_data(metric_category);
+CREATE INDEX IF NOT EXISTS idx_metric_data_tags ON metric_data USING GIN(tags);
+
+CREATE INDEX IF NOT EXISTS idx_report_sharing_report_id ON report_sharing(report_id);
+CREATE INDEX IF NOT EXISTS idx_report_sharing_shared_with ON report_sharing(shared_with);
+
+-- Insert sample metric data for reporting
+INSERT INTO metric_data (metric_id, metric_name, metric_category, value, target_value, unit, data_source, collection_timestamp, collection_method, metadata, tags) VALUES
+-- Governance KPIs
+('MET-001', 'governance_maturity_level', 'kpi', 3.5, 4.0, 'score', 'governance_assessment', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"assessment_type": "quarterly"}', ARRAY['governance', 'maturity']),
+('MET-002', 'policy_compliance_rate', 'compliance', 85.5, 95.0, 'percentage', 'compliance_monitor', CURRENT_TIMESTAMP - INTERVAL '2 days', 'automated', '{"policy_count": 25}', ARRAY['compliance', 'policy']),
+('MET-003', 'overall_risk_score', 'risk', 6.2, 4.0, 'score', 'risk_assessment', CURRENT_TIMESTAMP - INTERVAL '1 day', 'manual', '{"risk_factors": 15}', ARRAY['risk', 'assessment']),
+('MET-004', 'stakeholder_satisfaction', 'kpi', 78.0, 85.0, 'percentage', 'survey_system', CURRENT_TIMESTAMP - INTERVAL '3 days', 'survey', '{"response_rate": 65}', ARRAY['stakeholder', 'satisfaction']),
+('MET-005', 'business_value_realization', 'financial', 1250000, 1500000, 'currency', 'financial_system', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"currency": "USD"}', ARRAY['financial', 'value']),
+
+-- Compliance Metrics
+('MET-006', 'security_policy_compliance', 'compliance', 92.0, 98.0, 'percentage', 'security_monitor', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"controls_checked": 45}', ARRAY['security', 'compliance']),
+('MET-007', 'privacy_policy_compliance', 'compliance', 88.5, 95.0, 'percentage', 'privacy_monitor', CURRENT_TIMESTAMP - INTERVAL '2 days', 'automated', '{"data_subjects": 1250}', ARRAY['privacy', 'compliance']),
+('MET-008', 'operational_policy_compliance', 'compliance', 76.0, 90.0, 'percentage', 'ops_monitor', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"processes_checked": 32}', ARRAY['operational', 'compliance']),
+
+-- Risk Metrics
+('MET-009', 'cloud_security_risk', 'risk', 7.5, 5.0, 'score', 'cloud_monitor', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"cloud_services": 15}', ARRAY['cloud', 'security', 'risk']),
+('MET-010', 'vendor_risk', 'risk', 6.8, 4.0, 'score', 'vendor_assessment', CURRENT_TIMESTAMP - INTERVAL '2 days', 'manual', '{"vendor_count": 25}', ARRAY['vendor', 'risk']),
+('MET-011', 'data_breach_risk', 'risk', 4.2, 3.0, 'score', 'security_assessment', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"data_assets": 150}', ARRAY['data', 'security', 'risk']),
+
+-- Financial Metrics
+('MET-012', 'governance_investment', 'financial', 500000, 600000, 'currency', 'budget_system', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"currency": "USD", "period": "quarterly"}', ARRAY['investment', 'governance']),
+('MET-013', 'cost_savings', 'financial', 750000, 800000, 'currency', 'cost_tracking', CURRENT_TIMESTAMP - INTERVAL '2 days', 'automated', '{"currency": "USD", "period": "quarterly"}', ARRAY['savings', 'cost']),
+
+-- Remediation Metrics
+('MET-014', 'security_remediation_rate', 'compliance', 85.0, 95.0, 'percentage', 'security_system', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"issues_total": 45, "issues_resolved": 38}', ARRAY['remediation', 'security']),
+('MET-015', 'compliance_remediation_rate', 'compliance', 78.5, 90.0, 'percentage', 'compliance_system', CURRENT_TIMESTAMP - INTERVAL '2 days', 'automated', '{"issues_total": 28, "issues_resolved": 22}', ARRAY['remediation', 'compliance']),
+('MET-016', 'risk_remediation_rate', 'risk', 72.0, 85.0, 'percentage', 'risk_system', CURRENT_TIMESTAMP - INTERVAL '1 day', 'automated', '{"risks_total": 18, "risks_mitigated": 13}', ARRAY['remediation', 'risk'])
+ON CONFLICT (metric_id) DO NOTHING;
+
+-- ============================================================================
 -- GOVERNANCE WORKFLOW ENGINE TABLES
 -- ============================================================================
 
@@ -563,7 +745,21 @@ INSERT INTO permissions (permission_id, permission_name, display_name, descripti
 
 -- Applications
 ('PERM_APP_PROCUREMENT', 'app.procurement', 'Application Procurement', 'Request and manage application procurement', 'applications', 'procurement', TRUE),
-('PERM_APP_MANAGE', 'app.manage', 'Manage Applications', 'Manage application catalog and registrations', 'applications', 'manage', TRUE)
+('PERM_APP_MANAGE', 'app.manage', 'Manage Applications', 'Manage application catalog and registrations', 'applications', 'manage', TRUE),
+
+-- Dashboard Access
+('PERM_DASHBOARD_EXECUTIVE', 'dashboard.executive', 'Executive Dashboard Access', 'Access to executive-level dashboards and strategic metrics', 'dashboards', 'executive', TRUE),
+('PERM_DASHBOARD_OPERATIONAL', 'dashboard.operational', 'Operational Dashboard Access', 'Access to operational dashboards and detailed metrics', 'dashboards', 'operational', TRUE),
+('PERM_DASHBOARD_COMPLIANCE', 'dashboard.compliance', 'Compliance Dashboard Access', 'Access to compliance dashboards and regulatory metrics', 'dashboards', 'compliance', TRUE),
+('PERM_DASHBOARD_ANALYTICS', 'dashboard.analytics', 'Analytics Dashboard Access', 'Access to advanced analytics and data visualization features', 'dashboards', 'analytics', TRUE),
+('PERM_DASHBOARD_EXPORT', 'dashboard.export', 'Dashboard Export', 'Export dashboard data and reports', 'dashboards', 'export', TRUE),
+('PERM_DASHBOARD_ADMIN', 'dashboard.admin', 'Dashboard Administration', 'Manage dashboard configurations and user access', 'dashboards', 'admin', TRUE),
+
+-- Security Metrics and Secure Score
+('PERM_VIEW_SECURITY_METRICS', 'view_security_metrics', 'View Security Metrics', 'View security metrics and secure score data', 'security', 'view_metrics', TRUE),
+('PERM_MANAGE_SECURITY_METRICS', 'manage_security_metrics', 'Manage Security Metrics', 'Manage security metrics and secure score configurations', 'security', 'manage_metrics', TRUE),
+('PERM_SECURE_SCORE_SYNC', 'secure_score.sync', 'Sync Secure Score', 'Manually trigger secure score synchronization', 'security', 'sync', TRUE),
+('PERM_SECURE_SCORE_RECOMMENDATIONS', 'secure_score.recommendations', 'Manage Recommendations', 'Manage secure score recommendations and implementations', 'security', 'recommendations', TRUE)
 ON CONFLICT (permission_id) DO NOTHING;
 
 -- Assign permissions to default roles
@@ -594,6 +790,16 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_SUPER_ADMIN', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_SUPER_ADMIN', 'PERM_APP_PROCUREMENT'),
 ('ROLE_SUPER_ADMIN', 'PERM_APP_MANAGE'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_EXECUTIVE'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_EXPORT'),
+('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_ADMIN'),
+('ROLE_SUPER_ADMIN', 'PERM_VIEW_SECURITY_METRICS'),
+('ROLE_SUPER_ADMIN', 'PERM_MANAGE_SECURITY_METRICS'),
+('ROLE_SUPER_ADMIN', 'PERM_SECURE_SCORE_SYNC'),
+('ROLE_SUPER_ADMIN', 'PERM_SECURE_SCORE_RECOMMENDATIONS'),
 
 -- Admin - Most permissions except user/role management
 ('ROLE_ADMIN', 'PERM_USER_READ'),
@@ -613,6 +819,11 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_ADMIN', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_ADMIN', 'PERM_APP_PROCUREMENT'),
 ('ROLE_ADMIN', 'PERM_APP_MANAGE'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_EXECUTIVE'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_ADMIN', 'PERM_DASHBOARD_EXPORT'),
 
 -- Governance Manager
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_USER_READ'),
@@ -628,6 +839,11 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_APP_PROCUREMENT'),
 ('ROLE_GOVERNANCE_MANAGER', 'PERM_APP_MANAGE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_EXECUTIVE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_GOVERNANCE_MANAGER', 'PERM_DASHBOARD_EXPORT'),
 
 -- Compliance Officer
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_USER_READ'),
@@ -640,6 +856,10 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_WORKFLOW_CREATE'),
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_WORKFLOW_READ'),
 ('ROLE_COMPLIANCE_OFFICER', 'PERM_APP_PROCUREMENT'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_COMPLIANCE_OFFICER', 'PERM_DASHBOARD_EXPORT'),
 
 -- IT Manager
 ('ROLE_IT_MANAGER', 'PERM_USER_READ'),
@@ -654,6 +874,9 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_IT_MANAGER', 'PERM_WORKFLOW_MANAGE'),
 ('ROLE_IT_MANAGER', 'PERM_APP_PROCUREMENT'),
 ('ROLE_IT_MANAGER', 'PERM_APP_MANAGE'),
+('ROLE_IT_MANAGER', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_IT_MANAGER', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_IT_MANAGER', 'PERM_DASHBOARD_EXPORT'),
 
 -- Security Analyst
 ('ROLE_SECURITY_ANALYST', 'PERM_USER_READ'),
@@ -666,6 +889,13 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_SECURITY_ANALYST', 'PERM_WORKFLOW_CREATE'),
 ('ROLE_SECURITY_ANALYST', 'PERM_WORKFLOW_READ'),
 ('ROLE_SECURITY_ANALYST', 'PERM_APP_PROCUREMENT'),
+('ROLE_SECURITY_ANALYST', 'PERM_DASHBOARD_OPERATIONAL'),
+('ROLE_SECURITY_ANALYST', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_SECURITY_ANALYST', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_SECURITY_ANALYST', 'PERM_VIEW_SECURITY_METRICS'),
+('ROLE_SECURITY_ANALYST', 'PERM_MANAGE_SECURITY_METRICS'),
+('ROLE_SECURITY_ANALYST', 'PERM_SECURE_SCORE_SYNC'),
+('ROLE_SECURITY_ANALYST', 'PERM_SECURE_SCORE_RECOMMENDATIONS'),
 
 -- Auditor
 ('ROLE_AUDITOR', 'PERM_USER_READ'),
@@ -677,6 +907,9 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_AUDITOR', 'PERM_FEEDBACK_READ'),
 ('ROLE_AUDITOR', 'PERM_WORKFLOW_READ'),
 ('ROLE_AUDITOR', 'PERM_APP_PROCUREMENT'),
+('ROLE_AUDITOR', 'PERM_DASHBOARD_COMPLIANCE'),
+('ROLE_AUDITOR', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_AUDITOR', 'PERM_VIEW_SECURITY_METRICS'),
 
 -- Employee
 ('ROLE_EMPLOYEE', 'PERM_GOVERNANCE_READ'),
@@ -686,6 +919,7 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_EMPLOYEE', 'PERM_WORKFLOW_CREATE'),
 ('ROLE_EMPLOYEE', 'PERM_WORKFLOW_READ'),
 ('ROLE_EMPLOYEE', 'PERM_APP_PROCUREMENT'),
+('ROLE_EMPLOYEE', 'PERM_REPORTING_READ'),
 
 -- Guest
 ('ROLE_GUEST', 'PERM_GOVERNANCE_READ'),
@@ -935,21 +1169,20 @@ INSERT INTO permissions (permission_id, name, description, category) VALUES
 ('workflow.admin', 'Workflow Administration', 'Manage approval workflows', 'Workflow Management')
 ON CONFLICT (permission_id) DO NOTHING;
 
--- Grant document permissions to existing roles
 INSERT INTO role_permissions (role_id, permission_id) VALUES
--- Admin gets all document permissions
-('ADMIN', 'document.read'),
-('ADMIN', 'document.create'),
-('ADMIN', 'document.edit'),
-('ADMIN', 'document.delete'),
-('ADMIN', 'document.approve'),
-('ADMIN', 'document.publish'),
-('ADMIN', 'document.admin'),
-('ADMIN', 'version.create'),
-('ADMIN', 'version.compare'),
-('ADMIN', 'workflow.initiate'),
-('ADMIN', 'workflow.approve'),
-('ADMIN', 'workflow.admin'),
+-- Super Admin gets all document permissions
+('ROLE_SUPER_ADMIN', 'document.read'),
+('ROLE_SUPER_ADMIN', 'document.create'),
+('ROLE_SUPER_ADMIN', 'document.edit'),
+('ROLE_SUPER_ADMIN', 'document.delete'),
+('ROLE_SUPER_ADMIN', 'document.approve'),
+('ROLE_SUPER_ADMIN', 'document.publish'),
+('ROLE_SUPER_ADMIN', 'document.admin'),
+('ROLE_SUPER_ADMIN', 'version.create'),
+('ROLE_SUPER_ADMIN', 'version.compare'),
+('ROLE_SUPER_ADMIN', 'workflow.initiate'),
+('ROLE_SUPER_ADMIN', 'workflow.approve'),
+('ROLE_SUPER_ADMIN', 'workflow.admin'),
 
 -- IT Manager gets most document permissions
 ('IT_MANAGER', 'document.read'),
@@ -1008,3 +1241,165 @@ CREATE INDEX IF NOT EXISTS idx_document_comments_document_id ON document_comment
 CREATE INDEX IF NOT EXISTS idx_document_comments_version_id ON document_comments(version_id);
 CREATE INDEX IF NOT EXISTS idx_document_comments_created_by ON document_comments(created_by);
 CREATE INDEX IF NOT EXISTS idx_document_comments_status ON document_comments(status);
+
+-- Microsoft Graph Secure Score Tables
+
+-- Secure scores table - stores historical secure score data
+CREATE TABLE IF NOT EXISTS secure_scores (
+    id VARCHAR(255) PRIMARY KEY,
+    current_score INTEGER NOT NULL,
+    max_score INTEGER NOT NULL,
+    percentage DECIMAL(5,2) GENERATED ALWAYS AS (ROUND((current_score::DECIMAL / max_score::DECIMAL) * 100, 2)) STORED,
+    created_date_time TIMESTAMP NOT NULL,
+    active_user_count INTEGER,
+    enabled_services INTEGER,
+    licensed_user_count INTEGER,
+    raw_data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score control profiles table - stores control configuration and recommendations
+CREATE TABLE IF NOT EXISTS secure_score_control_profiles (
+    id VARCHAR(255) PRIMARY KEY,
+    control_name VARCHAR(255) NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    category VARCHAR(100),
+    implementation_cost VARCHAR(50),
+    user_impact VARCHAR(50),
+    compliance_information JSONB,
+    control_state_updates JSONB,
+    max_score INTEGER,
+    current_score INTEGER,
+    percentage DECIMAL(5,2),
+    description TEXT,
+    remediation_impact TEXT,
+    action_type VARCHAR(100),
+    service VARCHAR(100),
+    threats JSONB,
+    deprecated BOOLEAN DEFAULT FALSE,
+    raw_data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score recommendations table - stores actionable recommendations
+CREATE TABLE IF NOT EXISTS secure_score_recommendations (
+    id SERIAL PRIMARY KEY,
+    recommendation_id VARCHAR(255) UNIQUE NOT NULL,
+    control_profile_id VARCHAR(255) REFERENCES secure_score_control_profiles(id),
+    title VARCHAR(500) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    priority VARCHAR(20) CHECK (priority IN ('low', 'medium', 'high', 'critical')),
+    impact_score INTEGER,
+    implementation_cost VARCHAR(50),
+    user_impact VARCHAR(50),
+    compliance_frameworks JSONB,
+    action_required TEXT,
+    estimated_effort_hours INTEGER,
+    business_justification TEXT,
+    status VARCHAR(50) DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'completed', 'dismissed', 'not_applicable')),
+    assigned_to VARCHAR(255),
+    due_date DATE,
+    completed_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score alerts table - stores alerts for significant changes
+CREATE TABLE IF NOT EXISTS secure_score_alerts (
+    id SERIAL PRIMARY KEY,
+    alert_id VARCHAR(255) UNIQUE NOT NULL,
+    alert_type VARCHAR(100) NOT NULL,
+    severity VARCHAR(20) CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    title VARCHAR(500) NOT NULL,
+    description TEXT,
+    current_score DECIMAL(5,2),
+    previous_score DECIMAL(5,2),
+    threshold_value DECIMAL(5,2),
+    change_percentage DECIMAL(5,2),
+    affected_controls JSONB,
+    status VARCHAR(50) DEFAULT 'open' CHECK (status IN ('open', 'acknowledged', 'resolved', 'dismissed')),
+    acknowledged_by VARCHAR(255),
+    acknowledged_at TIMESTAMP,
+    resolved_by VARCHAR(255),
+    resolved_at TIMESTAMP,
+    resolution_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score compliance mapping table - maps controls to compliance frameworks
+CREATE TABLE IF NOT EXISTS secure_score_compliance_mapping (
+    id SERIAL PRIMARY KEY,
+    control_profile_id VARCHAR(255) REFERENCES secure_score_control_profiles(id),
+    compliance_framework VARCHAR(100) NOT NULL,
+    control_reference VARCHAR(100),
+    requirement_description TEXT,
+    implementation_status VARCHAR(50) DEFAULT 'not_implemented',
+    evidence_required BOOLEAN DEFAULT FALSE,
+    evidence_provided BOOLEAN DEFAULT FALSE,
+    last_assessment_date DATE,
+    next_assessment_date DATE,
+    assessor VARCHAR(255),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score improvement tracking table - tracks implementation progress
+CREATE TABLE IF NOT EXISTS secure_score_improvements (
+    id SERIAL PRIMARY KEY,
+    improvement_id VARCHAR(255) UNIQUE NOT NULL,
+    recommendation_id VARCHAR(255) REFERENCES secure_score_recommendations(recommendation_id),
+    control_profile_id VARCHAR(255) REFERENCES secure_score_control_profiles(id),
+    improvement_type VARCHAR(100) NOT NULL,
+    baseline_score INTEGER,
+    target_score INTEGER,
+    current_score INTEGER,
+    implementation_start_date DATE,
+    planned_completion_date DATE,
+    actual_completion_date DATE,
+    implementation_status VARCHAR(50) DEFAULT 'planned' CHECK (implementation_status IN ('planned', 'in_progress', 'testing', 'completed', 'failed', 'cancelled')),
+    implementation_notes TEXT,
+    business_impact TEXT,
+    technical_impact TEXT,
+    rollback_plan TEXT,
+    success_criteria TEXT,
+    assigned_team VARCHAR(255),
+    project_manager VARCHAR(255),
+    budget_allocated DECIMAL(10,2),
+    budget_spent DECIMAL(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for secure score tables
+CREATE INDEX IF NOT EXISTS idx_secure_scores_created_date_time ON secure_scores(created_date_time);
+CREATE INDEX IF NOT EXISTS idx_secure_scores_percentage ON secure_scores(percentage);
+CREATE INDEX IF NOT EXISTS idx_secure_scores_created_at ON secure_scores(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_control_profiles_category ON secure_score_control_profiles(category);
+CREATE INDEX IF NOT EXISTS idx_secure_score_control_profiles_implementation_cost ON secure_score_control_profiles(implementation_cost);
+CREATE INDEX IF NOT EXISTS idx_secure_score_control_profiles_user_impact ON secure_score_control_profiles(user_impact);
+CREATE INDEX IF NOT EXISTS idx_secure_score_control_profiles_deprecated ON secure_score_control_profiles(deprecated);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_priority ON secure_score_recommendations(priority);
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_status ON secure_score_recommendations(status);
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_category ON secure_score_recommendations(category);
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_assigned_to ON secure_score_recommendations(assigned_to);
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_due_date ON secure_score_recommendations(due_date);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_alerts_alert_type ON secure_score_alerts(alert_type);
+CREATE INDEX IF NOT EXISTS idx_secure_score_alerts_severity ON secure_score_alerts(severity);
+CREATE INDEX IF NOT EXISTS idx_secure_score_alerts_status ON secure_score_alerts(status);
+CREATE INDEX IF NOT EXISTS idx_secure_score_alerts_created_at ON secure_score_alerts(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_compliance_mapping_framework ON secure_score_compliance_mapping(compliance_framework);
+CREATE INDEX IF NOT EXISTS idx_secure_score_compliance_mapping_status ON secure_score_compliance_mapping(implementation_status);
+CREATE INDEX IF NOT EXISTS idx_secure_score_compliance_mapping_assessment_date ON secure_score_compliance_mapping(last_assessment_date);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_improvements_status ON secure_score_improvements(implementation_status);
+CREATE INDEX IF NOT EXISTS idx_secure_score_improvements_assigned_team ON secure_score_improvements(assigned_team);
+CREATE INDEX IF NOT EXISTS idx_secure_score_improvements_completion_date ON secure_score_improvements(planned_completion_date);

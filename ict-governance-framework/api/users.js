@@ -21,67 +21,128 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 // Validation rules
 const createUserValidation = [
   body('username')
+    .notEmpty()
+    .withMessage('Username is required')
     .isLength({ min: 3, max: 50 })
+    .withMessage('Username must be 3-50 characters')
     .matches(/^[a-zA-Z0-9_-]+$/)
-    .withMessage('Username must be 3-50 characters and contain only letters, numbers, underscores, and hyphens'),
+    .withMessage('Username can only contain letters, numbers, underscores, and hyphens')
+    .trim(),
   body('email')
+    .notEmpty()
+    .withMessage('Email is required')
     .isEmail()
+    .withMessage('Please enter a valid email address')
     .normalizeEmail()
-    .withMessage('Valid email is required'),
+    .isLength({ max: 255 })
+    .withMessage('Email must be less than 255 characters'),
   body('password')
-    .isLength({ min: 8 })
+    .notEmpty()
+    .withMessage('Password is required')
+    .isLength({ min: 8, max: 128 })
+    .withMessage('Password must be 8-128 characters')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
-    .withMessage('Password must be at least 8 characters with uppercase, lowercase, number, and special character'),
+    .withMessage('Password must contain uppercase, lowercase, number, and special character'),
   body('firstName')
+    .notEmpty()
+    .withMessage('First name is required')
     .isLength({ min: 1, max: 100 })
+    .withMessage('First name must be 1-100 characters')
     .trim()
-    .withMessage('First name is required'),
+    .matches(/^[a-zA-Z\s'-]+$/)
+    .withMessage('First name can only contain letters, spaces, hyphens, and apostrophes'),
   body('lastName')
+    .notEmpty()
+    .withMessage('Last name is required')
     .isLength({ min: 1, max: 100 })
+    .withMessage('Last name must be 1-100 characters')
     .trim()
-    .withMessage('Last name is required'),
+    .matches(/^[a-zA-Z\s'-]+$/)
+    .withMessage('Last name can only contain letters, spaces, hyphens, and apostrophes'),
   body('department')
-    .optional()
+    .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 100 })
+    .withMessage('Department must be less than 100 characters')
     .trim(),
   body('jobTitle')
-    .optional()
+    .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 150 })
+    .withMessage('Job title must be less than 150 characters')
+    .trim(),
+  body('phone')
+    .optional({ nullable: true, checkFalsy: true })
+    .isMobilePhone()
+    .withMessage('Please enter a valid phone number'),
+  body('employeeId')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 50 })
+    .withMessage('Employee ID must be less than 50 characters')
     .trim(),
   body('roles')
     .optional()
     .isArray()
     .withMessage('Roles must be an array')
+    .custom((roles) => {
+      if (roles && roles.length > 10) {
+        throw new Error('Cannot assign more than 10 roles to a user');
+      }
+      return true;
+    }),
+  body('status')
+    .optional()
+    .isIn(['Active', 'Inactive', 'Pending', 'Suspended'])
+    .withMessage('Invalid status value')
 ];
 
 const updateUserValidation = [
   body('email')
     .optional()
     .isEmail()
+    .withMessage('Please enter a valid email address')
     .normalizeEmail()
-    .withMessage('Valid email is required'),
+    .isLength({ max: 255 })
+    .withMessage('Email must be less than 255 characters'),
   body('firstName')
     .optional()
     .isLength({ min: 1, max: 100 })
+    .withMessage('First name must be 1-100 characters')
     .trim()
-    .withMessage('First name must be 1-100 characters'),
+    .matches(/^[a-zA-Z\s'-]+$/)
+    .withMessage('First name can only contain letters, spaces, hyphens, and apostrophes'),
   body('lastName')
     .optional()
     .isLength({ min: 1, max: 100 })
+    .withMessage('Last name must be 1-100 characters')
     .trim()
-    .withMessage('Last name must be 1-100 characters'),
+    .matches(/^[a-zA-Z\s'-]+$/)
+    .withMessage('Last name can only contain letters, spaces, hyphens, and apostrophes'),
   body('department')
-    .optional()
+    .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 100 })
+    .withMessage('Department must be less than 100 characters')
     .trim(),
   body('jobTitle')
-    .optional()
+    .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 150 })
+    .withMessage('Job title must be less than 150 characters')
+    .trim(),
+  body('phone')
+    .optional({ nullable: true, checkFalsy: true })
+    .isMobilePhone()
+    .withMessage('Please enter a valid phone number'),
+  body('employeeId')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 50 })
+    .withMessage('Employee ID must be less than 50 characters')
     .trim(),
   body('status')
     .optional()
     .isIn(['Active', 'Inactive', 'Suspended', 'Pending'])
-    .withMessage('Invalid status')
+    .withMessage('Invalid status value'),
+  body('preferences')
+    .optional()
+    .isJSON()
+    .withMessage('Preferences must be valid JSON')
 ];
 
 /**
@@ -296,10 +357,19 @@ router.post('/',
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        // Format errors for better client-side handling
+        const formattedErrors = errors.array().map(error => ({
+          field: error.path || error.param,
+          message: error.msg,
+          value: error.value,
+          location: error.location
+        }));
+        
         return res.status(400).json({
           error: 'Validation failed',
           code: 'VALIDATION_ERROR',
-          details: errors.array()
+          details: formattedErrors,
+          message: 'Please correct the validation errors and try again'
         });
       }
 
@@ -309,10 +379,10 @@ router.post('/',
         username,
         email,
         password,
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
         department,
-        jobTitle,
+        job_title: jobTitle,
         phone,
         employeeId,
         managerId,
@@ -323,17 +393,26 @@ router.post('/',
       const existingUserQuery = `
         SELECT user_id, username, email 
         FROM users 
-        WHERE username = $1 OR email = $2
+        WHERE LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($2)
       `;
       const existingUser = await client.query(existingUserQuery, [username, email]);
 
       if (existingUser.rows.length > 0) {
         const existing = existingUser.rows[0];
-        const field = existing.username === username ? 'username' : 'email';
+        const conflicts = [];
+        
+        if (existing.username.toLowerCase() === username.toLowerCase()) {
+          conflicts.push({ field: 'username', message: 'Username already exists' });
+        }
+        if (existing.email.toLowerCase() === email.toLowerCase()) {
+          conflicts.push({ field: 'email', message: 'Email already exists' });
+        }
+        
         return res.status(409).json({
-          error: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`,
+          error: 'User already exists',
           code: 'USER_EXISTS',
-          field
+          details: conflicts,
+          message: 'A user with this username or email already exists'
         });
       }
 
@@ -430,20 +509,29 @@ router.put('/:userId',
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        // Format errors for better client-side handling
+        const formattedErrors = errors.array().map(error => ({
+          field: error.path || error.param,
+          message: error.msg,
+          value: error.value,
+          location: error.location
+        }));
+        
         return res.status(400).json({
           error: 'Validation failed',
           code: 'VALIDATION_ERROR',
-          details: errors.array()
+          details: formattedErrors,
+          message: 'Please correct the validation errors and try again'
         });
       }
 
       const { userId } = req.params;
       const {
         email,
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
         department,
-        jobTitle,
+        job_title: jobTitle,
         phone,
         employeeId,
         managerId,
@@ -733,6 +821,110 @@ router.post('/:userId/roles',
       res.status(500).json({
         error: 'Failed to assign roles',
         code: 'ROLE_ASSIGN_ERROR'
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+/**
+ * PUT /api/users/:userId/roles
+ * Update user roles (replace all roles)
+ */
+router.put('/:userId/roles',
+  authenticateToken,
+  requirePermissions(['user.manage_roles']),
+  logActivity('USER_ROLE_UPDATE', (req) => `Updated roles for user ${req.params.userId}`),
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      const { userId } = req.params;
+      const { roles, reason } = req.body;
+
+      if (!roles || !Array.isArray(roles)) {
+        return res.status(400).json({
+          error: 'Roles array is required',
+          code: 'ROLES_REQUIRED'
+        });
+      }
+
+      await client.query('BEGIN');
+
+      // Check if user exists
+      const userQuery = 'SELECT user_id FROM users WHERE user_id = $1';
+      const userResult = await client.query(userQuery, [userId]);
+
+      if (userResult.rows.length === 0) {
+        return res.status(404).json({
+          error: 'User not found',
+          code: 'USER_NOT_FOUND'
+        });
+      }
+
+      // Validate roles exist
+      if (roles.length > 0) {
+        const roleQuery = 'SELECT role_id, role_name FROM roles WHERE role_name = ANY($1) AND is_active = true';
+        const roleResult = await client.query(roleQuery, [roles]);
+
+        if (roleResult.rows.length !== roles.length) {
+          const foundRoles = roleResult.rows.map(r => r.role_name);
+          const missingRoles = roles.filter(r => !foundRoles.includes(r));
+          return res.status(400).json({
+            error: 'Some roles not found',
+            code: 'ROLES_NOT_FOUND',
+            missingRoles
+          });
+        }
+      }
+
+      // Deactivate all current roles
+      await client.query(
+        'UPDATE user_roles SET is_active = false WHERE user_id = $1',
+        [userId]
+      );
+
+      // Assign new roles
+      const assignedRoles = [];
+      if (roles.length > 0) {
+        const roleQuery = 'SELECT role_id, role_name FROM roles WHERE role_name = ANY($1) AND is_active = true';
+        const roleResult = await client.query(roleQuery, [roles]);
+
+        for (const role of roleResult.rows) {
+          const assignQuery = `
+            INSERT INTO user_roles (user_id, role_id, assigned_by, assignment_reason)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (user_id, role_id) 
+            DO UPDATE SET is_active = true, assigned_by = $3, assigned_at = CURRENT_TIMESTAMP
+            RETURNING role_id
+          `;
+
+          await client.query(assignQuery, [
+            userId,
+            role.role_id,
+            req.user.user_id,
+            reason || 'Role updated via API'
+          ]);
+
+          assignedRoles.push(role.role_name);
+        }
+      }
+
+      await client.query('COMMIT');
+
+      res.json({
+        message: 'User roles updated successfully',
+        userId,
+        roles: assignedRoles
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Update user roles error:', error);
+      res.status(500).json({
+        error: 'Failed to update user roles',
+        code: 'ROLE_UPDATE_ERROR'
       });
     } finally {
       client.release();

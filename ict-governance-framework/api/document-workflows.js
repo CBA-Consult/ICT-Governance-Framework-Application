@@ -6,7 +6,7 @@ const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult, query } = require('express-validator');
 
-const { authenticateToken, requirePermission, logActivity } = require('./auth');
+const { authenticateToken, requirePermissions, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -52,7 +52,7 @@ const approvalValidation = [
 ];
 
 // GET /api/document-workflows - List workflows with filtering
-router.get('/', authenticateToken, requirePermission('workflow.approve'), [
+router.get('/', authenticateToken, requirePermissions(['workflow.approve']), [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('status').optional().isIn(['Pending', 'In Progress', 'Approved', 'Rejected', 'Cancelled']),
@@ -184,7 +184,7 @@ router.get('/', authenticateToken, requirePermission('workflow.approve'), [
 });
 
 // GET /api/document-workflows/:id - Get specific workflow with steps
-router.get('/:id', authenticateToken, requirePermission('workflow.approve'), async (req, res) => {
+router.get('/:id', authenticateToken, requirePermissions(['workflow.approve']), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -259,7 +259,7 @@ router.get('/:id', authenticateToken, requirePermission('workflow.approve'), asy
 });
 
 // POST /api/document-workflows - Create new approval workflow
-router.post('/', authenticateToken, requirePermission('workflow.initiate'), workflowValidation, async (req, res) => {
+router.post('/', authenticateToken, requirePermissions(['workflow.initiate']), workflowValidation, async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -389,7 +389,7 @@ router.post('/', authenticateToken, requirePermission('workflow.initiate'), work
 });
 
 // POST /api/document-workflows/:id/approve/:stepId - Approve/reject workflow step
-router.post('/:id/approve/:stepId', authenticateToken, requirePermission('workflow.approve'), approvalValidation, async (req, res) => {
+router.post('/:id/approve/:stepId', authenticateToken, requirePermissions(['workflow.approve']), approvalValidation, async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -548,7 +548,7 @@ router.post('/:id/approve/:stepId', authenticateToken, requirePermission('workfl
 });
 
 // DELETE /api/document-workflows/:id - Cancel workflow
-router.delete('/:id', authenticateToken, requirePermission('workflow.admin'), async (req, res) => {
+router.delete('/:id', authenticateToken, requirePermissions(['workflow.admin']), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -621,7 +621,7 @@ router.delete('/:id', authenticateToken, requirePermission('workflow.admin'), as
 });
 
 // GET /api/document-workflows/my-tasks - Get tasks assigned to current user
-router.get('/my-tasks', authenticateToken, requirePermission('workflow.approve'), async (req, res) => {
+router.get('/my-tasks', authenticateToken, requirePermissions(['workflow.approve']), async (req, res) => {
   const client = await pool.connect();
   
   try {

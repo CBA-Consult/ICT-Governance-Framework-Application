@@ -1,0 +1,464 @@
+{
+  "connectors": {
+    "azure-ad": {
+      "name": "Azure Active Directory",
+      "type": "identity",
+      "priority": "critical",
+      "enabled": true,
+      "description": "Enterprise identity and access management integration",
+      "capabilities": [
+        "user-management",
+        "group-management",
+        "authentication",
+        "authorization",
+        "conditional-access"
+      ],
+      "endpoints": {
+        "users": "/v1.0/users",
+        "groups": "/v1.0/groups",
+        "applications": "/v1.0/applications",
+        "policies": "/v1.0/policies/conditionalAccessPolicies"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 600,
+        "burstLimit": 100
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1000
+      }
+    },
+    "defender-cloud-apps": {
+      "name": "Microsoft Defender for Cloud Apps",
+      "type": "security",
+      "priority": "critical",
+      "enabled": true,
+      "description": "Cloud application security monitoring and governance",
+      "capabilities": [
+        "app-discovery",
+        "security-alerts",
+        "policy-enforcement",
+        "activity-monitoring",
+        "threat-detection"
+      ],
+      "endpoints": {
+        "discoveredApps": "/v1.0/security/cloudAppSecurityProfiles",
+        "alerts": "/v1.0/security/alerts",
+        "activities": "/v1.0/auditLogs/signIns",
+        "policies": "/v1.0/policies/conditionalAccessPolicies"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 30,
+        "burstLimit": 10
+      },
+      "retryPolicy": {
+        "maxAttempts": 5,
+        "backoffMultiplier": 2,
+        "initialDelay": 2000
+      }
+    },
+    "secure-score": {
+      "name": "Microsoft Secure Score",
+      "type": "security",
+      "priority": "high",
+      "enabled": true,
+      "description": "Microsoft Graph Secure Score integration for security posture monitoring",
+      "capabilities": [
+        "secure-score-monitoring",
+        "control-profiles",
+        "security-recommendations",
+        "compliance-mapping",
+        "trend-analysis"
+      ],
+      "endpoints": {
+        "secureScores": "/v1.0/security/secureScores",
+        "controlProfiles": "/v1.0/security/secureScoreControlProfiles",
+        "recommendations": "/v1.0/security/secureScoreControlProfiles",
+        "history": "/v1.0/security/secureScores"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "burstLimit": 20
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1000
+      },
+      "syncSettings": {
+        "autoSync": true,
+        "syncInterval": 3600000,
+        "alertThreshold": 5,
+        "lowScoreThreshold": 60,
+        "criticalThreshold": 40
+      },
+      "dataRetention": {
+        "historicalData": 365,
+        "recommendations": 90,
+        "alerts": 180
+      }
+    },
+    "servicenow": {
+      "name": "ServiceNow ITSM",
+      "type": "itsm",
+      "priority": "high",
+      "enabled": true,
+      "description": "IT Service Management and workflow automation",
+      "capabilities": [
+        "incident-management",
+        "change-management",
+        "cmdb-integration",
+        "service-catalog",
+        "workflow-automation"
+      ],
+      "endpoints": {
+        "incidents": "/api/now/table/incident",
+        "changeRequests": "/api/now/table/change_request",
+        "cmdbItems": "/api/now/table/cmdb_ci",
+        "serviceCatalog": "/api/now/table/sc_cat_item"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 120,
+        "burstLimit": 50
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 1.5,
+        "initialDelay": 1000
+      }
+    },
+    "power-bi": {
+      "name": "Microsoft Power BI",
+      "type": "analytics",
+      "priority": "high",
+      "enabled": true,
+      "description": "Business intelligence and data visualization platform",
+      "capabilities": [
+        "report-generation",
+        "dashboard-creation",
+        "data-visualization",
+        "self-service-analytics",
+        "embedded-analytics"
+      ],
+      "endpoints": {
+        "reports": "/v1.0/myorg/reports",
+        "datasets": "/v1.0/myorg/datasets",
+        "dashboards": "/v1.0/myorg/dashboards",
+        "workspaces": "/v1.0/myorg/groups"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 200,
+        "burstLimit": 100
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1000
+      }
+    },
+    "sap-erp": {
+      "name": "SAP S/4HANA ERP",
+      "type": "erp",
+      "priority": "critical",
+      "enabled": true,
+      "description": "Enterprise Resource Planning system integration",
+      "capabilities": [
+        "financial-data",
+        "master-data",
+        "user-management",
+        "business-processes",
+        "reporting"
+      ],
+      "endpoints": {
+        "users": "/sap/opu/odata/sap/ZHR_USER_SRV/UserSet",
+        "financialData": "/sap/opu/odata/sap/ZFI_DATA_SRV/FinancialDataSet",
+        "masterData": "/sap/opu/odata/sap/ZMD_SRV/MasterDataSet",
+        "health": "/sap/opu/odata/sap/ZSY_HEALTH_SRV/HealthSet"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "burstLimit": 20
+      },
+      "retryPolicy": {
+        "maxAttempts": 2,
+        "backoffMultiplier": 3,
+        "initialDelay": 2000
+      }
+    },
+    "salesforce": {
+      "name": "Salesforce CRM",
+      "type": "crm",
+      "priority": "critical",
+      "enabled": true,
+      "description": "Customer Relationship Management platform",
+      "capabilities": [
+        "customer-data",
+        "sales-automation",
+        "marketing-automation",
+        "service-management",
+        "analytics"
+      ],
+      "endpoints": {
+        "accounts": "/services/data/v58.0/sobjects/Account",
+        "opportunities": "/services/data/v58.0/sobjects/Opportunity",
+        "contacts": "/services/data/v58.0/sobjects/Contact",
+        "leads": "/services/data/v58.0/sobjects/Lead"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 100,
+        "burstLimit": 50
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1000
+      }
+    },
+    "workday": {
+      "name": "Workday HCM",
+      "type": "hcm",
+      "priority": "high",
+      "enabled": true,
+      "description": "Human Capital Management system",
+      "capabilities": [
+        "employee-data",
+        "organizational-data",
+        "payroll-integration",
+        "talent-management",
+        "workforce-analytics"
+      ],
+      "endpoints": {
+        "workers": "/ccx/service/customreport2/workday/ISU_Workers/Workers_Report",
+        "organizations": "/ccx/service/customreport2/workday/ISU_Organizations/Organizations_Report",
+        "jobProfiles": "/ccx/service/customreport2/workday/ISU_Job_Profiles/Job_Profiles_Report",
+        "health": "/ccx/service/customreport2/workday/ISU_System_Health/Health_Check"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "burstLimit": 30
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1500
+      }
+    },
+    "synapse": {
+      "name": "Azure Synapse Analytics",
+      "type": "datawarehouse",
+      "priority": "high",
+      "enabled": true,
+      "description": "Enterprise data warehouse and analytics platform",
+      "capabilities": [
+        "data-integration",
+        "big-data-analytics",
+        "machine-learning",
+        "real-time-analytics",
+        "data-warehousing"
+      ],
+      "endpoints": {
+        "pipelines": "/pipelines",
+        "datasets": "/datasets",
+        "sqlPools": "/sqlPools",
+        "sparkPools": "/sparkPools"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 100,
+        "burstLimit": 50
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1000
+      }
+    },
+    "sentinel": {
+      "name": "Microsoft Sentinel",
+      "type": "siem",
+      "priority": "critical",
+      "enabled": true,
+      "description": "Security Information and Event Management platform",
+      "capabilities": [
+        "security-monitoring",
+        "threat-detection",
+        "incident-response",
+        "security-orchestration",
+        "compliance-reporting"
+      ],
+      "endpoints": {
+        "incidents": "/providers/Microsoft.SecurityInsights/incidents",
+        "alerts": "/providers/Microsoft.SecurityInsights/alertRules",
+        "workbooks": "/providers/Microsoft.SecurityInsights/workbooks",
+        "dataConnectors": "/providers/Microsoft.SecurityInsights/dataConnectors"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 100,
+        "burstLimit": 50
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1000
+      }
+    },
+    "oracle": {
+      "name": "Oracle Database",
+      "type": "database",
+      "priority": "high",
+      "enabled": true,
+      "description": "Oracle database system integration",
+      "capabilities": [
+        "data-extraction",
+        "query-execution",
+        "performance-monitoring",
+        "metadata-access",
+        "transaction-management"
+      ],
+      "endpoints": {
+        "query": "/execute",
+        "metadata": "/metadata",
+        "health": "/health",
+        "metrics": "/metrics"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 200,
+        "burstLimit": 100
+      },
+      "retryPolicy": {
+        "maxAttempts": 2,
+        "backoffMultiplier": 2,
+        "initialDelay": 2000
+      }
+    },
+    "aws": {
+      "name": "Amazon Web Services",
+      "type": "cloud",
+      "priority": "medium",
+      "enabled": true,
+      "description": "AWS cloud platform integration",
+      "capabilities": [
+        "resource-discovery",
+        "policy-management",
+        "cost-management",
+        "security-monitoring",
+        "compliance-reporting"
+      ],
+      "endpoints": {
+        "resources": "/resources",
+        "policies": "/policies",
+        "costs": "/costs",
+        "security": "/security"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 100,
+        "burstLimit": 50
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1000
+      }
+    },
+    "gcp": {
+      "name": "Google Cloud Platform",
+      "type": "cloud",
+      "priority": "medium",
+      "enabled": true,
+      "description": "GCP cloud platform integration",
+      "capabilities": [
+        "resource-discovery",
+        "policy-management",
+        "cost-management",
+        "security-monitoring",
+        "compliance-reporting"
+      ],
+      "endpoints": {
+        "resources": "/resources",
+        "policies": "/policies",
+        "costs": "/costs",
+        "security": "/security"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 100,
+        "burstLimit": 50
+      },
+      "retryPolicy": {
+        "maxAttempts": 3,
+        "backoffMultiplier": 2,
+        "initialDelay": 1000
+      }
+    },
+    "legacy-systems": {
+      "name": "Legacy Systems",
+      "type": "legacy",
+      "priority": "medium",
+      "enabled": true,
+      "description": "Legacy system integration via file transfer and custom protocols",
+      "capabilities": [
+        "file-transfer",
+        "data-extraction",
+        "batch-processing",
+        "format-conversion",
+        "error-handling"
+      ],
+      "endpoints": {
+        "fileTransfer": "/file-transfer",
+        "mainframeData": "/mainframe-data",
+        "batchProcess": "/batch-process"
+      },
+      "rateLimit": {
+        "requestsPerMinute": 30,
+        "burstLimit": 10
+      },
+      "retryPolicy": {
+        "maxAttempts": 2,
+        "backoffMultiplier": 3,
+        "initialDelay": 5000
+      }
+    }
+  },
+  "globalSettings": {
+    "defaultTimeout": 30000,
+    "maxConcurrentConnections": 50,
+    "healthCheckInterval": 300000,
+    "metricsRetention": 2592000000,
+    "enableCircuitBreaker": true,
+    "circuitBreakerThreshold": 5,
+    "circuitBreakerTimeout": 60000,
+    "enableCaching": true,
+    "defaultCacheTTL": 300,
+    "enableMetrics": true,
+    "enableLogging": true,
+    "logLevel": "info"
+  },
+  "integrationPatterns": {
+    "realtime": {
+      "description": "Real-time synchronous integration",
+      "timeout": 10000,
+      "retryAttempts": 3,
+      "caching": false
+    },
+    "batch": {
+      "description": "Batch processing integration",
+      "timeout": 300000,
+      "retryAttempts": 2,
+      "caching": true,
+      "cacheTTL": 3600
+    },
+    "streaming": {
+      "description": "Streaming data integration",
+      "timeout": 60000,
+      "retryAttempts": 5,
+      "caching": false
+    }
+  },
+  "securitySettings": {
+    "encryptionRequired": true,
+    "tlsVersion": "1.2",
+    "certificateValidation": true,
+    "tokenRotationInterval": 3600000,
+    "auditLogging": true,
+    "sensitiveDataMasking": true
+  }
+}
