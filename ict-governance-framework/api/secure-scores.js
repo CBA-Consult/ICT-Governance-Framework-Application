@@ -1,4 +1,5 @@
 
+
 // File: ict-governance-framework/api/secure-scores.js
 // Microsoft Graph API Secure Score Integration
 
@@ -11,10 +12,12 @@ const { authenticateToken } = require('../middleware/auth');
 const { requirePermission } = require('../middleware/permissions');
 const axios = require('axios');
 
+
 // Initialize the router
 const router = express.Router();
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 // Microsoft Graph API configuration
 const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL || 'https://graph.microsoft.com';
 const GRAPH_API_VERSION = 'v1.0';
