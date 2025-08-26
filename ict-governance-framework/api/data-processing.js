@@ -5,8 +5,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult, query } = require('express-validator');
-const { authenticateToken, logActivity } = require('../middleware/auth');
-const { requirePermission } = require('../middleware/permissions');
+const { requirePermissions, authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -260,7 +259,7 @@ class DataProcessor {
 // POST /api/data-processing/calculate-kpi - Calculate KPI values
 router.post('/calculate-kpi',
   authenticateToken,
-  requirePermission('data_processing_read'),
+    requirePermissions(['data_processing_read']),
   [
     body('metric_name').notEmpty().withMessage('Metric name is required'),
     body('aggregation_type').isIn(['avg', 'sum', 'max', 'min', 'count', 'latest']).withMessage('Invalid aggregation type'),
@@ -320,7 +319,7 @@ router.post('/calculate-kpi',
 // POST /api/data-processing/calculate-trend - Calculate trend analysis
 router.post('/calculate-trend',
   authenticateToken,
-  requirePermission('data_processing_read'),
+    requirePermissions(['data_processing_read']),
   [
     body('metric_name').notEmpty().withMessage('Metric name is required'),
     body('time_range.start_date').isISO8601().withMessage('Invalid start date'),
@@ -379,7 +378,7 @@ router.post('/calculate-trend',
 // POST /api/data-processing/compliance-analysis - Calculate compliance metrics
 router.post('/compliance-analysis',
   authenticateToken,
-  requirePermission('data_processing_read'),
+    requirePermissions(['data_processing_read']),
   [
     body('compliance_metrics').isArray().withMessage('Compliance metrics must be an array'),
     body('time_range.start_date').isISO8601().withMessage('Invalid start date'),
@@ -441,7 +440,7 @@ router.post('/compliance-analysis',
 // POST /api/data-processing/generate-insights - Generate automated insights
 router.post('/generate-insights',
   authenticateToken,
-  requirePermission('data_processing_read'),
+    requirePermissions(['data_processing_read']),
   [
     body('metric_name').notEmpty().withMessage('Metric name is required'),
     body('time_range.start_date').isISO8601().withMessage('Invalid start date'),
@@ -495,7 +494,7 @@ router.post('/generate-insights',
 // GET /api/data-processing/dashboard-data - Get processed dashboard data
 router.get('/dashboard-data',
   authenticateToken,
-  requirePermission('data_processing_read'),
+    requirePermissions(['data_processing_read']),
   async (req, res) => {
     try {
       const { dashboard_type = 'executive', time_range_days = 30 } = req.query;
@@ -558,13 +557,13 @@ router.get('/dashboard-data',
           );
 
           dashboardData[metricName] = {
-            current_value: kpiResult.calculated_value || kpiResult.value,
-            target_value: kpiResult.avg_target_value || kpiResult.target_value,
+            current_value: kpiResult && (typeof kpiResult.calculated_value !== 'undefined' ? kpiResult.calculated_value : kpiResult.value) || null,
+            target_value: kpiResult && (typeof kpiResult.avg_target_value !== 'undefined' ? kpiResult.avg_target_value : kpiResult.target_value) || null,
             trend: {
-              direction: trendResult.trend_direction,
-              rate: trendResult.trend_rate
+              direction: trendResult && trendResult.trend_direction || 'unknown',
+              rate: trendResult && trendResult.trend_rate || 0
             },
-            last_updated: kpiResult.collection_timestamp || kpiResult.period_end
+            last_updated: kpiResult && (kpiResult.collection_timestamp || kpiResult.period_end) || null
           };
         } catch (metricError) {
           console.warn(`Error processing metric ${metricName}:`, metricError.message);
@@ -591,7 +590,7 @@ router.get('/dashboard-data',
         success: true,
         data: {
           dashboard_type,
-          time_range,
+          timeRange,
           metrics: dashboardData,
           generated_at: new Date().toISOString()
         }

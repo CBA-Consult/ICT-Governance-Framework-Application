@@ -5,7 +5,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult, query } = require('express-validator');
-const { authenticateToken, logActivity } = require('../middleware/auth');
+const { requirePermissions, authenticateToken, logActivity } = require('../middleware/auth');
 const { requirePermission } = require('../middleware/permissions');
 
 const router = express.Router();
@@ -478,7 +478,7 @@ class ReportGenerator {
 // GET /api/reporting/templates - List available report templates
 router.get('/templates',
   authenticateToken,
-  requirePermission('reporting.read'),
+  requirePermissions('reporting.read'),
   async (req, res) => {
     try {
       await logActivity(
@@ -510,7 +510,7 @@ router.get('/templates',
 // POST /api/reporting/generate - Generate a report
 router.post('/generate',
   authenticateToken,
-  requirePermission('reporting.write'),
+  requirePermissions('reporting.write'),
   [
     body('report_type').isIn(Object.keys(REPORT_TEMPLATES)).withMessage('Invalid report type'),
     body('time_range.start_date').isISO8601().withMessage('Invalid start date'),
@@ -612,7 +612,7 @@ router.post('/generate',
 // GET /api/reporting/reports - List generated reports
 router.get('/reports',
   authenticateToken,
-  requirePermission('reporting.read'),
+  requirePermissions('reporting.read'),
   async (req, res) => {
     try {
       const { page = 1, limit = 20, report_type, status } = req.query;
@@ -696,7 +696,7 @@ router.get('/reports',
 // GET /api/reporting/reports/:id - Get specific report
 router.get('/reports/:id',
   authenticateToken,
-  requirePermission('reporting.read'),
+  requirePermissions('reporting.read'),
   async (req, res) => {
     try {
       const { id } = req.params;
@@ -753,7 +753,7 @@ router.get('/reports/:id',
 // GET /api/reporting/custom-templates - List custom report templates
 router.get('/custom-templates',
   authenticateToken,
-  requirePermission('reporting.read'),
+  requirePermissions('reporting.read'),
   async (req, res) => {
     try {
       const { page = 1, limit = 20, category, is_public, created_by } = req.query;
@@ -853,7 +853,7 @@ router.get('/custom-templates',
 // POST /api/reporting/custom-templates - Create custom report template
 router.post('/custom-templates',
   authenticateToken,
-  requirePermission('reporting.custom'),
+  requirePermissions('reporting.custom'),
   [
     body('template_name').isLength({ min: 1, max: 255 }).withMessage('Template name is required'),
     body('template_config').isObject().withMessage('Template configuration is required'),
@@ -952,7 +952,7 @@ router.post('/custom-templates',
 // GET /api/reporting/custom-templates/:id - Get specific custom template
 router.get('/custom-templates/:id',
   authenticateToken,
-  requirePermission('reporting.read'),
+  requirePermissions('reporting.read'),
   async (req, res) => {
     try {
       const { id } = req.params;
@@ -1003,7 +1003,7 @@ router.get('/custom-templates/:id',
 // PUT /api/reporting/custom-templates/:id - Update custom template
 router.put('/custom-templates/:id',
   authenticateToken,
-  requirePermission('reporting.custom'),
+  requirePermissions('reporting.custom'),
   async (req, res) => {
     const client = await pool.connect();
     
@@ -1115,7 +1115,7 @@ router.put('/custom-templates/:id',
 // DELETE /api/reporting/custom-templates/:id - Delete custom template
 router.delete('/custom-templates/:id',
   authenticateToken,
-  requirePermission('reporting.custom'),
+  requirePermissions('reporting.custom'),
   async (req, res) => {
     const client = await pool.connect();
     
@@ -1189,7 +1189,7 @@ router.delete('/custom-templates/:id',
 // GET /api/reporting/reports/:id/export - Export report in various formats
 router.get('/reports/:id/export',
   authenticateToken,
-  requirePermission('reporting.read'),
+  requirePermissions('reporting.read'),
   async (req, res) => {
     try {
       const { id } = req.params;
@@ -1309,7 +1309,7 @@ function convertToCSV(data) {
 // POST /api/reporting/reports/:id/share - Share report with other users
 router.post('/reports/:id/share',
   authenticateToken,
-  requirePermission('reporting.read'),
+  requirePermissions('reporting.read'),
   [
     body('shared_with').isArray().withMessage('shared_with must be an array of user IDs'),
     body('share_type').isIn(['view', 'download', 'edit']).withMessage('Invalid share type')
@@ -1402,7 +1402,7 @@ router.post('/reports/:id/share',
 // GET /api/reporting/reports/:id/shares - Get report sharing information
 router.get('/reports/:id/shares',
   authenticateToken,
-  requirePermission('reporting.read'),
+  requirePermissions('reporting.read'),
   async (req, res) => {
     try {
       const { id } = req.params;

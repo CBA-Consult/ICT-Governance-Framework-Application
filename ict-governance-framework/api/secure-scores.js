@@ -1,4 +1,5 @@
 
+
 // File: ict-governance-framework/api/secure-scores.js
 // Microsoft Graph API Secure Score Integration
 
@@ -11,81 +12,111 @@ const { authenticateToken } = require('../middleware/auth');
 const { requirePermission } = require('../middleware/permissions');
 const axios = require('axios');
 
+
 // Initialize the router
 const router = express.Router();
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
 // Microsoft Graph API configuration
 const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL || 'https://graph.microsoft.com';
 const GRAPH_API_VERSION = 'v1.0';
 
 // Dashboard endpoint for frontend
+// --- New database-centric helper functions ---
+async function getLatestSecureScore() {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(`
+      SELECT * FROM secure_score ORDER BY created_datetime DESC LIMIT 1;
+    `);
+    return result.rows[0] || null;
+  } finally {
+    client.release();
+  }
+}
+
+async function getHistoricalSecureScores(timeRangeInDays) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(`
+      SELECT * FROM secure_score
+      WHERE created_datetime >= NOW() - INTERVAL '${timeRangeInDays} days'
+      ORDER BY created_datetime DESC;
+    `);
+    return result.rows;
+  } finally {
+    client.release();
+  }
+}
+
+async function getControlScoresForScore(secureScoreId) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(`
+      SELECT * FROM control_score WHERE secure_score_id = $1;
+    `, [secureScoreId]);
+    return result.rows;
+  } finally {
+    client.release();
+  }
+}
+
+// --- Refactored /dashboard endpoint ---
 router.get('/dashboard', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
   try {
     const { timeRange = '30' } = req.query;
-    const accessToken = await getGraphAccessToken();
-    const currentScores = await getCurrentSecureScores(accessToken);
-    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
+    const currentScore = await getLatestSecureScore();
+    if (!currentScore) {
+      return res.status(404).json({ error: 'No secure score data available' });
+    }
     const historicalData = await getHistoricalSecureScores(parseInt(timeRange));
+    const controlScores = await getControlScoresForScore(currentScore.id);
 
-    const currentScore = currentScores[0];
+    // Example: implemented controls logic (customize as needed)
+    const implementedControls = controlScores.filter(ctrl => ctrl.implementation_status === 'Implemented').length;
+    const controlsImplementationRate = controlScores.length > 0 ? Math.round((implementedControls / controlScores.length) * 100) : 0;
+
+    // Example: trend calculation (customize as needed)
     const previousScore = historicalData.length > 1 ? historicalData[1] : null;
-    const scoreDelta = previousScore ? currentScore.currentScore - previousScore.current_score : 0;
-    const percentageDelta = previousScore ? ((currentScore.currentScore / currentScore.maxScore) * 100) - previousScore.percentage : 0;
-    const topRecommendations = await getTopRecommendations(controlProfiles);
-    const projectedScoreIncrease = topRecommendations.slice(0, 5).reduce((sum, rec) => sum + (rec.impactScore * 0.1), 0);
-    const projectedScore = currentScore.currentScore + projectedScoreIncrease;
-    const implementedControls = controlProfiles.filter(profile => {
-      if (profile.controlStateUpdates && profile.controlStateUpdates.length > 0) {
-        const latestState = profile.controlStateUpdates[profile.controlStateUpdates.length - 1];
-        return latestState.state === 'On' || latestState.state === 'Reviewed';
-      }
-      return false;
-    }).length;
-    const controlsImplementationRate = Math.round((implementedControls / controlProfiles.length) * 100);
-    const trend = calculateTrend(historicalData);
-    const trendData = processTrendData(historicalData.slice(0, 30));
-    const riskAreas = identifyRiskAreas(controlProfiles);
-    const complianceFrameworks = calculateComplianceImpact(currentScore, controlProfiles);
+    const scoreDelta = previousScore ? currentScore.current_score - previousScore.current_score : 0;
+    const percentageDelta = previousScore ? ((currentScore.current_score / currentScore.max_score) * 100) - ((previousScore.current_score / previousScore.max_score) * 100) : 0;
+
+    // Example: trend direction
+    const trend = {
+      direction: scoreDelta > 0 ? 'up' : scoreDelta < 0 ? 'down' : 'stable',
+      change: scoreDelta
+    };
+
+    // Example: trend data for chart (last 30 days)
+    const trendData = historicalData.slice(0, 30).map(row => ({
+      date: row.created_datetime,
+      score: row.current_score
+    }));
+
+    // Example: compliance impact (customize as needed)
+    // You can use your existing calculateComplianceImpact logic here, passing controlScores
 
     // Format response for frontend
     res.json({
       data: {
         overview: {
-          currentScore: currentScore?.currentScore || 0,
-          maxScore: currentScore?.maxScore || 0,
-          percentage: currentScore ? Math.round((currentScore.currentScore / currentScore.maxScore) * 100) : 0,
+          currentScore: currentScore.current_score || 0,
+          maxScore: currentScore.max_score || 0,
+          percentage: currentScore.max_score ? Math.round((currentScore.current_score / currentScore.max_score) * 100) : 0,
           trend: { direction: trend.direction, change: trend.change },
-          lastUpdated: currentScore?.createdDateTime || new Date().toISOString()
+          lastUpdated: currentScore.created_datetime || new Date().toISOString()
         },
         trends: trendData,
-        controlCategories: controlProfiles.map(profile => ({
-          name: profile.displayName || profile.name,
-          implemented: (profile.controlStateUpdates && profile.controlStateUpdates.length > 0 && ['On', 'Reviewed'].includes(profile.controlStateUpdates[profile.controlStateUpdates.length - 1].state)) ? 1 : 0,
+        controlCategories: controlScores.map(ctrl => ({
+          name: ctrl.control_name,
+          implemented: ctrl.implementation_status === 'Implemented' ? 1 : 0,
           total: 1
         })),
-        topRecommendations: topRecommendations.map(rec => ({
-          title: rec.title,
-          description: rec.description,
-          priority: rec.priority,
-          impactScore: rec.impactScore,
-          implementationCost: rec.implementationCost,
-          userImpact: rec.userImpact,
-          complianceFrameworks: rec.complianceFrameworks,
-          action: rec.action
-        })),
-        riskAreas: riskAreas.map(area => ({
-          area: area.area,
-          recommendation: area.recommendation,
-          riskLevel: area.riskLevel,
-          implementationRate: area.implementationRate
-        })),
-        complianceImpact: complianceFrameworks.map(fw => ({
-          name: fw.name,
-          implementedControls: fw.implementedControls,
-          totalControls: fw.totalControls,
-          score: fw.score
-        }))
+        topRecommendations: [],
+        riskAreas: [],
+        complianceImpact: [],
+        controlsImplementationRate
       }
     });
   } catch (error) {
@@ -121,9 +152,112 @@ async function getGraphAccessToken() {
 }
 
 // Other functions and router definitions...
+/**
+ * Scheduled job to sync secure scores from Microsoft Graph to the approved normalized PostgreSQL schema.
+ */
+async function scheduledSync() {
+  const client = await pool.connect();
+  try {
+    console.log('Starting Scheduled Secure Score sync...');
+    const accessToken = await getGraphAccessToken();
+    // Fetch current secure scores from Microsoft Graph API
+    const secureScoreUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/security/secureScores`;
+    const response = await axios.get(secureScoreUrl, {
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    });
+    const secureScores = response.data.value || [];
 
-// End of the file
-// End of the file
+    if (secureScores.length === 0) {
+      console.log('Secure Score sync: No scores found to process.');
+      return;
+    }
+
+    // Process each score within its own transaction for data integrity
+    for (const score of secureScores) {
+      try {
+        await client.query('BEGIN');
+
+        // Upsert vendor_information
+        const vi = score.vendorInformation || {};
+        const vendorRes = await client.query(
+          `INSERT INTO vendor_information (vendor, provider, sub_provider)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (vendor, provider, sub_provider) DO UPDATE SET vendor = EXCLUDED.vendor
+           RETURNING id`,
+          [vi.vendor || 'Unknown', vi.provider || 'Unknown', vi.subProvider || null]
+        );
+        const vendorInformationId = vendorRes.rows[0]?.id;
+
+        // Upsert the main secure_score record
+        await client.query(
+          `INSERT INTO secure_score (
+            id, tenant_id, azure_tenant_id, active_user_count, licensed_user_count, 
+            created_datetime, current_score, max_score, vendor_information_id
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          ON CONFLICT (id) DO UPDATE SET
+            tenant_id = EXCLUDED.tenant_id,
+            active_user_count = EXCLUDED.active_user_count,
+            licensed_user_count = EXCLUDED.licensed_user_count,
+            created_datetime = EXCLUDED.created_datetime,
+            current_score = EXCLUDED.current_score,
+            max_score = EXCLUDED.max_score,
+            vendor_information_id = EXCLUDED.vendor_information_id;`,
+          [
+            score.id, score.azureTenantId, score.azureTenantId, score.activeUserCount, 
+            score.licensedUserCount, score.createdDateTime, score.currentScore, 
+            score.maxScore, vendorInformationId
+          ]
+        );
+
+        // Clear and insert child records for relational integrity
+        await client.query('DELETE FROM average_comparative_score WHERE secure_score_id = $1;', [score.id]);
+        await client.query('DELETE FROM control_score WHERE secure_score_id = $1;', [score.id]);
+
+        // Insert average_comparative_score records
+        if (Array.isArray(score.averageComparativeScores)) {
+          for (const compScore of score.averageComparativeScores) {
+            await client.query(
+              `INSERT INTO average_comparative_score (secure_score_id, basis, average_score)
+               VALUES ($1, $2, $3);`,
+              [score.id, compScore.basis, compScore.averageScore]
+            );
+          }
+        }
+
+        // Insert control_score records
+        if (Array.isArray(score.controlScores)) {
+          for (const ctrlScore of score.controlScores) {
+            await client.query(
+              `INSERT INTO control_score (
+                secure_score_id, control_category, control_name, description, 
+                score, score_in_percentage, implementation_status
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7);`,
+              [
+                score.id, ctrlScore.controlCategory, ctrlScore.controlName, ctrlScore.description, 
+                ctrlScore.score, ctrlScore.scoreInPercentage, ctrlScore.implementationStatus
+              ]
+            );
+          }
+        }
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        console.error(`Failed to sync score ID ${score.id}. Rolled back transaction. Error:`, err);
+      }
+    }
+    console.log(`Secure Score sync completed. Processed ${secureScores.length} records into normalized tables.`);
+  } catch (err) {
+    console.error('Scheduled Secure Score sync failed:', err);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// Attach the sync function to the router object
+router.scheduledSync = scheduledSync;
+
+// Export the router (now with scheduledSync attached)
 module.exports = router;
 
 /**
@@ -132,56 +266,21 @@ module.exports = router;
  */
 router.get('/', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
   try {
-    const { 
-      timeRange = '30',
-      includeHistory = 'false',
-      includeControlScores = 'false'
-    } = req.query;
+    const { timeRange = '30' } = req.query;
+    // Use the existing helper function to get historical data from the database
+    const historicalData = await getHistoricalSecureScores(parseInt(timeRange));
 
-    const accessToken = await getGraphAccessToken();
-    
-    // Fetch current secure score
-    const secureScoreUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/security/secureScores`;
-    const params = new URLSearchParams();
-    
-    if (timeRange !== 'all') {
-      const daysAgo = parseInt(timeRange);
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - daysAgo);
-      params.append('$filter', `createdDateTime ge ${startDate.toISOString()}`);
-    }
-    
-    params.append('$top', '50');
-    params.append('$orderby', 'createdDateTime desc');
-
-    const response = await axios.get(`${secureScoreUrl}?${params.toString()}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
+    res.json({
+      success: true,
+      data: historicalData,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        source: 'database',
+        timeRange: `${timeRange} days`
       }
     });
-
-    const secureScores = response.data.value;
-    
-    // Store in database for historical tracking
-    await storeSecureScoreData(secureScores);
-
-    // Get control scores if requested
-    let controlScores = null;
-    if (includeControlScores === 'true' && secureScores.length > 0) {
-      controlScores = await getSecureScoreControlProfiles(accessToken);
-    }
-
-    // Get historical data from database if requested
-    let historicalData = null;
-    if (includeHistory === 'true') {
-      historicalData = await getHistoricalSecureScores(parseInt(timeRange));
-    }
-    const result = {
-      // You may want to populate this object or remove it if unused
-    };
   } catch (error) {
-    console.error('Error fetching secure scores:', error);
+    console.error('Error fetching secure scores from database:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch secure scores',
@@ -302,77 +401,60 @@ function groupBy(array, key) {
 router.get('/executive-summary', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
   try {
     const { timeRange = '30' } = req.query;
-    
-    // Get current secure score data
-    const accessToken = await getGraphAccessToken();
-    const currentScores = await getCurrentSecureScores(accessToken);
-    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
+    // Get current secure score and historical data from database
+    const currentScore = await getLatestSecureScore();
     const historicalData = await getHistoricalSecureScores(parseInt(timeRange));
-    
-    // Calculate executive metrics
-    const currentScore = currentScores[0];
+    const controlScores = currentScore ? await getControlScoresForScore(currentScore.id) : [];
+
+    // Executive metrics
     const previousScore = historicalData.length > 1 ? historicalData[1] : null;
-    
-    // Calculate score delta
-    const scoreDelta = previousScore ? 
-      currentScore.currentScore - previousScore.current_score : 0;
-    const percentageDelta = previousScore ? 
-      ((currentScore.currentScore / currentScore.maxScore) * 100) - previousScore.percentage : 0;
-    
-    // Calculate projected score with top recommendations
-    const topRecommendations = await getTopRecommendations(controlProfiles);
-    const projectedScoreIncrease = topRecommendations.slice(0, 5)
-      .reduce((sum, rec) => sum + (rec.impactScore * 0.1), 0);
-    const projectedScore = currentScore.currentScore + projectedScoreIncrease;
-    
-    // Calculate controls implementation percentage
-    const implementedControls = controlProfiles.filter(profile => {
-      if (profile.controlStateUpdates && profile.controlStateUpdates.length > 0) {
-        const latestState = profile.controlStateUpdates[profile.controlStateUpdates.length - 1];
-        return latestState.state === 'On' || latestState.state === 'Reviewed';
-      }
-      return false;
-    }).length;
-    const controlsImplementationRate = Math.round((implementedControls / controlProfiles.length) * 100);
-    
-    // Generate trend analysis
-    const trend = calculateTrend(historicalData);
-    const trendData = processTrendData(historicalData.slice(0, 30)); // Last 30 days
-    
-    // Identify critical areas needing attention
-    const riskAreas = identifyRiskAreas(controlProfiles);
+    const scoreDelta = previousScore ? currentScore.current_score - previousScore.current_score : 0;
+    const percentageDelta = previousScore ? ((currentScore.current_score / currentScore.max_score) * 100) - ((previousScore.current_score / previousScore.max_score) * 100) : 0;
+
+    // Controls implementation
+    const implementedControls = controlScores.filter(ctrl => ctrl.implementation_status === 'Implemented').length;
+    const controlsImplementationRate = controlScores.length > 0 ? Math.round((implementedControls / controlScores.length) * 100) : 0;
+    const pendingImplementation = controlScores.length - implementedControls;
+
+    // Trend analysis
+    const trendDirection = scoreDelta > 0 ? 'improving' : scoreDelta < 0 ? 'declining' : 'stable';
+    const trendData = historicalData.slice(0, 30).map(row => ({
+      date: row.created_datetime,
+      score: row.current_score
+    }));
+
+    // Compliance impact (reuse calculateComplianceImpact if possible)
+    // For now, stub with empty array or implement logic if compliance data is in controlScores
+    let complianceFrameworks = [];
+    if (typeof calculateComplianceImpact === 'function') {
+      complianceFrameworks = calculateComplianceImpact(currentScore, controlScores);
+    }
+    const avgComplianceScore = complianceFrameworks.length > 0 ? Math.round(complianceFrameworks.reduce((sum, fw) => sum + fw.score, 0) / complianceFrameworks.length) : 0;
+
+    // Risk areas (stub, as risk logic may need more data)
+    const riskAreas = [];
     const criticalAlerts = riskAreas.filter(area => area.riskLevel === 'high').length;
-    
-    // Calculate compliance impact
-    const complianceFrameworks = calculateComplianceImpact(currentScore, controlProfiles);
-    const avgComplianceScore = complianceFrameworks.length > 0 ? 
-      Math.round(complianceFrameworks.reduce((sum, fw) => sum + fw.score, 0) / complianceFrameworks.length) : 0;
-    
+
     // Executive summary data structure
     const executiveSummary = {
-      // Key Performance Indicators
       securityPosture: {
-        currentScore: currentScore?.currentScore || 0,
-        maxScore: currentScore?.maxScore || 0,
-        percentage: currentScore ? Math.round((currentScore.currentScore / currentScore.maxScore) * 100) : 0,
+        currentScore: currentScore?.current_score || 0,
+        maxScore: currentScore?.max_score || 0,
+        percentage: currentScore?.max_score ? Math.round((currentScore.current_score / currentScore.max_score) * 100) : 0,
         scoreDelta: Math.round(scoreDelta),
         percentageDelta: Math.round(percentageDelta * 10) / 10,
-        trend: trend.direction,
-        lastUpdated: currentScore?.createdDateTime || new Date().toISOString(),
-        projectedScore: Math.round(projectedScore),
-        projectedPercentage: currentScore ? Math.round((projectedScore / currentScore.maxScore) * 100) : 0
+        trend: trendDirection,
+        lastUpdated: currentScore?.created_datetime || new Date().toISOString(),
+        projectedScore: currentScore?.current_score || 0, // No projection logic yet
+        projectedPercentage: currentScore?.max_score ? Math.round((currentScore.current_score / currentScore.max_score) * 100) : 0
       },
-      
-      // Controls Implementation Status
       controlsStatus: {
-        totalControls: controlProfiles.length,
-        implementedControls: implementedControls,
+        totalControls: controlScores.length,
+        implementedControls,
         implementationRate: controlsImplementationRate,
-        pendingImplementation: controlProfiles.length - implementedControls,
-        criticalGaps: riskAreas.filter(area => area.riskLevel === 'high').length
+        pendingImplementation,
+        criticalGaps: 0 // No risk logic yet
       },
-      
-      // Compliance Overview
       complianceOverview: {
         averageScore: avgComplianceScore,
         frameworks: complianceFrameworks.map(fw => ({
@@ -382,49 +464,28 @@ router.get('/executive-summary', authenticateToken, requirePermission('view_secu
         })),
         criticalFrameworks: complianceFrameworks.filter(fw => fw.score < 70).length
       },
-      
-      // Risk and Threat Landscape
       riskLandscape: {
         totalRiskAreas: riskAreas.length,
         highRiskAreas: riskAreas.filter(area => area.riskLevel === 'high').length,
         mediumRiskAreas: riskAreas.filter(area => area.riskLevel === 'medium').length,
-        riskTrend: trend.direction === 'improving' ? 'decreasing' : trend.direction === 'declining' ? 'increasing' : 'stable',
+        riskTrend: trendDirection,
         criticalAlerts: criticalAlerts
       },
-      
-      // Top Priority Actions
-      priorityActions: topRecommendations.slice(0, 5).map(rec => ({
-        id: rec.id,
-        title: rec.title,
-        category: rec.category,
-        priority: rec.priority,
-        impactScore: rec.impactScore,
-        estimatedImprovement: Math.round(rec.impactScore * 0.1) + ' points'
-      })),
-      
-      // Historical Trends (for charts)
+      priorityActions: [], // No recommendations logic yet
       trends: {
-        scoreHistory: trendData.slice(-30), // Last 30 days
+        scoreHistory: trendData.slice(-30),
         complianceTrends: complianceFrameworks.map(fw => ({
           framework: fw.name,
           currentScore: fw.score,
-          trend: 'stable' // Would need historical compliance data for real trends
+          trend: 'stable'
         }))
       },
-      
-      // Executive Alerts
       executiveAlerts: [
         ...(scoreDelta < -5 ? [{
           type: 'score_decline',
           severity: 'high',
           message: `Security score declined by ${Math.abs(scoreDelta)} points`,
           action: 'Review recent security changes and implement top recommendations'
-        }] : []),
-        ...(criticalAlerts > 0 ? [{
-          type: 'critical_risks',
-          severity: 'high',
-          message: `${criticalAlerts} critical risk areas identified`,
-          action: 'Immediate attention required for high-risk security controls'
         }] : []),
         ...(controlsImplementationRate < 70 ? [{
           type: 'low_implementation',
@@ -441,11 +502,10 @@ router.get('/executive-summary', authenticateToken, requirePermission('view_secu
       timestamp: new Date().toISOString(),
       metadata: {
         timeRange: timeRange,
-        dataFreshness: 'real-time',
-        nextUpdate: new Date(Date.now() + 3600000).toISOString() // Next hour
+        dataFreshness: 'local-db',
+        nextUpdate: new Date(Date.now() + 3600000).toISOString()
       }
     });
-
   } catch (error) {
     console.error('Error generating CISO executive summary:', error);
     res.status(500).json({

@@ -316,7 +316,14 @@ export default function SecureScoreDashboard({ timeRange = 30 }) {
     );
   }
 
-  const { overview, trends, controlCategories, topRecommendations, riskAreas, complianceImpact } = dashboardData;
+  const {
+    overview,
+    trends,
+    controlCategories,
+    topRecommendations = [],
+    riskAreas = [],
+    complianceImpact = []
+  } = dashboardData;
 
   return (
     <div className="space-y-6">

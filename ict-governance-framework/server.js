@@ -58,7 +58,7 @@ const { router: monitoringRouter } = require('./api/monitoring');
 const { router: diagnosticRouter } = require('./api/diagnostic-tools');
 
 // Import secure score API routes
-const secureScoresRouter = require('./api/secure-scores');
+const secureScoresApi = require('./api/secure-scores');
 
 // Import Enterprise API Framework
 const EnterpriseAPI = require('./api/enterprise-api');
@@ -164,7 +164,7 @@ app.use('/api/monitoring', monitoringRouter);
 app.use('/api/diagnostics', diagnosticRouter);
 
 // Secure score routes
-app.use('/api/secure-scores', secureScoresRouter);
+app.use('/api/secure-scores', secureScoresApi);
 
 // Initialize and mount Enterprise API Framework
 const enterpriseAPI = new EnterpriseAPI({
@@ -176,11 +176,17 @@ const enterpriseAPI = new EnterpriseAPI({
 app.use('/api/v2/enterprise', enterpriseAPI.getRouter());
 
 // Health check
-app.get('/api/health', (req, res) => res.json({ 
-  status: 'ok',
-  timestamp: new Date().toISOString(),
-  version: '1.0.0',
-  services: {
+const fs = require('fs');
+const connectorsPath = path.resolve(__dirname, '../config/enterprise-connectors.json');
+let connectorConfig = {};
+try {
+  connectorConfig = JSON.parse(fs.readFileSync(connectorsPath, 'utf8'));
+} catch (err) {
+  console.error('Could not read enterprise-connectors.json:', err);
+}
+
+app.get('/api/health', (req, res) => {
+  const services = {
     database: 'connected',
     authentication: 'enabled',
     userManagement: 'enabled',
@@ -209,12 +215,27 @@ app.get('/api/health', (req, res) => res.json({
     diagnostics: 'enabled',
     alerting: 'enabled',
     secureScore: 'enabled'
-  }
-}));
+  };
+  // Check enabled connectors and add to health check
+  Object.entries(connectorConfig).forEach(([key, value]) => {
+    if (value.enabled === true) {
+      services[key] = 'enabled';
+      // Optionally, run health check logic for enabled connectors only
+      // healthCheckConnector(key);
+    } else {
+      services[key] = 'skipped'; // Mark as skipped, not unhealthy
+    }
+  });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    services
+  });
+});
 
 app.listen(PORT, async () => {
   console.log(`Express server running on http://localhost:${PORT}`);
-  
   // Initialize monitoring and health checks
   try {
     await initializeMonitoring();
@@ -222,6 +243,11 @@ app.listen(PORT, async () => {
   } catch (error) {
     console.error('✗ Failed to initialize monitoring:', error.message);
   }
+  // Run secure score sync once on server startup
+  console.log('Performing initial secure score sync on server startup...');
+  secureScoresApi.scheduledSync().catch(err => {
+    console.error('Error during initial secure score sync on startup:', err);
+  });
 });
 
 // Scheduled Secure Score sync job
