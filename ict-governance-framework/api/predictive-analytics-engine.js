@@ -5,7 +5,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult, query } = require('express-validator');
-const { authenticateToken, logActivity } = require('../middleware/auth');
+const { requirePermissions, authenticateToken, logActivity } = require('../middleware/auth');
 const { requirePermission } = require('../middleware/permissions');
 
 const router = express.Router();
@@ -1200,7 +1200,7 @@ class PredictiveAnalyticsEngine {
 // API Endpoints
 router.post('/advanced-forecasting', [
   authenticateToken,
-  requirePermission('analytics_read'),
+  requirePermissions('analytics_read'),
   body('metric_name').notEmpty().withMessage('Metric name is required'),
   body('time_range.start_date').isISO8601().withMessage('Valid start date is required'),
   body('time_range.end_date').isISO8601().withMessage('Valid end date is required')
@@ -1246,7 +1246,7 @@ router.post('/advanced-forecasting', [
 
 router.post('/comprehensive-trend-analysis', [
   authenticateToken,
-  requirePermission('analytics_read'),
+  requirePermissions('analytics_read'),
   body('metric_name').notEmpty().withMessage('Metric name is required'),
   body('time_range.start_date').isISO8601().withMessage('Valid start date is required'),
   body('time_range.end_date').isISO8601().withMessage('Valid end date is required')
@@ -1292,7 +1292,7 @@ router.post('/comprehensive-trend-analysis', [
 
 router.post('/automated-insights', [
   authenticateToken,
-  requirePermission('analytics_read'),
+  requirePermissions('analytics_read'),
   body('metric_name').notEmpty().withMessage('Metric name is required'),
   body('time_range.start_date').isISO8601().withMessage('Valid start date is required'),
   body('time_range.end_date').isISO8601().withMessage('Valid end date is required')

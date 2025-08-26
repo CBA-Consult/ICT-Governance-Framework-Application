@@ -1,8 +1,7 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const express = require('express');
 const { Pool } = require('pg');
-const { authenticateToken } = require('../middleware/auth');
-const { requirePermission } = require('../middleware/permissions');
+const { requirePermissions, authenticateToken } = require('../middleware/auth');
 const EscalationService = require('../services/escalation-service');
 
 const router = express.Router();
@@ -15,7 +14,7 @@ const escalationService = new EscalationService();
 router.use(authenticateToken);
 
 // Start escalation monitoring service
-router.post('/service/start', requirePermission('escalation.manage'), async (req, res) => {
+router.post('/service/start', requirePermissions('escalation.manage'), async (req, res) => {
   try {
     escalationService.start();
     res.json({ 
@@ -29,7 +28,7 @@ router.post('/service/start', requirePermission('escalation.manage'), async (req
 });
 
 // Stop escalation monitoring service
-router.post('/service/stop', requirePermission('escalation.manage'), async (req, res) => {
+router.post('/service/stop', requirePermissions('escalation.manage'), async (req, res) => {
   try {
     escalationService.stop();
     res.json({ 
@@ -43,7 +42,7 @@ router.post('/service/stop', requirePermission('escalation.manage'), async (req,
 });
 
 // Get escalation service status
-router.get('/service/status', requirePermission('escalation.read'), async (req, res) => {
+router.get('/service/status', requirePermissions('escalation.read'), async (req, res) => {
   try {
     const stats = await escalationService.getEscalationStats();
     
@@ -59,7 +58,7 @@ router.get('/service/status', requirePermission('escalation.read'), async (req, 
 });
 
 // Trigger manual escalation check
-router.post('/service/check', requirePermission('escalation.manage'), async (req, res) => {
+router.post('/service/check', requirePermissions('escalation.manage'), async (req, res) => {
   try {
     await escalationService.checkEscalations();
     res.json({ 
@@ -72,7 +71,7 @@ router.post('/service/check', requirePermission('escalation.manage'), async (req
 });
 
 // Create manual escalation
-router.post('/manual', requirePermission('escalation.create'), async (req, res) => {
+router.post('/manual', requirePermissions('escalation.create'), async (req, res) => {
   try {
     const {
       feedback_id,
@@ -106,7 +105,7 @@ router.post('/manual', requirePermission('escalation.create'), async (req, res) 
 });
 
 // Get escalation policies
-router.get('/policies', requirePermission('escalation.read'), async (req, res) => {
+router.get('/policies', requirePermissions('escalation.read'), async (req, res) => {
   try {
     const query = `
       SELECT 
@@ -130,7 +129,7 @@ router.get('/policies', requirePermission('escalation.read'), async (req, res) =
 });
 
 // Create escalation policy
-router.post('/policies', requirePermission('escalation.manage'), async (req, res) => {
+router.post('/policies', requirePermissions('escalation.manage'), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -206,7 +205,7 @@ router.post('/policies', requirePermission('escalation.manage'), async (req, res
 });
 
 // Update escalation policy
-router.put('/policies/:id', requirePermission('escalation.manage'), async (req, res) => {
+router.put('/policies/:id', requirePermissions('escalation.manage'), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -286,7 +285,7 @@ router.put('/policies/:id', requirePermission('escalation.manage'), async (req, 
 });
 
 // Get escalation policy details with steps
-router.get('/policies/:id', requirePermission('escalation.read'), async (req, res) => {
+router.get('/policies/:id', requirePermissions('escalation.read'), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -331,7 +330,7 @@ router.get('/policies/:id', requirePermission('escalation.read'), async (req, re
 });
 
 // Delete escalation policy
-router.delete('/policies/:id', requirePermission('escalation.manage'), async (req, res) => {
+router.delete('/policies/:id', requirePermissions('escalation.manage'), async (req, res) => {
   const client = await pool.connect();
   
   try {
@@ -363,7 +362,7 @@ router.delete('/policies/:id', requirePermission('escalation.manage'), async (re
 });
 
 // Get SLA monitoring data
-router.get('/sla-monitoring', requirePermission('escalation.read'), async (req, res) => {
+router.get('/sla-monitoring', requirePermissions('escalation.read'), async (req, res) => {
   try {
     const query = `
       SELECT 
@@ -388,7 +387,7 @@ router.get('/sla-monitoring', requirePermission('escalation.read'), async (req, 
 });
 
 // Get escalation metrics
-router.get('/metrics', requirePermission('escalation.read'), async (req, res) => {
+router.get('/metrics', requirePermissions('escalation.read'), async (req, res) => {
   try {
     const { timeframe = '30' } = req.query;
 

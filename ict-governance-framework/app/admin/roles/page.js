@@ -18,7 +18,6 @@ import {
 } from '@heroicons/react/24/outline';
 
 // Import modal components
-import CreateRoleModal from '../../components/admin/CreateRoleModal';
 import EditRoleModal from '../../components/admin/EditRoleModal';
 import ManagePermissionsModal from '../../components/admin/ManagePermissionsModal';
 
@@ -157,11 +156,7 @@ function RoleManagementPage() {
   };
 
   // Handle role created successfully
-  const handleRoleCreated = (newRole) => {
-    setSuccessMessage('Role created successfully');
-    fetchRoles(pagination.page, searchTerm, typeFilter);
-    setShowCreateModal(false);
-  };
+  // (Removed duplicate handleRoleCreated function. The correct version is defined below for real-time updates.)
 
   // Clear messages
   const clearMessages = () => {

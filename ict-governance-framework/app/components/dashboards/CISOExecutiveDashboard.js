@@ -49,11 +49,22 @@ export default function CISOExecutiveDashboard({ timeRange = 30 }) {
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const { state } = useContext(AuthContext);
 
-  // Guard: show loading or error if context is not ready
+  // Guard: show loading spinner and redirect if context is not ready
+  useEffect(() => {
+    if (!state || !state.tokens) {
+      // Show spinner for 1s, then redirect
+      const timer = setTimeout(() => {
+        window.location.href = '/auth';
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [state]);
+
   if (!state || !state.tokens) {
     return (
       <div className="flex items-center justify-center h-full">
-        <span className="text-gray-500">Authentication not initialized. Please log in.</span>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mr-4"></div>
+        <span className="text-gray-500">Redirecting to login...</span>
       </div>
     );
   }

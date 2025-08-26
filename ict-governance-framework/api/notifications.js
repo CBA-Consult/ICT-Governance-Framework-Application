@@ -2,8 +2,7 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }
 const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
-const { authenticateToken } = require('../middleware/auth');
-const { requirePermission } = require('../middleware/permissions');
+const { requirePermissions, authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -257,7 +256,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Create notification (admin/system use)
-router.post('/', requirePermission('notification.create'), async (req, res) => {
+router.post('/', requirePermissions('notification.create'), async (req, res) => {
   const client = await pool.connect();
   
   try {

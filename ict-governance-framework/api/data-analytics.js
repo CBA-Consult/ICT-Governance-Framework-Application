@@ -5,8 +5,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult, query } = require('express-validator');
-const { authenticateToken, logActivity } = require('../middleware/auth');
-const { requirePermission } = require('../middleware/permissions');
+const { requirePermissions, authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -427,7 +426,7 @@ class AdvancedAnalytics {
 // POST /api/data-analytics/predictive-analysis - Perform predictive analysis
 router.post('/predictive-analysis',
   authenticateToken,
-  requirePermission('data_analytics_read'),
+  requirePermissions('data_analytics_read'),
   [
     body('metric_name').notEmpty().withMessage('Metric name is required'),
     body('time_range.start_date').isISO8601().withMessage('Invalid start date'),
@@ -486,7 +485,7 @@ router.post('/predictive-analysis',
 // POST /api/data-analytics/anomaly-detection - Detect anomalies in metrics
 router.post('/anomaly-detection',
   authenticateToken,
-  requirePermission('data_analytics_read'),
+  requirePermissions('data_analytics_read'),
   [
     body('metric_name').notEmpty().withMessage('Metric name is required'),
     body('time_range.start_date').isISO8601().withMessage('Invalid start date'),
@@ -545,7 +544,7 @@ router.post('/anomaly-detection',
 // POST /api/data-analytics/correlation-analysis - Analyze correlation between metrics
 router.post('/correlation-analysis',
   authenticateToken,
-  requirePermission('data_analytics_read'),
+  requirePermissions('data_analytics_read'),
   [
     body('metric1').notEmpty().withMessage('First metric name is required'),
     body('metric2').notEmpty().withMessage('Second metric name is required'),
@@ -604,7 +603,7 @@ router.post('/correlation-analysis',
 // POST /api/data-analytics/benchmark-analysis - Perform benchmark analysis
 router.post('/benchmark-analysis',
   authenticateToken,
-  requirePermission('data_analytics_read'),
+  requirePermissions('data_analytics_read'),
   [
     body('metric_name').notEmpty().withMessage('Metric name is required'),
     body('time_range.start_date').isISO8601().withMessage('Invalid start date'),
@@ -663,7 +662,7 @@ router.post('/benchmark-analysis',
 // POST /api/data-analytics/multidimensional-analysis - Perform multidimensional analysis
 router.post('/multidimensional-analysis',
   authenticateToken,
-  requirePermission('data_analytics_read'),
+  requirePermissions('data_analytics_read'),
   [
     body('metrics').isArray({ min: 2 }).withMessage('At least 2 metrics are required'),
     body('time_range.start_date').isISO8601().withMessage('Invalid start date'),

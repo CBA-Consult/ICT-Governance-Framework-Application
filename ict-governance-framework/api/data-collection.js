@@ -5,9 +5,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult, query } = require('express-validator');
-const { requirePermission } = require('../middleware/permissions');
-const { authenticateToken, logActivity } = require('../middleware/auth');
-
+const { requirePermissions, authenticateToken, logActivity } = require('../middleware/auth');
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -44,7 +42,7 @@ function generateDataSourceId() {
 // GET /api/data-collection/sources - List all data sources
 router.get('/sources', 
   authenticateToken, 
-  requirePermission('data_collection_read'),
+  requirePermissions('data_collection_read'),
   async (req, res) => {
     try {
       const { page = 1, limit = 50, source_type, data_category, is_active } = req.query;
@@ -148,7 +146,7 @@ router.get('/sources',
 // POST /api/data-collection/sources - Create new data source
 router.post('/sources',
   authenticateToken,
-  requirePermission('data_collection_write'),
+  requirePermissions('data_collection_write'),
   dataSourceValidation,
   async (req, res) => {
     const client = await pool.connect();
@@ -230,7 +228,7 @@ router.post('/sources',
 // POST /api/data-collection/metrics - Collect metric data
 router.post('/metrics',
   authenticateToken,
-  requirePermission('data_collection_write'),
+  requirePermissions('data_collection_write'),
   metricDataValidation,
   async (req, res) => {
     const client = await pool.connect();
@@ -336,7 +334,7 @@ router.post('/metrics',
 // POST /api/data-collection/metrics/batch - Batch collect metric data
 router.post('/metrics/batch',
   authenticateToken,
-  requirePermission('data_collection_write'),
+  requirePermissions('data_collection_write'),
   async (req, res) => {
     const client = await pool.connect();
     
@@ -461,7 +459,7 @@ router.post('/metrics/batch',
 // GET /api/data-collection/metrics - Query metric data
 router.get('/metrics',
   authenticateToken,
-  requirePermission('data_collection_read'),
+  requirePermissions('data_collection_read'),
   async (req, res) => {
     try {
       const {

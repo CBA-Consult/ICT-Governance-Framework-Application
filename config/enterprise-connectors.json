@@ -1,0 +1,56 @@
+{
+  "secure-score": {
+    "name": "Microsoft Secure Score",
+    "type": "security",
+    "priority": "high",
+    "enabled": true,
+    "capabilities": [
+      "secure-score-monitoring",
+      "control-profiles",
+      "security-recommendations",
+      "compliance-mapping",
+      "trend-analysis"
+    ],
+    "syncSettings": {
+      "autoSync": true,
+      "syncInterval": 3600000,
+      "alertThreshold": 5
+    }
+  },
+  "servicenow": {
+    "enabled": false
+  },
+  "sap": {
+    "enabled": false
+  },
+  "salesforce": {
+    "enabled": false
+  },
+  "workday": {
+    "enabled": false
+  },
+  "synapse": {
+    "enabled": true
+  },
+  "sentinel": {
+    "enabled": true
+  },
+  "power-bi": {
+    "enabled": true
+  },
+  "oracle": {
+    "enabled": false
+  },
+  "aws": {
+    "enabled": false
+  },
+  "gcp": {
+    "enabled": false
+  },
+  "legacySftp": {
+    "enabled": false
+  },
+  "mainframe": {
+    "enabled": false
+  }
+}
