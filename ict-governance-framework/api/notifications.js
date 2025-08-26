@@ -333,6 +333,18 @@ router.post('/', requirePermissions('notification.create'), async (req, res) => 
       `, [notificationId, channel]);
     }
 
+    // Create delivery records for each channel
+    for (const channel of delivery_channels) {
+      if (channel !== 'in_app') {
+        const deliveryId = `DEL-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        await client.query(`
+          INSERT INTO notification_deliveries (
+            delivery_id, notification_id, delivery_channel, status, scheduled_at
+          ) VALUES ($1, $2, $3, $4, $5)
+        `, [deliveryId, notificationId, channel, 'pending', scheduled_for || new Date()]);
+      }
+    }
+
     await client.query('COMMIT');
 
     res.status(201).json({
@@ -343,6 +355,270 @@ router.post('/', requirePermissions('notification.create'), async (req, res) => 
     await client.query('ROLLBACK');
     console.error('Error creating notification:', error);
     res.status(500).json({ error: 'Failed to create notification' });
+  } finally {
+    client.release();
+  }
+});
+
+// Acknowledge notification
+router.patch('/:id/acknowledge', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+    const userId = req.user.id;
+
+    const updateQuery = `
+      UPDATE notifications 
+      SET acknowledged = true, acknowledged_at = NOW(), acknowledged_by = $1,
+          acknowledgment_notes = $2
+      WHERE notification_id = $3 AND (recipient_user_id = $1 OR $4 = ANY(broadcast_to_roles))
+      RETURNING *
+    `;
+
+    const result = await pool.query(updateQuery, [userId, notes, id, req.user.roles || []]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Notification not found or already acknowledged' });
+    }
+
+    res.json({
+      message: 'Notification acknowledged successfully',
+      notification: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error acknowledging notification:', error);
+    res.status(500).json({ error: 'Failed to acknowledge notification' });
+  }
+});
+
+// Bulk notification operations
+router.post('/bulk-action', requirePermission('notification.manage'), async (req, res) => {
+  const client = await pool.connect();
+  
+  try {
+    await client.query('BEGIN');
+
+    const { action, notification_ids, notes } = req.body;
+    const userId = req.user.id;
+
+    if (!action || !notification_ids || !Array.isArray(notification_ids)) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: action, notification_ids (array)' 
+      });
+    }
+
+    let updateQuery = '';
+    let values = [];
+
+    switch (action) {
+      case 'mark_read':
+        updateQuery = `
+          UPDATE notifications 
+          SET status = 'read', read_at = NOW()
+          WHERE notification_id = ANY($1) AND recipient_user_id = $2
+          RETURNING notification_id, subject
+        `;
+        values = [notification_ids, userId];
+        break;
+
+      case 'archive':
+        updateQuery = `
+          UPDATE notifications 
+          SET archived = true, archived_at = NOW()
+          WHERE notification_id = ANY($1) AND recipient_user_id = $2
+          RETURNING notification_id, subject
+        `;
+        values = [notification_ids, userId];
+        break;
+
+      case 'delete':
+        updateQuery = `
+          DELETE FROM notifications 
+          WHERE notification_id = ANY($1) AND recipient_user_id = $2
+          RETURNING notification_id, subject
+        `;
+        values = [notification_ids, userId];
+        break;
+
+      default:
+        return res.status(400).json({ error: 'Invalid action. Supported: mark_read, archive, delete' });
+    }
+
+    const result = await client.query(updateQuery, values);
+
+    await client.query('COMMIT');
+
+    res.json({
+      message: `Bulk ${action} completed successfully`,
+      affected_notifications: result.rows.length,
+      notifications: result.rows
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error performing bulk action:', error);
+    res.status(500).json({ error: 'Failed to perform bulk action' });
+  } finally {
+    client.release();
+  }
+});
+
+// Get notification analytics
+router.get('/analytics', requirePermission('notification.read'), async (req, res) => {
+  try {
+    const { timeframe = '30', user_id } = req.query;
+    const currentUserId = user_id || req.user.id;
+
+    const analyticsQuery = `
+      SELECT 
+        COUNT(*) as total_notifications,
+        COUNT(CASE WHEN status = 'unread' THEN 1 END) as unread_count,
+        COUNT(CASE WHEN status = 'read' THEN 1 END) as read_count,
+        COUNT(CASE WHEN acknowledged = true THEN 1 END) as acknowledged_count,
+        COUNT(CASE WHEN priority = 'Critical' THEN 1 END) as critical_count,
+        COUNT(CASE WHEN priority = 'High' THEN 1 END) as high_count,
+        AVG(EXTRACT(EPOCH FROM (COALESCE(read_at, NOW()) - created_at))/60) as avg_read_time_minutes,
+        COUNT(CASE WHEN archived = true THEN 1 END) as archived_count
+      FROM notifications
+      WHERE recipient_user_id = $1 
+        AND created_at >= NOW() - INTERVAL '${parseInt(timeframe)} days'
+    `;
+
+    const categoryQuery = `
+      SELECT 
+        category,
+        COUNT(*) as count,
+        COUNT(CASE WHEN status = 'unread' THEN 1 END) as unread_count
+      FROM notifications
+      WHERE recipient_user_id = $1 
+        AND created_at >= NOW() - INTERVAL '${parseInt(timeframe)} days'
+      GROUP BY category
+      ORDER BY count DESC
+    `;
+
+    const trendQuery = `
+      SELECT 
+        DATE(created_at) as date,
+        COUNT(*) as notifications_count,
+        COUNT(CASE WHEN priority = 'Critical' THEN 1 END) as critical_count
+      FROM notifications
+      WHERE recipient_user_id = $1 
+        AND created_at >= NOW() - INTERVAL '${parseInt(timeframe)} days'
+      GROUP BY DATE(created_at)
+      ORDER BY date
+    `;
+
+    const [analyticsResult, categoryResult, trendResult] = await Promise.all([
+      pool.query(analyticsQuery, [currentUserId]),
+      pool.query(categoryQuery, [currentUserId]),
+      pool.query(trendQuery, [currentUserId])
+    ]);
+
+    res.json({
+      analytics: analyticsResult.rows[0],
+      by_category: categoryResult.rows,
+      trend: trendResult.rows,
+      timeframe: parseInt(timeframe)
+    });
+  } catch (error) {
+    console.error('Error fetching notification analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch notification analytics' });
+  }
+});
+
+// Schedule notification
+router.post('/schedule', requirePermission('notification.create'), async (req, res) => {
+  const client = await pool.connect();
+  
+  try {
+    await client.query('BEGIN');
+
+    const {
+      notification_type,
+      recipient_user_id,
+      recipient_role,
+      broadcast_to_roles = [],
+      subject,
+      message,
+      html_content,
+      priority = 'Medium',
+      category,
+      metadata = {},
+      related_entity_type,
+      related_entity_id,
+      scheduled_for,
+      delivery_channels = ['in_app'],
+      attachments = [],
+      recurrence_pattern,
+      recurrence_end_date
+    } = req.body;
+
+    if (!scheduled_for) {
+      return res.status(400).json({ error: 'scheduled_for is required for scheduled notifications' });
+    }
+
+    // Validate required fields
+    if (!notification_type || !subject || !message || !category) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: notification_type, subject, message, category' 
+      });
+    }
+
+    // Get notification type ID
+    const typeQuery = `SELECT id FROM notification_types WHERE type_name = $1`;
+    const typeResult = await client.query(typeQuery, [notification_type]);
+    
+    if (typeResult.rows.length === 0) {
+      return res.status(400).json({ error: 'Invalid notification type' });
+    }
+
+    const scheduleId = `SCHED-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+    const insertQuery = `
+      INSERT INTO scheduled_notifications (
+        schedule_id, notification_type_id, recipient_user_id, recipient_role,
+        broadcast_to_roles, sender_user_id, subject, message, html_content,
+        priority, category, metadata, related_entity_type, related_entity_id,
+        scheduled_for, delivery_channels, attachments, recurrence_pattern,
+        recurrence_end_date, status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+      RETURNING *
+    `;
+
+    const values = [
+      scheduleId,
+      typeResult.rows[0].id,
+      recipient_user_id,
+      recipient_role,
+      JSON.stringify(broadcast_to_roles),
+      req.user.id,
+      subject,
+      message,
+      html_content,
+      priority,
+      category,
+      JSON.stringify(metadata),
+      related_entity_type,
+      related_entity_id,
+      scheduled_for,
+      JSON.stringify(delivery_channels),
+      JSON.stringify(attachments),
+      JSON.stringify(recurrence_pattern),
+      recurrence_end_date,
+      'scheduled'
+    ];
+
+    const result = await client.query(insertQuery, values);
+
+    await client.query('COMMIT');
+
+    res.status(201).json({
+      message: 'Notification scheduled successfully',
+      scheduled_notification: result.rows[0]
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error scheduling notification:', error);
+    res.status(500).json({ error: 'Failed to schedule notification' });
   } finally {
     client.release();
   }

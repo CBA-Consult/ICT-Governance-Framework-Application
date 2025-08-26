@@ -472,6 +472,224 @@ router.get('/rules/list', requirePermission('alert.read'), async (req, res) => {
   }
 });
 
+// Bulk operations on alerts
+router.post('/bulk-action', requirePermission('alert.manage'), async (req, res) => {
+  const client = await pool.connect();
+  
+  try {
+    await client.query('BEGIN');
+
+    const { action, alert_ids, notes } = req.body;
+    const userId = req.user.id;
+
+    if (!action || !alert_ids || !Array.isArray(alert_ids) || alert_ids.length === 0) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: action, alert_ids (array)' 
+      });
+    }
+
+    let updateQuery = '';
+    let activityDescription = '';
+
+    switch (action) {
+      case 'acknowledge':
+        updateQuery = `
+          UPDATE alerts 
+          SET status = 'acknowledged', acknowledged_at = NOW(), acknowledged_by = $1
+          WHERE alert_id = ANY($2) AND status = 'active'
+          RETURNING alert_id, title, severity
+        `;
+        activityDescription = 'Bulk acknowledged';
+        break;
+
+      case 'resolve':
+        if (!notes) {
+          return res.status(400).json({ error: 'Resolution notes are required for bulk resolve' });
+        }
+        updateQuery = `
+          UPDATE alerts 
+          SET status = 'resolved', resolved_by = $1, resolved_at = NOW(), resolution_notes = $3
+          WHERE alert_id = ANY($2) AND status IN ('active', 'acknowledged')
+          RETURNING alert_id, title, severity
+        `;
+        activityDescription = 'Bulk resolved';
+        break;
+
+      case 'close':
+        updateQuery = `
+          UPDATE alerts 
+          SET status = 'closed'
+          WHERE alert_id = ANY($2) AND status NOT IN ('closed', 'resolved')
+          RETURNING alert_id, title, severity
+        `;
+        activityDescription = 'Bulk closed';
+        break;
+
+      default:
+        return res.status(400).json({ error: 'Invalid action. Supported: acknowledge, resolve, close' });
+    }
+
+    const values = action === 'resolve' ? [userId, alert_ids, notes] : [userId, alert_ids];
+    const result = await client.query(updateQuery, values);
+
+    // Log activity for each affected alert
+    for (const alert of result.rows) {
+      await client.query(`
+        INSERT INTO alert_actions (alert_id, action_type, action_by, notes)
+        VALUES ($1, $2, $3, $4)
+      `, [alert.alert_id, action, userId, `${activityDescription}${notes ? ': ' + notes : ''}`]);
+    }
+
+    await client.query('COMMIT');
+
+    res.json({
+      message: `Bulk ${action} completed successfully`,
+      affected_alerts: result.rows.length,
+      alerts: result.rows
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error performing bulk action:', error);
+    res.status(500).json({ error: 'Failed to perform bulk action' });
+  } finally {
+    client.release();
+  }
+});
+
+// Get alert trends and analytics
+router.get('/analytics/trends', requirePermission('alert.read'), async (req, res) => {
+  try {
+    const { timeframe = '30', group_by = 'day' } = req.query;
+
+    let dateFormat;
+    switch (group_by) {
+      case 'hour':
+        dateFormat = "DATE_TRUNC('hour', triggered_at)";
+        break;
+      case 'day':
+        dateFormat = "DATE_TRUNC('day', triggered_at)";
+        break;
+      case 'week':
+        dateFormat = "DATE_TRUNC('week', triggered_at)";
+        break;
+      case 'month':
+        dateFormat = "DATE_TRUNC('month', triggered_at)";
+        break;
+      default:
+        dateFormat = "DATE_TRUNC('day', triggered_at)";
+    }
+
+    const trendsQuery = `
+      SELECT 
+        ${dateFormat} as period,
+        COUNT(*) as total_alerts,
+        COUNT(CASE WHEN severity = 'Critical' THEN 1 END) as critical_alerts,
+        COUNT(CASE WHEN severity = 'High' THEN 1 END) as high_alerts,
+        COUNT(CASE WHEN status = 'resolved' THEN 1 END) as resolved_alerts,
+        AVG(EXTRACT(EPOCH FROM (COALESCE(acknowledged_at, NOW()) - triggered_at))/60) as avg_acknowledgment_minutes,
+        AVG(EXTRACT(EPOCH FROM (COALESCE(resolved_at, NOW()) - triggered_at))/60) as avg_resolution_minutes
+      FROM alerts
+      WHERE triggered_at >= NOW() - INTERVAL '${parseInt(timeframe)} days'
+      GROUP BY ${dateFormat}
+      ORDER BY period
+    `;
+
+    const categoryQuery = `
+      SELECT 
+        ar.category,
+        COUNT(*) as count,
+        COUNT(CASE WHEN a.severity = 'Critical' THEN 1 END) as critical_count,
+        AVG(EXTRACT(EPOCH FROM (COALESCE(a.resolved_at, NOW()) - a.triggered_at))/60) as avg_resolution_minutes
+      FROM alerts a
+      JOIN alert_rules ar ON a.alert_rule_id = ar.id
+      WHERE a.triggered_at >= NOW() - INTERVAL '${parseInt(timeframe)} days'
+      GROUP BY ar.category
+      ORDER BY count DESC
+    `;
+
+    const [trendsResult, categoryResult] = await Promise.all([
+      pool.query(trendsQuery),
+      pool.query(categoryQuery)
+    ]);
+
+    res.json({
+      trends: trendsResult.rows,
+      by_category: categoryResult.rows,
+      timeframe: parseInt(timeframe),
+      group_by
+    });
+  } catch (error) {
+    console.error('Error fetching alert analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch alert analytics' });
+  }
+});
+
+// Create alert template
+router.post('/templates', requirePermission('alert.manage'), async (req, res) => {
+  try {
+    const {
+      template_name,
+      category,
+      severity,
+      title_template,
+      description_template,
+      conditions = {},
+      auto_actions = {},
+      escalation_rules = {}
+    } = req.body;
+
+    if (!template_name || !category || !severity) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: template_name, category, severity' 
+      });
+    }
+
+    const insertQuery = `
+      INSERT INTO alert_templates (
+        template_name, category, severity, title_template, description_template,
+        conditions, auto_actions, escalation_rules, created_by
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *
+    `;
+
+    const result = await pool.query(insertQuery, [
+      template_name, category, severity, title_template, description_template,
+      JSON.stringify(conditions), JSON.stringify(auto_actions), 
+      JSON.stringify(escalation_rules), req.user.id
+    ]);
+
+    res.status(201).json({
+      message: 'Alert template created successfully',
+      template: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error creating alert template:', error);
+    res.status(500).json({ error: 'Failed to create alert template' });
+  }
+});
+
+// Get alert templates
+router.get('/templates', requirePermission('alert.read'), async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        at.*,
+        u.username as created_by_username
+      FROM alert_templates at
+      LEFT JOIN users u ON at.created_by = u.id
+      WHERE at.is_active = true
+      ORDER BY at.template_name
+    `;
+
+    const result = await pool.query(query);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching alert templates:', error);
+    res.status(500).json({ error: 'Failed to fetch alert templates' });
+  }
+});
+
 // Helper function to create alert notifications
 async function createAlertNotification(client, alert, action, actionBy, escalationTarget = null) {
   try {
