@@ -22,318 +22,251 @@ async function initializeMonitoring() {
       enableCaching: true
     });
 
-    // Register all integrations with monitoring service
-    const integrations = [
-      {
-        name: 'azure-ad',
-        priority: 'critical',
-        healthCheckInterval: 30000,
-        alertThresholds: {
-          responseTime: 3000,
-          errorRate: 5,
-          availability: 99
+  // Register only enabled integrations with monitoring service
+    const connectorConfig = require('../config/enterprise-connectors.json');
+  const integrations = [];
+
+    if (connectorConfig['azure-ad']?.enabled === true) integrations.push({
+      name: 'azure-ad',
+      priority: 'critical',
+      healthCheckInterval: 30000,
+      alertThresholds: { responseTime: 3000, errorRate: 5, availability: 99 },
+      customHealthChecks: [
+        {
+          name: 'token_validity',
+          description: 'Check if Azure AD tokens are valid and not expired',
+          test: async (integration) => {
+            const token = await integration.getAccessToken();
+            return { valid: !!token, tokenLength: token?.length || 0 };
+          }
         },
-        customHealthChecks: [
-          {
-            name: 'token_validity',
-            description: 'Check if Azure AD tokens are valid and not expired',
-            test: async (integration) => {
-              const token = await integration.getAccessToken();
-              return { valid: !!token, tokenLength: token?.length || 0 };
-            }
-          },
-          {
-            name: 'user_query',
-            description: 'Test user query functionality',
-            test: async (integration) => {
-              const users = await integration.getUsers({ limit: 1 });
-              return { userCount: users?.length || 0 };
-            }
+        {
+          name: 'user_query',
+          description: 'Test user query functionality',
+          test: async (integration) => {
+            const users = await integration.getUsers({ limit: 1 });
+            return { userCount: users?.length || 0 };
           }
-        ],
-        diagnosticTests: [
-          {
-            name: 'graph_api_connectivity',
-            description: 'Test Microsoft Graph API connectivity',
-            test: async (integration) => {
-              const response = await integration.client.get('/v1.0/me');
-              return { statusCode: response.status };
-            }
+        }
+      ],
+      diagnosticTests: [
+        {
+          name: 'graph_api_connectivity',
+          description: 'Test Microsoft Graph API connectivity',
+          test: async (integration) => {
+            const response = await integration.client.get('/v1.0/me');
+            return { statusCode: response.status };
           }
-        ]
-      },
-      {
-        name: 'defender-cloud-apps',
-        priority: 'critical',
-        healthCheckInterval: 60000,
-        alertThresholds: {
-          responseTime: 5000,
-          errorRate: 10,
-          availability: 95
+        }
+      ]
+    });
+    // Repeat for each integration, only if enabled === true
+    if (connectorConfig['defender-cloud-apps']?.enabled === true) integrations.push({
+      name: 'defender-cloud-apps',
+      priority: 'critical',
+      healthCheckInterval: 60000,
+      alertThresholds: { responseTime: 5000, errorRate: 10, availability: 95 },
+      customHealthChecks: [
+        {
+          name: 'discovered_apps_check',
+          description: 'Verify discovered apps data is accessible',
+          test: async (integration) => {
+            const apps = await integration.getDiscoveredApps({ limit: 1 });
+            return { appsFound: apps?.length || 0 };
+          }
         },
-        customHealthChecks: [
-          {
-            name: 'discovered_apps_check',
-            description: 'Verify discovered apps data is accessible',
-            test: async (integration) => {
-              const apps = await integration.getDiscoveredApps({ limit: 1 });
-              return { appsFound: apps?.length || 0 };
-            }
-          },
-          {
-            name: 'alerts_check',
-            description: 'Check security alerts accessibility',
-            test: async (integration) => {
-              const alerts = await integration.getAlerts({ limit: 1 });
-              return { alertsFound: alerts?.length || 0 };
-            }
+        {
+          name: 'alerts_check',
+          description: 'Check security alerts accessibility',
+          test: async (integration) => {
+            const alerts = await integration.getAlerts({ limit: 1 });
+            return { alertsFound: alerts?.length || 0 };
           }
-        ]
-      },
-      {
-        name: 'servicenow',
-        priority: 'high',
-        healthCheckInterval: 60000,
-        alertThresholds: {
-          responseTime: 5000,
-          errorRate: 10,
-          availability: 95
+        }
+      ]
+    });
+    if (connectorConfig['servicenow']?.enabled === true) integrations.push({
+      name: 'servicenow',
+      priority: 'high',
+      healthCheckInterval: 60000,
+      alertThresholds: { responseTime: 5000, errorRate: 10, availability: 95 },
+      customHealthChecks: [
+        {
+          name: 'incident_creation',
+          description: 'Test incident creation capability',
+          test: async (integration) => {
+            const testIncident = {
+              title: 'Health Check Test',
+              description: 'Automated health check test incident',
+              priority: '5',
+              category: 'Software'
+            };
+            const result = await integration.createIncident(testIncident);
+            return { incidentCreated: !!result };
+          }
         },
-        customHealthChecks: [
-          {
-            name: 'incident_creation',
-            description: 'Test incident creation capability',
-            test: async (integration) => {
-              // Test with a dummy incident (would be cleaned up)
-              const testIncident = {
-                title: 'Health Check Test',
-                description: 'Automated health check test incident',
-                priority: '5',
-                category: 'Software'
-              };
-              const result = await integration.createIncident(testIncident);
-              return { incidentCreated: !!result };
-            }
-          },
-          {
-            name: 'cmdb_access',
-            description: 'Test CMDB data access',
-            test: async (integration) => {
-              const items = await integration.getCMDBItems({ limit: 1 });
-              return { cmdbItemsFound: items?.length || 0 };
-            }
+        {
+          name: 'cmdb_access',
+          description: 'Test CMDB data access',
+          test: async (integration) => {
+            const items = await integration.getCMDBItems({ limit: 1 });
+            return { cmdbItemsFound: items?.length || 0 };
           }
-        ]
-      },
-      {
-        name: 'power-bi',
-        priority: 'medium',
-        healthCheckInterval: 120000,
-        alertThresholds: {
-          responseTime: 8000,
-          errorRate: 15,
-          availability: 90
+        }
+      ]
+    });
+    if (connectorConfig['powerbi']?.enabled === true) integrations.push({
+      name: 'power-bi',
+      priority: 'medium',
+      healthCheckInterval: 120000,
+      alertThresholds: { responseTime: 8000, errorRate: 15, availability: 90 },
+      customHealthChecks: [
+        {
+          name: 'reports_access',
+          description: 'Test Power BI reports access',
+          test: async (integration) => {
+            const reports = await integration.getReports({ limit: 1 });
+            return { reportsFound: reports?.length || 0 };
+          }
+        }
+      ]
+    });
+    if (connectorConfig['sap']?.enabled === true) integrations.push({
+      name: 'sap-erp',
+      priority: 'critical',
+      healthCheckInterval: 60000,
+      alertThresholds: { responseTime: 10000, errorRate: 5, availability: 98 },
+      customHealthChecks: [
+        {
+          name: 'odata_service',
+          description: 'Test SAP OData service connectivity',
+          test: async (integration) => {
+            const users = await integration.getUsers({ limit: 1 });
+            return { usersFound: users?.length || 0 };
+          }
         },
-        customHealthChecks: [
-          {
-            name: 'reports_access',
-            description: 'Test Power BI reports access',
-            test: async (integration) => {
-              const reports = await integration.getReports({ limit: 1 });
-              return { reportsFound: reports?.length || 0 };
-            }
+        {
+          name: 'financial_data',
+          description: 'Test financial data access',
+          test: async (integration) => {
+            const data = await integration.getFinancialData({ limit: 1 });
+            return { dataRecords: data?.length || 0 };
           }
-        ]
-      },
-      {
-        name: 'sap-erp',
-        priority: 'critical',
-        healthCheckInterval: 60000,
-        alertThresholds: {
-          responseTime: 10000,
-          errorRate: 5,
-          availability: 98
-        },
-        customHealthChecks: [
-          {
-            name: 'odata_service',
-            description: 'Test SAP OData service connectivity',
-            test: async (integration) => {
-              const users = await integration.getUsers({ limit: 1 });
-              return { usersFound: users?.length || 0 };
-            }
-          },
-          {
-            name: 'financial_data',
-            description: 'Test financial data access',
-            test: async (integration) => {
-              const data = await integration.getFinancialData({ limit: 1 });
-              return { dataRecords: data?.length || 0 };
-            }
+        }
+      ]
+    });
+    if (connectorConfig['salesforce']?.enabled === true) integrations.push({
+      name: 'salesforce',
+      priority: 'high',
+      healthCheckInterval: 60000,
+      alertThresholds: { responseTime: 5000, errorRate: 10, availability: 95 },
+      customHealthChecks: [
+        {
+          name: 'sobject_access',
+          description: 'Test Salesforce object access',
+          test: async (integration) => {
+            const accounts = await integration.getAccounts({ limit: 1 });
+            return { accountsFound: accounts?.length || 0 };
           }
-        ]
-      },
-      {
-        name: 'salesforce',
-        priority: 'high',
-        healthCheckInterval: 60000,
-        alertThresholds: {
-          responseTime: 5000,
-          errorRate: 10,
-          availability: 95
-        },
-        customHealthChecks: [
-          {
-            name: 'sobject_access',
-            description: 'Test Salesforce object access',
-            test: async (integration) => {
-              const accounts = await integration.getAccounts({ limit: 1 });
-              return { accountsFound: accounts?.length || 0 };
-            }
+        }
+      ]
+    });
+    if (connectorConfig['workday']?.enabled === true) integrations.push({
+      name: 'workday',
+      priority: 'high',
+      healthCheckInterval: 120000,
+      alertThresholds: { responseTime: 8000, errorRate: 10, availability: 95 },
+      customHealthChecks: [
+        {
+          name: 'worker_data',
+          description: 'Test worker data access',
+          test: async (integration) => {
+            const workers = await integration.getWorkers({ limit: 1 });
+            return { workersFound: workers?.length || 0 };
           }
-        ]
-      },
-      {
-        name: 'workday',
-        priority: 'high',
-        healthCheckInterval: 120000,
-        alertThresholds: {
-          responseTime: 8000,
-          errorRate: 10,
-          availability: 95
-        },
-        customHealthChecks: [
-          {
-            name: 'worker_data',
-            description: 'Test worker data access',
-            test: async (integration) => {
-              const workers = await integration.getWorkers({ limit: 1 });
-              return { workersFound: workers?.length || 0 };
-            }
+        }
+      ]
+    });
+    if (connectorConfig['synapse']?.enabled === true) integrations.push({
+      name: 'synapse',
+      priority: 'medium',
+      healthCheckInterval: 300000,
+      alertThresholds: { responseTime: 15000, errorRate: 15, availability: 90 },
+      customHealthChecks: [
+        {
+          name: 'pipeline_status',
+          description: 'Check data pipeline status',
+          test: async (integration) => {
+            const pipelines = await integration.getPipelines({ limit: 1 });
+            return { pipelinesFound: pipelines?.length || 0 };
           }
-        ]
-      },
-      {
-        name: 'synapse',
-        priority: 'medium',
-        healthCheckInterval: 300000,
-        alertThresholds: {
-          responseTime: 15000,
-          errorRate: 15,
-          availability: 90
-        },
-        customHealthChecks: [
-          {
-            name: 'pipeline_status',
-            description: 'Check data pipeline status',
-            test: async (integration) => {
-              const pipelines = await integration.getPipelines({ limit: 1 });
-              return { pipelinesFound: pipelines?.length || 0 };
-            }
+        }
+      ]
+    });
+    if (connectorConfig['sentinel']?.enabled === true) integrations.push({
+      name: 'sentinel',
+      priority: 'critical',
+      healthCheckInterval: 60000,
+      alertThresholds: { responseTime: 5000, errorRate: 5, availability: 98 },
+      customHealthChecks: [
+        {
+          name: 'incident_access',
+          description: 'Test security incident access',
+          test: async (integration) => {
+            const incidents = await integration.getIncidents({ limit: 1 });
+            return { incidentsFound: incidents?.length || 0 };
           }
-        ]
-      },
-      {
-        name: 'sentinel',
-        priority: 'critical',
-        healthCheckInterval: 60000,
-        alertThresholds: {
-          responseTime: 5000,
-          errorRate: 5,
-          availability: 98
-        },
-        customHealthChecks: [
-          {
-            name: 'incident_access',
-            description: 'Test security incident access',
-            test: async (integration) => {
-              const incidents = await integration.getIncidents({ limit: 1 });
-              return { incidentsFound: incidents?.length || 0 };
-            }
+        }
+      ]
+    });
+    if (connectorConfig['oracle']?.enabled === true) integrations.push({
+      name: 'oracle',
+      priority: 'high',
+      healthCheckInterval: 120000,
+      alertThresholds: { responseTime: 8000, errorRate: 10, availability: 95 },
+      customHealthChecks: [
+        {
+          name: 'query_execution',
+          description: 'Test database query execution',
+          test: async (integration) => {
+            const result = await integration.executeQuery('SELECT 1 FROM DUAL');
+            return { queryExecuted: !!result };
           }
-        ]
-      },
-      {
-        name: 'oracle',
-        priority: 'high',
-        healthCheckInterval: 120000,
-        alertThresholds: {
-          responseTime: 8000,
-          errorRate: 10,
-          availability: 95
-        },
-        customHealthChecks: [
-          {
-            name: 'query_execution',
-            description: 'Test database query execution',
-            test: async (integration) => {
-              const result = await integration.executeQuery('SELECT 1 FROM DUAL');
-              return { queryExecuted: !!result };
-            }
+        }
+      ]
+    });
+    if (connectorConfig['aws']?.enabled === true) integrations.push({
+      name: 'aws',
+      priority: 'medium',
+      healthCheckInterval: 300000,
+      alertThresholds: { responseTime: 10000, errorRate: 15, availability: 90 },
+      customHealthChecks: [
+        {
+          name: 'resource_discovery',
+          description: 'Test AWS resource discovery',
+          test: async (integration) => {
+            const resources = await integration.getResources({ limit: 1 });
+            return { resourcesFound: resources?.length || 0 };
           }
-        ]
-      },
-      {
-        name: 'aws',
-        priority: 'medium',
-        healthCheckInterval: 300000,
-        alertThresholds: {
-          responseTime: 10000,
-          errorRate: 15,
-          availability: 90
-        },
-        customHealthChecks: [
-          {
-            name: 'resource_discovery',
-            description: 'Test AWS resource discovery',
-            test: async (integration) => {
-              const resources = await integration.getResources({ limit: 1 });
-              return { resourcesFound: resources?.length || 0 };
-            }
+        }
+      ]
+    });
+    if (connectorConfig['gcp']?.enabled === true) integrations.push({
+      name: 'gcp',
+      priority: 'medium',
+      healthCheckInterval: 300000,
+      alertThresholds: { responseTime: 10000, errorRate: 15, availability: 90 },
+      customHealthChecks: [
+        {
+          name: 'resource_discovery',
+          description: 'Test GCP resource discovery',
+          test: async (integration) => {
+            const resources = await integration.getResources({ limit: 1 });
+            return { resourcesFound: resources?.length || 0 };
           }
-        ]
-      },
-      {
-        name: 'gcp',
-        priority: 'medium',
-        healthCheckInterval: 300000,
-        alertThresholds: {
-          responseTime: 10000,
-          errorRate: 15,
-          availability: 90
-        },
-        customHealthChecks: [
-          {
-            name: 'resource_discovery',
-            description: 'Test GCP resource discovery',
-            test: async (integration) => {
-              const resources = await integration.getResources({ limit: 1 });
-              return { resourcesFound: resources?.length || 0 };
-            }
-          }
-        ]
-      },
-      {
-        name: 'legacy-systems',
-        priority: 'low',
-        healthCheckInterval: 600000,
-        alertThresholds: {
-          responseTime: 30000,
-          errorRate: 20,
-          availability: 85
-        },
-        customHealthChecks: [
-          {
-            name: 'file_transfer',
-            description: 'Test file transfer capability',
-            test: async (integration) => {
-              // Test file transfer without actually transferring files
-              return { transferCapable: true };
-            }
-          }
-        ]
-      }
-    ];
+        }
+      ]
+    });
 
     // Register each integration
     for (const integrationConfig of integrations) {
@@ -421,24 +354,6 @@ function setupMonitoringEventHandlers() {
     // createJiraTicket(alert);
   });
 
-  // Integration registered event
-  monitoringService.on('integration-registered', (data) => {
-    console.log(`Integration registered for monitoring: ${data.name}`);
-  });
-}
-
-/**
- * Get monitoring status
- */
-function getMonitoringStatus() {
-  return {
-    isInitialized: true,
-    integrationsCount: monitoringService.integrations.size,
-    healthChecksActive: monitoringService.options.enableRealTimeMonitoring,
-    diagnosticsEnabled: monitoringService.options.enableDiagnostics,
-    alertingEnabled: monitoringService.options.enableAlerting,
-    uptime: process.uptime()
-  };
 }
 
 /**
@@ -448,6 +363,18 @@ function stopMonitoring() {
   console.log('Stopping all monitoring services...');
   monitoringService.stopAllMonitoring();
   console.log('✓ All monitoring stopped');
+}
+
+/**
+ * Get current monitoring status
+ */
+function getMonitoringStatus() {
+  // Return a summary of monitoring status
+  return {
+    monitoringActive: typeof monitoringService !== 'undefined' && monitoringService.isActive ? true : false,
+    integrationsRegistered: monitoringService?.getRegisteredIntegrations ? monitoringService.getRegisteredIntegrations().length : 0,
+    registeredIntegrations: monitoringService?.getRegisteredIntegrations ? monitoringService.getRegisteredIntegrations() : [],
+  };
 }
 
 module.exports = {

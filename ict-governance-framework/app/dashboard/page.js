@@ -92,8 +92,11 @@ export default function DashboardPage() {
         throw new Error('Failed to check dashboard permissions');
       }
 
-      const result = await response.json();
-      setUserPermissions(result.data.dashboardAccess);
+  const result = await response.json();
+  // tolerate multiple possible shapes returned by the API
+  const dashboardAccess = result?.data?.dashboardAccess ?? result?.dashboardAccess ?? result?.data ?? result;
+  
+  setUserPermissions(dashboardAccess);
       setAccessError(null);
     } catch (err) {
       console.error('Error checking dashboard access:', err);
@@ -134,13 +137,60 @@ export default function DashboardPage() {
     );
   }
 
-  // Check if user has any dashboard permissions
-  const hasAnyDashboardAccess = userPermissions && (
-    userPermissions.executive || 
-    userPermissions.operational || 
-    userPermissions.compliance || 
-    userPermissions.analytics
-  );
+  // Helper to normalize permission shapes and recognise super-admins
+  const hasPermissionFlag = (perms) => {
+    if (!perms) return false;
+    
+    // array of role names
+    if (Array.isArray(perms)) {
+      return perms.includes('superAdmin') || perms.includes('super_admin') || perms.includes('administrator') || perms.length > 0;
+    }
+    
+    // object with boolean flags
+    if (typeof perms === 'object') {
+      // Check for super admin or admin roles first
+      if (perms.superAdmin || perms.super_admin || perms.administrator || perms.admin) {
+        return true;
+      }
+      
+      // Check for high-level access
+      if (perms.hasHighLevelAccess) {
+        return true;
+      }
+      
+      // Check for specific dashboard permissions
+      if (perms.executive || perms.operational || perms.compliance || perms.analytics || perms.export) {
+        return true;
+      }
+      
+      // Check if roles array contains admin roles
+      if (Array.isArray(perms.roles)) {
+        if (perms.roles.includes('super_admin') || perms.roles.includes('admin') || 
+            perms.roles.includes('governance_manager') || perms.roles.includes('it_manager')) {
+          return true;
+        }
+      }
+      
+      // Check for any truthy dashboard-related key
+      const dashboardKeys = ['executive', 'operational', 'compliance', 'analytics', 'export', 'admin'];
+      if (dashboardKeys.some(k => !!perms[k])) {
+        return true;
+      }
+      
+      // Fallback: check if any key is truthy
+      return Object.keys(perms).some(k => !!perms[k]);
+    }
+    
+    // string single role
+    if (typeof perms === 'string') {
+      return perms === 'superAdmin' || perms === 'super_admin' || perms === 'administrator' || perms === 'admin';
+    }
+    
+    return false;
+  };
+
+  // Check if user has any dashboard permissions (including super-admin)
+  const hasAnyDashboardAccess = hasPermissionFlag(userPermissions);
 
   if (!hasAnyDashboardAccess) {
     return (

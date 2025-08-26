@@ -129,9 +129,11 @@ const requirePermissions = (requiredPermissions) => {
     }
 
     const userPermissions = req.user.permissions || [];
-    
+    // Defensive: ensure requiredPermissions is always an array
+    const required = Array.isArray(requiredPermissions) ? requiredPermissions : [requiredPermissions];
+
     // Check if user has all required permissions
-    const hasAllPermissions = requiredPermissions.every(permission => 
+    const hasAllPermissions = required.every(permission => 
       userPermissions.includes(permission)
     );
 
@@ -142,7 +144,7 @@ const requirePermissions = (requiredPermissions) => {
       return res.status(403).json({ 
         error: 'Insufficient permissions',
         code: 'INSUFFICIENT_PERMISSIONS',
-        required: requiredPermissions,
+        required,
         current: userPermissions
       });
     }
@@ -187,6 +189,7 @@ const requireRoles = (requiredRoles) => {
 };
 
 /**
+
  * Middleware to check if user is admin (has admin or super_admin role)
  */
 const requireAdmin = requireRoles(['admin', 'super_admin']);

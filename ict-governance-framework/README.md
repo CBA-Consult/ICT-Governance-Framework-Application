@@ -163,6 +163,7 @@ Then assign the super_admin role using the SQL command above.
 - Advanced search and filtering capabilities
 - Document relationships and compliance tracking
 
+
 ### **Activity Logging & Audit Trail**
 - Comprehensive user activity logging
 - API request/response tracking
@@ -286,7 +287,6 @@ Then assign the super_admin role using the SQL command above.
 - Error tracking and alerting
 - Performance monitoring
 
-
 ## 🔧 Security & Configuration
 
 ### Environment Security
@@ -405,7 +405,6 @@ npm run db:reset
 ```
 
 **Note:** This framework and dashboard are under active development with production-ready user management. For authoritative framework content, refer to the Markdown files in the repository root or the [Table of Contents](../Table-of-Contents.md).
-
 
 ## 🤝 Contributing
 

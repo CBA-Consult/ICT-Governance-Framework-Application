@@ -753,7 +753,13 @@ INSERT INTO permissions (permission_id, permission_name, display_name, descripti
 ('PERM_DASHBOARD_COMPLIANCE', 'dashboard.compliance', 'Compliance Dashboard Access', 'Access to compliance dashboards and regulatory metrics', 'dashboards', 'compliance', TRUE),
 ('PERM_DASHBOARD_ANALYTICS', 'dashboard.analytics', 'Analytics Dashboard Access', 'Access to advanced analytics and data visualization features', 'dashboards', 'analytics', TRUE),
 ('PERM_DASHBOARD_EXPORT', 'dashboard.export', 'Dashboard Export', 'Export dashboard data and reports', 'dashboards', 'export', TRUE),
-('PERM_DASHBOARD_ADMIN', 'dashboard.admin', 'Dashboard Administration', 'Manage dashboard configurations and user access', 'dashboards', 'admin', TRUE)
+('PERM_DASHBOARD_ADMIN', 'dashboard.admin', 'Dashboard Administration', 'Manage dashboard configurations and user access', 'dashboards', 'admin', TRUE),
+
+-- Security Metrics and Secure Score
+('PERM_VIEW_SECURITY_METRICS', 'view_security_metrics', 'View Security Metrics', 'View security metrics and secure score data', 'security', 'view_metrics', TRUE),
+('PERM_MANAGE_SECURITY_METRICS', 'manage_security_metrics', 'Manage Security Metrics', 'Manage security metrics and secure score configurations', 'security', 'manage_metrics', TRUE),
+('PERM_SECURE_SCORE_SYNC', 'secure_score.sync', 'Sync Secure Score', 'Manually trigger secure score synchronization', 'security', 'sync', TRUE),
+('PERM_SECURE_SCORE_RECOMMENDATIONS', 'secure_score.recommendations', 'Manage Recommendations', 'Manage secure score recommendations and implementations', 'security', 'recommendations', TRUE)
 ON CONFLICT (permission_id) DO NOTHING;
 
 -- Assign permissions to default roles
@@ -790,6 +796,10 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_ANALYTICS'),
 ('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_EXPORT'),
 ('ROLE_SUPER_ADMIN', 'PERM_DASHBOARD_ADMIN'),
+('ROLE_SUPER_ADMIN', 'PERM_VIEW_SECURITY_METRICS'),
+('ROLE_SUPER_ADMIN', 'PERM_MANAGE_SECURITY_METRICS'),
+('ROLE_SUPER_ADMIN', 'PERM_SECURE_SCORE_SYNC'),
+('ROLE_SUPER_ADMIN', 'PERM_SECURE_SCORE_RECOMMENDATIONS'),
 
 -- Admin - Most permissions except user/role management
 ('ROLE_ADMIN', 'PERM_USER_READ'),
@@ -882,6 +892,10 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_SECURITY_ANALYST', 'PERM_DASHBOARD_OPERATIONAL'),
 ('ROLE_SECURITY_ANALYST', 'PERM_DASHBOARD_COMPLIANCE'),
 ('ROLE_SECURITY_ANALYST', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_SECURITY_ANALYST', 'PERM_VIEW_SECURITY_METRICS'),
+('ROLE_SECURITY_ANALYST', 'PERM_MANAGE_SECURITY_METRICS'),
+('ROLE_SECURITY_ANALYST', 'PERM_SECURE_SCORE_SYNC'),
+('ROLE_SECURITY_ANALYST', 'PERM_SECURE_SCORE_RECOMMENDATIONS'),
 
 -- Auditor
 ('ROLE_AUDITOR', 'PERM_USER_READ'),
@@ -895,6 +909,7 @@ INSERT INTO role_permissions (role_id, permission_id) VALUES
 ('ROLE_AUDITOR', 'PERM_APP_PROCUREMENT'),
 ('ROLE_AUDITOR', 'PERM_DASHBOARD_COMPLIANCE'),
 ('ROLE_AUDITOR', 'PERM_DASHBOARD_ANALYTICS'),
+('ROLE_AUDITOR', 'PERM_VIEW_SECURITY_METRICS'),
 
 -- Employee
 ('ROLE_EMPLOYEE', 'PERM_GOVERNANCE_READ'),
@@ -1226,3 +1241,165 @@ CREATE INDEX IF NOT EXISTS idx_document_comments_document_id ON document_comment
 CREATE INDEX IF NOT EXISTS idx_document_comments_version_id ON document_comments(version_id);
 CREATE INDEX IF NOT EXISTS idx_document_comments_created_by ON document_comments(created_by);
 CREATE INDEX IF NOT EXISTS idx_document_comments_status ON document_comments(status);
+
+-- Microsoft Graph Secure Score Tables
+
+-- Secure scores table - stores historical secure score data
+CREATE TABLE IF NOT EXISTS secure_scores (
+    id VARCHAR(255) PRIMARY KEY,
+    current_score INTEGER NOT NULL,
+    max_score INTEGER NOT NULL,
+    percentage DECIMAL(5,2) GENERATED ALWAYS AS (ROUND((current_score::DECIMAL / max_score::DECIMAL) * 100, 2)) STORED,
+    created_date_time TIMESTAMP NOT NULL,
+    active_user_count INTEGER,
+    enabled_services INTEGER,
+    licensed_user_count INTEGER,
+    raw_data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score control profiles table - stores control configuration and recommendations
+CREATE TABLE IF NOT EXISTS secure_score_control_profiles (
+    id VARCHAR(255) PRIMARY KEY,
+    control_name VARCHAR(255) NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    category VARCHAR(100),
+    implementation_cost VARCHAR(50),
+    user_impact VARCHAR(50),
+    compliance_information JSONB,
+    control_state_updates JSONB,
+    max_score INTEGER,
+    current_score INTEGER,
+    percentage DECIMAL(5,2),
+    description TEXT,
+    remediation_impact TEXT,
+    action_type VARCHAR(100),
+    service VARCHAR(100),
+    threats JSONB,
+    deprecated BOOLEAN DEFAULT FALSE,
+    raw_data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score recommendations table - stores actionable recommendations
+CREATE TABLE IF NOT EXISTS secure_score_recommendations (
+    id SERIAL PRIMARY KEY,
+    recommendation_id VARCHAR(255) UNIQUE NOT NULL,
+    control_profile_id VARCHAR(255) REFERENCES secure_score_control_profiles(id),
+    title VARCHAR(500) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    priority VARCHAR(20) CHECK (priority IN ('low', 'medium', 'high', 'critical')),
+    impact_score INTEGER,
+    implementation_cost VARCHAR(50),
+    user_impact VARCHAR(50),
+    compliance_frameworks JSONB,
+    action_required TEXT,
+    estimated_effort_hours INTEGER,
+    business_justification TEXT,
+    status VARCHAR(50) DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'completed', 'dismissed', 'not_applicable')),
+    assigned_to VARCHAR(255),
+    due_date DATE,
+    completed_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score alerts table - stores alerts for significant changes
+CREATE TABLE IF NOT EXISTS secure_score_alerts (
+    id SERIAL PRIMARY KEY,
+    alert_id VARCHAR(255) UNIQUE NOT NULL,
+    alert_type VARCHAR(100) NOT NULL,
+    severity VARCHAR(20) CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    title VARCHAR(500) NOT NULL,
+    description TEXT,
+    current_score DECIMAL(5,2),
+    previous_score DECIMAL(5,2),
+    threshold_value DECIMAL(5,2),
+    change_percentage DECIMAL(5,2),
+    affected_controls JSONB,
+    status VARCHAR(50) DEFAULT 'open' CHECK (status IN ('open', 'acknowledged', 'resolved', 'dismissed')),
+    acknowledged_by VARCHAR(255),
+    acknowledged_at TIMESTAMP,
+    resolved_by VARCHAR(255),
+    resolved_at TIMESTAMP,
+    resolution_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score compliance mapping table - maps controls to compliance frameworks
+CREATE TABLE IF NOT EXISTS secure_score_compliance_mapping (
+    id SERIAL PRIMARY KEY,
+    control_profile_id VARCHAR(255) REFERENCES secure_score_control_profiles(id),
+    compliance_framework VARCHAR(100) NOT NULL,
+    control_reference VARCHAR(100),
+    requirement_description TEXT,
+    implementation_status VARCHAR(50) DEFAULT 'not_implemented',
+    evidence_required BOOLEAN DEFAULT FALSE,
+    evidence_provided BOOLEAN DEFAULT FALSE,
+    last_assessment_date DATE,
+    next_assessment_date DATE,
+    assessor VARCHAR(255),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Secure score improvement tracking table - tracks implementation progress
+CREATE TABLE IF NOT EXISTS secure_score_improvements (
+    id SERIAL PRIMARY KEY,
+    improvement_id VARCHAR(255) UNIQUE NOT NULL,
+    recommendation_id VARCHAR(255) REFERENCES secure_score_recommendations(recommendation_id),
+    control_profile_id VARCHAR(255) REFERENCES secure_score_control_profiles(id),
+    improvement_type VARCHAR(100) NOT NULL,
+    baseline_score INTEGER,
+    target_score INTEGER,
+    current_score INTEGER,
+    implementation_start_date DATE,
+    planned_completion_date DATE,
+    actual_completion_date DATE,
+    implementation_status VARCHAR(50) DEFAULT 'planned' CHECK (implementation_status IN ('planned', 'in_progress', 'testing', 'completed', 'failed', 'cancelled')),
+    implementation_notes TEXT,
+    business_impact TEXT,
+    technical_impact TEXT,
+    rollback_plan TEXT,
+    success_criteria TEXT,
+    assigned_team VARCHAR(255),
+    project_manager VARCHAR(255),
+    budget_allocated DECIMAL(10,2),
+    budget_spent DECIMAL(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for secure score tables
+CREATE INDEX IF NOT EXISTS idx_secure_scores_created_date_time ON secure_scores(created_date_time);
+CREATE INDEX IF NOT EXISTS idx_secure_scores_percentage ON secure_scores(percentage);
+CREATE INDEX IF NOT EXISTS idx_secure_scores_created_at ON secure_scores(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_control_profiles_category ON secure_score_control_profiles(category);
+CREATE INDEX IF NOT EXISTS idx_secure_score_control_profiles_implementation_cost ON secure_score_control_profiles(implementation_cost);
+CREATE INDEX IF NOT EXISTS idx_secure_score_control_profiles_user_impact ON secure_score_control_profiles(user_impact);
+CREATE INDEX IF NOT EXISTS idx_secure_score_control_profiles_deprecated ON secure_score_control_profiles(deprecated);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_priority ON secure_score_recommendations(priority);
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_status ON secure_score_recommendations(status);
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_category ON secure_score_recommendations(category);
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_assigned_to ON secure_score_recommendations(assigned_to);
+CREATE INDEX IF NOT EXISTS idx_secure_score_recommendations_due_date ON secure_score_recommendations(due_date);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_alerts_alert_type ON secure_score_alerts(alert_type);
+CREATE INDEX IF NOT EXISTS idx_secure_score_alerts_severity ON secure_score_alerts(severity);
+CREATE INDEX IF NOT EXISTS idx_secure_score_alerts_status ON secure_score_alerts(status);
+CREATE INDEX IF NOT EXISTS idx_secure_score_alerts_created_at ON secure_score_alerts(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_compliance_mapping_framework ON secure_score_compliance_mapping(compliance_framework);
+CREATE INDEX IF NOT EXISTS idx_secure_score_compliance_mapping_status ON secure_score_compliance_mapping(implementation_status);
+CREATE INDEX IF NOT EXISTS idx_secure_score_compliance_mapping_assessment_date ON secure_score_compliance_mapping(last_assessment_date);
+
+CREATE INDEX IF NOT EXISTS idx_secure_score_improvements_status ON secure_score_improvements(implementation_status);
+CREATE INDEX IF NOT EXISTS idx_secure_score_improvements_assigned_team ON secure_score_improvements(assigned_team);
+CREATE INDEX IF NOT EXISTS idx_secure_score_improvements_completion_date ON secure_score_improvements(planned_completion_date);

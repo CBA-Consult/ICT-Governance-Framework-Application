@@ -1,6 +1,9 @@
+
+
 // File: ict-governance-framework/api/secure-scores.js
 // Microsoft Graph API Secure Score Integration
 
+// ALL IMPORTS AND INITIALIZATIONS MUST BE AT THE TOP
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const express = require('express');
 const { Pool } = require('pg');
@@ -9,12 +12,118 @@ const { authenticateToken } = require('../middleware/auth');
 const { requirePermission } = require('../middleware/permissions');
 const axios = require('axios');
 
+
+// Initialize the router
 const router = express.Router();
+
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 // Microsoft Graph API configuration
 const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL || 'https://graph.microsoft.com';
 const GRAPH_API_VERSION = 'v1.0';
+
+// Dashboard endpoint for frontend
+// --- New database-centric helper functions ---
+async function getLatestSecureScore() {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(`
+      SELECT * FROM secure_score ORDER BY created_datetime DESC LIMIT 1;
+    `);
+    return result.rows[0] || null;
+  } finally {
+    client.release();
+  }
+}
+
+async function getHistoricalSecureScores(timeRangeInDays) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(`
+      SELECT * FROM secure_score
+      WHERE created_datetime >= NOW() - INTERVAL '${timeRangeInDays} days'
+      ORDER BY created_datetime DESC;
+    `);
+    return result.rows;
+  } finally {
+    client.release();
+  }
+}
+
+async function getControlScoresForScore(secureScoreId) {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(`
+      SELECT * FROM control_score WHERE secure_score_id = $1;
+    `, [secureScoreId]);
+    return result.rows;
+  } finally {
+    client.release();
+  }
+}
+
+// --- Refactored /dashboard endpoint ---
+router.get('/dashboard', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
+  try {
+    const { timeRange = '30' } = req.query;
+    const currentScore = await getLatestSecureScore();
+    if (!currentScore) {
+      return res.status(404).json({ error: 'No secure score data available' });
+    }
+    const historicalData = await getHistoricalSecureScores(parseInt(timeRange));
+    const controlScores = await getControlScoresForScore(currentScore.id);
+
+    // Example: implemented controls logic (customize as needed)
+    const implementedControls = controlScores.filter(ctrl => ctrl.implementation_status === 'Implemented').length;
+    const controlsImplementationRate = controlScores.length > 0 ? Math.round((implementedControls / controlScores.length) * 100) : 0;
+
+    // Example: trend calculation (customize as needed)
+    const previousScore = historicalData.length > 1 ? historicalData[1] : null;
+    const scoreDelta = previousScore ? currentScore.current_score - previousScore.current_score : 0;
+    const percentageDelta = previousScore ? ((currentScore.current_score / currentScore.max_score) * 100) - ((previousScore.current_score / previousScore.max_score) * 100) : 0;
+
+    // Example: trend direction
+    const trend = {
+      direction: scoreDelta > 0 ? 'up' : scoreDelta < 0 ? 'down' : 'stable',
+      change: scoreDelta
+    };
+
+    // Example: trend data for chart (last 30 days)
+    const trendData = historicalData.slice(0, 30).map(row => ({
+      date: row.created_datetime,
+      score: row.current_score
+    }));
+
+    // Example: compliance impact (customize as needed)
+    // You can use your existing calculateComplianceImpact logic here, passing controlScores
+
+    // Format response for frontend
+    res.json({
+      data: {
+        overview: {
+          currentScore: currentScore.current_score || 0,
+          maxScore: currentScore.max_score || 0,
+          percentage: currentScore.max_score ? Math.round((currentScore.current_score / currentScore.max_score) * 100) : 0,
+          trend: { direction: trend.direction, change: trend.change },
+          lastUpdated: currentScore.created_datetime || new Date().toISOString()
+        },
+        trends: trendData,
+        controlCategories: controlScores.map(ctrl => ({
+          name: ctrl.control_name,
+          implemented: ctrl.implementation_status === 'Implemented' ? 1 : 0,
+          total: 1
+        })),
+        topRecommendations: [],
+        riskAreas: [],
+        complianceImpact: [],
+        controlsImplementationRate
+      }
+    });
+  } catch (error) {
+    console.error('Error in /dashboard:', error);
+    res.status(500).json({ error: 'Failed to fetch dashboard data' });
+  }
+});
 
 /**
  * Get Microsoft Graph API access token
@@ -42,75 +151,136 @@ async function getGraphAccessToken() {
   }
 }
 
+// Other functions and router definitions...
+/**
+ * Scheduled job to sync secure scores from Microsoft Graph to the approved normalized PostgreSQL schema.
+ */
+async function scheduledSync() {
+  const client = await pool.connect();
+  try {
+    console.log('Starting Scheduled Secure Score sync...');
+    const accessToken = await getGraphAccessToken();
+    // Fetch current secure scores from Microsoft Graph API
+    const secureScoreUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/security/secureScores`;
+    const response = await axios.get(secureScoreUrl, {
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    });
+    const secureScores = response.data.value || [];
+
+    if (secureScores.length === 0) {
+      console.log('Secure Score sync: No scores found to process.');
+      return;
+    }
+
+    // Process each score within its own transaction for data integrity
+    for (const score of secureScores) {
+      try {
+        await client.query('BEGIN');
+
+        // Upsert vendor_information
+        const vi = score.vendorInformation || {};
+        const vendorRes = await client.query(
+          `INSERT INTO vendor_information (vendor, provider, sub_provider)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (vendor, provider, sub_provider) DO UPDATE SET vendor = EXCLUDED.vendor
+           RETURNING id`,
+          [vi.vendor || 'Unknown', vi.provider || 'Unknown', vi.subProvider || null]
+        );
+        const vendorInformationId = vendorRes.rows[0]?.id;
+
+        // Upsert the main secure_score record
+        await client.query(
+          `INSERT INTO secure_score (
+            id, tenant_id, azure_tenant_id, active_user_count, licensed_user_count, 
+            created_datetime, current_score, max_score, vendor_information_id
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          ON CONFLICT (id) DO UPDATE SET
+            tenant_id = EXCLUDED.tenant_id,
+            active_user_count = EXCLUDED.active_user_count,
+            licensed_user_count = EXCLUDED.licensed_user_count,
+            created_datetime = EXCLUDED.created_datetime,
+            current_score = EXCLUDED.current_score,
+            max_score = EXCLUDED.max_score,
+            vendor_information_id = EXCLUDED.vendor_information_id;`,
+          [
+            score.id, score.azureTenantId, score.azureTenantId, score.activeUserCount, 
+            score.licensedUserCount, score.createdDateTime, score.currentScore, 
+            score.maxScore, vendorInformationId
+          ]
+        );
+
+        // Clear and insert child records for relational integrity
+        await client.query('DELETE FROM average_comparative_score WHERE secure_score_id = $1;', [score.id]);
+        await client.query('DELETE FROM control_score WHERE secure_score_id = $1;', [score.id]);
+
+        // Insert average_comparative_score records
+        if (Array.isArray(score.averageComparativeScores)) {
+          for (const compScore of score.averageComparativeScores) {
+            await client.query(
+              `INSERT INTO average_comparative_score (secure_score_id, basis, average_score)
+               VALUES ($1, $2, $3);`,
+              [score.id, compScore.basis, compScore.averageScore]
+            );
+          }
+        }
+
+        // Insert control_score records
+        if (Array.isArray(score.controlScores)) {
+          for (const ctrlScore of score.controlScores) {
+            await client.query(
+              `INSERT INTO control_score (
+                secure_score_id, control_category, control_name, description, 
+                score, score_in_percentage, implementation_status
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7);`,
+              [
+                score.id, ctrlScore.controlCategory, ctrlScore.controlName, ctrlScore.description, 
+                ctrlScore.score, ctrlScore.scoreInPercentage, ctrlScore.implementationStatus
+              ]
+            );
+          }
+        }
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        console.error(`Failed to sync score ID ${score.id}. Rolled back transaction. Error:`, err);
+      }
+    }
+    console.log(`Secure Score sync completed. Processed ${secureScores.length} records into normalized tables.`);
+  } catch (err) {
+    console.error('Scheduled Secure Score sync failed:', err);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// Attach the sync function to the router object
+router.scheduledSync = scheduledSync;
+
+// Export the router (now with scheduledSync attached)
+module.exports = router;
+
 /**
  * GET /api/secure-scores
  * Retrieve current secure scores from Microsoft Graph API
  */
 router.get('/', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
   try {
-    const { 
-      timeRange = '30',
-      includeHistory = 'false',
-      includeControlScores = 'false'
-    } = req.query;
-
-    const accessToken = await getGraphAccessToken();
-    
-    // Fetch current secure score
-    const secureScoreUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/security/secureScores`;
-    const params = new URLSearchParams();
-    
-    if (timeRange !== 'all') {
-      const daysAgo = parseInt(timeRange);
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - daysAgo);
-      params.append('$filter', `createdDateTime ge ${startDate.toISOString()}`);
-    }
-    
-    params.append('$top', '50');
-    params.append('$orderby', 'createdDateTime desc');
-
-    const response = await axios.get(`${secureScoreUrl}?${params.toString()}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const secureScores = response.data.value;
-    
-    // Store in database for historical tracking
-    await storeSecureScoreData(secureScores);
-
-    // Get control scores if requested
-    let controlScores = null;
-    if (includeControlScores === 'true' && secureScores.length > 0) {
-      controlScores = await getSecureScoreControlProfiles(accessToken);
-    }
-
-    // Get historical data from database if requested
-    let historicalData = null;
-    if (includeHistory === 'true') {
-      historicalData = await getHistoricalSecureScores(parseInt(timeRange));
-    }
-
-    const result = {
-      current: secureScores[0] || null,
-      history: secureScores,
-      controlScores,
-      historicalData,
-      summary: generateSecureScoreSummary(secureScores),
-      recommendations: await generateRecommendations(secureScores[0])
-    };
+    const { timeRange = '30' } = req.query;
+    // Use the existing helper function to get historical data from the database
+    const historicalData = await getHistoricalSecureScores(parseInt(timeRange));
 
     res.json({
       success: true,
-      data: result,
-      timestamp: new Date().toISOString()
+      data: historicalData,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        source: 'database',
+        timeRange: `${timeRange} days`
+      }
     });
-
   } catch (error) {
-    console.error('Error fetching secure scores:', error);
+    console.error('Error fetching secure scores from database:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch secure scores',
@@ -118,463 +288,6 @@ router.get('/', authenticateToken, requirePermission('view_security_metrics'), a
     });
   }
 });
-
-/**
- * GET /api/secure-scores/control-profiles
- * Get secure score control profiles
- */
-router.get('/control-profiles', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
-  try {
-    const accessToken = await getGraphAccessToken();
-    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
-
-    res.json({
-      success: true,
-      data: controlProfiles,
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Error fetching control profiles:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch control profiles',
-      details: error.message
-    });
-  }
-});
-
-/**
- * GET /api/secure-scores/dashboard
- * Get dashboard data for secure scores
- */
-router.get('/dashboard', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
-  try {
-    const { timeRange = '30' } = req.query;
-    
-    // Get current secure score data
-    const accessToken = await getGraphAccessToken();
-    const currentScores = await getCurrentSecureScores(accessToken);
-    
-    // Get historical trends
-    const historicalData = await getHistoricalSecureScores(parseInt(timeRange));
-    
-    // Get control profiles for detailed analysis
-    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
-    
-    // Generate dashboard metrics
-    const dashboardData = {
-      overview: {
-        currentScore: currentScores[0]?.currentScore || 0,
-        maxScore: currentScores[0]?.maxScore || 0,
-        percentage: currentScores[0] ? Math.round((currentScores[0].currentScore / currentScores[0].maxScore) * 100) : 0,
-        trend: calculateTrend(historicalData),
-        lastUpdated: currentScores[0]?.createdDateTime || new Date().toISOString()
-      },
-      trends: processTrendData(historicalData),
-      controlCategories: processControlCategories(controlProfiles),
-      topRecommendations: await getTopRecommendations(controlProfiles),
-      riskAreas: identifyRiskAreas(controlProfiles),
-      complianceImpact: calculateComplianceImpact(currentScores[0], controlProfiles)
-    };
-
-    res.json({
-      success: true,
-      data: dashboardData,
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Error generating dashboard data:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to generate dashboard data',
-      details: error.message
-    });
-  }
-});
-
-/**
- * POST /api/secure-scores/sync
- * Manually trigger sync with Microsoft Graph API
- */
-router.post('/sync', authenticateToken, requirePermission('manage_security_metrics'), async (req, res) => {
-  try {
-    const accessToken = await getGraphAccessToken();
-    
-    // Fetch latest secure scores
-    const secureScores = await getCurrentSecureScores(accessToken);
-    
-    // Fetch control profiles
-    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
-    
-    // Store in database
-    await storeSecureScoreData(secureScores);
-    await storeControlProfileData(controlProfiles);
-    
-    // Generate alerts for significant changes
-    await checkForSecureScoreAlerts(secureScores[0]);
-
-    res.json({
-      success: true,
-      message: 'Secure score data synchronized successfully',
-      data: {
-        scoresUpdated: secureScores.length,
-        controlProfilesUpdated: controlProfiles.length,
-        lastSync: new Date().toISOString()
-      }
-    });
-
-  } catch (error) {
-    console.error('Error syncing secure scores:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to sync secure scores',
-      details: error.message
-    });
-  }
-});
-
-/**
- * GET /api/secure-scores/recommendations
- * Get actionable recommendations based on secure score
- */
-router.get('/recommendations', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
-  try {
-    const { priority = 'all', category = 'all' } = req.query;
-    
-    const accessToken = await getGraphAccessToken();
-    const controlProfiles = await getSecureScoreControlProfiles(accessToken);
-    
-    let recommendations = await generateDetailedRecommendations(controlProfiles);
-    
-    // Filter by priority
-    if (priority !== 'all') {
-      recommendations = recommendations.filter(rec => rec.priority === priority);
-    }
-    
-    // Filter by category
-    if (category !== 'all') {
-      recommendations = recommendations.filter(rec => rec.category === category);
-    }
-    
-    // Sort by impact score
-    recommendations.sort((a, b) => b.impactScore - a.impactScore);
-
-    res.json({
-      success: true,
-      data: {
-        recommendations,
-        summary: {
-          total: recommendations.length,
-          byPriority: groupBy(recommendations, 'priority'),
-          byCategory: groupBy(recommendations, 'category'),
-          estimatedImpact: recommendations.reduce((sum, rec) => sum + rec.impactScore, 0)
-        }
-      },
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Error fetching recommendations:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch recommendations',
-      details: error.message
-    });
-  }
-});
-
-// Helper functions
-
-async function getCurrentSecureScores(accessToken) {
-  const secureScoreUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/security/secureScores`;
-  const response = await axios.get(`${secureScoreUrl}?$top=10&$orderby=createdDateTime desc`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
-    }
-  });
-  return response.data.value;
-}
-
-async function getSecureScoreControlProfiles(accessToken) {
-  const controlProfilesUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/security/secureScoreControlProfiles`;
-  const response = await axios.get(`${controlProfilesUrl}?$top=100`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
-    }
-  });
-  return response.data.value;
-}
-
-async function storeSecureScoreData(secureScores) {
-  const client = await pool.connect();
-  try {
-    for (const score of secureScores) {
-      await client.query(`
-        INSERT INTO secure_scores (
-          id, current_score, max_score, percentage, created_date_time, 
-          active_user_count, enabled_services, licensed_user_count, raw_data
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        ON CONFLICT (id) DO UPDATE SET
-          current_score = EXCLUDED.current_score,
-          max_score = EXCLUDED.max_score,
-          percentage = EXCLUDED.percentage,
-          updated_at = CURRENT_TIMESTAMP,
-          raw_data = EXCLUDED.raw_data
-      `, [
-        score.id,
-        score.currentScore,
-        score.maxScore,
-        Math.round((score.currentScore / score.maxScore) * 100),
-        score.createdDateTime,
-        score.activeUserCount,
-        score.enabledServices?.length || 0,
-        score.licensedUserCount,
-        JSON.stringify(score)
-      ]);
-    }
-  } finally {
-    client.release();
-  }
-}
-
-async function storeControlProfileData(controlProfiles) {
-  const client = await pool.connect();
-  try {
-    for (const profile of controlProfiles) {
-      await client.query(`
-        INSERT INTO secure_score_control_profiles (
-          id, control_name, title, category, implementation_cost, 
-          user_impact, compliance_information, control_state_updates, raw_data
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        ON CONFLICT (id) DO UPDATE SET
-          control_name = EXCLUDED.control_name,
-          title = EXCLUDED.title,
-          category = EXCLUDED.category,
-          implementation_cost = EXCLUDED.implementation_cost,
-          user_impact = EXCLUDED.user_impact,
-          compliance_information = EXCLUDED.compliance_information,
-          control_state_updates = EXCLUDED.control_state_updates,
-          updated_at = CURRENT_TIMESTAMP,
-          raw_data = EXCLUDED.raw_data
-      `, [
-        profile.id,
-        profile.controlName,
-        profile.title,
-        profile.controlCategory,
-        profile.implementationCost,
-        profile.userImpact,
-        JSON.stringify(profile.complianceInformation || []),
-        JSON.stringify(profile.controlStateUpdates || []),
-        JSON.stringify(profile)
-      ]);
-    }
-  } finally {
-    client.release();
-  }
-}
-
-async function getHistoricalSecureScores(days) {
-  const result = await pool.query(`
-    SELECT * FROM secure_scores 
-    WHERE created_date_time >= NOW() - INTERVAL '${days} days'
-    ORDER BY created_date_time DESC
-  `);
-  return result.rows;
-}
-
-function generateSecureScoreSummary(secureScores) {
-  if (!secureScores || secureScores.length === 0) {
-    return null;
-  }
-
-  const current = secureScores[0];
-  const previous = secureScores[1];
-  
-  return {
-    currentScore: current.currentScore,
-    maxScore: current.maxScore,
-    percentage: Math.round((current.currentScore / current.maxScore) * 100),
-    change: previous ? current.currentScore - previous.currentScore : 0,
-    trend: previous ? (current.currentScore > previous.currentScore ? 'improving' : 
-                     current.currentScore < previous.currentScore ? 'declining' : 'stable') : 'stable'
-  };
-}
-
-async function generateRecommendations(secureScore) {
-  if (!secureScore) return [];
-  
-  const recommendations = [];
-  const percentage = (secureScore.currentScore / secureScore.maxScore) * 100;
-  
-  if (percentage < 70) {
-    recommendations.push({
-      priority: 'high',
-      title: 'Critical Security Improvements Needed',
-      description: 'Your secure score is below 70%. Immediate action is required.',
-      action: 'Review and implement high-impact security controls'
-    });
-  } else if (percentage < 85) {
-    recommendations.push({
-      priority: 'medium',
-      title: 'Security Posture Enhancement',
-      description: 'Good progress, but there\'s room for improvement.',
-      action: 'Focus on medium-impact controls with low user impact'
-    });
-  }
-  
-  return recommendations;
-}
-
-async function generateDetailedRecommendations(controlProfiles) {
-  const recommendations = [];
-  
-  for (const profile of controlProfiles) {
-    if (profile.controlStateUpdates && profile.controlStateUpdates.length > 0) {
-      const latestUpdate = profile.controlStateUpdates[profile.controlStateUpdates.length - 1];
-      
-      if (latestUpdate.state === 'Default' || latestUpdate.state === 'Ignored') {
-        recommendations.push({
-          id: profile.id,
-          title: profile.title,
-          category: profile.controlCategory,
-          priority: mapImplementationCostToPriority(profile.implementationCost),
-          description: profile.description,
-          impactScore: calculateImpactScore(profile),
-          implementationCost: profile.implementationCost,
-          userImpact: profile.userImpact,
-          complianceFrameworks: profile.complianceInformation?.map(c => c.certificationName) || [],
-          action: `Implement ${profile.controlName} to improve security posture`
-        });
-      }
-    }
-  }
-  
-  return recommendations;
-}
-
-function mapImplementationCostToPriority(cost) {
-  switch (cost) {
-    case 'Low': return 'high';
-    case 'Moderate': return 'medium';
-    case 'High': return 'low';
-    default: return 'medium';
-  }
-}
-
-function calculateImpactScore(profile) {
-  let score = 0;
-  
-  // Base score from max score
-  if (profile.maxScore) {
-    score += profile.maxScore * 0.4;
-  }
-  
-  // Implementation cost factor (lower cost = higher priority)
-  switch (profile.implementationCost) {
-    case 'Low': score += 30; break;
-    case 'Moderate': score += 20; break;
-    case 'High': score += 10; break;
-  }
-  
-  // User impact factor (lower impact = higher priority)
-  switch (profile.userImpact) {
-    case 'Low': score += 25; break;
-    case 'Moderate': score += 15; break;
-    case 'High': score += 5; break;
-  }
-  
-  return Math.round(score);
-}
-
-function calculateTrend(historicalData) {
-  if (!historicalData || historicalData.length < 2) {
-    return { direction: 'stable', change: 0 };
-  }
-  
-  const recent = historicalData[0];
-  const previous = historicalData[1];
-  const change = recent.percentage - previous.percentage;
-  
-  return {
-    direction: change > 0 ? 'improving' : change < 0 ? 'declining' : 'stable',
-    change: Math.round(change * 10) / 10
-  };
-}
-
-function processTrendData(historicalData) {
-  return historicalData.map(item => ({
-    date: item.created_date_time,
-    score: item.current_score,
-    maxScore: item.max_score,
-    percentage: item.percentage
-  })).reverse(); // Oldest first for chart display
-}
-
-function processControlCategories(controlProfiles) {
-  const categories = {};
-  
-  for (const profile of controlProfiles) {
-    const category = profile.controlCategory || 'Other';
-    if (!categories[category]) {
-      categories[category] = {
-        name: category,
-        totalControls: 0,
-        implementedControls: 0,
-        averageScore: 0,
-        totalScore: 0
-      };
-    }
-    
-    categories[category].totalControls++;
-    if (profile.controlStateUpdates && profile.controlStateUpdates.length > 0) {
-      const latestState = profile.controlStateUpdates[profile.controlStateUpdates.length - 1];
-      if (latestState.state === 'On' || latestState.state === 'Reviewed') {
-        categories[category].implementedControls++;
-      }
-    }
-    
-    if (profile.maxScore) {
-      categories[category].totalScore += profile.maxScore;
-    }
-  }
-  
-  // Calculate averages
-  Object.values(categories).forEach(category => {
-    category.implementationRate = Math.round((category.implementedControls / category.totalControls) * 100);
-    category.averageScore = category.totalControls > 0 ? Math.round(category.totalScore / category.totalControls) : 0;
-  });
-  
-  return Object.values(categories);
-}
-
-async function getTopRecommendations(controlProfiles) {
-  const recommendations = await generateDetailedRecommendations(controlProfiles);
-  return recommendations
-    .sort((a, b) => b.impactScore - a.impactScore)
-    .slice(0, 5);
-}
-
-function identifyRiskAreas(controlProfiles) {
-  const riskAreas = [];
-  const categoryStats = processControlCategories(controlProfiles);
-  
-  for (const category of categoryStats) {
-    if (category.implementationRate < 50) {
-      riskAreas.push({
-        area: category.name,
-        riskLevel: category.implementationRate < 25 ? 'high' : 'medium',
-        implementationRate: category.implementationRate,
-        recommendation: `Improve ${category.name} controls implementation`
-      });
-    }
-  }
-  
-  return riskAreas;
-}
 
 function calculateComplianceImpact(currentScore, controlProfiles) {
   const complianceFrameworks = {};
@@ -680,5 +393,127 @@ function groupBy(array, key) {
     return groups;
   }, {});
 }
+
+/**
+ * GET /api/secure-scores/executive-summary
+ * Get CISO executive overview dashboard data
+ */
+router.get('/executive-summary', authenticateToken, requirePermission('view_security_metrics'), async (req, res) => {
+  try {
+    const { timeRange = '30' } = req.query;
+    // Get current secure score and historical data from database
+    const currentScore = await getLatestSecureScore();
+    const historicalData = await getHistoricalSecureScores(parseInt(timeRange));
+    const controlScores = currentScore ? await getControlScoresForScore(currentScore.id) : [];
+
+    // Executive metrics
+    const previousScore = historicalData.length > 1 ? historicalData[1] : null;
+    const scoreDelta = previousScore ? currentScore.current_score - previousScore.current_score : 0;
+    const percentageDelta = previousScore ? ((currentScore.current_score / currentScore.max_score) * 100) - ((previousScore.current_score / previousScore.max_score) * 100) : 0;
+
+    // Controls implementation
+    const implementedControls = controlScores.filter(ctrl => ctrl.implementation_status === 'Implemented').length;
+    const controlsImplementationRate = controlScores.length > 0 ? Math.round((implementedControls / controlScores.length) * 100) : 0;
+    const pendingImplementation = controlScores.length - implementedControls;
+
+    // Trend analysis
+    const trendDirection = scoreDelta > 0 ? 'improving' : scoreDelta < 0 ? 'declining' : 'stable';
+    const trendData = historicalData.slice(0, 30).map(row => ({
+      date: row.created_datetime,
+      score: row.current_score
+    }));
+
+    // Compliance impact (reuse calculateComplianceImpact if possible)
+    // For now, stub with empty array or implement logic if compliance data is in controlScores
+    let complianceFrameworks = [];
+    if (typeof calculateComplianceImpact === 'function') {
+      complianceFrameworks = calculateComplianceImpact(currentScore, controlScores);
+    }
+    const avgComplianceScore = complianceFrameworks.length > 0 ? Math.round(complianceFrameworks.reduce((sum, fw) => sum + fw.score, 0) / complianceFrameworks.length) : 0;
+
+    // Risk areas (stub, as risk logic may need more data)
+    const riskAreas = [];
+    const criticalAlerts = riskAreas.filter(area => area.riskLevel === 'high').length;
+
+    // Executive summary data structure
+    const executiveSummary = {
+      securityPosture: {
+        currentScore: currentScore?.current_score || 0,
+        maxScore: currentScore?.max_score || 0,
+        percentage: currentScore?.max_score ? Math.round((currentScore.current_score / currentScore.max_score) * 100) : 0,
+        scoreDelta: Math.round(scoreDelta),
+        percentageDelta: Math.round(percentageDelta * 10) / 10,
+        trend: trendDirection,
+        lastUpdated: currentScore?.created_datetime || new Date().toISOString(),
+        projectedScore: currentScore?.current_score || 0, // No projection logic yet
+        projectedPercentage: currentScore?.max_score ? Math.round((currentScore.current_score / currentScore.max_score) * 100) : 0
+      },
+      controlsStatus: {
+        totalControls: controlScores.length,
+        implementedControls,
+        implementationRate: controlsImplementationRate,
+        pendingImplementation,
+        criticalGaps: 0 // No risk logic yet
+      },
+      complianceOverview: {
+        averageScore: avgComplianceScore,
+        frameworks: complianceFrameworks.map(fw => ({
+          name: fw.name,
+          score: fw.score,
+          status: fw.score >= 95 ? 'excellent' : fw.score >= 85 ? 'good' : fw.score >= 70 ? 'needs_improvement' : 'critical'
+        })),
+        criticalFrameworks: complianceFrameworks.filter(fw => fw.score < 70).length
+      },
+      riskLandscape: {
+        totalRiskAreas: riskAreas.length,
+        highRiskAreas: riskAreas.filter(area => area.riskLevel === 'high').length,
+        mediumRiskAreas: riskAreas.filter(area => area.riskLevel === 'medium').length,
+        riskTrend: trendDirection,
+        criticalAlerts: criticalAlerts
+      },
+      priorityActions: [], // No recommendations logic yet
+      trends: {
+        scoreHistory: trendData.slice(-30),
+        complianceTrends: complianceFrameworks.map(fw => ({
+          framework: fw.name,
+          currentScore: fw.score,
+          trend: 'stable'
+        }))
+      },
+      executiveAlerts: [
+        ...(scoreDelta < -5 ? [{
+          type: 'score_decline',
+          severity: 'high',
+          message: `Security score declined by ${Math.abs(scoreDelta)} points`,
+          action: 'Review recent security changes and implement top recommendations'
+        }] : []),
+        ...(controlsImplementationRate < 70 ? [{
+          type: 'low_implementation',
+          severity: 'medium',
+          message: `Only ${controlsImplementationRate}% of security controls implemented`,
+          action: 'Accelerate security controls implementation program'
+        }] : [])
+      ]
+    };
+
+    res.json({
+      success: true,
+      data: executiveSummary,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        timeRange: timeRange,
+        dataFreshness: 'local-db',
+        nextUpdate: new Date(Date.now() + 3600000).toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('Error generating CISO executive summary:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate executive summary',
+      details: error.message
+    });
+  }
+});
 
 module.exports = router;

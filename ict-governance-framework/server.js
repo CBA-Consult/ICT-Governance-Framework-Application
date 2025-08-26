@@ -29,6 +29,7 @@ const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
 const rolesRouter = require('./api/roles');
 const userPermissionsRouter = require('./api/user-permissions');
+const profileRouter = require('./api/profile');
 
 // Import dashboard access management API routes
 const dashboardAccessRouter = require('./api/dashboard-access');
@@ -57,7 +58,7 @@ const { router: monitoringRouter } = require('./api/monitoring');
 const { router: diagnosticRouter } = require('./api/diagnostic-tools');
 
 // Import secure score API routes
-const secureScoresRouter = require('./api/secure-scores');
+const secureScoresApi = require('./api/secure-scores');
 
 // Import Enterprise API Framework
 const EnterpriseAPI = require('./api/enterprise-api');
@@ -106,6 +107,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Serve static files for uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Trust proxy for accurate IP addresses
 app.set('trust proxy', 1);
 
@@ -115,6 +119,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/roles', rolesRouter);
 app.use('/api/user-permissions', userPermissionsRouter);
+app.use('/api/profile', profileRouter);
 
 // Dashboard access management routes
 app.use('/api/dashboard-access', dashboardAccessRouter);
@@ -159,7 +164,7 @@ app.use('/api/monitoring', monitoringRouter);
 app.use('/api/diagnostics', diagnosticRouter);
 
 // Secure score routes
-app.use('/api/secure-scores', secureScoresRouter);
+app.use('/api/secure-scores', secureScoresApi);
 
 // Initialize and mount Enterprise API Framework
 const enterpriseAPI = new EnterpriseAPI({
@@ -171,11 +176,17 @@ const enterpriseAPI = new EnterpriseAPI({
 app.use('/api/v2/enterprise', enterpriseAPI.getRouter());
 
 // Health check
-app.get('/api/health', (req, res) => res.json({ 
-  status: 'ok',
-  timestamp: new Date().toISOString(),
-  version: '1.0.0',
-  services: {
+const fs = require('fs');
+const connectorsPath = path.resolve(__dirname, '../config/enterprise-connectors.json');
+let connectorConfig = {};
+try {
+  connectorConfig = JSON.parse(fs.readFileSync(connectorsPath, 'utf8'));
+} catch (err) {
+  console.error('Could not read enterprise-connectors.json:', err);
+}
+
+app.get('/api/health', (req, res) => {
+  const services = {
     database: 'connected',
     authentication: 'enabled',
     userManagement: 'enabled',
@@ -202,13 +213,29 @@ app.get('/api/health', (req, res) => res.json({
     monitoring: 'enabled',
     healthChecks: 'enabled',
     diagnostics: 'enabled',
-    alerting: 'enabled'
-  }
-}));
+    alerting: 'enabled',
+    secureScore: 'enabled'
+  };
+  // Check enabled connectors and add to health check
+  Object.entries(connectorConfig).forEach(([key, value]) => {
+    if (value.enabled === true) {
+      services[key] = 'enabled';
+      // Optionally, run health check logic for enabled connectors only
+      // healthCheckConnector(key);
+    } else {
+      services[key] = 'skipped'; // Mark as skipped, not unhealthy
+    }
+  });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    services
+  });
+});
 
 app.listen(PORT, async () => {
   console.log(`Express server running on http://localhost:${PORT}`);
-  
   // Initialize monitoring and health checks
   try {
     await initializeMonitoring();
@@ -216,4 +243,27 @@ app.listen(PORT, async () => {
   } catch (error) {
     console.error('✗ Failed to initialize monitoring:', error.message);
   }
+  // Run secure score sync once on server startup
+  console.log('Performing initial secure score sync on server startup...');
+  secureScoresApi.scheduledSync().catch(err => {
+    console.error('Error during initial secure score sync on startup:', err);
+  });
 });
+
+// Scheduled Secure Score sync job
+const ONE_HOUR_MS = 60 * 60 * 1000;
+const secureScoresSync = require('./api/secure-scores');
+
+async function runSecureScoreSync() {
+  try {
+    await secureScoresSync.scheduledSync(process.env.DATABASE_URL);
+    console.log('Secure Score sync completed.');
+  } catch (err) {
+    console.error('Secure Score sync failed:', err);
+  }
+}
+
+// Run once on server start
+runSecureScoreSync();
+// Repeat every hour
+setInterval(runSecureScoreSync, ONE_HOUR_MS);

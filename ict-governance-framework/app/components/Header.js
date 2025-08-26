@@ -16,6 +16,7 @@ import NotificationCenter from './NotificationCenter';
 export default function Header() {
   const { isAuthenticated, user, logout, hasPermission, hasRole } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null); // Track which dropdown is open
 
   const handleLogout = async () => {
     try {
@@ -42,121 +43,117 @@ export default function Header() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Navigation Links */}
+            {/* Navigation Links - Grouped Dropdowns for Desktop */}
             {isAuthenticated && (
               <nav className="hidden md:flex space-x-4">
-                <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                  Dashboard
-                </Link>
-                
-                {hasPermission('app.procurement') && (
-                  <>
-                    <Link href="/employee-app-store" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
-                      App Store
-                    </Link>
-                    <Link href="/application-procurement" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                      Procurement
-                    </Link>
-                  </>
-                )}
-
-                {hasPermission('governance.read') && (
-                  <Link href="/policies" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                    Policies
-                  </Link>
-                )}
-
-                {hasPermission('document.read') && (
-                  <Link href="/documents" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
-                    Document Management System
-                  </Link>
-                )}
-
-                {hasPermission('workflow.approve') && (
-                  <Link href="/workflows" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                    Workflows
-                  </Link>
-                )}
-
-                {hasPermission('governance.read') && (
-                  <Link href="/blueprints" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                    Blueprints
-                  </Link>
-                )}
-
+                {/* Governance Group */}
+                <div className="relative" style={{ display: 'inline-block' }}>
+                  <button
+                    className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold flex items-center"
+                    onClick={() => setOpenDropdown(openDropdown === 'governance' ? null : 'governance')}
+                  >
+                    Governance
+                    <ChevronDownIcon className="h-4 w-4 ml-1" />
+                  </button>
+                  {(openDropdown === 'governance') && (
+                    <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</Link>
+                      {hasPermission('governance.read') && <Link href="/policies" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Policies</Link>}
+                      {hasPermission('governance.read') && <Link href="/blueprints" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Blueprints</Link>}
+                    </div>
+                  )}
+                </div>
+                {/* Compliance Group */}
                 {hasPermission('compliance.read') && (
-                  <>
-                    <Link href="/compliance" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                      Compliance
-                    </Link>
-                    <Link href="/compliance-dashboard" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                      Compliance Dashboard
-                    </Link>
-                  </>
+                  <div className="relative" style={{ display: 'inline-block' }}>
+                    <button
+                      className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold flex items-center"
+                      onClick={() => setOpenDropdown(openDropdown === 'compliance' ? null : 'compliance')}
+                    >
+                      Compliance<ChevronDownIcon className="h-4 w-4 ml-1" />
+                    </button>
+                    {(openDropdown === 'compliance') && (
+                      <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+                        <Link href="/compliance" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Compliance</Link>
+                        <Link href="/compliance-dashboard" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Compliance Dashboard</Link>
+                      </div>
+                    )}
+                  </div>
                 )}
-
+                {/* Security Group */}
                 {hasPermission('view_security_metrics') && (
-                  <Link href="/secure-score" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
-                    Secure Score
-                  </Link>
+                  <div className="relative" style={{ display: 'inline-block' }}>
+                    <button
+                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-bold flex items-center"
+                      onClick={() => setOpenDropdown(openDropdown === 'security' ? null : 'security')}
+                    >
+                      Security<ChevronDownIcon className="h-4 w-4 ml-1" />
+                    </button>
+                    {(openDropdown === 'security') && (
+                      <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+                        <Link href="/secure-score" className="block px-4 py-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">Secure Score</Link>
+                        <Link href="/ciso-dashboard" className="px-4 py-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-bold flex items-center"><ShieldCheckIcon className="h-4 w-4 mr-1" />CISO Dashboard</Link>
+                      </div>
+                    )}
+                  </div>
                 )}
-
-                {hasPermission('system.audit') && (
-                  <Link href="/defender-activities" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                    Defender Activities
-                  </Link>
-                )}
-
-                {hasPermission('alert.read') && (
-                  <Link href="/alerts" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                    Alerts
-                  </Link>
-                )}
-
-                <Link href="/notifications" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                  Notifications
-                </Link>
-
-                {hasPermission('data_collection_read') && (
-                  <Link href="/data-collection" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                    Data Collection
-                  </Link>
-                )}
-
-                {hasPermission('reporting_read') && (
-                  <Link href="/reporting" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                    Reports
-                  </Link>
-                )}
-
-                {hasPermission('data_analytics_read') && (
-                  <Link href="/analytics" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                    Analytics
-                  </Link>
-                )}
-
+                {/* Operations Group */}
+                <div className="relative" style={{ display: 'inline-block' }}>
+                  <button
+                    className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold flex items-center"
+                    onClick={() => setOpenDropdown(openDropdown === 'operations' ? null : 'operations')}
+                  >
+                    Operations<ChevronDownIcon className="h-4 w-4 ml-1" />
+                  </button>
+                  {(openDropdown === 'operations') && (
+                    <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+                      {hasPermission('app.procurement') && <Link href="/employee-app-store" className="block px-4 py-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">App Store</Link>}
+                      {hasPermission('app.procurement') && <Link href="/application-procurement" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Procurement</Link>}
+                      {hasPermission('document.read') && <Link href="/documents" className="block px-4 py-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">Document Management System</Link>}
+                      {hasPermission('workflow.approve') && <Link href="/workflows" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Workflows</Link>}
+                      {hasPermission('system.audit') && <Link href="/defender-activities" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Defender Activities</Link>}
+                      {hasPermission('alert.read') && <Link href="/alerts" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Alerts</Link>}
+                      <Link href="/notifications" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Notifications</Link>
+                      {hasPermission('data_collection_read') && <Link href="/data-collection" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Data Collection</Link>}
+                      {hasPermission('reporting_read') && <Link href="/reporting" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Reports</Link>}
+                      {hasPermission('data_analytics_read') && <Link href="/analytics" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Analytics</Link>}
+                    </div>
+                  )}
+                </div>
+                {/* Feedback Group */}
                 {hasPermission('feedback.create') && (
-                  <>
-                    <Link href="/feedback" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                      Feedback
-                    </Link>
-                    <Link href="/escalations" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-                      Escalations
-                    </Link>
-                  </>
+                  <div className="relative" style={{ display: 'inline-block' }}>
+                    <button
+                      className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold flex items-center"
+                      onClick={() => setOpenDropdown(openDropdown === 'feedback' ? null : 'feedback')}
+                    >
+                      Feedback<ChevronDownIcon className="h-4 w-4 ml-1" />
+                    </button>
+                    {(openDropdown === 'feedback') && (
+                      <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+                        <Link href="/feedback" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Feedback</Link>
+                        <Link href="/escalations" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Escalations</Link>
+                      </div>
+                    )}
+                  </div>
                 )}
-
-                <Link href="/docs" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
-                  Docs
-                </Link>
-
+                {/* Docs Link */}
+                <Link href="/docs" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">Docs</Link>
                 {/* Admin Links */}
                 {(hasPermission('user.read') || hasPermission('role.read')) && (
-                  <div className="relative">
-                    <Link href="/admin" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white flex items-center">
-                      <ShieldCheckIcon className="h-4 w-4 mr-1" />
-                      Admin
-                    </Link>
+                  <div className="relative" style={{ display: 'inline-block' }}>
+                    <button
+                      className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold flex items-center"
+                      onClick={() => setOpenDropdown(openDropdown === 'admin' ? null : 'admin')}
+                    >
+                      Admin<ChevronDownIcon className="h-4 w-4 ml-1" />
+                    </button>
+                    {(openDropdown === 'admin') && (
+                      <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+                        <Link href="/admin" className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"><ShieldCheckIcon className="h-4 w-4 mr-1" />Admin</Link>
+                        <Link href="/admin/users" className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"><ShieldCheckIcon className="h-4 w-4 mr-1" />User Management</Link>
+                      </div>
+                    )}
                   </div>
                 )}
               </nav>
