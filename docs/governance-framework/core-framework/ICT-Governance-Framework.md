@@ -25,6 +25,7 @@ This framework covers all technology assets, services, and resources:
 * **⚡ Edge Computing:** Edge infrastructure, distributed processing, real-time analytics, edge-cloud integration
 * **🔗 Blockchain:** Distributed ledger technologies, smart contracts, cryptocurrency, digital assets, decentralized applications
 * **🌱 Sustainability:** Carbon footprint tracking, energy efficiency optimization, sustainable technology practices, ESG compliance
+* **💨 Wind Energy Harvesting:** Wind turbines, energy storage systems, grid integration, renewable energy generation for ICT operations
 
 ## Unified Governance Platform
 
@@ -78,6 +79,7 @@ The platform integrates the following governance domains:
 | **Application Governance** | API | App catalog, discovery, validation workflows |
 | **Security Governance** | API | SIEM integration, threat management, compliance |
 | **Sustainability Governance** | API | Carbon tracking, energy monitoring, ESG reporting |
+| **Wind Energy Governance** | API | Wind energy monitoring, performance tracking, grid integration |
 
 #### API Ecosystem
 
@@ -96,6 +98,7 @@ https://governance-api.company.com/v2/
 ├── applications/            # Application governance
 ├── security/                # Security governance
 ├── sustainability/          # Sustainability governance
+├── wind-energy/             # Wind energy harvesting governance
 └── integrations/            # External system integrations
 ```
 

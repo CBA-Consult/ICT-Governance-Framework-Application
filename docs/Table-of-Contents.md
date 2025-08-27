@@ -156,3 +156,11 @@ This document lists all major documents and directories in the repository for ea
 - **[ICT Governance Metrics](docs/governance-framework/metrics/ICT-Governance-Metrics.md)**
 - **[Zero Trust Maturity Model](docs/architecture/target-state/Zero-Trust-Maturity-Model.md)**
 - **[Information Overview](InformationOverview.md)** *(Remaining at root level)*
+
+## 🌱 Sustainability and Renewable Energy
+- **[ICT Sustainability Policy](docs/policies/governance/ICT-Sustainability-Policy.md)**
+- **[ICT Carbon Footprint Reduction Framework](docs/governance-framework/core-framework/ICT-Carbon-Footprint-Reduction-Framework.md)**
+- **[Wind Energy Harvesting Governance Framework](docs/governance-framework/core-framework/Wind-Energy-Harvesting-Governance-Framework.md)**
+- **[Wind Energy Harvesting Policy](docs/policies/governance/Wind-Energy-Harvesting-Policy.md)**
+- **[Wind Energy Harvesting Implementation Guide](docs/implementation/guides/Wind-Energy-Harvesting-Implementation-Guide.md)**
+- **[Wind Energy Harvesting Implementation Summary](docs/implementation/summaries/Wind-Energy-Harvesting-Implementation-Summary.md)**
