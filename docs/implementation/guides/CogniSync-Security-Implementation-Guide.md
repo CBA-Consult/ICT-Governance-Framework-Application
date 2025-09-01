@@ -1,0 +1,1 @@
+# CogniSync Security Implementation Guide
