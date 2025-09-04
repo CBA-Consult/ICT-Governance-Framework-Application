@@ -4,6 +4,8 @@
 
 This ICT Governance Framework establishes a comprehensive structure for managing information and communication technology assets, services, and resources across the organization through a **Unified Governance Platform**. Its purpose is to ensure technology alignment with business objectives, security, compliance, and efficient use of ICT resources through a shared responsibility model aligned with industry best practices (COBIT, ITIL, ISO/IEC 38500).
 
+The framework implements the **ISO/IEC 38500 Corporate Governance of IT** standard as its foundational governance model, incorporating the six core principles of Responsibility, Strategy, Acquisition, Performance, Conformance, and Human Behavior through the Evaluate-Direct-Monitor governance cycle. For detailed implementation guidance, refer to [ISO/IEC 38500 Governance Standards](../../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md).
+
 The framework has evolved from siloed governance tools to an integrated platform that provides:
 - **Unified Oversight**: Single pane of glass for all governance activities
 - **Cohesive API Ecosystem**: Integrated APIs connecting all governance tools and systems
@@ -866,7 +868,29 @@ The framework ensures compliance with relevant regulations and standards:
 * **📊 SOX:** Financial reporting controls
 * **🏥 HIPAA:** Healthcare data protection (if applicable)
 * **💳 PCI DSS:** Payment data security (if applicable)
-* **🔍 ISO/IEC 38500:** IT governance standard
+* **🔍 ISO/IEC 38500:** Corporate governance of IT standard - **[Full Implementation Guide](../../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md)**
+
+### ISO/IEC 38500 Implementation Highlights
+
+Our framework fully implements the ISO/IEC 38500 standard through:
+
+**🎯 Six Core Principles:**
+- **Responsibility:** Clear accountability for IT governance outcomes across all organizational levels
+- **Strategy:** IT strategy directly aligned with business strategy and transformation goals
+- **Acquisition:** Transparent, value-based IT acquisition processes with comprehensive business cases
+- **Performance:** Fit-for-purpose IT services meeting current and future business requirements
+- **Conformance:** Full compliance with regulations, policies, and standards
+- **Human Behavior:** Human-centered design and stakeholder engagement in all IT decisions
+
+**🔄 Governance Model:**
+- **Evaluate:** Continuous assessment of IT performance, risks, and strategic alignment
+- **Direct:** Clear direction through policies, strategies, and resource allocation
+- **Monitor:** Comprehensive monitoring of IT performance, compliance, and value delivery
+
+**📊 Success Metrics:**
+- 95% adherence to all six ISO/IEC 38500 principles
+- Level 4+ maturity in Evaluate-Direct-Monitor governance model
+- 90% stakeholder satisfaction with IT governance effectiveness
 
 ---
 
@@ -1456,6 +1480,8 @@ For detailed guidance on onboarding new technology components and offboarding de
 
 ### Annual Benchmarking and Continuous Excellence Metrics
 * ✅ 90% alignment with industry standards (COBIT, ITIL, ISO/IEC 38500, TOGAF, FAIR, NIST CSF, COSO)
+* ✅ ISO/IEC 38500 compliance score >95% across all six principles
+* ✅ Evaluate-Direct-Monitor governance model maturity Level 4+ achieved
 * ✅ Top quartile performance in governance maturity benchmarking
 * ✅ 20% improvement against industry benchmarks annually
 * ✅ 80% adoption rate of identified best practices from benchmarking
