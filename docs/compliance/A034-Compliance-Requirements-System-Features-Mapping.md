@@ -152,7 +152,76 @@ This document provides a comprehensive mapping of compliance requirements to spe
 | **U.12** | Business Continuity | FR-WFL-004: Business Continuity | DIRECT | Government continuity requirements implementation |
 | **U.13** | Compliance | FR-RPT-001: Compliance Reporting | AUTOMATED | Government compliance reporting and audit support |
 
-### 3.2 Cloud Security Alliance (CSA) Mapping
+### 3.2 ITIL 4 Service Management Mapping
+
+#### 3.2.1 Service Value Chain Activities
+
+| Value Chain Activity | ITIL Requirement | System Feature | Implementation Type | Capability Description |
+|---------------------|------------------|----------------|-------------------|----------------------|
+| **Plan** | Strategic planning and portfolio management | FR-GOV-001: Policy Framework | DIRECT | Strategic planning integration with governance framework |
+| **Plan** | Service portfolio management | FR-GOV-013: Service Portfolio | DIRECT | Comprehensive service portfolio management and optimization |
+| **Plan** | Architecture and design planning | FR-GOV-014: Architecture Management | DIRECT | Enterprise architecture planning and governance |
+| **Improve** | Continual service improvement | FR-WFL-008: Improvement Management | AUTOMATED | Automated improvement identification and tracking |
+| **Improve** | Performance monitoring and analysis | NFR-PER-001: Monitoring | AUTOMATED | Real-time performance monitoring with analytics |
+| **Improve** | Innovation management | FR-GOV-015: Innovation Framework | DIRECT | Innovation evaluation and management processes |
+| **Engage** | Stakeholder relationship management | FR-GOV-016: Stakeholder Management | DIRECT | Comprehensive stakeholder engagement and communication |
+| **Engage** | Customer experience management | FR-WFL-009: Customer Experience | AUTOMATED | Customer journey mapping and experience optimization |
+| **Engage** | Communication management | FR-COM-001: Communication Center | DIRECT | Multi-channel communication and collaboration platform |
+| **Design & Transition** | Service design and development | FR-WFL-010: Service Design | DIRECT | Standardized service design and development processes |
+| **Design & Transition** | Change enablement | FR-GOV-008: Change Management | AUTOMATED | Comprehensive change management with approval workflows |
+| **Design & Transition** | Release management | FR-WFL-011: Release Management | AUTOMATED | Automated release planning and deployment management |
+| **Obtain/Build** | Supplier management | FR-GOV-007: Vendor Management | DIRECT | Comprehensive supplier relationship and performance management |
+| **Obtain/Build** | Asset management | FR-GOV-004: Asset Register | AUTOMATED | Complete IT asset lifecycle management |
+| **Obtain/Build** | Procurement management | FR-WFL-007: Procurement Workflow | AUTOMATED | Automated procurement with compliance validation |
+| **Deliver & Support** | Service desk operations | FR-WFL-014: Service Desk | DIRECT | Integrated service desk with multi-channel support |
+| **Deliver & Support** | Incident management | FR-WFL-002: Incident Response | AUTOMATED | Automated incident detection, response, and resolution |
+| **Deliver & Support** | Problem management | FR-WFL-015: Problem Management | AUTOMATED | Root cause analysis and problem resolution tracking |
+
+#### 3.2.2 ITIL 4 Practices Implementation
+
+| Practice Category | Practice | System Feature | Implementation Type | Capability Description |
+|------------------|----------|----------------|-------------------|----------------------|
+| **General Management** | Strategy management | FR-GOV-001: Policy Framework | DIRECT | Strategic planning and execution framework |
+| **General Management** | Portfolio management | FR-GOV-013: Service Portfolio | DIRECT | Service and project portfolio optimization |
+| **General Management** | Architecture management | FR-GOV-014: Architecture Management | DIRECT | Enterprise architecture governance and planning |
+| **General Management** | Service financial management | FR-FIN-001: Financial Management | DIRECT | Service costing, budgeting, and financial optimization |
+| **General Management** | Risk management | FR-GOV-017: Risk Management | AUTOMATED | Comprehensive risk assessment and mitigation |
+| **General Management** | Information security management | FR-SEC-001: Security Framework | ENFORCED | Integrated security management and compliance |
+| **General Management** | Compliance management | FR-RPT-001: Compliance Reporting | AUTOMATED | Real-time compliance monitoring and reporting |
+| **General Management** | Continual improvement | FR-WFL-008: Improvement Management | AUTOMATED | Systematic improvement identification and implementation |
+| **Service Management** | Service level management | FR-SLA-001: SLA Management | AUTOMATED | Automated SLA monitoring and reporting |
+| **Service Management** | Service request management | FR-WFL-016: Service Requests | AUTOMATED | Self-service request portal with workflow automation |
+| **Service Management** | Incident management | FR-WFL-002: Incident Response | AUTOMATED | AI-powered incident detection and automated response |
+| **Service Management** | Problem management | FR-WFL-015: Problem Management | AUTOMATED | Predictive problem identification and resolution |
+| **Service Management** | Change enablement | FR-GOV-008: Change Management | AUTOMATED | Risk-based change approval and implementation |
+| **Service Management** | Release management | FR-WFL-011: Release Management | AUTOMATED | Continuous integration and deployment pipeline |
+| **Service Management** | Service configuration management | FR-GOV-018: Configuration Management | AUTOMATED | Automated CMDB with real-time discovery |
+| **Service Management** | IT asset management | FR-GOV-004: Asset Register | AUTOMATED | Complete asset lifecycle with financial integration |
+| **Service Management** | Monitoring and event management | NFR-PER-001: Monitoring | AUTOMATED | Comprehensive monitoring with intelligent alerting |
+| **Service Management** | Service desk | FR-WFL-014: Service Desk | DIRECT | Omnichannel service desk with AI assistance |
+| **Service Management** | Service catalogue management | FR-GOV-019: Service Catalogue | DIRECT | Self-service catalogue with automated provisioning |
+| **Service Management** | Service availability management | FR-SLA-002: Availability Management | AUTOMATED | Proactive availability monitoring and optimization |
+| **Service Management** | Service capacity and performance management | NFR-PER-002: Capacity Management | AUTOMATED | Predictive capacity planning and performance optimization |
+| **Service Management** | Service continuity management | FR-WFL-004: Business Continuity | DIRECT | Business continuity and disaster recovery planning |
+| **Service Management** | Business analysis | FR-GOV-020: Business Analysis | DIRECT | Requirements analysis and solution design |
+| **Service Management** | Supplier management | FR-GOV-007: Vendor Management | DIRECT | End-to-end supplier lifecycle management |
+| **Technical Management** | Deployment management | FR-WFL-017: Deployment Management | AUTOMATED | Automated deployment with rollback capabilities |
+| **Technical Management** | Infrastructure and platform management | NFR-SEC-007: Infrastructure Security | ENFORCED | Secure infrastructure management and optimization |
+| **Technical Management** | Software development and management | NFR-SEC-003: Secure SDLC | ENFORCED | Secure software development lifecycle |
+
+#### 3.2.3 ITIL 4 Guiding Principles Compliance
+
+| Guiding Principle | Compliance Requirement | System Feature | Implementation Type | Capability Description |
+|------------------|------------------------|----------------|-------------------|----------------------|
+| **Focus on Value** | Value-driven decision making | FR-GOV-021: Value Assessment | AUTOMATED | Automated business value assessment and tracking |
+| **Start Where You Are** | Current state assessment | FR-GOV-022: Current State Analysis | DIRECT | Comprehensive current state assessment capabilities |
+| **Progress Iteratively** | Iterative improvement approach | FR-WFL-008: Improvement Management | AUTOMATED | Agile improvement methodology with sprint tracking |
+| **Collaborate and Promote Visibility** | Stakeholder collaboration | FR-COM-001: Communication Center | DIRECT | Collaborative workspace with transparency dashboards |
+| **Think and Work Holistically** | End-to-end service view | FR-GOV-023: Service Mapping | AUTOMATED | Complete service dependency mapping and visualization |
+| **Keep It Simple and Practical** | Process optimization | FR-WFL-018: Process Optimization | AUTOMATED | Continuous process analysis and simplification |
+| **Optimize and Automate** | Automation and optimization | FR-WFL-019: Automation Engine | AUTOMATED | Intelligent automation with machine learning optimization |
+
+### 3.3 Cloud Security Alliance (CSA) Mapping
 
 #### 3.2.1 Cloud Controls Matrix (CCM)
 

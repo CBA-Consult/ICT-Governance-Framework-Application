@@ -2,7 +2,9 @@
 
 ## Purpose
 
-This ICT Governance Framework establishes a comprehensive structure for managing information and communication technology assets, services, and resources across the organization through a **Unified Governance Platform**. Its purpose is to ensure technology alignment with business objectives, security, compliance, and efficient use of ICT resources through a shared responsibility model aligned with industry best practices (COBIT, ITIL, ISO/IEC 38500).
+This ICT Governance Framework establishes a comprehensive structure for managing information and communication technology assets, services, and resources across the organization through a **Unified Governance Platform**. Its purpose is to ensure technology alignment with business objectives, security, compliance, and efficient use of ICT resources through a shared responsibility model aligned with industry best practices (COBIT, ITIL 4, ISO/IEC 38500).
+
+**ITIL 4 Integration:** The framework fully integrates ITIL 4 Service Management practices to ensure IT services are designed, delivered, and continuously improved to create value for the business. This includes implementation of the Service Value System (SVS), all 34 ITIL practices, and the seven guiding principles. For detailed ITIL implementation guidance, refer to [ITIL 4 Service Management Framework](../../compliance/regulatory/ITIL-4-Service-Management-Framework.md) and [ITIL Service Management Policy](../../policies/governance/ITIL-Service-Management-Policy.md).
 
 The framework implements the **ISO/IEC 38500 Corporate Governance of IT** standard as its foundational governance model, incorporating the six core principles of Responsibility, Strategy, Acquisition, Performance, Conformance, and Human Behavior through the Evaluate-Direct-Monitor governance cycle. For detailed implementation guidance, refer to [ISO/IEC 38500 Governance Standards](../../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md).
 

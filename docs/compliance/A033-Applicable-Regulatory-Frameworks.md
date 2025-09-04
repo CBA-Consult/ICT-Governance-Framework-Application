@@ -200,11 +200,30 @@ The regulatory frameworks have been classified using a multi-dimensional assessm
 #### 3.1.2 ITIL 4 Service Management
 - **Jurisdiction:** International Best Practice
 - **Applicability:** INDIRECT - Service management framework
-- **Impact Level:** MEDIUM
-- **Legal Basis:** ITIL 4 Foundation
-- **Key Requirements:** Service value system, practices, continual improvement
-- **Implementation Status:** 81% compliant
-- **Critical Controls:** Service strategy, change management, continual improvement
+- **Impact Level:** HIGH
+- **Legal Basis:** ITIL 4 Foundation and Service Management Framework
+- **Key Requirements:** Service Value System (SVS), 34 ITIL practices, 7 guiding principles, service value chain
+- **Implementation Status:** 81% compliant (Target: 95% by Q4 2025)
+- **Critical Controls:** Service strategy, service design, service transition, service operation, continual service improvement
+- **Framework Reference:** [ITIL 4 Service Management Framework](regulatory/ITIL-4-Service-Management-Framework.md)
+
+**ITIL 4 Implementation Scope:**
+- **Service Value System:** Holistic approach to service management with governance integration
+- **Guiding Principles:** 7 principles (Focus on value, Start where you are, Progress iteratively, etc.)
+- **Service Value Chain:** 6 key activities (Plan, Improve, Engage, Design & Transition, Obtain/Build, Deliver & Support)
+- **34 ITIL Practices:** 8 General Management, 17 Service Management, 3 Technical Management practices
+- **Four Dimensions:** Organizations and people, Information and technology, Partners and suppliers, Value streams and processes
+
+**Current Implementation Highlights:**
+- Service Value Chain implementation: 87% complete
+- Practice implementation: 78% (Service Management), 85% (General Management), 80% (Technical Management)
+- Guiding Principles adherence: 87% average across all principles
+- Integration with ICT Governance Framework: 90% complete
+
+**Priority Improvement Areas:**
+- Optimize and Automate principle: 79% → Target 90%
+- Service Management practices: 78% → Target 95%
+- Think and Work Holistically: 83% → Target 90%
 
 #### 3.1.3 ISO/IEC 38500:2015 IT Governance
 - **Jurisdiction:** International Standard
