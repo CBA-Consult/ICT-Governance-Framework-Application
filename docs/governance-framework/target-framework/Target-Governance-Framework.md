@@ -4,6 +4,8 @@
 
 This Target Governance Framework represents the evolution of the CBA Consult IT Management Framework, enhanced with industry-leading practices from ISO/IEC 38500, ITIL 4, COBIT 2019, CMMI, and FAIR frameworks. It is specifically designed to optimize operations in multi-cloud environments while ensuring robust governance, risk management, and value delivery.
 
+**ISO/IEC 38500 Implementation:** This framework fully implements the ISO/IEC 38500 Corporate Governance of IT standard as its foundational governance model. For detailed implementation guidance including the six core principles and Evaluate-Direct-Monitor governance cycle, refer to [ISO/IEC 38500 Governance Standards](../../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md).
+
 The framework transforms traditional IT governance from a compliance-focused approach to a strategic business enablement function that accelerates innovation, manages risks intelligently, and delivers measurable business value across all cloud platforms and emerging technologies.
 
 ---

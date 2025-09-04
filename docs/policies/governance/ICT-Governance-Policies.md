@@ -2,6 +2,8 @@
 
 This document outlines the core policies that support the ICT Governance Framework. These policies establish the rules, guidelines, and procedures for managing technology assets, services, and resources across the organization.
 
+**Governance Standards Alignment:** These policies are aligned with ISO/IEC 38500 Corporate Governance of IT standards, implementing the six core principles of Responsibility, Strategy, Acquisition, Performance, Conformance, and Human Behavior. For detailed implementation guidance, refer to [ISO/IEC 38500 Governance Standards](../../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md).
+
 ## 1. Technology Selection and Standardization Policy
 
 ### Purpose

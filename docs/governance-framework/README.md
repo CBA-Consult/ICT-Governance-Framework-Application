@@ -47,6 +47,7 @@ The ICT Governance Framework is built on these foundational principles:
 3. **Cross-Cloud Operations** - Unified governance across AWS, Azure, GCP, and emerging platforms
 4. **Automated Lifecycle Management** - Streamlined processes from onboarding to offboarding
 5. **Compliance by Design** - Built-in regulatory compliance and monitoring
+6. **ISO/IEC 38500 Alignment** - Full implementation of international IT governance standards
 
 ### Framework Components
 
@@ -82,6 +83,7 @@ The ICT Governance Framework is built on these foundational principles:
 - **[Implementation](../implementation/)** - Implementation guides and automation
 - **[Architecture](../architecture/)** - Technical architecture and integration
 - **[Compliance](../compliance/)** - Compliance monitoring and audit procedures
+- **[ISO/IEC 38500 Standards](../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md)** - Comprehensive ISO/IEC 38500 implementation guide
 
 ## 📊 Framework Maturity
 

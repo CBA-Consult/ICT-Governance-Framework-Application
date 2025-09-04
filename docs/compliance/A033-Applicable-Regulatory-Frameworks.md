@@ -12,16 +12,16 @@
 
 ## Executive Summary
 
-This document provides a comprehensive identification of all applicable regulatory frameworks, standards, and compliance requirements that impact the ICT Governance Framework implementation. Building upon the detailed analysis in A007-Regulatory-Requirements-Matrix.md, this document categorizes **47 regulatory frameworks** across **12 compliance domains** and establishes their applicability, impact levels, and implementation priorities.
+This document provides a comprehensive identification of all applicable regulatory frameworks, standards, and compliance requirements that impact the ICT Governance Framework implementation. Building upon the detailed analysis in A007-Regulatory-Requirements-Matrix.md, this document categorizes **48 regulatory frameworks** across **12 compliance domains** and establishes their applicability, impact levels, and implementation priorities.
 
 **Key Findings:**
-- **Critical Frameworks:** 12 high-impact regulatory frameworks requiring immediate compliance integration
+- **Critical Frameworks:** 13 high-impact regulatory frameworks requiring immediate compliance integration
 - **Essential Standards:** 18 international and industry standards providing governance foundation
 - **Emerging Requirements:** 17 emerging and future regulatory considerations
 - **Geographic Coverage:** Frameworks spanning EU, US, International, and industry-specific jurisdictions
 
 **Framework Classification:**
-- **Tier 1 (Critical):** 12 frameworks with direct legal obligations and high business impact
+- **Tier 1 (Critical):** 13 frameworks with direct legal obligations and high business impact
 - **Tier 2 (Important):** 18 frameworks with significant operational impact and best practice requirements
 - **Tier 3 (Emerging):** 17 frameworks with future or conditional applicability
 
@@ -131,6 +131,16 @@ The regulatory frameworks have been classified using a multi-dimensional assessm
 - **Key Requirements:** Govern, Identify, Protect, Detect, Respond, Recover functions
 - **Implementation Status:** 79% compliant
 - **Critical Controls:** Cybersecurity governance, threat detection, incident response
+
+#### 2.3.3 ISO/IEC 38500:2015 Corporate Governance of IT
+- **Jurisdiction:** International Standard
+- **Applicability:** DIRECT - IT governance requirements
+- **Impact Level:** HIGH
+- **Legal Basis:** ISO/IEC 38500:2015 Information technology — Governance of IT for the organization
+- **Key Requirements:** Six governance principles (Responsibility, Strategy, Acquisition, Performance, Conformance, Human Behavior), Evaluate-Direct-Monitor model
+- **Implementation Status:** 85% compliant
+- **Critical Controls:** IT governance structure, strategic alignment, performance monitoring, compliance assurance
+- **Related Documentation:** [ISO/IEC 38500 Governance Standards](regulatory/ISO-IEC-38500-Governance-Standards.md)
 
 ### 2.4 Dutch National Security Requirements
 
@@ -438,6 +448,7 @@ The regulatory frameworks have been classified using a multi-dimensional assessm
 | **SOX Controls Enhancement** | 8.8 | HIGH | 80 hours | February 2025 |
 | **ISO 27001 Gap Closure** | 8.5 | HIGH | 160 hours | March 2025 |
 | **NIST CSF 2.0 Implementation** | 8.2 | HIGH | 140 hours | March 2025 |
+| **ISO/IEC 38500 Enhancement** | 8.0 | HIGH | 100 hours | March 2025 |
 
 ### 5.2 Short-Term Implementation (Q2-Q3 2025)
 
@@ -570,6 +581,7 @@ The regulatory frameworks have been classified using a multi-dimensional assessm
 
 ### 9.4 Policy and Procedure Documents
 - [ICT Governance Policies](docs/policies/governance/ICT-Governance-Policies.md)
+- [ISO/IEC 38500 Governance Standards](regulatory/ISO-IEC-38500-Governance-Standards.md)
 - [AI Ethics Policy](docs/policies/governance/AI-Ethics-Policy.md)
 - [ICT Sustainability Policy](docs/policies/governance/ICT-Sustainability-Policy.md)
 
