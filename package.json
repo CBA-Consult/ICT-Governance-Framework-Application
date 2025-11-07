@@ -14,6 +14,8 @@
     "@types/node": "^24.2.1"
   },
   "scripts": {
+    "start": "node server-multi-tenant.js",
+    "start:dev": "NODE_ENV=development node server-multi-tenant.js",
     "test": "playwright test",
     "test:user-management": "playwright test tests/user-management.spec.ts",
     "test:user-management:headed": "playwright test tests/user-management.spec.ts --headed",
