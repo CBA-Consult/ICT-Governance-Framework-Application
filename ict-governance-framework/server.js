@@ -66,6 +66,9 @@ const EnterpriseAPI = require('./api/enterprise-api');
 // Import monitoring initialization
 const { initializeMonitoring } = require('./api/initialize-monitoring');
 
+// Import CASB App Catalog API
+const casbAppCatalogRouter = require('./api/casb-app-catalog');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -166,6 +169,9 @@ app.use('/api/diagnostics', diagnosticRouter);
 // Secure score routes
 app.use('/api/secure-scores', secureScoresApi);
 
+// CASB App Catalog routes
+app.use('/api/casb', casbAppCatalogRouter);
+
 // Initialize and mount Enterprise API Framework
 const enterpriseAPI = new EnterpriseAPI({
   version: '2.0.0',
@@ -214,7 +220,8 @@ app.get('/api/health', (req, res) => {
     healthChecks: 'enabled',
     diagnostics: 'enabled',
     alerting: 'enabled',
-    secureScore: 'enabled'
+    secureScore: 'enabled',
+    casbAppCatalog: 'enabled'
   };
   // Check enabled connectors and add to health check
   Object.entries(connectorConfig).forEach(([key, value]) => {

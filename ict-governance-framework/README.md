@@ -248,6 +248,31 @@ Then assign the super_admin role using the SQL command above.
 
 ### Governance & Compliance Endpoints
 - `GET /api/defender-entities/sync` - Sync Defender entities
+
+### CASB App Catalog Endpoints
+**Employee-Facing:**
+- `GET /api/casb/catalog/me` - Get personalized app catalog
+- `GET /api/casb/catalog/:appId` - Get app details with compliance info
+- `POST /api/casb/catalog/:appId/request-approval` - Request app approval
+- `POST /api/casb/catalog/report-shadow-app` - Report shadow IT
+- `GET /api/casb/catalog/me/compliance` - Check compliance status
+- `POST /api/casb/catalog/:appId/acknowledge-policy` - Acknowledge policy
+- `GET /api/casb/notifications/me` - Get user notifications
+- `POST /api/casb/feedback/apps/:appId` - Submit app feedback
+
+**Admin-Facing:**
+- `GET /api/casb/admin/catalog` - Manage app catalog
+- `POST /api/casb/admin/catalog` - Add new application
+- `PUT /api/casb/admin/catalog/:appId` - Update application
+- `DELETE /api/casb/admin/catalog/:appId` - Remove application
+- `GET /api/casb/admin/app-requests` - View approval requests
+- `PUT /api/casb/admin/app-requests/:requestId` - Process request
+- `GET /api/casb/admin/app-usage-analytics` - Get usage analytics
+- `GET /api/casb/admin/shadow-it-reports` - View shadow IT reports
+- `POST /api/casb/admin/policy-updates/broadcast` - Broadcast policy update
+
+📖 **[Complete CASB API Documentation](./CASB-API-README.md)**
+
 - `GET /api/defender-alerts/sync` - Sync Defender alerts
 - `GET /api/defender-files/sync` - Sync Defender files
 - `POST /api/feedback` - Submit feedback
