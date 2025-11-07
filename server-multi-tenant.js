@@ -9,11 +9,31 @@
 
 require('dotenv').config();
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const { Pool } = require('pg');
 const multiTenantAPI = require('./ict-governance-framework/api/multi-tenant-management');
 const { MultiCloudOrchestrator } = require('./ict-governance-framework/services/multi-cloud-orchestrator');
 
 const app = express();
+
+// Rate limiting configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+// Apply rate limiting to all routes
+app.use(limiter);
+
+// Stricter rate limiting for tenant creation
+const createTenantLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // Limit each IP to 10 tenant creations per hour
+  message: 'Too many tenant creation requests, please try again later.'
+});
 
 // Middleware
 app.use(express.json());
@@ -147,6 +167,9 @@ app.get('/health', async (req, res) => {
 
 // API routes
 app.use('/api/tenants', multiTenantAPI);
+
+// Apply stricter rate limiting to tenant creation endpoint
+app.post('/api/tenants', createTenantLimiter);
 
 // Documentation endpoint
 app.get('/docs', (req, res) => {
