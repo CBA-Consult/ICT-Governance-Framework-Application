@@ -150,10 +150,11 @@ app.use('/api/tenants', multiTenantAPI);
 
 // Documentation endpoint
 app.get('/docs', (req, res) => {
+  const port = parseInt(process.env.PORT) || 3000;
   res.json({
     title: 'Multi-Tenant Management API Documentation',
     version: '1.0.0',
-    baseUrl: `http://localhost:${PORT}/api/tenants`,
+    baseUrl: `http://localhost:${port}/api/tenants`,
     endpoints: [
       {
         method: 'GET',
@@ -264,7 +265,7 @@ const server = app.listen(PORT, () => {
   console.log(`  Server running on port ${PORT}`);
   console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log('');
-  console.log('  Endpoints:`);
+  console.log('  Endpoints:');
   console.log(`    Health:        http://localhost:${PORT}/health`);
   console.log(`    API:           http://localhost:${PORT}/api/tenants`);
   console.log(`    Documentation: http://localhost:${PORT}/docs`);
