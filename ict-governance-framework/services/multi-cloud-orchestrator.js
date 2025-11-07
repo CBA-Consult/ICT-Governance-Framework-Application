@@ -151,6 +151,11 @@ class MultiCloudOrchestrator extends EventEmitter {
    * Generate provisioning plan based on tenant requirements
    */
   generateProvisioningPlan(tenantConfig) {
+    // Validate required fields
+    if (!tenantConfig.tenantId || !tenantConfig.cloudProvider || !tenantConfig.region) {
+      throw new Error('Missing required fields: tenantId, cloudProvider, and region are required');
+    }
+
     const {
       tenantId,
       tenantName,

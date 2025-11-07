@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS tenants (
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     activated_date TIMESTAMP,
     suspended_date TIMESTAMP,
-    archived_date TIMESTAMP,
-    CONSTRAINT valid_email CHECK (tenant_admin_email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$')
+    archived_date TIMESTAMP
+    -- Note: Email validation is handled at application layer for better flexibility with international addresses
 );
 
 -- Create index on tenant state for faster queries

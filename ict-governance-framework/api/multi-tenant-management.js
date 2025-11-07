@@ -11,6 +11,7 @@
 
 const express = require('express');
 const router = express.Router();
+const { v4: uuidv4 } = require('uuid');
 
 /**
  * Tenant classification types
@@ -239,8 +240,8 @@ router.post('/', async (req, res) => {
     try {
       await client.query('BEGIN');
 
-      // Generate tenant ID
-      const tenantId = `tenant-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      // Generate tenant ID using UUID for guaranteed uniqueness
+      const tenantId = `tenant-${uuidv4()}`;
 
       // Insert tenant
       const insertQuery = `

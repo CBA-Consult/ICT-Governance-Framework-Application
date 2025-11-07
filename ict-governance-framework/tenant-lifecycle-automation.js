@@ -564,17 +564,17 @@ async function main() {
         console.log('Multi-Cloud Multi-Tenant Lifecycle Management');
         console.log('');
         console.log('Usage:');
-        console.log('  node tenant-lifecycle-automation.js onboard <config-file>');
-        console.log('  node tenant-lifecycle-automation.js offboard <tenant-id>');
-        console.log('  node tenant-lifecycle-automation.js health-check <tenant-id>');
-        console.log('  node tenant-lifecycle-automation.js suspend <tenant-id> [reason]');
+        console.log('  node tenant-lifecycle-automation.js <command> [options]');
         console.log('');
-        console.log('Environment Variables:');
-        console.log('  API_BASE_URL - Base URL for the API (default: http://localhost:3000)');
-        console.log('  API_KEY - API key for authentication');
-        console.log('  DEFAULT_CLOUD_PROVIDER - Default cloud provider (default: azure)');
-        console.log('  DEFAULT_REGION - Default region (default: eastus)');
-        console.log('  VERBOSE - Enable verbose logging (default: false)');
+        console.log('Commands:');
+        console.log('  onboard <config-file>        Onboard a new tenant');
+        console.log('  offboard <tenant-id>         Offboard and cleanup tenant');
+        console.log('  health-check <tenant-id>     Check tenant health status');
+        console.log('  suspend <tenant-id> [reason] Suspend tenant operations');
+        console.log('');
+        console.log('Configuration:');
+        console.log('  Set required environment variables or use configuration file');
+        console.log('  See documentation for details');
         process.exit(0);
     }
   } catch (error) {
