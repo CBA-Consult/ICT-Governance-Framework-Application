@@ -18,6 +18,9 @@
     "test:user-management": "playwright test tests/user-management.spec.ts",
     "test:user-management:headed": "playwright test tests/user-management.spec.ts --headed",
     "test:user-management:debug": "playwright test tests/user-management.spec.ts --debug",
+    "test:multi-tenant": "playwright test tests/multi-tenant-management.spec.ts",
+    "test:multi-tenant:headed": "playwright test tests/multi-tenant-management.spec.ts --headed",
+    "test:orchestrator": "jest tests/multi-cloud-orchestrator.test.js",
     "test:validate-env": "node tests/validate-test-environment.js",
     "test:report": "playwright show-report"
   }
