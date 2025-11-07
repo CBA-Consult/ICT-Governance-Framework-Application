@@ -1,0 +1,49 @@
+{
+  "tenantName": "Sample Enterprise Tenant",
+  "tenantClassification": "enterprise",
+  "isolationModel": "silo",
+  "serviceTier": "premium",
+  "primaryCloudProvider": "azure",
+  "secondaryCloudProvider": "aws",
+  "tenantAdminEmail": "admin@example.com",
+  "tenantCostCenter": "IT-12345",
+  "complianceRequirements": [
+    "ISO27001",
+    "GDPR",
+    "SOX"
+  ],
+  "dataResidency": "US",
+  "enableAdvancedMonitoring": true,
+  "enableBackupDR": true,
+  "customConfiguration": {
+    "autoScaling": {
+      "enabled": true,
+      "minInstances": 2,
+      "maxInstances": 10
+    },
+    "networking": {
+      "allowedIpRanges": [
+        "10.0.0.0/8",
+        "172.16.0.0/12"
+      ],
+      "enableVpn": true
+    },
+    "security": {
+      "mfaRequired": true,
+      "passwordPolicy": "strict",
+      "sessionTimeout": 30
+    },
+    "backup": {
+      "frequency": "daily",
+      "retentionDays": 90
+    },
+    "notifications": {
+      "channels": ["email", "webhook"],
+      "alertThresholds": {
+        "cpu": 80,
+        "memory": 85,
+        "cost": 5000
+      }
+    }
+  }
+}
