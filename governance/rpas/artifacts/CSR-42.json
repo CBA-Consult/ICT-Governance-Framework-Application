@@ -1,0 +1,9 @@
+{
+  "artifactId": "CSR-42",
+  "version": "2.3.0",
+  "certificationDate": "2024-05-15T00:00:00Z",
+  "certifiedBy": "DRACO AI Governance Board",
+  "status": "CERTIFIED",
+  "description": "Certified Stable Release RTM Baseline for ADPA Framework.",
+  "aevGatesCleared": true
+}

@@ -1,0 +1,29 @@
+{
+  "manifestVersion": "1.0",
+  "governanceId": "RPAS-CM-CORE",
+  "baselineVersion": "2.3.0",
+  "requiredFiles": [
+    "governance/rpas/manifest.json",
+    "governance/rpas/project.binding.json",
+    "governance/rpas/scripts/RpasGovernance.psm1"
+  ],
+  "hashExclusions": [
+    "governance/rpas/governance_checksum.json"
+  ],
+  "artifacts": [
+    {
+      "id": "CSR-42",
+      "path": "governance/rpas/artifacts/CSR-42.json",
+      "requiredKeys": [
+        "artifactId",
+        "version",
+        "certificationDate",
+        "certifiedBy",
+        "aevGatesCleared"
+      ]
+    }
+  ],
+  "enforcement": {
+    "strictMode": true
+  }
+}

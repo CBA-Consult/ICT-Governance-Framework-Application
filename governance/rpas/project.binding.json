@@ -1,0 +1,16 @@
+{
+  "projectId": "ADPA-ICT-GOV",
+  "repository": "ICT-Governance-Framework-Application",
+  "governanceRoot": "governance/rpas",
+  "integrationMethod": "git-hooks",
+  "paths": {
+    "validator": "governance/rpas/scripts/validate-aev.ps1",
+    "register": "governance/rpas/scripts/register-governance.ps1",
+    "hookTemplate": "governance/rpas/hooks/pre-commit.template",
+    "checksum": "governance/rpas/governance_checksum.json",
+    "evidenceTemplate": "governance/rpas/templates/evidence.md"
+  },
+  "enforcement": {
+    "requireChecksum": true
+  }
+}

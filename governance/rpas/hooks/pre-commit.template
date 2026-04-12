@@ -1,0 +1,4 @@
+#!/bin/sh
+# RPAS-CM Pre-Commit Hook
+echo "Executing RPAS Governance AEV checks..."
+pwsh -File "./governance/rpas/scripts/validate-aev.ps1"
