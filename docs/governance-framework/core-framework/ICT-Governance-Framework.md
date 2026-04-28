@@ -25,7 +25,7 @@ This framework covers all technology assets, services, and resources:
 * **🔄 Integration:** APIs, middleware, data exchange mechanisms, security information exchange
 * **🌐 IoT (Internet of Things):** IoT devices, sensors, edge processing, IoT data governance, device lifecycle management
 * **⚡ Edge Computing:** Edge infrastructure, distributed processing, real-time analytics, edge-cloud integration
-* **🔗 Blockchain:** Distributed ledger technologies, smart contracts, cryptocurrency, digital assets, decentralized applications
+* **🔗 Blockchain:** Distributed ledger technologies, smart contracts, digital assets, decentralized applications
 * **🌱 Sustainability:** Carbon footprint tracking, energy efficiency optimization, sustainable technology practices, ESG compliance
 
 ## Unified Governance Platform
