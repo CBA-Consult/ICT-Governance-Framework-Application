@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.2",
-    "@modelcontextprotocol/server-memory": "^2025.8.4",
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@modelcontextprotocol/server-memory": "^2025.11.25",
     "adpa-enterprise-framework-automation": "^3.2.0",
-    "axios": "^1.12.2",
+    "axios": "^1.15.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.2.1",
@@ -17,6 +17,9 @@
   "scripts": {
     "start": "node server-multi-tenant.js",
     "start:dev": "NODE_ENV=development node server-multi-tenant.js",
+    "governance:register": "node ./governance/rpas/scripts/run-powershell.js ./governance/rpas/scripts/register-governance.ps1",
+    "governance:validate": "node ./governance/rpas/scripts/run-powershell.js ./governance/rpas/scripts/validate-aev.ps1",
+    "governance:checksum": "node ./governance/rpas/scripts/run-powershell.js ./governance/rpas/scripts/validate-aev.ps1 -RefreshChecksum",
     "test": "playwright test",
     "test:user-management": "playwright test tests/user-management.spec.ts",
     "test:user-management:headed": "playwright test tests/user-management.spec.ts --headed",

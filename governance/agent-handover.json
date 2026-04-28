@@ -1,0 +1,289 @@
+{
+  "rpas_version": "RPAS-CM-1.0",
+  "purpose": "Authoritative operational handover for coding agents working within ADPA under RPAS Cloud Master governance.",
+  "architecture": {
+    "tiers": {
+  "agent_handover": {
+    "system_context": {
+      "name": "ADPA Framework",
+      "methodology": "RPAS Cloud Master (RPAS-CM)",
+      "lifecycle_stages": [
+        "Ideation",
+        "Business Case",
+        "Approval",
+        "RTM Seed",
+        "Amendment Proposal",
+        "Amendment Decision",
+        "Execution",
+        "CSR-Certified RTM Baseline"
+      ],
+      "governance_model": "Proposal → Decision → Execution",
+      "data_principles": [
+        "Append-only governance",
+        "Cryptographic CSR versioning",
+        "Deterministic ritual execution",
+        "Immutable lineage"
+      ]
+    },
+    "tier_architecture": {
+      "orchestrator": {
+        "language": "C# / .NET 10",
+        "stack": "C# / .NET 10 / Aspire 13.x",
+        "responsibilities": [
+          "Implements all governance rituals: propose, decide, execute",
+          "Applies amendments and CSR versioning",
+          "Validates lifecycle integrity and authority boundaries",
+          "Exposes REST APIs to Experience Tier"
+          "Implements governance rituals: propose, decide, execute",
+          "RTM seeding and amendment application",
+          "CSR stamping",
+          "Authority enforcement (G1–G5)",
+          "HTTP API for Experience Tier"
+        ]
+      },
+      "experience_tier": {
+        "governor_portal": {
+          "framework": "Blazor",
+          "stack": "Blazor",
+          "responsibilities": [
+            "Approval and execution actions",
+            "RTM baseline and lineage oversight",
+            "CSR version visibility",
+            "Governance-only write actions"
+            "Approval + execution of amendments",
+            "Governance visibility",
+            "RTM lineage and CSR display"
+          ],
+          "restrictions": [
+            "May approve/execute but NOT propose",
+            "Must not bypass Orchestrator",
+            "No direct database writes"
+          ]
+        },
+        "researcher_dashboard": {
+          "framework": "Next.js",
+          "stack": "Next.js",
+          "responsibilities": [
+            "Read-only exploration of RTM and amendments",
+            "AI-assisted proposal drafting",
+            "No mutation or execution authority"
+            "Read-only exploration of RTM and lineage",
+            "AI-assisted drafting of PENDING amendments",
+            "Full RTM history, CSR versions, superseded lineage"
+          ],
+          "restrictions": [
+            "No execute endpoints",
+            "No state mutation",
+            "Advisory-only flows"
+          ]
+        }
+      },
+      "intelligence_tier": {
+        "language": "Python",
+        "stack": "Python (PMBOK engines, LLM advisors)",
+        "responsibilities": [
+          "AI research advisor for RTM evolution",
+          "Advisory-only suggestions",
+          "Outputs structured JSON proposals",
+          "No ability to mutate state"
+        ]
+          "Contextual requirement analysis",
+          "Structured advisory outputs",
+          "Taxonomy-based amendment recommendations"
+        ],
+        "restrictions": [
+          "Advisory-only",
+          "Must never submit proposals",
+          "Must never decide or execute",
+          "No direct DB access or mutations"
+        ],
+        "structured_output_format": {
+          "suggestedType": "REPLACEMENT | EXPANSION",
+          "proposedDescription": "string",
+          "justification": "string",
+          "confidence": "float"
+        }
+      },
+      "governance_ledger": {
+        "database": "PostgreSQL",
+        "principles": [
+          "Append-only storage",
+          "Immutable governance artifacts",
+          "CSR version stamping",
+          "No in-place mutation"
+        "stack": "PostgreSQL",
+        "rules": [
+          "Append-only RTM records",
+          "Amendments immutable after Decision ritual",
+          "CSR versioning required for all Execution artifacts",
+          "No in-place modification of any governance artifact"
+        ]
+      }
+    }
+  },
+  "rpas_guardrails": {
+    "G1_authority_boundary": "AI may only propose; humans decide; orchestrator executes. No silent mutations.",
+    "G2_lifecycle_integrity": "All state changes must follow the ritual sequence: Ideation → Business Case → Approval → Seed → Proposal → Decision → Execution → CSR.",
+    "G3_evidence_and_lineage": "All artifacts must reference their governing decision and retain immutable snapshots.",
+    "G4_determinism": "Execution must be idempotent and deterministic. Replays cannot corrupt state.",
+    "G5_read_vs_act": "Experience tier may only mutate via explicit rituals; research tier is read-only."
+  },
+  "cloud_ready_criteria": {
+    "CR1_deterministic_execution": "CSR versioning ensures deterministic, replay-safe behavior.",
+    "CR2_authority_gated_mutation": "All mutations must be tied to explicit, human-attributed decisions.",
+    "CR3_append_only_history": "Superseded data must remain queryable.",
+    "CR4_failure_safety": "System must withstand retries, network duplication, or restarts.",
+    "CR5_experience_decoupling": "Governance logic lives in orchestrator, not UI."
+  },
+  "coding_rules": {
+    "no_mutation_outside_rituals": true,
+    "rituals": [
+      "POST /propose-amendment",
+      "POST /decide-amendment",
+      "POST /apply-amendment"
+    },
+    "non_negotiable_rules": [
+      "NO_MUTATION_OUTSIDE_RITUALS",
+      "RTM_APPEND_ONLY",
+      "AMENDMENTS_IMMUTABLE_AFTER_DECISION",
+      "DETERMINISTIC_IDEMPOTENT_EXECUTION",
+      "CSR_GENERATED_ONCE_ONLY",
+      "EXPERIENCE_TIER_IS_READ_ONLY",
+      "AI_IS_ADVISORY_ONLY",
+      "NO_BACKGROUND_OR_SILENT_EXECUTION"
+    ],
+    "rtm_records": {
+      "append_only": true,
+      "required_fields": [
+        "AmendmentId",
+        "SourceVersion",
+        "CsrVersion",
+        "ExecutedAt"
+      ]
+    "validation_gates": {
+      "AEV_RPAS_PIPELINE": {
+        "gate_1": "Mechanical Integrity — Only intended files modified. No scope creep.",
+        "gate_2": "Build Integrity — dotnet build must succeed with no errors.",
+        "gate_3": "Orchestration Integrity — Aspire AppHost resolves fully with all services healthy.",
+        "gate_4": "Governance Attestation — Explicit validation of G1–G5 compliance.",
+        "commit_certification_rule": "Commits must be prefixed with 'SAFE (RPAS): <description>'"
+      }
+    },
+    "execution": {
+      "idempotency_required": true,
+      "csr_generated_once": true
+    "governance_guardrails": {
+      "G1_authority_boundary": "AI proposes, Human approves, Orchestrator executes. No direct state mutation from Experience Tier or AI.",
+      "G2_lifecycle_integrity": "All state transitions must follow the ritual chain.",
+      "G3_evidence_and_lineage": "Every artifact must reference its governing decision, amendment, and CSR version.",
+      "G4_determinism": "Execution must be idempotent, replay-safe, deterministic.",
+      "G5_read_vs_act": "Experience Tier cannot mutate state outside explicit rituals."
+    },
+    "experience_tier_restrictions": {
+      "governor_portal": "May approve or execute, not propose",
+      "researcher_dashboard": "Read-only + advisory proposals only"
+    "cloud_ready_criteria": {
+      "CR1_deterministic_execution": "CSR stamping ensures deterministic identity.",
+      "CR2_authority_gated_mutation": "All mutations tied to human Decision ritual.",
+      "CR3_append_only_history": "No deletes or updates to governed data.",
+      "CR4_failure_safety": "Safe under retries and multi-region execution.",
+      "CR5_experience_decoupling": "UI cannot perform governance logic."
+    },
+    "ai_restrictions": {
+      "advisory_only": true,
+      "structured_output_format": {
+        "suggestedType": "REPLACEMENT | EXPANSION",
+        "proposedDescription": "string",
+        "justification": "string",
+        "confidence": "float"
+    "invariants": {
+      "rtm_append_only": true,
+      "amendment_immutability": true,
+      "csr_required_for_execution": true,
+      "full_traceability_required": true,
+      "deterministic_execution_required": true,
+      "no_ui_mutation": true
+    },
+    "known_issues": {
+      "aspire_file_locking": {
+        "symptoms": [
+          "MSB3026",
+          "MSB3027",
+          "DLL locked by Adpa.AppHost"
+        ],
+        "fix": [
+          "Kill ALL Adpa.AppHost.exe processes",
+          "Clean bin/ and obj/",
+          "Rebuild and restart Aspire AppHost"
+        ]
+      },
+      "env_var_injection": {
+        "critical_vars": [
+          "AI_PROVIDER"
+        ],
+        "rules": [
+          "Validate environment variables at runtime",
+          "Avoid static initialization (reads before Aspire injects env)",
+          "Ensure injection from AppHost Program.cs"
+        ]
+      }
+    }
+  },
+  "invariants": {
+    "rtm_append_only": true,
+    "amendments_immutable_after_decision": true,
+    "csr_execution_stamp_required": true,
+    "full_traceability_required": true,
+    "no_background_execution": true
+  },
+  "aev_workflow_gates": {
+    "atomicity_contract": "One logical change only. Fully specified scope.",
+    "gate_1_mechanical_integrity": "git status / git diff --stat. Only declared files changed.",
+    "gate_2_build_integrity": "dotnet build. All projects compile. No new warnings/errors.",
+    "gate_3_orchestration_integrity": "dotnet run --project Adpa.AppHost. Aspire resolves all services without exceptions.",
+    "gate_4_governance_attestation": "Verify ledger is append-only, human approval gates execution, idempotent events.",
+    "gate_5_proof_of_life": "Run one happy path scenario.",
+    "commit_certification": "Commits must be prefixed with 'SAFE: <atomic change description>'.",
+    "rollback_rule": "If ANY gate fails, revert to last SAFE commit. Do not debug in a dirty state."
+  },
+  "stabilization_issues": {
+    "file_locks": {
+      "symptoms": [
+        "MSB3026",
+        "MSB3027"
+      ],
+      "fix": [
+        "Terminate leaked Adpa.AppHost.exe processes",
+        "Clean bin/obj directories",
+        "Rebuild once"
+      ]
+    },
+    "environment_variable_injection": {
+      "common_missing": [
+        "AI_PROVIDER"
+      ],
+      "avoid_static_initialization": true
+    }
+  },
+  "operational_summary": {
+    "agent_responsibilities": [
+      "Maintain RPAS compliance",
+      "Modify backend only within ritual boundaries",
+      "Preserve deterministic execution semantics",
+      "Respect append-only governance model",
+      "Preserve role separation in Experience Tier",
+      "Ensure AI never executes or mutates state",
+      "Fix mechanical issues before semantic logic",
+      "Maintain consistent architecture across tiers",
+      "Document all topology or migration steps"
+      "Maintain RPAS Gate compliance (1–4)",
+      "Preserve append-only governance constraints",
+      "Preserve deterministic CSR execution semantics",
+      "Respect Experience Tier restrictions",
+      "Implement advisory-only AI integrations",
+      "Fix mechanical integrity BEFORE semantic logic",
+      "Document architecture-impacting changes",
+      "Never bypass governance rituals"
+    ]
+  }
+}

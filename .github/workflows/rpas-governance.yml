@@ -1,0 +1,36 @@
+name: RPAS Governance Validation
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Register RPAS governance bindings
+      shell: pwsh
+      run: |
+        ./governance/rpas/scripts/register-governance.ps1 -SkipHookInstall
+
+    - name: Validate RPAS governance baseline
+      shell: pwsh
+      run: |
+        ./governance/rpas/scripts/validate-aev.ps1 -Ci
+
+    - name: Install Pester
+      shell: pwsh
+      run: |
+        Install-Module -Name Pester -MinimumVersion '5.0.0' -MaximumVersion '5.9999.9999' -Force -Scope CurrentUser -AllowClobber -SkipPublisherCheck
+
+    - name: Run RPAS governance tests
+      shell: pwsh
+      run: |
+        Invoke-Pester -Path .\tests\RpasGovernance.Tests.ps1 -CI

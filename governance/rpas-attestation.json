@@ -1,0 +1,33 @@
+{
+  "traceability": {
+    "artifactId": "RPAS-CM-GRA-004",
+    "origin": "Orchestration",
+    "humanDecisionId": "DEC-2026-04-11-003",
+    "csrVersion": "v2.3.0+CSR.2026-04-11T21:45Z",
+    "timestamp": "2026-04-11T21:45:12Z"
+  },
+  "authority": {
+    "actorId": "Antigravity-Agent-773",
+    "tier": "Orchestration",
+    "ritualRole": "Executor"
+  },
+  "collision_prevention": {
+    "taskId": "TASK-GRA-004-V2.3.0",
+    "scope": [
+      "scripts/draco-gate-5.ts",
+      "scripts/validate-rpas.ps1",
+      "package.json",
+      "governance/RPAS.md",
+      "governance/v2.3.0-Release-Notes.md",
+      "GEMINI.md",
+      "governance/rpas-attestation.json"
+    ],
+    "status": "IN_PROGRESS",
+    "locks": [
+      {
+        "resource": "scripts/validate-rpas.ps1",
+        "type": "FILE"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Prevent auto-formatting mutations on the cryptographic ledger
+[governance/rpas/governance_checksum.json]
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+# Maintain strict spacing for generated artifacts and status files
+[governance/rpas/**/*.{json,md}]
+indent_style = space
+indent_size = 2
