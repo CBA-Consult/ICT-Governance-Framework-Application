@@ -1,0 +1,16 @@
+#!/bin/sh
+# RPAS-CM Commit Message Validator
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Check if the commit message starts with the required SAFE prefix
+if ! echo "$COMMIT_MSG" | grep -qE "^SAFE \(RPAS\):"; then
+    echo "❌ GOVERNANCE VIOLATION: Commit message must begin with 'SAFE (RPAS):'"
+    echo "Example: SAFE (RPAS): Stamped baseline with CSR-42 certification"
+    echo "Your message was: $COMMIT_MSG"
+    exit 1
+fi
+
+echo "✅ RPAS Governance: Commit message format accepted."
+exit 0

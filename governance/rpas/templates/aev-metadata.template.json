@@ -1,0 +1,11 @@
+{
+  "artifactId": "AEV",
+  "controlVersion": "0.1.0-bootstrap",
+  "projectId": "ICT-Governance-Framework-Application",
+  "changeReference": "CHG-0000",
+  "releaseReference": "REL-0000",
+  "checksum": "sha256:replace-me",
+  "reviewedBy": "owner@domain.example",
+  "reviewedOn": "2026-04-12",
+  "notes": "Replace this template with project-specific evidence metadata."
+}

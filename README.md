@@ -3,6 +3,8 @@
 # Multi-Cloud Multi-Tenant ICT Governance Framework
 
 [![Pester Tests](https://github.com/CBA-Consult/ICT-Governance-Framework-Application/actions/workflows/pester.yml/badge.svg)](https://github.com/CBA-Consult/ICT-Governance-Framework-Application/actions/workflows/pester.yml)
+[![RPAS-AEV Validation](https://github.com/CBA-Consult/ICT-Governance-Framework-Application/actions/workflows/rpas-aev-validation.yml/badge.svg)](https://github.com/CBA-Consult/ICT-Governance-Framework-Application/actions/workflows/rpas-aev-validation.yml)
+[![RPAS Governance Validation](https://github.com/CBA-Consult/ICT-Governance-Framework-Application/actions/workflows/rpas-governance.yml/badge.svg)](https://github.com/CBA-Consult/ICT-Governance-Framework-Application/actions/workflows/rpas-governance.yml)
 
 **[See: Table of Contents](Table-of-Contents.md)** | **[📁 Documentation Structure](docs/README.md)**
 

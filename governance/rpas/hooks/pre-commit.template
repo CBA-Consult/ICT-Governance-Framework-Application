@@ -1,0 +1,8 @@
+#!/bin/sh
+# RPAS-CM Pre-Commit Hook
+echo "Executing RPAS Governance AEV checks..."
+if command -v pwsh >/dev/null 2>&1; then
+    pwsh -File "./governance/rpas/scripts/validate-aev.ps1"
+else
+    powershell -File "./governance/rpas/scripts/validate-aev.ps1"
+fi

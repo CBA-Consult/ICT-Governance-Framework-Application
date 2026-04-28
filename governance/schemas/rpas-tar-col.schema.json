@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://adpa.governance/schemas/rpas-tar-col.schema.json",
+  "title": "RPAS-CM-TAR-COL-001 Validation Schema",
+  "description": "Enforces Traceability, Authority, Responsibility, and Collision-Prevention invariants for ADPA agents.",
+  "type": "object",
+  "required": [
+    "traceability",
+    "authority",
+    "collision_prevention"
+  ],
+  "properties": {
+    "traceability": {
+      "type": "object",
+      "required": [
+        "artifactId",
+        "origin",
+        "humanDecisionId",
+        "csrVersion"
+      ],
+      "properties": {
+        "artifactId": {
+          "type": "string",
+          "pattern": "^RPAS-CM-[A-Z]+-[0-9]{3}$"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "Intelligence",
+            "Experience",
+            "Orchestration",
+            "Human"
+          ]
+        },
+        "humanDecisionId": {
+          "type": "string"
+        },
+        "amendmentId": {
+          "type": "string"
+        },
+        "csrVersion": {
+          "type": "string",
+          "pattern": "^v[0-9]+(\\.[0-9]+)*\\+CSR\\.[A-Z0-9-:]+$"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "required": [
+        "actorId",
+        "tier",
+        "ritualRole"
+      ],
+      "properties": {
+        "actorId": {
+          "type": "string"
+        },
+        "tier": {
+          "type": "string",
+          "enum": [
+            "Intelligence",
+            "Experience",
+            "Orchestration",
+            "Data"
+          ]
+        },
+        "ritualRole": {
+          "type": "string",
+          "enum": [
+            "Proposer",
+            "Approver",
+            "Executor"
+          ]
+        }
+      }
+    },
+    "collision_prevention": {
+      "type": "object",
+      "required": [
+        "taskId",
+        "scope",
+        "status"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "PENDING",
+            "CLAIMED",
+            "IN_PROGRESS",
+            "COMMITTED",
+            "FAILED",
+            "ROLLED_BACK"
+          ]
+        },
+        "locks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "resource": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "FILE",
+                  "RTM_ITEM",
+                  "AMENDMENT",
+                  "TOPOLOGY_NODE"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
