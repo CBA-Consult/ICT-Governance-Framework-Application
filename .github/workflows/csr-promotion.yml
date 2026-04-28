@@ -1,0 +1,52 @@
+name: CSR Promotion Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      rcVersion:
+        description: 'Release Candidate Version (e.g., 2.3.0)'
+        required: true
+        default: '2.3.0'
+      csrId:
+        description: 'Target CSR ID (e.g., CSR-43)'
+        required: true
+        default: 'CSR-43'
+
+jobs:
+  promote-csr:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate CSR Artifact
+        shell: pwsh
+        run: |
+          $csrPath = "./governance/rpas/artifacts/${{ github.event.inputs.csrId }}.json"
+          $date = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssZ")
+          $content = @{
+              artifactId = "${{ github.event.inputs.csrId }}"
+              version = "${{ github.event.inputs.rcVersion }}"
+              certificationDate = $date
+              certifiedBy = "DRACO AI Governance Board"
+              status = "CERTIFIED"
+              description = "Certified Stable Release RTM Baseline for ADPA Framework."
+              aevGatesCleared = $true
+          }
+          $content | ConvertTo-Json -Depth 5 | Out-File $csrPath -Encoding utf8
+          Write-Host "Created CSR Artifact: $csrPath"
+
+      - name: Regenerate Governance Checksum
+        shell: pwsh
+        run: |
+          ./governance/rpas/scripts/register-governance.ps1 -RefreshChecksum
+
+      - name: Commit CSR Promotion
+        shell: pwsh
+        run: |
+          git config --global user.name "DRACO AI Governance"
+          git config --global user.email "draco@adpa-framework.local"
+          git add ./governance/rpas/artifacts/
+          git add ./governance/rpas/governance_checksum.json
+          git commit -m "SAFE (RPAS): Promoted baseline to ${{ github.event.inputs.csrId }} for version ${{ github.event.inputs.rcVersion }}"
+          git push

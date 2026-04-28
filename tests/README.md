@@ -215,6 +215,22 @@ After running tests, you'll see a summary like:
 - No sensitive information in logs
 - Isolated test environment
 
+## RPAS Governance Tests
+
+The repository also includes focused Pester coverage for the RPAS governance scaffold.
+
+Run it from the repository root:
+
+```powershell
+Invoke-Pester -Path .\tests\RpasGovernance.Tests.ps1
+```
+
+See also:
+
+- [RpasGovernance.Tests.ps1](./RpasGovernance.Tests.ps1)
+- [RPAS Governance Integration Guide](../docs/implementation/guides/RPAS-Governance-Integration-Guide.md)
+- `.github/workflows/rpas-governance.yml`
+
 ---
 
 For questions or issues, please refer to the detailed documentation or create an issue in the project repository.

@@ -1,0 +1,22 @@
+﻿{
+    "governanceId":  "RPAS-CM-CORE",
+    "baselineVersion":  "2.3.0",
+    "algorithm":  "SHA256",
+    "generatedOnUtc":  "2026-04-12T23:19:44.1753423Z",
+    "fileCount":  3,
+    "combinedHash":  "28b7c54b98d8a02237cf694cf22ffda59d43b5b61710a9b49c9fbe687484e39a",
+    "files":  [
+                  {
+                      "RelativePath":  "governance/rpas/manifest.json",
+                      "Hash":  "37151e4776873b9ba7293980e9d33929809d48afbf2357e59c2e07add929be41"
+                  },
+                  {
+                      "RelativePath":  "governance/rpas/project.binding.json",
+                      "Hash":  "d50b5dd22af3030bdb0f6bb4a095202b1cebd3aa011447c4ae092c7c0db38b36"
+                  },
+                  {
+                      "RelativePath":  "governance/rpas/scripts/RpasGovernance.psm1",
+                      "Hash":  "2b6a8ba3701e4e9e55b4e2d2d909eeb6b04940335991d948aa2d98a0e72f44dd"
+                  }
+              ]
+}

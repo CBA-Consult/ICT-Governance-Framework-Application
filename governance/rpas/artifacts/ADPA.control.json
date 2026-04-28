@@ -1,0 +1,24 @@
+{
+  "artifactId": "ADPA",
+  "name": "Architecture Decision and Policy Alignment",
+  "version": "0.1.0-bootstrap",
+  "status": "bootstrap",
+  "owner": "ICT Governance Framework Team",
+  "sourceOfTruth": "SET_ME",
+  "controls": {
+    "traceabilityRequired": true,
+    "versionDisciplineRequired": true,
+    "changeApprovalRequired": true
+  },
+  "evidence": {
+    "metadataTemplate": "governance/rpas/templates/aev-metadata.template.json",
+    "requiredFields": [
+      "artifactId",
+      "controlVersion",
+      "projectId",
+      "changeReference",
+      "reviewedBy",
+      "reviewedOn"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "artifactId": "ARM",
+  "name": "Assurance and Release Management",
+  "version": "0.1.0-bootstrap",
+  "status": "bootstrap",
+  "owner": "ICT Governance Framework Team",
+  "sourceOfTruth": "SET_ME",
+  "controls": {
+    "baselineLockRequired": true,
+    "driftDetectionRequired": true,
+    "changeWindowRequired": true
+  },
+  "evidence": {
+    "metadataTemplate": "governance/rpas/templates/aev-metadata.template.json",
+    "requiredFields": [
+      "artifactId",
+      "controlVersion",
+      "releaseReference",
+      "checksum",
+      "reviewedBy",
+      "reviewedOn"
+    ]
+  }
+}

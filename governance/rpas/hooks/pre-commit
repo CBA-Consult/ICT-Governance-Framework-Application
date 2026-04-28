@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+set -eu
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT"
+
+if command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -File "./governance/rpas/scripts/validate-aev.ps1"
+  exit $?
+fi
+
+if command -v powershell >/dev/null 2>&1; then
+  powershell -NoProfile -ExecutionPolicy Bypass -File ".\\governance\\rpas\\scripts\\validate-aev.ps1"
+  exit $?
+fi
+
+echo "RPAS governance validation requires PowerShell (pwsh or powershell)." >&2
+exit 1

@@ -202,7 +202,27 @@ When moving or renaming documents:
 For questions about repository structure or documentation:
 - Review this guide and the [docs/README.md](docs/README.md)
 - Check the [Table of Contents](Table-of-Contents.md)
+- Review the [RPAS Governance Integration Guide](docs/implementation/guides/RPAS-Governance-Integration-Guide.md)
 - Contact the ICT Governance Team
+
+## RPAS Governance Quick Reference
+
+The repository includes an RPAS governance baseline under `governance/rpas`.
+
+Use these commands from the repository root:
+
+```bash
+npm run governance:register
+npm run governance:validate
+npm run governance:checksum
+```
+
+Primary references:
+
+- [docs/implementation/guides/RPAS-Governance-Integration-Guide.md](docs/implementation/guides/RPAS-Governance-Integration-Guide.md)
+- [../governance/rpas/README.md](../governance/rpas/README.md)
+- [../governance/rpas/project.binding.json](../governance/rpas/project.binding.json)
+- [../governance/rpas/manifest.json](../governance/rpas/manifest.json)
 
 ---
 

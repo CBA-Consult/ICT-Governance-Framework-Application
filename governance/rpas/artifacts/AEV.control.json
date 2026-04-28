@@ -1,0 +1,21 @@
+{
+  "artifactId": "AEV",
+  "name": "Automated Evidence Validation",
+  "version": "0.1.0-bootstrap",
+  "status": "active",
+  "owner": "ICT Governance Framework Team",
+  "sourceOfTruth": "SET_ME",
+  "controls": {
+    "validator": "governance/rpas/scripts/validate-aev.ps1",
+    "preCommitHook": "governance/rpas/hooks/pre-commit",
+    "ciWorkflow": ".github/workflows/rpas-governance.yml",
+    "checksumFile": "governance/rpas/governance_checksum.json"
+  },
+  "requiredChecks": [
+    "manifest",
+    "bindings",
+    "artifact-files",
+    "checksum",
+    "hook-template"
+  ]
+}

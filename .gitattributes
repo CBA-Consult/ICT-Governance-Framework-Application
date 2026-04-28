@@ -1,0 +1,11 @@
+# Set default behavior, enforcing LF line endings for consistency across OSs
+* text=auto eol=lf
+
+# Strictly enforce LF for all governance scripts and artifacts
+*.ps1 text eol=lf
+*.sh text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# Treat pre-commit hooks explicitly as Unix shell scripts
+governance/rpas/hooks/* text eol=lf
