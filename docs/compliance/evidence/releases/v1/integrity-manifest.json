@@ -1,0 +1,9 @@
+{
+  "release": "v1.0-adaptive-governance",
+  "commit": "f1ae54c",
+  "generated_at": "2026-06-18T23:58:33.073Z",
+  "files": {
+    "audit-bundle-v1.json": "f7ba098e233453d8a6f0184b7664c881ccec5a4a8da849925b54688546241a90",
+    "calibration-baseline-v1.json": "6f31805a637db80717795c51d6a875175d9a5c0df9bed8c9b88e30f38e043270"
+  }
+}
