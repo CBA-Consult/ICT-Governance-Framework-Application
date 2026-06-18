@@ -1,21 +1,36 @@
 {
-  "artifactId": "AEV",
-  "name": "Automated Evidence Validation",
-  "version": "0.1.0-bootstrap",
-  "status": "active",
-  "owner": "ICT Governance Framework Team",
-  "sourceOfTruth": "SET_ME",
-  "controls": {
-    "validator": "governance/rpas/scripts/validate-aev.ps1",
-    "preCommitHook": "governance/rpas/hooks/pre-commit",
-    "ciWorkflow": ".github/workflows/rpas-governance.yml",
-    "checksumFile": "governance/rpas/governance_checksum.json"
+  "$schema": "../schemas/rpas-tar-col.schema.json",
+  "artifactMetadata": {
+    "artifactId": "TAR-AEV-003",
+    "prefix": "TAR",
+    "version": "2.3.0",
+    "status": "Production-Attested",
+    "lastModified": "2026-06-18T16:15:00Z",
+    "sourceOfTruth": "https://github.com/CBA-Consult/ICT-Governance-Framework-Application/tree/main/governance/rpas/scripts/"
   },
-  "requiredChecks": [
-    "manifest",
-    "bindings",
-    "artifact-files",
-    "checksum",
-    "hook-template"
-  ]
+  "authorityMatrix": {
+    "governanceRole": "Cloud Platform Stewards",
+    "decidingAuthority": "Strategic Governance Council",
+    "executingSystem": "GitHub Actions / Local Pre-Commit Runner",
+    "humanInTheLoopRequired": false,
+    "escalationPath": "RPAS-ESC.md"
+  },
+  "complianceMapping": {
+    "framework": "NIST_CSF_2.0",
+    "primaryCategory": "PR.DS",
+    "enforcedBy": "Pester Verification Pipeline",
+    "auditLineage": "append-only"
+  },
+  "systematics": {
+    "integrationMode": "in-repo",
+    "checksumValidation": {
+      "enabled": true,
+      "targetFile": "governance/rpas/governance_checksum.json"
+    },
+    "driftTaxonomyMapping": {
+      "gateBypass": "process",
+      "checksumMismatch": "governance",
+      "scriptModification": "process"
+    }
+  }
 }

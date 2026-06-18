@@ -9,14 +9,21 @@ const { Pool } = require('pg');
 
 const router = express.Router();
 
-
-// Ensure correct Defender Activities API URL and fail fast if missing
-if (!process.env.DEFENDER_CLOUDAPPS_API_URL) {
-  throw new Error('Missing DEFENDER_CLOUDAPPS_API_URL in environment variables');
+function getDefenderActivitiesApiUrl() {
+  if (!process.env.DEFENDER_CLOUDAPPS_API_URL) {
+    return null;
+  }
+  return process.env.DEFENDER_CLOUDAPPS_API_URL.endsWith('/api')
+    ? `${process.env.DEFENDER_CLOUDAPPS_API_URL}/v1/activities/`
+    : `${process.env.DEFENDER_CLOUDAPPS_API_URL}/api/v1/activities/`;
 }
-const DEFENDER_ACTIVITIES_API_URL = process.env.DEFENDER_CLOUDAPPS_API_URL.endsWith('/api')
-  ? `${process.env.DEFENDER_CLOUDAPPS_API_URL}/v1/activities/`
-  : `${process.env.DEFENDER_CLOUDAPPS_API_URL}/api/v1/activities/`;
+
+function defenderNotConfigured(res) {
+  return res.status(503).json({
+    error: 'Defender for Cloud Apps is not configured',
+    message: 'Set DEFENDER_CLOUDAPPS_API_URL and DEFENDER_CLOUDAPPS_API_TOKEN in .env',
+  });
+}
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -25,9 +32,13 @@ const pool = new Pool({
 
 // Fetch activities from Defender for Cloud Apps
 async function fetchDefenderActivities() {
-  // Use the constructed API URL
+  const url = getDefenderActivitiesApiUrl();
+  if (!url || !process.env.DEFENDER_CLOUDAPPS_API_TOKEN) {
+    const error = new Error('Defender for Cloud Apps is not configured');
+    error.code = 'DEFENDER_NOT_CONFIGURED';
+    throw error;
+  }
   const token = process.env.DEFENDER_CLOUDAPPS_API_TOKEN;
-  const url = DEFENDER_ACTIVITIES_API_URL;
   const headers = {
     'Authorization': `Token ${token}`,
     'Content-Type': 'application/json',
@@ -105,6 +116,9 @@ router.get('/', async (req, res) => {
 
 // POST /api/defender-activities/sync - fetch from Defender API and store in DB
 router.post('/sync', async (req, res) => {
+  if (!getDefenderActivitiesApiUrl() || !process.env.DEFENDER_CLOUDAPPS_API_TOKEN) {
+    return defenderNotConfigured(res);
+  }
   try {
     const activities = await fetchDefenderActivities();
     await storeActivities(activities);

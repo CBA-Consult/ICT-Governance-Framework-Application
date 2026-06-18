@@ -263,21 +263,34 @@ const getUserDashboardPermissions = async (userId) => {
     const isAdmin = roles.some(r => r.role_name === 'admin');
     const hasHighLevelRole = roles.some(r => r.role_hierarchy_level >= 80); // Governance Manager level and above
 
-    return {
+    const dashboardAccess = {
       executive: permissions.some(p => p.permission_name === 'dashboard.executive'),
       operational: permissions.some(p => p.permission_name === 'dashboard.operational'),
       compliance: permissions.some(p => p.permission_name === 'dashboard.compliance'),
       analytics: permissions.some(p => p.permission_name === 'dashboard.analytics'),
       export: permissions.some(p => p.permission_name === 'dashboard.export'),
       admin: permissions.some(p => p.permission_name === 'dashboard.admin'),
-      // Include role-based flags for dashboard access logic
       super_admin: isSuperAdmin,
-      superAdmin: isSuperAdmin, // Alternative naming
+      superAdmin: isSuperAdmin,
       administrator: isAdmin,
       hasHighLevelAccess: hasHighLevelRole,
       roles: roles.map(r => r.role_name),
       permissions: permissions
     };
+
+    // Super admins and admins get full dashboard access even when role_permissions are missing
+    if (isSuperAdmin || isAdmin || hasHighLevelRole) {
+      dashboardAccess.executive = true;
+      dashboardAccess.operational = true;
+      dashboardAccess.compliance = true;
+      dashboardAccess.analytics = true;
+      dashboardAccess.export = true;
+      if (isSuperAdmin || isAdmin) {
+        dashboardAccess.admin = true;
+      }
+    }
+
+    return dashboardAccess;
   } catch (error) {
     console.error('Error getting user dashboard permissions:', error);
     throw error;
@@ -323,9 +336,55 @@ const logDashboardAccess = async (userId, dashboardType, success, ipAddress) => 
   }
 };
 
+/**
+ * Middleware for dashboard data API — uses dashboard permissions, not data_processing_read
+ */
+const requireDashboardDataAccess = () => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user?.user_id) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const dashboardType = req.query.dashboard_type || 'executive';
+      const permissions = await getUserDashboardPermissions(req.user.user_id);
+
+      const hasFullAccess = !!(
+        permissions.super_admin ||
+        permissions.superAdmin ||
+        permissions.administrator ||
+        permissions.admin ||
+        permissions.hasHighLevelAccess
+      );
+      const hasTypeAccess = !!permissions[dashboardType];
+
+      if (!hasFullAccess && !hasTypeAccess) {
+        return res.status(403).json({
+          success: false,
+          message: `Access denied. Insufficient permissions for ${dashboardType} dashboard`,
+          dashboardType
+        });
+      }
+
+      req.dashboardPermissions = permissions;
+      next();
+    } catch (error) {
+      console.error('Dashboard data authorization error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error during dashboard authorization'
+      });
+    }
+  };
+};
+
 module.exports = {
   requireDashboardAccess,
   requireAnyDashboardAccess,
+  requireDashboardDataAccess,
   getUserDashboardPermissions,
   logDashboardAccess
 };

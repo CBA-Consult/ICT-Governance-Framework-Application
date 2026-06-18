@@ -1,0 +1,13 @@
+[
+  {
+    "templateId": "policy-alignment",
+    "generatedAt": "2026-06-18T11:51:52.455Z",
+    "frameworkSource": "docs/policies/governance/ICT-Governance-Policies.md",
+    "outputPath": "generated-documents\\management-plans\\policy-alignment-1781783512454.md",
+    "variables": {
+      "entityId": "tenant-contoso-health",
+      "policyName": "Security Requirements"
+    },
+    "projectId": "ADPA-ICT-GOV"
+  }
+]

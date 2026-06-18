@@ -17,11 +17,15 @@
 >
 > Conducting a full NIST CSF 2.0 assessment or marketing framework capabilities **while P1 remediation items remain open** would produce invalid results and create misrepresentation risk. See [Remediation prerequisites](#remediation-prerequisites-gate-checklist).
 
-**Status:** Active planning document — **remediation in progress** (June 2026)
+**Status:** Active planning document — **remediation in progress** (18 June 2026)
+
+> **June 2026 sprint:** JIT/Break Glass consoles, privileged-action ledger, RPAS asset register, governance incident ingest, Organisational Profile, and ADPA Production-Attested artifacts delivered. See [NIST CSF 2.0 Compliance Review — Remediation progress](NIST-CSF-2.0-Compliance-Review.md#remediation-progress-june-2026-update). **Gate A not met** — sign-off pending.
 
 The ICT Governance Framework has a **strong documentation and policy foundation**, **working RBAC/authentication**, **RPAS governance scaffold**, and **deployable IaC patterns**. The largest gaps are where **documentation and UI overstate live capability** — mock dashboards, unimplemented mapped features, and bootstrap governance artifacts.
 
 **Place emphasis on these six focus areas:**
+
+> **Implementation plan:** [Enterprise Security Seven-Pillar Implementation Plan](../implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md) — sprint checklists for SecOps (A–B), Software supply chain (C), and Resilience (D).
 
 | Rank | Focus area | Why it matters | Horizon |
 |------|------------|----------------|---------|
@@ -40,15 +44,15 @@ The following **must be complete** before proceeding to [full NIST CSF 2.0 asses
 
 ### Gate A — Required before full NIST CSF 2.0 assessment (P1)
 
-| ID | Remediation | Focus area | Blocks assessment of |
-|----|-------------|------------|------------------------|
-| G-A1 | A034 reconciled — every mapping tagged Implemented / Partial / Planned / Gap with code evidence | 1 | All CSF functions — integrity of evidence base |
-| G-A2 | Mock compliance and executive dashboards removed or explicitly demo-only; production paths use live data | 1 | GV.OV, DE.CM, DETECT evidence |
-| G-A3 | Production CASB/vendor inventory (no in-memory mock catalog) | 5 | GV.SC |
-| G-A4 | Incident ticket creation wired (ServiceNow and/or Sentinel) — stub removed | 2 | DE.CM, RS.MA |
-| G-A5 | CSF 2.0 Organisational Profile (Current) published | 3 | GV.OC, entire GOVERN function |
-| G-A6 | Placeholder Zero Trust scores replaced with live assessment or removed from reporting | 4 | ID.RA, GV.RM |
-| G-A7 | ADPA/RPAS artifacts — `SET_ME` resolved; bootstrap status upgraded or formally scoped as pre-production | 3 | GV.PO, GV.OV |
+| ID | Remediation | Focus area | Blocks assessment of | June 2026 status |
+|----|-------------|------------|------------------------|------------------|
+| G-A1 | A034 reconciled — every mapping tagged Implemented / Partial / Planned / Gap with code evidence | 1 | All CSF functions — integrity of evidence base | ☐ Open |
+| G-A2 | Mock compliance and executive dashboards removed or explicitly demo-only; production paths use live data | 1 | GV.OV, DE.CM, DETECT evidence | 🟢 Substantial — compliance + CISO + Executive dashboards live via `GET /api/governance/executive/metrics`; Strategic Initiatives demo-only |
+| G-A3 | Production CASB/vendor inventory (no in-memory mock catalog) | 5 | GV.SC | 🟡 Partial — ingest webhook live; catalog in-memory |
+| G-A4 | Incident ticket creation wired (ServiceNow and/or Sentinel) — stub removed | 2 | DE.CM, RS.MA | 🟡 Partial — REST ingest API live; PowerShell stub |
+| G-A5 | CSF 2.0 Organisational Profile (Current) published | 3 | GV.OC, entire GOVERN function | 🟡 Substantial — profile v1.1 published |
+| G-A6 | Placeholder Zero Trust scores replaced with live assessment or removed from reporting | 4 | ID.RA, GV.RM | ☐ Open |
+| G-A7 | ADPA/RPAS artifacts — `SET_ME` resolved; bootstrap status upgraded or formally scoped as pre-production | 3 | GV.PO, GV.OV | 🟡 Substantial — Production-Attested |
 
 **Gate A sign-off:** Compliance Officer + CISO — required to open NIST CSF 2.0 Phase 3 validation.
 
@@ -56,13 +60,13 @@ The following **must be complete** before proceeding to [full NIST CSF 2.0 asses
 
 Complete **Gate A** plus:
 
-| ID | Remediation | Focus area | Blocks |
-|----|-------------|------------|--------|
-| G-B1 | Asset register service implemented (FR-GOV-004) | 4 | ID.AM, client asset governance claims |
-| G-B2 | Live Sentinel adverse-event correlation operational | 2 | DE.AE, detect/respond service SLAs |
-| G-B3 | End-to-end DR test executed with documented RTO/RPO | 6 | Business Continuity / content continuation offers |
-| G-B4 | IR analysis workflow API — not documentation-only | 2 | Incident response solution claims |
-| G-B5 | Client and MSP materials reviewed — no capability claims beyond Gate B evidence | 1 | All client-facing solution proposals |
+| ID | Remediation | Focus area | Blocks | June 2026 status |
+|----|-------------|------------|--------|------------------|
+| G-B1 | Asset register service implemented (FR-GOV-004) | 4 | ID.AM, client asset governance claims | 🟡 Substantial — API, schema, UI, tests |
+| G-B2 | Live Sentinel adverse-event correlation operational | 2 | DE.AE, detect/respond service SLAs | 🟡 Partial — incident ingest |
+| G-B3 | End-to-end DR test executed with documented RTO/RPO | 6 | Business Continuity / content continuation offers | 🟡 Partial — DR fields in register |
+| G-B4 | IR analysis workflow API — not documentation-only | 2 | Incident response solution claims | ☐ Open |
+| G-B5 | Client and MSP materials reviewed — no capability claims beyond Gate B evidence | 1 | All client-facing solution proposals | ☐ Open |
 
 **Gate B sign-off:** Compliance Officer + Service Delivery Lead — required for MSP tier launches and formal solution proposals.
 
@@ -156,13 +160,15 @@ Detection without **closed-loop response** fails CSF 2.0 DETECT and RESPOND expe
 
 ### Actions
 
-| # | Action | Owner domain |
-|---|--------|--------------|
-| 2.1 | Wire incident creation to ServiceNow and/or Sentinel incidents | Azure automation |
-| 2.2 | Complete `Automated-Remediation-Framework.ps1` coverage for top 10 resource types | Azure automation |
-| 2.3 | Implement live Sentinel correlation for adverse events (DE.AE) | Security operations |
-| 2.4 | Build incident analysis workflow API (RS.AN) — link AMD records to IR tickets | Development |
-| 2.5 | Validate ransomware scenario end-to-end in test tenant (detect → contain → ticket) | Security + BC |
+| # | Action | Owner domain | Sprint |
+|---|--------|--------------|--------|
+| 2.1 | Wire incident creation to governance API and/or ServiceNow | Azure automation | **A** |
+| 2.2 | Complete `Automated-Remediation-Framework.ps1` coverage for top 10 resource types | Azure automation | **B** |
+| 2.3 | Implement live Sentinel correlation for adverse events (DE.AE) | Security operations | **B** |
+| 2.4 | Build incident analysis workflow API (RS.AN) — link AMD records to IR tickets | Development | **B** |
+| 2.5 | Validate ransomware scenario end-to-end in test tenant (detect → contain → ticket) | Security + BC | **B** / **D** |
+
+See [Sprint A & B checklists](../implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md#sprint-a--close-the-detect--ticket-loop-2-weeks).
 
 ### Success criteria
 
@@ -209,8 +215,9 @@ CSF 2.0 makes **GOVERN** foundational. The framework's differentiator (RPAS + AD
 
 ### Evidence today
 
-- `governance/rpas/artifacts/ADPA.control.json` — bootstrap
-- `README.md` — ADPA bridge section (design)
+- `governance/rpas/artifacts/ADPA.control.json` — Production-Attested v2.3.0
+- `docs/compliance/NIST-CSF-2.0-Organisational-Profile.md` — Current State Profile v1.1
+- `app/jit-elevation/`, `app/break-glass/` — privileged access oversight consoles
 
 ---
 
@@ -221,7 +228,8 @@ CSF 2.0 makes **GOVERN** foundational. The framework's differentiator (RPAS + AD
 ### Current state
 
 - Azure resource enumeration via PowerShell module (`Get-AzResource`).
-- A034 maps FR-GOV-004 (asset register) and FR-GOV-005 (FAIR risk) — **neither implemented in application code**.
+- **Asset register (FR-GOV-004) implemented** — PostgreSQL schema, REST API, web UI, CASB/DR fields, verification tests (`npm run verify:assets`).
+- A034 still maps FR-GOV-005 (FAIR risk) — **not implemented in application code**.
 - Zero Trust maturity assessment uses **hardcoded placeholder scores**.
 
 ### Gap
@@ -232,7 +240,7 @@ Without authoritative asset inventory and live risk assessment, IDENTIFY functio
 
 | # | Action | Owner domain |
 |---|--------|--------------|
-| 4.1 | Implement asset register API and schema (FR-GOV-004) — multi-cloud asset IDs | Development |
+| 4.1 | Implement asset register API and schema (FR-GOV-004) — multi-cloud asset IDs | Development | **Delivered June 2026** — deepen multi-cloud sync |
 | 4.2 | Integrate asset register with Azure Resource Graph, M365, CASB catalog | Integration |
 | 4.3 | Replace placeholder ZT scores with live telemetry-driven assessment | Azure automation |
 | 4.4 | Introduce risk register (FAIR-lite minimum) linked to assets and tenants | Governance |
@@ -263,13 +271,15 @@ Shadow IT, SaaS sprawl, and vendor risk are core client concerns — especially 
 
 ### Actions
 
-| # | Action | Owner domain |
-|---|--------|--------------|
-| 5.1 | Persist CASB catalog to PostgreSQL; integrate Defender for Cloud Apps API | Development |
-| 5.2 | Replace mock compliance validation with live API calls | Development |
-| 5.3 | Build vendor/SaaS inventory aligned to GV.SC — link to procurement workflow | Compliance |
-| 5.4 | Unify Shadow IT detection with drift taxonomy (application drift category) | Security operations |
-| 5.5 | Report supply chain posture on compliance dashboard (live) | Development |
+| # | Action | Owner domain | Sprint |
+|---|--------|--------------|--------|
+| 5.1 | Persist CASB catalog to PostgreSQL; integrate Defender for Cloud Apps API | Development | **C** |
+| 5.2 | Replace mock compliance validation with live API calls | Development | **C** |
+| 5.3 | Build vendor/SaaS inventory aligned to GV.SC — link to procurement workflow | Compliance | **C** |
+| 5.4 | Unify Shadow IT detection with drift taxonomy (application drift category) | Security operations | **C** |
+| 5.5 | Report supply chain posture on compliance dashboard (live) | Development | **C** |
+
+See [Sprint C checklist](../implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md#sprint-c--software-supply-chain-pillar-2-weeks).
 
 ### Success criteria
 
@@ -301,13 +311,15 @@ Clients buying continuity services need **proven RTO/RPO**, not documented inten
 
 ### Actions
 
-| # | Action | Owner domain |
-|---|--------|--------------|
-| 6.1 | Execute ransomware recovery scenario in isolated test tenant; record RTO/RPO | BC / Security |
-| 6.2 | Add DR validation to CI or quarterly scheduled workflow | DevOps |
-| 6.3 | Complete backup remediation logic in automation framework | Azure automation |
-| 6.4 | Package recovery attestation template for client delivery post-test | Compliance |
-| 6.5 | Extend Git-to-cloud recovery script chain (validate → deploy → restore → verify) | DevOps |
+| # | Action | Owner domain | Sprint |
+|---|--------|--------------|--------|
+| 6.1 | Execute ransomware recovery scenario in isolated test tenant; record RTO/RPO | BC / Security | **D** |
+| 6.2 | Add DR validation to CI or quarterly scheduled workflow | DevOps | **D** |
+| 6.3 | Complete backup remediation logic in automation framework | Azure automation | **D** (stretch) |
+| 6.4 | Package recovery attestation template for client delivery post-test | Compliance | **D** |
+| 6.5 | Extend Git-to-cloud recovery script chain (validate → deploy → restore → verify) | DevOps | **D** |
+
+See [Sprint D checklist](../implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md#sprint-d--resilience--measured-recovery-2-weeks).
 
 ### Success criteria
 

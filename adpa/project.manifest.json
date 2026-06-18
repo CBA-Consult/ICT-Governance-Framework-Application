@@ -1,0 +1,30 @@
+{
+  "productId": "ADPA-ICT-GOV",
+  "name": "Architecture Decision and Policy Alignment",
+  "version": "1.0.0",
+  "status": "active",
+  "repository": "ICT-Governance-Framework-Application",
+  "integrationMode": "in-repo",
+  "description": "ADPA is the in-repository policy-to-code bridge for the ICT Governance Framework.",
+  "paths": {
+    "root": "adpa",
+    "governance": "governance/rpas",
+    "frameworkDocs": "docs/governance-framework",
+    "policies": "docs/policies",
+    "generatedOutput": "generated-documents",
+    "complianceAsCode": "blueprint-templates",
+    "webApp": "ict-governance-framework",
+    "schemas": "adpa/schemas",
+    "templates": "adpa/templates",
+    "entities": "adpa/entities"
+  },
+  "rpasBinding": {
+    "projectId": "ADPA-ICT-GOV",
+    "csrBaseline": "CSR-42",
+    "baselineVersion": "2.3.0",
+    "tarColSchema": "governance/schemas/rpas-tar-col.schema.json"
+  },
+  "tiers": "adpa/systematics/tiers.json",
+  "lifecycle": "adpa/systematics/lifecycle.json",
+  "templateRegistry": "adpa/templates/manifest.json"
+}

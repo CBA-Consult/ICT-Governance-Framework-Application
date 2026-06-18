@@ -1,0 +1,37 @@
+{
+  "drillId": "GB3-20260618-165938",
+  "csrId": "CSR-42",
+  "tenantId": "tenant-01",
+  "targetRtoHours": 4,
+  "targetRpoHours": 1,
+  "phases": [
+    {
+      "name": "pre-flight",
+      "status": "passed"
+    },
+    {
+      "name": "baseline-checkout",
+      "status": "passed",
+      "checksum": "5860483d630ae643158339117ed88e07303930ffa1d9cb1fec4500da391f7e71"
+    },
+    {
+      "name": "infrastructure-hydration",
+      "status": "passed",
+      "assetId": "/subscriptions/0000-1111/resourceGroups/rg-contoso-recovery/providers/Microsoft.Compute/virtualMachines/vm-app-recovered-01",
+      "assetName": "vm-app-recovered-01"
+    },
+    {
+      "name": "post-recovery-telemetry",
+      "status": "passed",
+      "incidentId": 6,
+      "correlated": true
+    }
+  ],
+  "passed": true,
+  "startedAtUtc": "2026-06-18T14:59:38.4158456Z",
+  "completedAtUtc": "2026-06-18T14:59:39.1112539Z",
+  "durationMs": 724,
+  "rtoMet": true,
+  "rpoMet": true,
+  "rtoSeconds": 1.0
+}

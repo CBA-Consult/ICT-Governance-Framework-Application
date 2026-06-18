@@ -16,6 +16,7 @@ export default function CompliancePage() {
       </ul>
       <p className="text-gray-700 dark:text-gray-200">
         For compliance checklists, audit results, and detailed procedures, refer to the compliance documentation in the repository.
+        View the <a href="/compliance-dashboard" className="text-blue-600 hover:underline">live NIST CSF 2.0 compliance dashboard</a> for current control posture and incident traceability.
       </p>
     </div>
   );

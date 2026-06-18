@@ -64,7 +64,14 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }) {
       }
     } catch (err) {
       console.error('Login error:', err);
-      setFormError(err.response?.data?.error || 'Login failed. Please try again.');
+      let message = err.response?.data?.error || 'Login failed. Please try again.';
+      if (err.response?.status === 429) {
+        const retryAfter = err.response?.headers?.['retry-after'];
+        message = retryAfter
+          ? `Too many login attempts. Try again in ${retryAfter} seconds.`
+          : 'Too many login attempts. Restart `npm run server` to reset the dev limit, then retry.';
+      }
+      setFormError(message);
     }
   };
 

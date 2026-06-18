@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cba-consult.github.io/ict-governance/rpas-tar-col.schema.json",
+  "title": "RPAS TAR Control Artifact",
+  "description": "Schema for production-attested ADPA/ARM/AEV control manifests (Gate A G-A7)",
+  "type": "object",
+  "required": [
+    "$schema",
+    "artifactMetadata",
+    "authorityMatrix",
+    "complianceMapping",
+    "systematics"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "../schemas/rpas-tar-col.schema.json"
+    },
+    "artifactMetadata": {
+      "type": "object",
+      "required": [
+        "artifactId",
+        "prefix",
+        "version",
+        "status",
+        "lastModified",
+        "sourceOfTruth"
+      ],
+      "properties": {
+        "artifactId": { "type": "string", "pattern": "^TAR-[A-Z]+-[0-9]+$" },
+        "prefix": { "type": "string", "enum": ["TAR"] },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "status": {
+          "type": "string",
+          "enum": ["Production-Attested", "Pre-Production", "Deprecated"]
+        },
+        "lastModified": { "type": "string", "format": "date-time" },
+        "sourceOfTruth": { "type": "string", "format": "uri" }
+      },
+      "additionalProperties": false
+    },
+    "authorityMatrix": {
+      "type": "object",
+      "required": [
+        "governanceRole",
+        "decidingAuthority",
+        "executingSystem",
+        "humanInTheLoopRequired",
+        "escalationPath"
+      ],
+      "additionalProperties": true
+    },
+    "complianceMapping": {
+      "type": "object",
+      "required": ["framework", "primaryCategory", "enforcedBy", "auditLineage"],
+      "additionalProperties": true
+    },
+    "systematics": {
+      "type": "object",
+      "required": ["integrationMode", "checksumValidation", "driftTaxonomyMapping"],
+      "properties": {
+        "integrationMode": { "type": "string", "enum": ["in-repo", "submodule", "external"] },
+        "checksumValidation": {
+          "type": "object",
+          "required": ["enabled", "targetFile"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "targetFile": { "type": "string" }
+          }
+        },
+        "driftTaxonomyMapping": { "type": "object" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

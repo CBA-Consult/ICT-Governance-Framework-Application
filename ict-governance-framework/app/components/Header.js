@@ -76,6 +76,8 @@ export default function Header() {
                       <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
                         <Link href="/compliance" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Compliance</Link>
                         <Link href="/compliance-dashboard" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Compliance Dashboard</Link>
+                        <Link href="/secops-console" className="block px-4 py-2 text-sm text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 font-semibold">SecOps Console</Link>
+                        <Link href="/asset-register" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Asset Register</Link>
                       </div>
                     )}
                   </div>
@@ -93,6 +95,11 @@ export default function Header() {
                       <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
                         <Link href="/secure-score" className="block px-4 py-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">Secure Score</Link>
                         <Link href="/ciso-dashboard" className="px-4 py-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-bold flex items-center"><ShieldCheckIcon className="h-4 w-4 mr-1" />CISO Dashboard</Link>
+                        {hasPermission('compliance.read') && (
+                          <Link href="/secops-console" className="block px-4 py-2 text-sm text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 font-semibold">SecOps Console</Link>
+                        )}
+                        <Link href="/jit-elevation" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">JIT Elevation</Link>
+                        <Link href="/break-glass" className="block px-4 py-2 text-sm text-red-700 dark:text-red-300 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-semibold">Break Glass Console</Link>
                       </div>
                     )}
                   </div>
@@ -307,6 +314,23 @@ export default function Header() {
                   </Link>
                   <Link href="/compliance-dashboard" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                     Compliance Dashboard
+                  </Link>
+                  <Link href="/secops-console" className="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-semibold">
+                    SecOps Console
+                  </Link>
+                  <Link href="/asset-register" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                    Asset Register
+                  </Link>
+                </>
+              )}
+
+              {hasPermission('view_security_metrics') && (
+                <>
+                  <Link href="/jit-elevation" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                    JIT Elevation
+                  </Link>
+                  <Link href="/break-glass" className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-semibold">
+                    Break Glass
                   </Link>
                 </>
               )}

@@ -5,7 +5,13 @@
   "requiredFiles": [
     "governance/rpas/manifest.json",
     "governance/rpas/project.binding.json",
-    "governance/rpas/scripts/RpasGovernance.psm1"
+    "governance/rpas/scripts/RpasGovernance.psm1",
+    "adpa/project.manifest.json",
+    "adpa/templates/manifest.json",
+    "governance/rpas/artifacts/ADPA.control.json",
+    "governance/rpas/artifacts/ARM.control.json",
+    "governance/rpas/artifacts/AEV.control.json",
+    "governance/rpas/schemas/rpas-tar-col.schema.json"
   ],
   "hashExclusions": [
     "governance/rpas/governance_checksum.json"
@@ -20,6 +26,42 @@
         "certificationDate",
         "certifiedBy",
         "aevGatesCleared"
+      ]
+    },
+    {
+      "id": "ADPA",
+      "path": "governance/rpas/artifacts/ADPA.control.json",
+      "schema": "governance/rpas/schemas/rpas-tar-col.schema.json",
+      "requiredKeys": [
+        "$schema",
+        "artifactMetadata",
+        "authorityMatrix",
+        "complianceMapping",
+        "systematics"
+      ]
+    },
+    {
+      "id": "ARM",
+      "path": "governance/rpas/artifacts/ARM.control.json",
+      "schema": "governance/rpas/schemas/rpas-tar-col.schema.json",
+      "requiredKeys": [
+        "$schema",
+        "artifactMetadata",
+        "authorityMatrix",
+        "complianceMapping",
+        "systematics"
+      ]
+    },
+    {
+      "id": "AEV",
+      "path": "governance/rpas/artifacts/AEV.control.json",
+      "schema": "governance/rpas/schemas/rpas-tar-col.schema.json",
+      "requiredKeys": [
+        "$schema",
+        "artifactMetadata",
+        "authorityMatrix",
+        "complianceMapping",
+        "systematics"
       ]
     }
   ],

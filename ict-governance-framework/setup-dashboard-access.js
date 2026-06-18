@@ -147,7 +147,26 @@ async function setupDashboardAccess() {
         );
         
         if (existingUser.rows.length > 0) {
-          console.log(`   ⚠️  User ${user.username} already exists, skipping...`);
+          console.log(`   ⚠️  User ${user.username} already exists, ensuring roles...`);
+          for (const roleId of user.roles) {
+            try {
+              await client.query(`
+                INSERT INTO user_roles (user_id, role_id, assigned_by, assigned_at, is_active, assignment_reason)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                ON CONFLICT (user_id, role_id) DO UPDATE SET is_active = true
+              `, [
+                user.user_id,
+                roleId,
+                'USR-SUPERADMIN-001',
+                new Date(),
+                true,
+                'Initial system setup'
+              ]);
+              console.log(`     🔑 Ensured role: ${roleId}`);
+            } catch (roleError) {
+              console.log(`     ⚠️  Role assignment failed for ${roleId}: ${roleError.message}`);
+            }
+          }
           continue;
         }
         

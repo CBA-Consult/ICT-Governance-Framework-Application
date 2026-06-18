@@ -1,0 +1,39 @@
+{
+  "bridgeVersion": "1.0.0",
+  "description": "Bindings between ADPA in-repo module and ICT Governance Framework application components.",
+  "adpaModule": "adpa",
+  "connections": {
+    "webApp": {
+      "path": "ict-governance-framework",
+      "connectorsConfig": "ict-governance-framework/config/enterprise-connectors.json",
+      "telemetryAdapters": [
+        "sentinel",
+        "defender-cloud-apps"
+      ],
+      "envVars": {
+        "ADPA_PROJECT_ID": "ADPA-ICT-GOV",
+        "ADPA_TEMPLATE_MANIFEST": "adpa/templates/manifest.json",
+        "ADPA_ENTITIES_DIR": "adpa/entities"
+      }
+    },
+    "governance": {
+      "path": "governance/rpas",
+      "controlArtifact": "governance/rpas/artifacts/ADPA.control.json",
+      "validation": "npm run governance:validate"
+    },
+    "complianceAsCode": {
+      "path": "blueprint-templates",
+      "iacGuide": "docs/architecture/integration/ICT-Governance-IaC-Integration.md"
+    },
+    "documentOutput": {
+      "path": "generated-documents",
+      "generationCli": "npm run adpa:generate"
+    }
+  },
+  "telemetryPipeline": {
+    "ingest": "ict-governance-framework/api/framework/enterprise-integration.js",
+    "prioritize": "adpa/scripts/prioritize-from-telemetry.js",
+    "generate": "adpa/scripts/generate.js",
+    "certify": "governance/rpas/scripts/validate-aev.ps1"
+  }
+}

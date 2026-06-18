@@ -6,6 +6,7 @@ const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult, query } = require('express-validator');
 const { requirePermissions, authenticateToken, logActivity } = require('../middleware/auth');
+const { requireDashboardDataAccess } = require('../middleware/dashboardAuth');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -494,7 +495,7 @@ router.post('/generate-insights',
 // GET /api/data-processing/dashboard-data - Get processed dashboard data
 router.get('/dashboard-data',
   authenticateToken,
-    requirePermissions(['data_processing_read']),
+  requireDashboardDataAccess(),
   async (req, res) => {
     try {
       const { dashboard_type = 'executive', time_range_days = 30 } = req.query;

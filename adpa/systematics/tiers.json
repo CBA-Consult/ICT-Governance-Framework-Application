@@ -1,0 +1,64 @@
+{
+  "version": "1.0.0",
+  "description": "ADPA tier boundaries within the ICT Governance Framework single product repository.",
+  "tiers": {
+    "intelligence": {
+      "id": "intelligence",
+      "name": "Intelligence Tier",
+      "authority": "advisory-only",
+      "location": "adpa/scripts",
+      "responsibilities": [
+        "Template drafting and contextual analysis",
+        "Telemetry signal interpretation for template prioritization",
+        "Structured advisory JSON only"
+      ],
+      "restrictions": [
+        "No governance ledger mutation",
+        "No execution of IaC or policy changes"
+      ]
+    },
+    "orchestration": {
+      "id": "orchestration",
+      "name": "Orchestration Tier",
+      "authority": "execution",
+      "location": "governance/rpas/scripts",
+      "responsibilities": [
+        "RPAS amendment rituals and CSR baseline management",
+        "AEV validation gates",
+        "Checksum and drift detection"
+      ],
+      "restrictions": [
+        "Material changes require human decision per RPAS G1",
+        "No bypass of AMD or CSR lineage"
+      ]
+    },
+    "experience": {
+      "id": "experience",
+      "name": "Experience Tier",
+      "authority": "read-and-decide",
+      "location": "ict-governance-framework",
+      "responsibilities": [
+        "Governance dashboards and stakeholder portals",
+        "Human approval workflows",
+        "Enterprise connector ingestion (Sentinel, CASB)"
+      ],
+      "restrictions": [
+        "Governance mutations via orchestration scripts or approved APIs only",
+        "No direct writes to certified baselines"
+      ]
+    },
+    "data": {
+      "id": "data",
+      "name": "Data Tier",
+      "authority": "append-only",
+      "location": "adpa/entities",
+      "responsibilities": [
+        "Entity catalog (tenant, workload, application, subscription)",
+        "Generation manifests and telemetry-derived entity snapshots"
+      ],
+      "restrictions": [
+        "Entity baselines versioned; superseded records retained for audit"
+      ]
+    }
+  }
+}

@@ -1,24 +1,36 @@
 {
-  "artifactId": "ARM",
-  "name": "Assurance and Release Management",
-  "version": "0.1.0-bootstrap",
-  "status": "bootstrap",
-  "owner": "ICT Governance Framework Team",
-  "sourceOfTruth": "SET_ME",
-  "controls": {
-    "baselineLockRequired": true,
-    "driftDetectionRequired": true,
-    "changeWindowRequired": true
+  "$schema": "../schemas/rpas-tar-col.schema.json",
+  "artifactMetadata": {
+    "artifactId": "TAR-ARM-002",
+    "prefix": "TAR",
+    "version": "2.3.0",
+    "status": "Production-Attested",
+    "lastModified": "2026-06-18T16:15:00Z",
+    "sourceOfTruth": "https://github.com/CBA-Consult/ICT-Governance-Framework-Application/tree/main/blueprint-templates/"
   },
-  "evidence": {
-    "metadataTemplate": "governance/rpas/templates/aev-metadata.template.json",
-    "requiredFields": [
-      "artifactId",
-      "controlVersion",
-      "releaseReference",
-      "checksum",
-      "reviewedBy",
-      "reviewedOn"
-    ]
+  "authorityMatrix": {
+    "governanceRole": "Cloud Platform Stewards",
+    "decidingAuthority": "Strategic Governance Council",
+    "executingSystem": "Azure Resource Manager / Bicep Engine",
+    "humanInTheLoopRequired": false,
+    "escalationPath": "RPAS-ESC.md"
+  },
+  "complianceMapping": {
+    "framework": "NIST_CSF_2.0",
+    "primaryCategory": "PR.IR",
+    "enforcedBy": "Azure Policy Definitions",
+    "auditLineage": "append-only"
+  },
+  "systematics": {
+    "integrationMode": "in-repo",
+    "checksumValidation": {
+      "enabled": true,
+      "targetFile": "governance/rpas/governance_checksum.json"
+    },
+    "driftTaxonomyMapping": {
+      "resourceDrift": "architectural",
+      "policyDrift": "governance",
+      "rbacDrift": "security"
+    }
   }
 }

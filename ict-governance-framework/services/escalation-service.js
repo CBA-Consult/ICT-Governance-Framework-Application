@@ -126,6 +126,13 @@ class EscalationService {
         console.log(`Escalated ${result.rows.length} critical alerts`);
       }
     } catch (error) {
+      if (error.code === '42P01' || error.code === '42703') {
+        if (!this._warnedAlerts) {
+          console.warn('Alert escalations skipped — run npm run setup:enterprise for alerts schema');
+          this._warnedAlerts = true;
+        }
+        return;
+      }
       console.error('Error checking alert escalations:', error);
     } finally {
       client.release();
@@ -171,18 +178,28 @@ class EscalationService {
   // Check for workflow approval timeouts
   async checkWorkflowApprovalTimeouts() {
     const client = await this.pool.connect();
-    
+
     try {
-      // Get workflow approvals that are overdue
-        const query = `
+      const colCheck = await client.query(`
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'workflow_approvals'
+          AND column_name IN ('instance_id', 'sla_deadline', 'escalated_at')
+      `);
+      const cols = new Set(colCheck.rows.map((r) => r.column_name));
+      if (!cols.has('instance_id') || !cols.has('sla_deadline')) {
+        return;
+      }
+
+      const query = `
           SELECT 
             wa.*,
-            wi.workflow_type,
-            wi.title as workflow_title
+            wi.workflow_id,
+            wi.instance_id AS workflow_instance_id
           FROM workflow_approvals wa
-          JOIN workflow_instances wi ON wa.workflow_instance_id::VARCHAR = wi.id::VARCHAR
-          WHERE wa.approval_status = 'pending'
-            AND wa.due_date < NOW()
+          LEFT JOIN workflow_instances wi ON wa.instance_id = wi.instance_id
+          WHERE wa.approval_status = 'Pending'
+            AND wa.sla_deadline IS NOT NULL
+            AND wa.sla_deadline < NOW()
             AND wa.escalated_at IS NULL
         `;
 
@@ -196,6 +213,13 @@ class EscalationService {
         console.log(`Escalated ${result.rows.length} overdue workflow approvals`);
       }
     } catch (error) {
+      if (error.code === '42P01' || error.code === '42703') {
+        if (!this._warnedWorkflow) {
+          console.warn('Workflow approval escalations skipped — run npm run setup:enterprise');
+          this._warnedWorkflow = true;
+        }
+        return;
+      }
       console.error('Error checking workflow approval timeouts:', error);
     } finally {
       client.release();
@@ -482,7 +506,7 @@ class EscalationService {
         'High',
         'workflow',
         'workflow',
-        approval.workflow_instance_id,
+        approval.workflow_instance_id || approval.instance_id,
         JSON.stringify({ approval_id: approval.id, escalation_reason: reason })
       ]);
 

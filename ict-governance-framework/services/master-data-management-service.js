@@ -25,6 +25,10 @@ class MasterDataManagementService extends EventEmitter {
       await this.loadDataQualityRules();
       console.log('Master Data Management Service initialized successfully');
     } catch (error) {
+      if (error.code === '42P01') {
+        console.warn('Master Data Management: tables missing — run npm run setup:enterprise');
+        return;
+      }
       console.error('Failed to initialize Master Data Management Service:', error);
       throw error;
     }

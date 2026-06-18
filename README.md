@@ -15,9 +15,10 @@ A comprehensive governance framework, documentation library, automation tooling,
 | New to the project | [Project scope and objectives](docs/project-management/A001-Project-Scope-and-Objectives.md) |
 | Governance teams | [Core ICT Governance Framework](docs/governance-framework/core-framework/ICT-Governance-Framework.md) |
 | Improvement priorities | [Improvement focus areas](docs/compliance/ICT-Governance-Framework-Improvement-Focus-Areas.md) |
-| RPAS / agent governance | [RPAS Governance](#rpas-governance) and [Integration Guide](docs/implementation/guides/RPAS-Governance-Integration-Guide.md) |
+| RPAS / agent governance | [RPAS Governance](#rpas-governance), [ADPA module](adpa/README.md), and [Integration Guide](docs/implementation/guides/ADPA-ICT-Governance-Integration-Guide.md) |
 | Client / service providers | [Business Continuity Services](#business-continuity-services) |
 | Implementers | [Implementation summary](docs/implementation/summaries/IMPLEMENTATION-SUMMARY.md) |
+| Security / compliance operators | [Privileged access governance](#privileged-access-governance-jit--break-glass), [Web application](#web-application), and [Seven-Pillar Implementation Plan](docs/implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md) |
 | Developers | [Web application README](ict-governance-framework/README.md) and [Developer guide](DEVELOPER.md) |
 | Contributors | [Contributing guidelines](CONTRIBUTING.md) |
 
@@ -33,6 +34,8 @@ The framework addresses governance across complex tenant communities with varyin
 - **Compliance automation** — tenant-specific regulatory monitoring and reporting
 - **Cost optimization** — multi-tenant cost allocation, budgets, and chargeback
 - **Drift detection** — compare deployed infrastructure against approved governance baselines
+- **RPAS asset register** — multi-cloud inventory with DR posture, CASB shadow-IT discovery, and validation workflows (Gate B)
+- **Privileged access governance** — JIT elevation and Break Glass emergency procedures with immutable ledger audit trails, decoupled from asset inventory views
 - **ADPA integration** — ADPA bridges the ICT Governance Framework to Compliance as Code and governance automation (see [ADPA as the governance bridge](#adpa-as-the-governance-bridge))
 - **Business continuity** — staged path from content backup to full ICT recovery from Git across multi-cloud (see [Business Continuity Services](#business-continuity-services))
 
@@ -41,6 +44,7 @@ The framework addresses governance across complex tenant communities with varyin
 ```
 ICT-Governance-Framework-Application/
 ├── docs/                          # Primary documentation (policies, architecture, implementation)
+├── adpa/                          # ADPA product module (templates, entities, generation, systematics)
 ├── governance/                    # RPAS-CM governance baseline and validation artifacts
 ├── ict-governance-framework/      # Web application, APIs, and frontend dashboard
 ├── azure-automation/              # PowerShell modules and Azure governance automation
@@ -104,8 +108,70 @@ For a detailed breakdown by role and document category, see the [Repository Guid
 
 - Zero Trust architecture with tenant-specific security controls
 - Support for GDPR, HIPAA, SOX, PCI-DSS, FedRAMP, and ISO 27001
-- **NIST CSF 2.0: NOT CERTIFIED** — preliminary review complete; **remediate Gate A before full assessment** ([focus areas](docs/compliance/ICT-Governance-Framework-Improvement-Focus-Areas.md) · [review](docs/compliance/NIST-CSF-2.0-Compliance-Review.md))
+- **NIST CSF 2.0: NOT CERTIFIED** — live governance capabilities documented; evidence-backed alignment in progress ([Security Governance & NIST CSF 2.0 Alignment](#security-governance--nist-csf-20-alignment) · [review](docs/compliance/NIST-CSF-2.0-Compliance-Review.md))
 - Automated remediation and proactive security monitoring
+- **JIT elevation** — time-bounded privileged access tokens for standard governance mutations, enforced via `X-JIT-Context` middleware on protected API routes
+- **Break Glass emergency access** — out-of-band activation when identity infrastructure is degraded, with webhook alerting, trend analytics, and manual cryptographic reconciliation
+
+## Security Governance & NIST CSF 2.0 Alignment
+
+This platform implements a **live, audit-ready governance system** aligned with **NIST CSF 2.0**, extending beyond static compliance into **continuous, provable security operations**.
+
+### Key Capabilities
+
+- **Closed-loop SecOps lifecycle**
+  - Detection → Incident → Lifecycle → Resolution with SLA enforcement
+  - Full audit traceability using `correlation_id`
+
+- **MITRE ATT&CK integration**
+  - Incidents enriched with tactics and techniques
+  - Standardized threat classification across all telemetry
+
+- **FAIR quantitative risk model**
+  - Real-time ALE (Annual Loss Expectancy)
+  - Scenario-based financial risk modeling
+  - Event-driven recalculation on incident ingest and resolution
+
+- **Driver-level risk attribution**
+  - Risk changes explained via telemetry (e.g. `mitre_technique_T1003` → Credential Dumping)
+  - Exposed in both SecOps and Executive dashboards
+
+- **Adaptive risk calibration (Phase 4)**
+  - Automatic TEF adjustment based on observed incident frequency
+  - Bounded, damped model updates (learning rate, ± caps)
+  - MITRE severity weighting tuned dynamically
+
+- **Calibration governance & auditability**
+  - Full calibration log with `previous_value → new_value`
+  - Model stability classification (Stable / Moderate / Adjusting)
+  - Configurable parameters exposed in API and evidence export
+
+- **Executive / CISO dashboards (G-A2)**
+  - Risk posture (MODERATE → CRITICAL) derived from ALE
+  - Top drivers, scenario impact, 24h trend
+  - Calibration visibility (model stability, drift, confidence)
+  - Drill-down into SecOps Console
+
+- **Audit Evidence Pack (Phase 3 + P4-D1)**
+  - Exportable JSON with:
+    - Incident lifecycle trace
+    - FAIR calculations and telemetry drivers
+    - MITRE mappings
+    - Calibration state and adjustment history
+  - Automated verification (`npm run export:audit-evidence`)
+
+### NIST CSF 2.0 Coverage (Summary)
+
+| Function | Status |
+|---------|--------|
+| Identify (ID) | ✅ Asset register + CASB integration |
+| Protect (PR) | ✅ Identity (JIT), Devices |
+| Detect (DE) | ✅ Continuous monitoring + XDR-aligned |
+| Respond (RS) | ✅ Closed-loop incident lifecycle |
+| Recover (RC) | 🟡 DR validation (Sprint D) |
+| Govern (GV) | ✅ FAIR + calibration + executive dashboards |
+
+> **Note:** This implementation provides **evidence-backed alignment** with NIST CSF 2.0 but does not claim formal certification. See the [NIST CSF 2.0 Compliance Review](docs/compliance/NIST-CSF-2.0-Compliance-Review.md).
 
 ## RPAS Governance
 
@@ -155,7 +221,16 @@ governance/
     └── governance_checksum.json   # Committed checksum for drift detection
 ```
 
-The current integration mode is `vendor-scaffold` — the full RPAS baseline is committed in-repo and can later be replaced with a canonical upstream source via git submodule or subtree without changing the enforcement model.
+The current integration mode is **`in-repo`** — ADPA systematics, RPAS governance, framework documentation, Compliance as Code, and the web application are a single product repository. The `adpa/` module is the canonical source for policy alignment, templates, entity catalog, and document generation.
+
+```bash
+npm run adpa:validate      # Validate ADPA project structure
+npm run adpa:list          # List ICT framework templates
+npm run adpa:generate -- policy-alignment --var entityId=tenant-01
+npm run adpa:prioritize    # Telemetry → template priority queue (demo)
+```
+
+See [adpa/README.md](adpa/README.md) and [ADPA Integration Guide](docs/implementation/guides/ADPA-ICT-Governance-Integration-Guide.md).
 
 ### Commands
 
@@ -244,7 +319,7 @@ Without ADPA, governance documents and automated enforcement remain disconnected
 | Layer | Role | Current foundation |
 |-------|------|--------------------|
 | **ICT Governance Framework** | Strategic and tactical policies, roles, and compliance frameworks | [`docs/governance-framework/`](docs/governance-framework/core-framework/ICT-Governance-Framework.md), [`docs/policies/`](docs/policies/governance/ICT-Governance-Policies.md) |
-| **ADPA bridge** | Decision records, policy alignment, traceability, and baseline certification | [ADPA control artifact](governance/rpas/artifacts/ADPA.control.json), [ADPA-generated documents](generated-documents/), [evidence templates](governance/rpas/templates/) |
+| **ADPA bridge** | Decision records, policy alignment, traceability, and baseline certification | [ADPA module](adpa/README.md), [ADPA control artifact](governance/rpas/artifacts/ADPA.control.json), [ADPA templates](adpa/templates/), [generated documents](generated-documents/) |
 | **Compliance as Code** | Codified policies, infrastructure templates, and certified baselines | [`blueprint-templates/`](blueprint-templates/), [IaC integration guide](docs/architecture/integration/ICT-Governance-IaC-Integration.md), [CSR-42 baseline](governance/rpas/artifacts/CSR-42.json) |
 | **Governance automation** | Automated validation, monitoring, drift detection, and remediation | [`azure-automation/`](azure-automation/), [RPAS validation scripts](governance/rpas/scripts/), [continuous compliance monitoring](azure-automation/Continuous-Compliance-Monitoring.ps1) |
 | **Entity baseline** | Certified golden state per governed entity | [Governance checksum](governance/rpas/governance_checksum.json), IaC golden state, [Aspire manifest drift](governance/rpas/scripts/Test-RpasDependencyDrift.ps1) |
@@ -284,6 +359,260 @@ Active integration work targets:
 - Extending entity baselines from repository-level checksums to per-tenant/per-workload golden states
 - Closing the loop: telemetry drift → ADPA-classified change request → codified remediation → automation
 - Unifying governance, compliance, and telemetry signals in the web dashboard
+- Binding ADPA template selection to live SIEM/Sentinel signals so generation prioritizes highest-value governance gaps
+
+#### ADPA templates and PMBOK value delivery
+
+ADPA document generation aligns with **PMBOK value-delivery principles** (outcomes over outputs, continuous value assessment, stakeholder-defined success). Templates are not produced for documentation volume — each artifact must trace to measurable value, an approved decision, or a compliance obligation.
+
+**Recommended ADPA template pack** (mapped to the ICT Governance Framework):
+
+| Template | Source framework document | PMBOK alignment | Primary value outcome |
+|----------|---------------------------|-----------------|----------------------|
+| Framework charter | ICT Governance Framework | Benefits / stakeholder | Strategic alignment and governed scope |
+| Multi-tenant governance | Multi-Cloud Multi-Tenant Framework | Resource / stakeholder | Tenant isolation and SLA-backed service tiers |
+| Operating model | Strategic & Tactical Overview | Team / stakeholder | Clear authority and escalation (RPAS TAR) |
+| Target state | Target Governance Framework | Planning / uncertainty | Gap closure toward industry benchmarks |
+| Policy alignment | ICT Governance Policies | Quality / delivery | Policy → Compliance as Code traceability |
+| RACI & authority | Roles & Responsibilities | Team / stakeholder | Non-overlapping accountability |
+| KPI catalog | ICT Governance Metrics | Measurement / uncertainty | Quantified governance effectiveness |
+| Compliance-as-code map | IaC Integration guide | Delivery / planning | Automated enforcement of approved controls |
+| ISO 38500 crosswalk | ISO/IEC 38500 Standards | Quality / stakeholder | Conformance evidence for audit |
+| Zero Trust assessment | Zero Trust Maturity Model | Uncertainty / measurement | Risk-informed security investment |
+
+Template outputs carry **TAR-COL metadata** (`governance/schemas/rpas-tar-col.schema.json`) and tie to the [value realization plan](generated-documents/core-analysis/value-realization-plan.md) categories: cost reduction, risk reduction, revenue enablement, and strategic capability.
+
+#### Telemetry-guided ADPA generation (SIEM / Sentinel)
+
+When **entities** (tenants, workloads, subscriptions, applications, identities) and **template priorities** are derived from live telemetry rather than static inventories alone, ADPA shifts from reactive documentation to **evidence-led governance**.
+
+```mermaid
+flowchart TB
+    subgraph telemetry [Live telemetry]
+        SENT[Microsoft Sentinel]
+        SIEM[SIEM / CASB / Log Analytics]
+        MON[Azure Monitor and Policy]
+        EP[Endpoint and identity signals]
+    end
+
+    subgraph entities [ADPA entity model]
+        ENT[Tenant / workload / app entities]
+        RISK[Risk and exposure scoring]
+        GAP[Governance gap detection]
+        PRI[Template priority queue]
+    end
+
+    subgraph adpa_gen [ADPA generation]
+        TPL[Context-aware templates]
+        DEC[Decision records]
+        BASE[Entity baselines]
+        RTM[Requirements and RTM updates]
+    end
+
+    subgraph value [PMBOK value loop]
+        MEAS[Measure outcomes]
+        OPT[Optimize portfolio]
+        PROVE[Audit evidence]
+    end
+
+    SENT --> ENT
+    SIEM --> ENT
+    MON --> GAP
+    EP --> RISK
+    ENT --> PRI
+    GAP --> PRI
+    RISK --> PRI
+    PRI --> TPL
+    TPL --> DEC
+    TPL --> BASE
+    TPL --> RTM
+    BASE --> MON
+    DEC --> PROVE
+    MEAS --> OPT
+    OPT --> PRI
+```
+
+**How Sentinel and SIEM guide the system**
+
+| Telemetry signal | Entity or scope discovered | ADPA template triggered | Governance action |
+|------------------|---------------------------|-------------------------|-------------------|
+| Shadow IT / unsanctioned SaaS (CASB + Sentinel) | Application entity | Policy alignment, Zero Trust assessment | Approve, block, or procure via governance workflow |
+| Repeated policy violations (Azure Policy + Sentinel) | Workload / subscription entity | Compliance-as-code map, KPI catalog update | Codify remediation in IaC; amend baseline (AMD) |
+| Incident correlation (Sentinel incidents / alerts) | Affected tenant and identity entities | Architecture decision record, risk register | Harden controls; link to CSR baseline |
+| Compliance drift (continuous monitoring) | Configuration entity | Policy alignment, ISO crosswalk | PR-based IaC fix with AEV gates |
+| Observability gaps (missing logs / connectors) | Platform entity | Framework charter section, operating model | Close instrumentation gap; resolve observability drift |
+| High-risk exception patterns | Domain owner entity | RACI template, stakeholder communication | Escalate per RPAS-ESC; human-in-the-loop approval |
+
+Entity baselines are **hydrated from telemetry**: discovery sources (Defender for Cloud Apps, Sentinel, resource graph) populate the governed entity catalog; ADPA compares live posture to certified golden state and classifies drift using the [drift taxonomy](governance/rpas/scripts/drift-taxonomy.md). Connectors are defined in the [enterprise connectors guide](ict-governance-framework/docs/ENTERPRISE-CONNECTORS.md) (`sentinel`, `defender-cloud-apps`).
+
+**Generation rules (target behaviour)**
+
+1. **Sense** — Ingest incidents, alerts, discovery events, and compliance scan results from Sentinel/SIEM (integration requirement [IR-008](docs/architecture/integration/A027-Integration-Requirements-and-Constraints.md)).
+2. **Classify** — Map signals to entity type, drift category, and severity (critical detection target: &lt; 2 minutes per [real-time monitoring](docs/implementation/summaries/Real-Time-Monitoring-Implementation-Summary.md)).
+3. **Prioritize** — Rank ADPA template generation by value at risk, regulatory exposure, and stakeholder impact (PMBOK portfolio lens).
+4. **Generate** — Produce only the templates needed for the classified gap; attach TAR-COL traceability and link to source telemetry event IDs.
+5. **Certify** — Route material changes through RPAS amendment rituals and CSR baseline updates.
+6. **Measure** — Feed outcomes into governance KPIs and [value realization](generated-documents/core-analysis/value-realization-plan.md) dashboards.
+
+#### Value creation proposition (telemetry-informed ADPA)
+
+Telemetry-guided ADPA closes the gap between **governance intent** and **operational reality**, converting SIEM/Sentinel evidence into auditable decisions and codified remediation — the differentiator described in the business case ($2.3M annual value target, 94% ROI).
+
+| Value category | Without telemetry-guided ADPA | With Sentinel/SIEM-guided ADPA | How value is measured |
+|----------------|------------------------------|--------------------------------|----------------------|
+| **Cost reduction** | Manual discovery, stale inventories, duplicate assessments | Auto-prioritized templates; generate only where drift or shadow IT is proven | Hours saved on assessment; FTE redeployment ([value plan](generated-documents/core-analysis/value-realization-plan.md) — process automation $450K) |
+| **Risk reduction** | Late detection; documentation disconnected from incidents | Incident-linked decision records; baselines updated from real attack paths | Incident rate, MTTR, governance-related security cost ($150K target) |
+| **Compliance efficiency** | Periodic audits; reactive remediation | Continuous drift → ADPA change request → IaC fix loop | Compliance automation %; audit prep time ($280K target) |
+| **Strategic capability** | Static framework docs; maturity guesses | Live Zero Trust and policy-gap assessments from telemetry | Maturity score improvement; portfolio value realization rate |
+| **Stakeholder confidence** | Reports lag reality | Real-time dashboards with traceable ADPA evidence | Stakeholder satisfaction; policy compliance rate (&gt;95% KPI) |
+
+**PMBOK value-delivery chain**
+
+| PMBOK principle (7th/8th ed.) | ADPA + telemetry manifestation |
+|-------------------------------|-------------------------------|
+| Focus on value | Template queue ordered by value-at-risk from live signals |
+| Be a steward | Entities and baselines reflect actual estate, not aspirational diagrams |
+| Recognize complexity | Multi-source correlation (Sentinel + CASB + Policy) before generation |
+| Demonstrate leadership | Executive KPI catalog fed by measured outcomes |
+| Tailor based on context | Per-tenant / per-workload templates from entity classification |
+| Build quality into deliverables | TAR-COL metadata and AEV gates on every generated artifact |
+| Optimize risk responses | Drift severity drives template type and escalation path |
+
+**One-sentence value proposition:** *ADPA turns Sentinel and SIEM telemetry into governed entities, prioritized templates, and certified baselines — so every governance artifact is generated because the live environment proved it was needed, and every remediation can be traced to measurable value.*
+
+#### Infrastructure optimization, cost of inaction, and unified value proposition
+
+The **ICT Governance Framework**, **ADPA**, and **RPAS** form a single value system — not three parallel initiatives. Together they turn infrastructure optimization from local, project-by-project effort into portfolio-wide, auditable, continuously enforced governance.
+
+```mermaid
+flowchart TB
+    subgraph ict [ICT Governance Framework]
+        STRAT[Strategy policies roles metrics]
+        INTENT[What good looks like]
+    end
+
+    subgraph adpa [ADPA]
+        TRANS[Decisions templates baselines]
+        BRIDGE[Policy to Compliance as Code]
+    end
+
+    subgraph rpas [RPAS Governance]
+        ENF[AEV gates TAR-COL CSR AMD]
+        ASSURE[Integrity accountability audit trail]
+    end
+
+    subgraph infra [Optimized ICT infrastructure]
+        IAC[IaC golden state]
+        TELEM[Sentinel SIEM telemetry]
+        AUTO[Automation and drift remediation]
+    end
+
+    subgraph value [Measured value]
+        COST[Cost reduction]
+        RISK[Risk reduction]
+        REV[Portfolio and innovation ROI]
+    end
+
+    STRAT --> TRANS
+    TRANS --> ENF
+    ENF --> IAC
+    IAC --> TELEM
+    TELEM -->|drift gaps incidents| TRANS
+    TELEM -->|KPIs evidence| STRAT
+    IAC --> COST
+    TELEM --> RISK
+    ASSURE --> REV
+```
+
+| Layer | Role in optimization | Value it unlocks |
+|-------|---------------------|----------------|
+| **ICT Governance Framework** | Defines *what* to govern — policies, tenant models, Zero Trust, metrics, ISO 38500 alignment | Strategic alignment; stops undifferentiated spend |
+| **ADPA** | Translates intent into traceable decisions, templates, entity baselines, and Compliance as Code | Closes the policy-to-code gap; evidence-led change |
+| **RPAS** | Certifies every change as attributable and replay-safe (CSR-42, AEV, TAR-COL, AMD) | Prevents governance theatre; audit-ready lineage |
+
+##### Value in optimizing ICT infrastructure
+
+Infrastructure optimization in this framework is not only cost reduction on cloud resources. It means:
+
+1. **Standardized golden state** — approved Bicep/IaC patterns, tenant isolation, policy-as-code ([`blueprint-templates/`](blueprint-templates/))
+2. **Continuous posture vs baseline** — drift detection, Sentinel/SIEM correlation, compliance scans
+3. **Governed change** — amendments through RPAS; remediation via PR-based IaC, not ad-hoc console changes
+4. **Recoverable estate** — Git as recovery source; CSR-certified baselines for DR and ransomware scenarios
+
+The [business case](generated-documents/core-analysis/business-case.md) targets **$2.3M annual value at 94% ROI** on $1.275M investment:
+
+| Value bucket | Annual target | Infrastructure optimization angle |
+|--------------|---------------|----------------------------------|
+| Cost reduction | $1.2M (52%) | Automation, resource redeployment, compliance efficiency |
+| Revenue / portfolio | $900K (39%) | 25% ICT investment ROI improvement; faster time-to-value |
+| Strategic | $200K (9%) | Maturity positioning, stakeholder trust |
+
+See the [value realization plan](generated-documents/core-analysis/value-realization-plan.md) for targets within cost reduction: process automation ($450K), resource optimization ($320K), compliance automation ($280K), and risk/incident reduction ($150K).
+
+##### Hidden costs of inaction
+
+The business case models **Status Quo (Do Nothing)** explicitly:
+
+| Metric | Do-nothing outcome |
+|--------|-------------------|
+| Annual value | **−$650K** (continued value leakage) |
+| 5-year NPV | **−$2.75M** |
+| Risk | High — worsening governance and regulatory pressure |
+
+The $650K is *accounted* leakage. **Hidden costs** — often unbudgeted — compound on top:
+
+| Hidden cost | Evidence in current-state analysis | Impact |
+|-------------|-----------------------------------|--------|
+| **Operational drag** | 2,400 manual governance hours/month; 14-day decision cycle; 30% effort on non-value work | Teams firefight instead of standardize; every deployment reinvents approvals |
+| **Portfolio waste** | 35% of ICT investments lack justification; 15% portfolio value leakage | Cloud sprawl, duplicate tools, ungoverned workload retirement |
+| **Risk and incident tax** | $180K/year governance-related security issues; 23 audit findings (800 remediation hours) | Response cost, reputational damage, regulatory exposure |
+| **Drift and shadow estate** | Shadow IT, config drift, observability gaps | Live estate diverges from approved baseline until breach or audit |
+| **Recovery exposure** | Git-to-cloud recovery designed but not end-to-end validated | RTO/RPO targets fail silently until a real event |
+| **Governance credibility gap** | Bootstrap ADPA (`SET_ME`); mock dashboards in some paths | Client trust risk; invalid compliance assessment if presented as production-ready |
+
+> **Practical formula:** Hidden cost ≈ accounted leakage ($650K) + incident/audit tax + drift remediation surge + delayed projects + failed recovery events.
+
+The [framework evaluation methodology](framework-evaluation/analysis-and-improvement-framework.md) includes **estimate cost of inaction** in gap analysis because unmaintained governance gaps accelerate under regulatory and threat pressure.
+
+##### Value proposition by pillar
+
+**ICT Governance Framework — *know what to optimize***
+
+- ISO 38500 Evaluate–Direct–Monitor model
+- Multi-tenant classification, Zero Trust maturity, governance KPIs (&gt;95% policy compliance target)
+- Core policies for technology selection, security, and architecture review
+
+**ADPA — *turn intent into executable, traceable artifacts***
+
+- Policy alignment → Azure Policy, Bicep, M365DSC
+- Entity baselines per tenant, workload, and subscription
+- Telemetry-guided template generation — Sentinel/SIEM prioritizes where governance artifacts and remediations are needed
+
+**RPAS — *make optimization safe, auditable, and repeatable***
+
+- Guardrails G1–G5 (humans decide, systems execute, append-only lineage)
+- AEV gates, checksum drift detection, CSR-42 certified baseline
+- AMD amendment records; ransomware recovery via `Restore-RpasBaseline.ps1`
+
+##### Combined value proposition
+
+**Executive summary:** Optimizing ICT infrastructure under the ICT Governance Framework, with ADPA as the policy-to-code bridge and RPAS as the assurance layer, converts **$650K+ annual value leakage** into **$2.3M annual measurable value** — through automated compliance, fewer incidents, portfolio ROI improvement, and recoverable multi-cloud estates. Inaction does not save money; it defers cost into incidents, audits, drift remediation, and failed recovery events (modeled **−$2.75M five-year NPV**).
+
+**Technical summary:** *The framework defines the golden state, ADPA codifies and prioritizes it from live telemetry, RPAS certifies every change, and automation keeps production aligned — so infrastructure optimization is continuous, provable, and reversible.*
+
+| Dimension | Inaction / siloed tooling | ICT GF + ADPA + RPAS |
+|-----------|----------------------------|----------------------|
+| Policy enforcement | Manual reviews, periodic audits | Compliance as Code + continuous scan |
+| Change control | Tickets and email | AMD + AEV + PR-based IaC |
+| Incident → improvement | Post-mortem slides | Sentinel signal → ADPA decision → baseline update |
+| Drift | Discovered at audit or outage | Classified in minutes; governed remediation |
+| Recovery | Restore backups to unknown config | Git + CSR baseline to known governed state |
+| Audit evidence | Scattered, reconstructed | TAR-COL lineage, append-only AMD |
+| Value measurement | Aspirational | KPI catalog tied to value realization plan |
+
+##### Production readiness note
+
+The platform has transitioned from static compliance scaffolding to a **live, adaptive governance system** (SecOps loop, FAIR risk, calibration, executive dashboards). Formal NIST CSF 2.0 certification remains pending — see [Gate A remediation](docs/compliance/ICT-Governance-Framework-Improvement-Focus-Areas.md) for remaining items (CASB persistence, DR validation, Phase 3 attestation).
 
 ## Business Continuity Services
 
@@ -415,24 +744,116 @@ npm run governance:validate
 
 ## Web Application
 
-The [`ict-governance-framework/`](ict-governance-framework/) directory contains the interactive governance dashboard — a Node.js/Express backend with a Next.js frontend providing:
+The [`ict-governance-framework/`](ict-governance-framework/) directory contains the interactive governance portal — a **Next.js** frontend (`:3000`) backed by an **Express** API (`:4000`) and **PostgreSQL** persistence.
 
-- Role-based access control and user management
-- Secure score and compliance dashboards
-- Document management and reporting
-- REST APIs for governance data and integrations
+### Capabilities
 
-**Prerequisites:** Node.js 16+, PostgreSQL 12+
+- Role-based access control, user management, and audit logging
+- Secure score, CISO executive, and compliance dashboards (live FAIR ALE, risk drivers, calibration panel)
+- Document management, workflows, and reporting
+- Gate A governance incident ingestion and measurement-plan KPI patching
+- Gate B RPAS asset register (DR sync, CASB shadow-IT ingest, validation promotion)
+- JIT elevation and Break Glass emergency consoles with immutable privileged-action ledgers
+- REST APIs for Defender, CASB, governance data, and enterprise integrations
+
+### Audit domain separation
+
+The portal treats **infrastructure posture** and **human authority events** as separate audit boundaries — a design aligned with NIS2 evidence presentation:
+
+| Domain | What it tracks | UI surface |
+|--------|----------------|------------|
+| **Assets** | Infrastructure objects — tenant, origin, DR posture, CASB refs, RTO/RPO | [`/asset-register`](http://localhost:3000/asset-register) |
+| **JIT elevation** | Standard operators requesting time-bounded privileged tokens | [`/jit-elevation`](http://localhost:3000/jit-elevation) |
+| **Break Glass** | Out-of-band emergency windows, trend exposure, manual reconciliation | [`/break-glass`](http://localhost:3000/break-glass) |
+
+Regulators reviewing configuration state use the **Asset Register**. Evaluating control effectiveness and systemic integrity pivots to the **JIT / Break Glass ledgers** — not per-asset audit drawers.
+
+### Key routes
+
+| Route | Menu | Purpose |
+|-------|------|---------|
+| `/asset-register` | Compliance → Asset Register | RPAS inventory: DR status, shadow IT, validation posture |
+| `/jit-elevation` | Security → JIT Elevation | Create JIT tickets, browse ledger, view privileged actions |
+| `/break-glass` | Security → Break Glass Console | Emergency ticket war-room, trend chart, cryptographic sweep |
+| `/compliance-dashboard` | Compliance | Compliance posture overview |
+| `/ciso-dashboard` | Security → CISO Dashboard | Executive security metrics |
+
+### Prerequisites
+
+- Node.js 16+
+- PostgreSQL 12+
+
+### Quick setup
 
 ```bash
 cd ict-governance-framework
 npm install
-cp .env.example .env   # configure database and JWT secrets
-node server.js         # API on http://localhost:4000
-npm run dev            # frontend on http://localhost:3000
+cp .env.example .env          # database, JWT, JIT, and Break Glass secrets
+createdb ict_governance_framework
+npm run setup-db
+npm run setup-users           # dashboard roles and dev login (see app README)
+npm run setup:governance
+npm run setup:assets
+npm run setup:jit-ledger
+
+# Terminal 1 — API
+npm run server                # http://localhost:4000
+
+# Terminal 2 — frontend
+npm run dev                   # http://localhost:3000
 ```
 
-See the [web application README](ict-governance-framework/README.md) for complete setup instructions.
+Default dev credentials are created by `setup-users` (see [web application README](ict-governance-framework/README.md)).
+
+### Privileged access governance (JIT & Break Glass)
+
+**JIT elevation** issues short-lived context tokens for protected mutations (asset promote/sync, governance incidents, measurement-plan patches). When `JIT_ENFORCEMENT_ENABLED=true`, callers must pass `X-JIT-Context: Bearer <token>` after `POST /api/auth/jit/elevate`.
+
+**Break Glass** is an out-of-band emergency path when cloud identity is unavailable. Activation uses `POST /api/auth/jit/emergency/activate` with the configured system secret — not exposed in the UI. Optional `BREAK_GLASS_ALERT_WEBHOOK_URL` dispatches Slack-shaped alerts on activation.
+
+| API | Method | Purpose |
+|-----|--------|---------|
+| `/api/auth/jit/elevate` | POST | Create standard JIT elevation ticket |
+| `/api/auth/jit/ledger` | GET | List ledger tickets (`?category=jit` or `break_glass`) |
+| `/api/auth/jit/ledger/:ticketId/actions` | GET | Privileged action log for a ticket |
+| `/api/auth/jit/emergency/activate` | POST | Break Glass activation (system secret) |
+| `/api/auth/jit/emergency/revoke` | POST | Revoke active emergency ticket |
+| `/api/auth/jit/emergency/reconcile` | POST | Manual cryptographic audit sweep |
+| `/api/analytics/break-glass/trend` | GET | Break Glass exposure trend (integrity KPI input) |
+
+Ledger tables: `jit_elevation_ledger`, `privileged_action_logs` (see [`sql/jit_ledger.sql`](ict-governance-framework/sql/jit_ledger.sql)).
+
+### Verification scripts
+
+Run from `ict-governance-framework/` after the database is configured:
+
+```bash
+npm run verify:jit              # JIT enforcement middleware
+npm run verify:break-glass      # Emergency activation lifecycle
+npm run verify:analytics        # Break Glass trend reconciliation
+npm run verify:manual-audit     # Manual ledger cryptographic sweep
+npm run verify:assets           # Asset register API
+npm run verify:casb-ingest      # CASB shadow-IT webhook ingest
+npm run verify:secops           # SecOps loop (MITRE, timeline, FAIR)
+npm run verify:calibration      # FAIR model calibration
+npm run export:audit-evidence   # Phase 3 + P4 audit evidence pack
+```
+
+### Environment variables
+
+See [`.env.example`](ict-governance-framework/.env.example) for the full list. Security-relevant entries:
+
+| Variable | Purpose |
+|----------|---------|
+| `JIT_ENFORCEMENT_ENABLED` | Enforce JIT context on privileged routes (default on in production) |
+| `JIT_ELEVATION_SECRET` | Signing secret for JIT context tokens |
+| `BREAK_GLASS_ALLOWED` | Enable Break Glass emergency activation |
+| `BREAK_GLASS_SYSTEM_SECRET` | Out-of-band activation secret |
+| `BREAK_GLASS_ALERT_WEBHOOK_URL` | Slack/webhook URL for activation alerts |
+| `GOVERNANCE_WEBHOOK_SECRET` | Gate A incident ingestion |
+| `CASB_INGEST_WEBHOOK_SECRET` | Focus Area 5 shadow-IT ingest |
+
+See the [web application README](ict-governance-framework/README.md) for authentication, RBAC, and API details.
 
 ## Getting Started
 
@@ -453,7 +874,7 @@ See the [web application README](ict-governance-framework/README.md) for complet
 ### For developers
 
 1. Read [DEVELOPER.md](DEVELOPER.md) for local testing with Pester
-2. Set up the [web application](ict-governance-framework/README.md)
+2. Set up the [web application](ict-governance-framework/README.md) — run schema setup and `npm run verify:jit` to confirm privileged-access enforcement
 3. Run Playwright tests: `npm test`
 
 ### For administrators

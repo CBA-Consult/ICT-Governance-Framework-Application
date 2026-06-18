@@ -65,6 +65,17 @@ const authenticateToken = async (req, res, next) => {
     const sessionResult = await pool.query(sessionQuery, [decoded.userId, decoded.sessionId]);
     
     if (sessionResult.rows.length === 0) {
+      // Development: allow valid JWT when session row is missing (e.g. after DB reset)
+      if (process.env.NODE_ENV === 'development' || process.env.ALLOW_SESSION_RECOVERY === 'true') {
+        req.user = {
+          ...user,
+          sessionId: decoded.sessionId,
+          roles: user.roles.filter(r => r !== null),
+          permissions: user.permissions.filter(p => p !== null)
+        };
+        return next();
+      }
+
       return res.status(401).json({ 
         error: 'Session not found or expired',
         code: 'SESSION_INVALID'
@@ -129,8 +140,14 @@ const requirePermissions = (requiredPermissions) => {
     }
 
     const userPermissions = req.user.permissions || [];
+    const userRoles = req.user.roles || [];
     // Defensive: ensure requiredPermissions is always an array
     const required = Array.isArray(requiredPermissions) ? requiredPermissions : [requiredPermissions];
+
+    // Super admins bypass permission checks
+    if (userRoles.includes('super_admin')) {
+      return next();
+    }
 
     // Check if user has all required permissions
     const hasAllPermissions = required.every(permission => 

@@ -1,45 +1,43 @@
 # RPAS Governance Integration
 
-This directory anchors the RPAS governance baseline inside this repository.
+This directory anchors the RPAS governance baseline inside the ICT Governance Framework product repository.
 
-The current implementation is a `vendor-scaffold` integration. It gives the project:
-
-- committed RPAS binding metadata
-- ADPA, ARM, and AEV control placeholders with traceability fields
-- checksum-based drift detection
-- a local pre-commit hook template
-- CI validation through GitHub Actions
+**Integration mode:** `in-repo` — ADPA systematics live in `adpa/`; TAR control manifests are **Production-Attested** at baseline `2.3.0`.
 
 ## Layout
 
 ```text
 governance/rpas/
-|- artifacts/                  RPAS control metadata committed with the project
-|- hooks/                      Versioned local hook templates
-|- scripts/                    Registration and validation tooling
-|- templates/                  Evidence metadata templates
-|- governance_checksum.json    Committed checksum for drift detection
-|- manifest.json               Governance manifest and required file list
-`- project.binding.json        Project-specific RPAS binding settings
+├── artifacts/                  ADPA, ARM, AEV, CSR control metadata
+├── hooks/                      Pre-commit hook templates
+├── scripts/                    Registration and validation tooling
+├── templates/                  Evidence metadata templates
+├── governance_checksum.json    Committed checksum for drift detection
+├── manifest.json               Governance manifest and required file list
+└── project.binding.json        Project-specific RPAS + ADPA binding
 ```
+
+ADPA module: [`adpa/README.md`](../../adpa/README.md)
 
 ## Commands
 
-```powershell
+```bash
 npm run governance:register
 npm run governance:validate
 npm run governance:checksum
+npm run adpa:validate
 ```
 
-## Upgrading To A Canonical Source
+## Control artifacts
 
-When the authoritative RPAS repository URL is available, replace this scaffold with either:
+| ID | File | TAR ID | sourceOfTruth |
+|----|------|--------|---------------|
+| ADPA | `artifacts/ADPA.control.json` | TAR-ADPA-001 | `adpa/` |
+| ARM | `artifacts/ARM.control.json` | TAR-ARM-002 | `blueprint-templates/` |
+| AEV | `artifacts/AEV.control.json` | TAR-AEV-003 | `governance/rpas/scripts/` |
+| CSR-42 | `artifacts/CSR-42.json` | — | Certified baseline |
 
-- `git submodule add <url> governance/rpas`
-- `git subtree add --prefix governance/rpas <url> <branch> --squash`
+## Documentation
 
-After switching, update `project.binding.json.authoritativeSource` and refresh the checksum:
-
-```powershell
-./governance/rpas/scripts/validate-aev.ps1 -RefreshChecksum
-```
+- [ADPA integration guide](../../docs/implementation/guides/ADPA-ICT-Governance-Integration-Guide.md)
+- [RPAS integration guide](../../docs/implementation/guides/RPAS-Governance-Integration-Guide.md)

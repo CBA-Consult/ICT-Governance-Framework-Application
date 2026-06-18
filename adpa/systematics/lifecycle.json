@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "model": "Proposal → Decision → Execution",
+  "stages": [
+    {
+      "id": "ideation",
+      "name": "Ideation",
+      "outputs": ["draft-template", "advisory-json"]
+    },
+    {
+      "id": "business-case",
+      "name": "Business Case",
+      "outputs": ["value-assessment", "cost-of-inaction"]
+    },
+    {
+      "id": "approval",
+      "name": "Approval",
+      "outputs": ["human-decision-id", "stakeholder-sign-off"]
+    },
+    {
+      "id": "rtm-seed",
+      "name": "RTM Seed",
+      "outputs": ["requirements-traceability", "framework-crosswalk"]
+    },
+    {
+      "id": "amendment-proposal",
+      "name": "Amendment Proposal",
+      "outputs": ["amd-draft", "tar-col-metadata"]
+    },
+    {
+      "id": "amendment-decision",
+      "name": "Amendment Decision",
+      "outputs": ["approved-amd", "reviewed-by", "reviewed-on"]
+    },
+    {
+      "id": "execution",
+      "name": "Execution",
+      "outputs": ["generated-document", "iac-change", "policy-as-code"]
+    },
+    {
+      "id": "csr-baseline",
+      "name": "CSR-Certified RTM Baseline",
+      "outputs": ["csr-artifact", "checksum-update", "audit-evidence"]
+    }
+  ],
+  "telemetryLoop": {
+    "sense": "Ingest Sentinel, SIEM, CASB, Azure Policy signals",
+    "classify": "Map to entity type and drift taxonomy category",
+    "prioritize": "Rank templates by value-at-risk",
+    "generate": "Produce ADPA artifacts with TAR-COL metadata",
+    "certify": "Route through RPAS AEV gates and AMD rituals",
+    "measure": "Update governance KPIs and value realization metrics"
+  }
+}

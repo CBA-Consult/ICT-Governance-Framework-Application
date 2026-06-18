@@ -1,0 +1,12 @@
+{
+  "entityId": "tenant-contoso-health",
+  "entityType": "tenant",
+  "displayName": "Contoso Health (demo)",
+  "discoverySource": "sentinel",
+  "riskScore": 7.5,
+  "driftCategory": "security",
+  "telemetryEventIds": ["sentinel-incident-demo-001"],
+  "baselineRef": "governance/rpas/artifacts/CSR-42.json",
+  "lastObservedAt": "2026-06-18T10:00:00Z",
+  "recommendedTemplates": ["policy-alignment", "zero-trust-assessment", "compliance-as-code-map"]
+}

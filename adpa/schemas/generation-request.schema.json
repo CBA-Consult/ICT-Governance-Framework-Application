@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/generation-request.schema.json",
+  "title": "ADPA Generation Request",
+  "type": "object",
+  "required": ["templateId", "projectId"],
+  "properties": {
+    "templateId": { "type": "string" },
+    "projectId": { "type": "string" },
+    "entityId": { "type": "string" },
+    "telemetryEventIds": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "variables": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "tarCol": {
+      "type": "object",
+      "properties": {
+        "humanDecisionId": { "type": "string" },
+        "amendmentId": { "type": "string" },
+        "csrVersion": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "namespace": "ict-governance",
+  "templates": [
+    {
+      "id": "framework-charter",
+      "file": "ict-governance/framework-charter.template.md",
+      "frameworkSource": "docs/governance-framework/core-framework/ICT-Governance-Framework.md",
+      "pmbokDomain": "stakeholder",
+      "outputCategory": "project-charter"
+    },
+    {
+      "id": "multi-tenant-governance",
+      "file": "ict-governance/multi-tenant-governance.template.md",
+      "frameworkSource": "docs/governance-framework/core-framework/Multi-Cloud-Multi-Tenant-ICT-Governance-Framework.md",
+      "pmbokDomain": "resource",
+      "outputCategory": "core-analysis"
+    },
+    {
+      "id": "operating-model",
+      "file": "ict-governance/operating-model.template.md",
+      "frameworkSource": "docs/governance-framework/core-framework/Strategic-Tactical-IT-Governance-Overview.md",
+      "pmbokDomain": "team",
+      "outputCategory": "core-analysis"
+    },
+    {
+      "id": "target-state",
+      "file": "ict-governance/target-state.template.md",
+      "frameworkSource": "docs/governance-framework/target-framework/Target-Governance-Framework.md",
+      "pmbokDomain": "planning",
+      "outputCategory": "core-analysis"
+    },
+    {
+      "id": "policy-alignment",
+      "file": "ict-governance/policy-alignment.template.md",
+      "frameworkSource": "docs/policies/governance/ICT-Governance-Policies.md",
+      "pmbokDomain": "quality",
+      "outputCategory": "management-plans",
+      "telemetryTriggers": ["policy-violation", "shadow-it", "compliance-drift"]
+    },
+    {
+      "id": "raci-authority",
+      "file": "ict-governance/raci-authority.template.md",
+      "frameworkSource": "docs/policies/governance/ICT-Governance-Roles-Responsibilities.md",
+      "pmbokDomain": "team",
+      "outputCategory": "management-plans"
+    },
+    {
+      "id": "kpi-catalog",
+      "file": "ict-governance/kpi-catalog.template.md",
+      "frameworkSource": "docs/governance-framework/metrics/ICT-Governance-Metrics.md",
+      "pmbokDomain": "measurement",
+      "outputCategory": "management-plans"
+    },
+    {
+      "id": "compliance-as-code-map",
+      "file": "ict-governance/compliance-as-code-map.template.md",
+      "frameworkSource": "docs/architecture/integration/ICT-Governance-IaC-Integration.md",
+      "pmbokDomain": "delivery",
+      "outputCategory": "implementation-guides",
+      "telemetryTriggers": ["policy-violation", "architectural-drift", "security-drift"]
+    },
+    {
+      "id": "iso38500-crosswalk",
+      "file": "ict-governance/iso38500-crosswalk.template.md",
+      "frameworkSource": "docs/compliance/regulatory/ISO-IEC-38500-Governance-Standards.md",
+      "pmbokDomain": "quality",
+      "outputCategory": "compliance"
+    },
+    {
+      "id": "zero-trust-assessment",
+      "file": "ict-governance/zero-trust-assessment.template.md",
+      "frameworkSource": "docs/architecture/target-state/Zero-Trust-Maturity-Model.md",
+      "pmbokDomain": "uncertainty",
+      "outputCategory": "core-analysis",
+      "telemetryTriggers": ["security-incident", "access-anomaly", "observability-gap"]
+    }
+  ],
+  "pmbokTemplates": {
+    "processorConfig": "adpa/config/processor-config.json",
+    "package": "adpa-enterprise-framework-automation",
+    "outputRoot": "generated-documents"
+  }
+}

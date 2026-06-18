@@ -1,7 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import EnhancedDashboard from "../components/EnhancedDashboard";
 import { ChartBarIcon, Cog6ToothIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { useAuth } from "../contexts/AuthContext";
+import { authFetch, getStoredAccessToken, parseApiError } from "../lib/authFetch";
 
 const kpiData = [
   {
@@ -63,40 +66,37 @@ const kpiData = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [viewMode, setViewMode] = useState('enhanced');
   const [userPermissions, setUserPermissions] = useState(null);
   const [loading, setLoading] = useState(true);
   const [accessError, setAccessError] = useState(null);
 
-  useEffect(() => {
-    checkDashboardAccess();
-  }, []);
-
-  const checkDashboardAccess = async () => {
+  const checkDashboardAccess = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
+      setLoading(true);
+      const token = getStoredAccessToken();
       if (!token) {
-        setAccessError('Authentication required');
-        setLoading(false);
+        setAccessError('Authentication required. Please sign in again.');
         return;
       }
 
-      const response = await fetch('/api/dashboard-access/permissions', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await authFetch('/api/dashboard-access/permissions');
 
       if (!response.ok) {
-        throw new Error('Failed to check dashboard permissions');
+        const message = await parseApiError(response, 'Failed to check dashboard permissions');
+        if (response.status === 401) {
+          setAccessError('Your session has expired. Please sign in again.');
+          return;
+        }
+        throw new Error(message);
       }
 
-  const result = await response.json();
-  // tolerate multiple possible shapes returned by the API
-  const dashboardAccess = result?.data?.dashboardAccess ?? result?.dashboardAccess ?? result?.data ?? result;
-  
-  setUserPermissions(dashboardAccess);
+      const result = await response.json();
+      const dashboardAccess = result?.data?.dashboardAccess ?? result?.dashboardAccess ?? result?.data ?? result;
+
+      setUserPermissions(dashboardAccess);
       setAccessError(null);
     } catch (err) {
       console.error('Error checking dashboard access:', err);
@@ -104,9 +104,21 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  if (loading) {
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
+      setAccessError('Authentication required. Please sign in again.');
+      setLoading(false);
+      return;
+    }
+
+    checkDashboardAccess();
+  }, [authLoading, isAuthenticated, checkDashboardAccess]);
+
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -124,14 +136,26 @@ export default function DashboardPage() {
           <LockClosedIcon className="h-12 w-12 text-red-500 mx-auto" />
           <p className="mt-4 text-red-600">Access Error: {accessError}</p>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Please contact your administrator to request dashboard access.
+            {accessError.includes('sign in')
+              ? 'Your session may have expired after a server restart.'
+              : 'Please contact your administrator to request dashboard access.'}
           </p>
-          <button 
-            onClick={checkDashboardAccess}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Retry
-          </button>
+          <div className="mt-4 flex gap-3 justify-center">
+            <button 
+              onClick={checkDashboardAccess}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Retry
+            </button>
+            {accessError.includes('sign in') && (
+              <button
+                onClick={() => router.push('/auth')}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                Sign in
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );

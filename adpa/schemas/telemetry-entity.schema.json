@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/telemetry-entity.schema.json",
+  "title": "ADPA Telemetry Entity",
+  "description": "Governed entity discovered or updated from Sentinel, SIEM, CASB, or policy compliance telemetry.",
+  "type": "object",
+  "required": ["entityId", "entityType", "discoverySource", "lastObservedAt"],
+  "properties": {
+    "entityId": { "type": "string" },
+    "entityType": {
+      "type": "string",
+      "enum": ["tenant", "workload", "subscription", "application", "identity", "platform"]
+    },
+    "displayName": { "type": "string" },
+    "discoverySource": {
+      "type": "string",
+      "enum": ["sentinel", "siem", "defender-cloud-apps", "azure-policy", "resource-graph", "manual"]
+    },
+    "riskScore": { "type": "number", "minimum": 0, "maximum": 10 },
+    "driftCategory": {
+      "type": "string",
+      "enum": ["governance", "architectural", "process", "documentation", "observability", "security", "none"]
+    },
+    "telemetryEventIds": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "baselineRef": { "type": "string" },
+    "lastObservedAt": { "type": "string", "format": "date-time" },
+    "recommendedTemplates": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

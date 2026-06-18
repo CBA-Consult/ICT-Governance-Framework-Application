@@ -11,6 +11,7 @@ import {
   Cog6ToothIcon,
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
+import { authFetch, getStoredAccessToken, parseApiError } from '../lib/authFetch';
 
 export default function EnhancedDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
@@ -33,30 +34,27 @@ export default function EnhancedDashboard() {
 
   const checkUserPermissions = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredAccessToken();
       if (!token) {
         setAccessError('Authentication required');
+        setLoading(false);
         return;
       }
 
-      const response = await fetch('/api/dashboard-access/permissions', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await authFetch('/api/dashboard-access/permissions');
 
       if (!response.ok) {
-        throw new Error('Failed to check dashboard permissions');
+        const message = await parseApiError(response, 'Failed to check dashboard permissions');
+        throw new Error(message);
       }
 
       const result = await response.json();
-      setUserPermissions(result.data.dashboardAccess);
+      const permissions = result.data.dashboardAccess;
+      setUserPermissions(permissions);
       setAccessError(null);
 
       // Set default dashboard type based on available permissions
-      const permissions = result.data.dashboardAccess;
-      if (permissions.executive) {
+      if (permissions.executive || permissions.super_admin || permissions.superAdmin || permissions.administrator) {
         setDashboardType('executive');
       } else if (permissions.operational) {
         setDashboardType('operational');
@@ -64,19 +62,22 @@ export default function EnhancedDashboard() {
         setDashboardType('compliance');
       } else if (permissions.analytics) {
         setDashboardType('analytics');
+      } else if (permissions.hasHighLevelAccess) {
+        setDashboardType('executive');
       } else {
         setAccessError('No dashboard access permissions found');
       }
     } catch (err) {
       console.error('Error checking permissions:', err);
       setAccessError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
       
       // Check if user has permission for this dashboard type
       if (!hasPermissionForDashboard(dashboardType)) {
@@ -85,12 +86,7 @@ export default function EnhancedDashboard() {
         return;
       }
       
-      const response = await fetch(`/api/data-processing/dashboard-data?dashboard_type=${dashboardType}&time_range_days=${selectedTimeRange}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await authFetch(`/api/data-processing/dashboard-data?dashboard_type=${dashboardType}&time_range_days=${selectedTimeRange}`);
 
       if (response.status === 403) {
         setError('Access denied: Insufficient permissions for this dashboard');
@@ -113,9 +109,21 @@ export default function EnhancedDashboard() {
     }
   };
 
+  const hasFullDashboardAccess = (permissions) => {
+    if (!permissions) return false;
+    return !!(
+      permissions.super_admin ||
+      permissions.superAdmin ||
+      permissions.administrator ||
+      permissions.admin ||
+      permissions.hasHighLevelAccess
+    );
+  };
+
   const hasPermissionForDashboard = (type) => {
     if (!userPermissions) return false;
-    
+    if (hasFullDashboardAccess(userPermissions)) return true;
+
     switch (type) {
       case 'executive':
         return userPermissions.executive;

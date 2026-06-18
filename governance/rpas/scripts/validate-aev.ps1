@@ -3,6 +3,11 @@ param([switch]$Ci, [switch]$RefreshChecksum)
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'RpasGovernance.psm1') -Force
 
+if ($RefreshChecksum) {
+    $checksum = Save-RpasChecksum
+    Write-Host "RPAS checksum refreshed: $($checksum.combinedHash)"
+}
+
 $result = Test-RpasGovernanceBaseline -SkipChecksum:$RefreshChecksum
 if (-not $result.IsValid) {
     Write-Error "RPAS Governance Baseline validation failed:`n$($result.Errors -join "`n")"

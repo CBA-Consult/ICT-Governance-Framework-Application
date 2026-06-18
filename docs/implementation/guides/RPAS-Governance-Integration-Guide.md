@@ -72,7 +72,9 @@ If the checksum is stale, `npm run governance:validate` and the CI workflow will
 
 ## Moving To A Canonical RPAS Source
 
-When the authoritative RPAS repository becomes available, replace the scaffold with either:
+> **Note:** ADPA is now integrated **in-repo** under `adpa/`. Submodule/subtree is only needed if RPAS-CM core methodology is maintained in a separate upstream repository.
+
+When an external authoritative RPAS repository must be linked, use either:
 
 ```bash
 git submodule add <authoritative-rpas-url> governance/rpas

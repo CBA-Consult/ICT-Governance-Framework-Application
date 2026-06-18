@@ -1,24 +1,36 @@
 {
-  "artifactId": "ADPA",
-  "name": "Architecture Decision and Policy Alignment",
-  "version": "0.1.0-bootstrap",
-  "status": "bootstrap",
-  "owner": "ICT Governance Framework Team",
-  "sourceOfTruth": "SET_ME",
-  "controls": {
-    "traceabilityRequired": true,
-    "versionDisciplineRequired": true,
-    "changeApprovalRequired": true
+  "$schema": "../schemas/rpas-tar-col.schema.json",
+  "artifactMetadata": {
+    "artifactId": "TAR-ADPA-001",
+    "prefix": "TAR",
+    "version": "2.3.0",
+    "status": "Production-Attested",
+    "lastModified": "2026-06-18T16:10:00Z",
+    "sourceOfTruth": "https://github.com/CBA-Consult/ICT-Governance-Framework-Application/tree/main/adpa/"
   },
-  "evidence": {
-    "metadataTemplate": "governance/rpas/templates/aev-metadata.template.json",
-    "requiredFields": [
-      "artifactId",
-      "controlVersion",
-      "projectId",
-      "changeReference",
-      "reviewedBy",
-      "reviewedOn"
-    ]
+  "authorityMatrix": {
+    "governanceRole": "Cloud Platform Stewards",
+    "decidingAuthority": "Strategic Governance Council",
+    "executingSystem": "RPAS Core Orchestrator",
+    "humanInTheLoopRequired": true,
+    "escalationPath": "RPAS-ESC.md"
+  },
+  "complianceMapping": {
+    "framework": "NIST_CSF_2.0",
+    "primaryCategory": "GV.PO",
+    "enforcedBy": "Bicep Blueprint Policies",
+    "auditLineage": "append-only"
+  },
+  "systematics": {
+    "integrationMode": "in-repo",
+    "checksumValidation": {
+      "enabled": true,
+      "targetFile": "governance/rpas/governance_checksum.json"
+    },
+    "driftTaxonomyMapping": {
+      "policyMismatches": "documentation",
+      "templateDeviations": "architectural",
+      "unauthorizedState": "governance"
+    }
   }
 }

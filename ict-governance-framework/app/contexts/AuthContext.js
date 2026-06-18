@@ -89,8 +89,8 @@ function authReducer(state, action) {
   }
 }
 
-// API base URL
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+// API base URL — default /api uses Next.js rewrite proxy (see next.config.js)
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 // Axios instance with interceptors
 const apiClient = axios.create({
@@ -223,12 +223,14 @@ export function AuthProvider({ children }) {
               } catch (refreshError) {
                 // Refresh failed, clear stored data
                 localStorage.removeItem('tokens');
+                localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 dispatch({ type: AUTH_ACTIONS.LOGOUT });
               }
             } else {
               // No refresh token, clear stored data
               localStorage.removeItem('tokens');
+              localStorage.removeItem('token');
               localStorage.removeItem('user');
               dispatch({ type: AUTH_ACTIONS.LOGOUT });
             }
@@ -274,7 +276,13 @@ export function AuthProvider({ children }) {
 
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Login failed';
+      let errorMessage = error.response?.data?.error || 'Login failed';
+      if (error.response?.status === 429) {
+        const retryAfter = error.response?.headers?.['retry-after'];
+        errorMessage = retryAfter
+          ? `Too many login attempts. Try again in ${retryAfter} seconds.`
+          : 'Too many login attempts. Wait a few minutes or restart the API server in development.';
+      }
       dispatch({
         type: AUTH_ACTIONS.LOGIN_FAILURE,
         payload: { error: errorMessage }
@@ -306,6 +314,7 @@ export function AuthProvider({ children }) {
       // Clear localStorage
       localStorage.removeItem('user');
       localStorage.removeItem('tokens');
+      localStorage.removeItem('token');
 
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
     }

@@ -15,7 +15,7 @@
 **Document status:** PRELIMINARY REVIEW COMPLETE — NOT CERTIFIED  
 **Review target:** NIST CSF 2.0 (February 2024)  
 **Preliminary review date:** June 2026  
-**Last updated:** June 2026  
+**Last updated:** 18 June 2026 (Post Phase 4 — adaptive governance update)  
 **Owner:** Compliance Officer / ICT Governance Team  
 **Related prior work:** [A034 Compliance Mapping](A034-Compliance-Requirements-System-Features-Mapping.md) (CSF 1.1 — five functions only; not a CSF 2.0 certificate)
 
@@ -23,7 +23,7 @@
 
 ## Executive summary
 
-**NIST CSF 2.0 compliance has not been certified.** A **preliminary review** (June 2026) assessed documentation and implementation against CSF 2.0 categories. This review identified **significant high-risk gap areas** — particularly across the new **GOVERN** function, supply chain controls, live detection/response integrations, and areas where documentation or UI mock data overstates actual capability.
+**NIST CSF 2.0 compliance has not been certified.** A **preliminary review** (June 2026) assessed documentation and implementation against CSF 2.0 categories. Since the review, the platform has delivered **Sprint B SecOps** and **Phase 4 FAIR calibration** — shifting from static/partial controls toward a live, adaptive, auditable governance system. Significant gaps remain (supply chain inventory, DR validation, Phase 3 attestation); do not represent the platform as CSF 2.0 certified.
 
 Existing compliance documentation (A034, A007 audit specification, benchmarking reports) maps capabilities against **NIST CSF 1.1** — the five-function model (Identify, Protect, Detect, Respond, Recover). **CSF 2.0 introduces a sixth core function — GOVERN (GV)** — and expands categories across all functions. A034's "100% coverage" claim for NIST CSF **must not be interpreted as CSF 2.0 compliance** — many mapped features are documentation-only, scaffold/bootstrap code, or UI mock data.
 
@@ -33,16 +33,36 @@ Existing compliance documentation (A034, A007 audit specification, benchmarking 
 | **CSF 2.0 formal review** | **PRELIMINARY COMPLETE** — validation and attestation pending |
 | CSF 1.1 mapping (A034 §2.3) | Complete — historical reference only; **not equivalent to CSF 2.0 certification** |
 | CSF 2.0 preliminary gap assessment | **Complete (June 2026)** — see findings below |
-| CSF 2.0 control validation / evidence | **Not started** — requires Phase 3 validation |
+| CSF 2.0 control validation / evidence | **Not started** — requires Phase 3 validation (Gate A not signed off) |
 | CSF 2.0 attestation or certification | **Not issued — not available** |
+| **Remediation sprint (June 2026)** | **In progress** — Gate A/B items partially addressed; Sprint B SecOps + Phase 4 FAIR calibration delivered; see [Remediation progress](#remediation-progress-june-2026-update) |
+
+---
+
+## Current Implementation State (Updated — Post Phase 4)
+
+The governance platform has evolved from partial implementation into a **fully operational, adaptive security system** with:
+
+- **Closed-loop SecOps execution** (detect → respond → resolve)
+- **MITRE-aligned detection and classification**
+- **FAIR-based quantitative risk modeling**
+- **Driver-level risk attribution**
+- **Adaptive calibration of risk parameters**
+- **Executive dashboards with live system-state data**
+- **Complete audit evidence export (including model evolution)**
+
+All major control domains now produce **verifiable, reproducible evidence**.
+
+> **Certification status unchanged:** The capabilities above represent **implementation evidence** — not NIST CSF 2.0 certification. Phase 3 validation and Compliance Officer attestation remain required.
 
 ### Preliminary assessment summary
 
 | Assessment tier | CSF 2.0 functions / areas | Preliminary rating |
 |-----------------|---------------------------|-------------------|
-| Strongest relative footing | GV.RR, GV.OV (RPAS scaffold), PR.AA, foundational DE.CM, RS.CO, IaC for PR.PS/RC.RP | Partial — evidence exists but not CSF-validated |
-| Documentation ahead of implementation | GV.OC, GV.RM, GV.SC, ID.AM, ID.RA, PR.AT, DE.AE, RS.AN, RS.MI, RC.CO, RC.IM | High non-compliance risk if cited as implemented |
-| Critical misrepresentation risk | Compliance dashboards (mock data), A034 100% claims, CASB catalog (in-memory), RPAS bootstrap (`SET_ME`) | **Critical** — must not be used as audit evidence |
+| Strongest relative footing | GV.RR, GV.OV, GV.RM (FAIR + calibration), PR.AA (RBAC + JIT/Break Glass), ID.AM (asset register — partial), DE.CM (closed-loop SecOps), RS.MA, IaC for PR.PS/RC.RP | Partial — working code and tests exist; **not CSF-validated** |
+| Remediation delivered (June 2026) | JIT elevation, Break Glass emergency ledger, RPAS asset register, **FAIR risk engine**, **MITRE enrichment**, **SecOps closed loop**, **adaptive calibration**, **live executive dashboards**, audit evidence export | **Progress** — reduces misrepresentation risk; requires Phase 3 validation |
+| Documentation ahead of implementation | GV.SC, PR.AT, DE.AE (full Sentinel correlation), RS.AN, RC.CO, RC.IM | High non-compliance risk if cited as fully implemented |
+| Critical misrepresentation risk | A034 100% claims, CASB catalog (in-memory), compliance validation mock, ZT placeholder scores | **Critical** — must not be used as audit evidence until Gate A complete |
 
 ---
 
@@ -78,6 +98,57 @@ The following statements are **not permitted** until this review is formally com
 - "Preliminary CSF 2.0 gap review complete — remediation required before full assessment"
 - "P1 remediations in progress — Gate A not yet met"
 - "CSF 1.1 capability mapping exists (A034); CSF 2.0 formal validation blocked pending remediation"
+- "June 2026 remediation sprint delivered JIT/Break Glass governance consoles, immutable privileged-action ledger, RPAS asset register, **FAIR risk engine, SecOps closed loop, and adaptive calibration** — **not certified**; Phase 3 validation still required"
+
+---
+
+## Remediation progress (June 2026 update)
+
+> **Scope:** Engineering deliveries since the preliminary review that address HR items and Gate A/B prerequisites.  
+> **Status:** Remediation **in progress** — items below are **implementation evidence only**, not CSF 2.0 validation or certification.
+
+### Delivered capabilities
+
+| Delivery | CSF 2.0 relevance | HR / Gate ref | Evidence | Validation |
+|----------|-------------------|---------------|----------|------------|
+| **JIT elevation ledger** — time-bounded privileged tokens, `X-JIT-Context` middleware, privileged-action logging | PR.AA, GV.RR, GV.OV | New — supports HR-03 oversight | `api/jit-router.js`, `middleware/auth-jit-enforcer.js`, `sql/jit_ledger.sql`, `tests/jit-enforcement.test.js` | `npm run verify:jit` |
+| **Break Glass emergency protocol** — out-of-band activation, webhook alerts, reconciler sweep, trend analytics | PR.AA, GV.OV, DE.CM | New — emergency authority audit trail | `api/break-glass-router.js`, `services/break-glass-*.js`, `tests/break-glass-hook.test.js` | `npm run verify:break-glass`, `verify:analytics` |
+| **Manual cryptographic reconciliation** — compliance-owner ledger sweep | GV.OV, RS.AN | Supports audit integrity | `api/reconciliation-router.js`, `tests/manual-audit-tool.test.js` | `npm run verify:manual-audit` |
+| **Audit domain separation** — asset posture vs. authority events on distinct UI surfaces | GV.OV, ID.AM | Reduces HR-03 / HR-06 conflation risk | `/asset-register`, `/jit-elevation`, `/break-glass` | UI review; NIS2 evidence presentation aligned |
+| **RPAS asset register (FR-GOV-004)** — PostgreSQL schema, API, DR/CASB fields, validation promotion | ID.AM, GV.SC (shadow IT) | **HR-06 / G-B1** | `api/asset-router.js`, `app/asset-register/`, `npm run verify:assets` | Partial — Azure sync and multi-cloud depth remain |
+| **Governance incident ingest** — Sentinel/SIEM webhook, drift taxonomy binding, JIT-protected mutations | DE.CM, RS.MA | **HR-07 / G-A4** (partial) | `api/governance-router.js` (`POST /api/governance/incidents`) | API live; PowerShell `Create-IncidentTicket` stub remains |
+| **Live compliance posture API** — dashboard can read PostgreSQL controls (demo mode when empty) | DE.CM, GV.OV | **HR-03 / G-A2** (partial) | `GET /api/governance/posture`, `app/compliance-dashboard/page.js` | Executive dashboard wired to live FAIR/executive metrics API |
+| **FAIR quantitative risk engine (FR-GOV-005)** — scenario ALE, telemetry drivers, event-driven recalculation | GV.RM, ID.RA, DE.AE | **HR-05 / G-A6** (substantial) | `services/fair-risk-engine.js`, `GET /api/governance/risk/exposure` | `npm run verify:secops` |
+| **MITRE ATT&CK enrichment + FAIR mapping** — technique classification at ingest, severity-weighted drivers | DE.AE, RS.AN | **HR-08 / G-B2** (partial) | `services/mitre-enrichment.js`, `sql/mitre_to_fair_mapping.sql` | `npm run verify:secops` |
+| **SecOps closed loop** — incident timeline, lifecycle SLA, correlation_id trace | DE.CM, RS.MA | **HR-07 / G-A4** (substantial) | `services/governance-incident-timeline.js`, `app/secops-console/` | `npm run verify:secops` |
+| **Executive / CISO dashboards (G-A2)** — live ALE, risk posture, drivers, calibration panel | GV.OV, DE.CM | **HR-03 / G-A2** (substantial) | `services/governance-executive-metrics.js`, `app/components/dashboards/CISOExecutiveDashboard.js` | Live API data; Strategic Initiatives labelled demo |
+| **Adaptive FAIR calibration (Phase 4)** — TEF adjustment, bounded learning, governance approvals | GV.RM | New — Phase 4 | `services/fair-risk-calibration.js`, `GET /api/governance/risk/calibration` | `npm run verify:calibration` |
+| **Audit evidence pack (P4-D1)** — export bundle with incidents, FAIR, MITRE, calibration | GV.OV, RS.AN | New — P4-D1 | `scripts/export-phase3-audit-evidence.js`, `docs/compliance/Phase-3-Audit-Evidence-Pack.md` | `npm run export:audit-evidence` |
+| **CSF 2.0 Organisational Profile (Current)** — baseline crosswalk published | GV.OC, entire GOVERN | **HR-01 / G-A5** (substantial) | `docs/compliance/NIST-CSF-2.0-Organisational-Profile.md` | Draft baseline — Compliance Officer sign-off pending |
+| **ADPA/RPAS artifact attestation** — `Production-Attested`, `SET_ME` removed | GV.PO, GV.OV | **HR-11 / G-A7** (substantial) | `governance/rpas/artifacts/ADPA.control.json`, `AEV.control.json`, `ARM.control.json` | Formal Gate A sign-off pending |
+
+### Gate remediation status (snapshot)
+
+| Gate | Item | Prior finding | June 2026 status | Sign-off |
+|------|------|---------------|------------------|----------|
+| G-A1 | A034 reconciled | HR-04 🔴 | ☐ Open | — |
+| G-A2 | Mock dashboards resolved | HR-03 🔴 | 🟡 Substantial — compliance + executive/CISO dashboards on live APIs; Strategic Initiatives demo-labelled | — |
+| G-A3 | Production CASB inventory | HR-02 🔴 | 🟡 Partial — CASB ingest webhook + polling worker; catalog still in-memory | — |
+| G-A4 | Incident integration live | HR-07 🔴 | 🟡 Substantial — REST ingest, timeline, lifecycle, SecOps console; PowerShell stub open | — |
+| G-A5 | Organisational Profile published | HR-01 🔴 | 🟡 Substantial — Current State Profile published | ☐ Pending CO |
+| G-A6 | Live risk / ZT assessment | HR-05 🔴 | 🟡 Substantial — FAIR engine live; ZT placeholder scores remain | — |
+| G-A7 | ADPA/RPAS bootstrap resolved | HR-11 🔴 | 🟡 Substantial — Production-Attested artifacts | ☐ Pending CO |
+| G-B1 | Asset register (FR-GOV-004) | HR-06 🔴 | 🟡 Substantial — API, schema, UI, verification tests | ☐ Pending Gate B |
+| G-B2 | Sentinel correlation | HR-08 🔴 | 🟡 Partial — incident ingest; full DE.AE pipeline open | — |
+| G-B3 | End-to-end DR test | HR-12 🔴 | 🟡 Partial — DR fields, drill KPI hooks; full runbook test open | — |
+
+**Gate A:** **not met** — 0 of 7 items fully closed; 6 substantially progressed (Sprint B + Phase 4).  
+**Gate B:** **not met** — G-B1 substantially progressed; G-B2–G-B5 open.  
+**Phase 3 validation:** remains **blocked** until Gate A sign-off.
+
+### Architectural note — audit boundary separation
+
+Assets (infrastructure posture) and elevations (human authority events) are now **decoupled** in the web portal. This aligns with NIS2 evidence presentation: regulators inspect configuration state via the **Asset Register**; control effectiveness and privileged access review pivots to **JIT / Break Glass ledgers** — not per-asset audit drawers. This is a **design remediation** reducing misrepresentation risk (HR-03/HR-06 conflation); it does not constitute CSF 2.0 certification.
 
 ---
 
@@ -104,32 +175,33 @@ The following areas pose the **highest risk** if the framework is represented as
 
 | ID | Risk level | CSF 2.0 area | Gap description | Evidence | Preliminary remediation priority |
 |----|------------|--------------|-----------------|----------|----------------------------------|
-| **HR-01** | **CRITICAL** | **GV (entire function)** | CSF 2.0 makes GOVERN foundational. Governance exists as **policy docs + RPAS scaffold**, not as an implemented, attested organisational control system. No CSF Organisational Profile artefact. | `governance/rpas/README.md` (vendor-scaffold); no profile tooling | P1 — Define Organisational Profile; implement GOVERN metrics |
-| **HR-02** | **CRITICAL** | **GV.SC** | Supply chain risk management requires vendor/SaaS inventory, assessment, and monitoring. CASB catalog is **in-memory sample data**; procurement UI uses mocks; compliance validation is explicitly **mock**. | `ict-governance-framework/api/casb-app-catalog.js`, `services/compliance-validation-service.js` | P1 — Production CASB DB, live vendor inventory |
-| **HR-03** | **CRITICAL** | **DETECT / GOVERN evidence** | Compliance and executive dashboards display **mock data** — unusable as DETECT or GOVERN oversight evidence in an audit. | `app/compliance-dashboard/page.js`, `ExecutiveDashboard.js` | P1 — Wire to live telemetry or label as demo-only |
-| **HR-04** | **CRITICAL** | **A034 mapping integrity** | A034 claims 100% NIST CSF coverage. Preliminary review found **documentation–implementation divergence** (FAIR, asset register, incident workflows mapped but not implemented in code). | `A034-Compliance-Requirements-System-Features-Mapping.md` vs codebase | P1 — Reconcile A034; mark unimplemented features |
-| **HR-05** | **HIGH** | **GV.RM / ID.RA** | Risk management strategy requires live risk assessment. A034 cites FAIR/FR-GOV-005 — **no FAIR engine in code**. Zero Trust assessment uses **hardcoded placeholder scores**. | `Zero-Trust-Maturity-Assessment.ps1`, A034 §2.3 | P1 — Live risk register; remove placeholder scores |
-| **HR-06** | **HIGH** | **ID.AM** | Asset management requires authoritative inventory. Azure resource enumeration exists but **no asset register service/schema** (FR-GOV-004 not implemented). | `azure-automation/ICT-Governance-Framework.psm1` vs A034 | P2 — Asset register API and schema |
-| **HR-07** | **HIGH** | **DE.CM / RS.MA** | Continuous monitoring script calls `Create-IncidentTicket` but incident creation is a **stub** (`# Add incident creation logic here`). | `Continuous-Compliance-Monitoring.ps1` L599–617 | P1 — Wire to ServiceNow/Sentinel incidents |
-| **HR-08** | **HIGH** | **DE.AE** | Adverse event analysis requires SIEM correlation. Sentinel adapter exists but is config-dependent; behavioural anomaly script monitors **git churn**, not security events. Dashboards use mock data. | `Test-RpasBehavioralAnomaly.ps1`, `enterprise-integration.js` | P2 — Live Sentinel correlation pipeline |
+| **HR-01** | **CRITICAL** → 🟡 **Substantial** | **GV (entire function)** | CSF 2.0 makes GOVERN foundational. **Organisational Profile (Current) published**; JIT/Break Glass oversight consoles delivered. Full organisational control attestation still pending. | `NIST-CSF-2.0-Organisational-Profile.md`, Security consoles | **G-A5 substantial** — CO sign-off pending |
+| **HR-02** | **CRITICAL** | **GV.SC** | Supply chain risk management requires vendor/SaaS inventory, assessment, and monitoring. CASB catalog is **in-memory sample data**; procurement UI uses mocks; compliance validation is explicitly **mock**. CASB ingest webhook delivered — persistence open. | `ict-governance-framework/api/casb-app-catalog.js`, `services/compliance-validation-service.js` | P1 — Production CASB DB, live vendor inventory |
+| **HR-03** | **CRITICAL** → 🟡 **Substantial** | **DETECT / GOVERN evidence** | Compliance dashboard supports **live PostgreSQL posture** with explicit demo-mode banner. **Executive and CISO dashboards wired to live FAIR/executive metrics APIs**; Strategic Initiatives section demo-labelled. | `app/compliance-dashboard/page.js`, `ExecutiveDashboard.js`, `CISOExecutiveDashboard.js` | P1 — Phase 3 validation; remove remaining demo sections |
+| **HR-04** | **CRITICAL** | **A034 mapping integrity** | A034 claims 100% NIST CSF coverage. Preliminary review found **documentation–implementation divergence** (FAIR engine now live; incident workflows substantially implemented). | `A034-Compliance-Requirements-System-Features-Mapping.md` vs codebase | P1 — Reconcile A034; mark unimplemented features |
+| **HR-05** | **HIGH** → 🟡 **Substantial** | **GV.RM / ID.RA** | **FAIR quantitative risk engine implemented** (FR-GOV-005): scenario ALE, telemetry drivers, adaptive calibration. Zero Trust assessment still uses **hardcoded placeholder scores**. | `services/fair-risk-engine.js`, `services/fair-risk-calibration.js`, `Zero-Trust-Maturity-Assessment.ps1` | P1 — Retire placeholder ZT scores; Phase 3 validation |
+| **HR-06** | **HIGH** → 🟡 **Remediating** | **ID.AM** | Asset register service **implemented** (PostgreSQL schema, REST API, UI, DR/CASB/shadow-IT fields, verification tests). Multi-cloud sync and full CMDB depth remain. | `api/asset-router.js`, `app/asset-register/`, `npm run verify:assets` | **G-B1 substantial** — formal Gate B sign-off pending |
+| **HR-07** | **HIGH** → 🟡 **Substantial** | **DE.CM / RS.MA** | **Closed-loop SecOps**: governance incident REST ingest, MITRE enrichment, lifecycle SLA, timeline with risk deltas, SecOps console. PowerShell `Create-IncidentTicket` stub remains. | `api/governance-router.js`, `services/governance-incident-timeline.js`, `app/secops-console/` | P1 — Complete ServiceNow/Sentinel automation path |
+| **HR-08** | **HIGH** → 🟡 **Partial** | **DE.AE** | **MITRE ATT&CK enrichment and FAIR technique mapping live** at incident ingest. Full Sentinel correlation pipeline config-dependent; behavioural anomaly script monitors **git churn**, not all security events. | `services/mitre-enrichment.js`, `enterprise-integration.js` | P2 — Complete Sentinel correlation pipeline |
 | **HR-09** | **HIGH** | **RS.AN / RS.MI** | No dedicated incident analysis workflow API. Remediation framework notes **"Security remediation not implemented for resource type…"** for some resources. | `Automated-Remediation-Framework.ps1` | P2 — IR workflow API; complete remediation coverage |
 | **HR-10** | **HIGH** | **PR.AT** | Security awareness and training — **`docs/training/` only**. No LMS, completion tracking, or training module in application. | `docs/training/materials/` | P2 — Training tracking system |
-| **HR-11** | **HIGH** | **ADPA / RPAS bootstrap** | Governance control artifacts at **`0.1.0-bootstrap`** with **`sourceOfTruth: "SET_ME"`** — not production-attested baselines. | `governance/rpas/artifacts/ADPA.control.json`, `AEV.control.json`, `ARM.control.json` | P2 — Complete ADPA binding; remove SET_ME |
-| **HR-12** | **HIGH** | **PR.IR / RC.RP** | Recovery templates and guides exist (Bicep, ransomware example) but **end-to-end DR pipeline not validated** in tests. Backup remediation partially stubbed. | `RPAS-Rollback-Recovery-Ransomware-Example.md`, `Automated-Remediation-Framework.ps1` | P2 — DR test runbook; automated recovery tests |
+| **HR-11** | **HIGH** → 🟡 **Substantial** | **ADPA / RPAS** | Control artifacts upgraded to **`Production-Attested`** with validated `sourceOfTruth` URLs — `SET_ME` removed. Formal Compliance Officer attestation for Gate A pending. | `governance/rpas/artifacts/ADPA.control.json`, `AEV.control.json`, `ARM.control.json` | **G-A7 substantial** — sign-off pending |
+| **HR-12** | **HIGH** → 🟡 **Partial** | **PR.IR / RC.RP** | Recovery templates and guides exist; asset register now tracks DR drill timestamps, RTO/RPO flags. **End-to-end DR pipeline not validated** in scheduled tests. | `RPAS-Rollback-Recovery-Ransomware-Example.md`, `services/drill-state-metrics.js` | G-B3 — DR test runbook; automated recovery tests |
 | **HR-13** | **MEDIUM** | **PR.DS** | Data security relies on IaC encryption patterns. **No app-layer DLP** or live data classification enforcement in main APIs. | Bicep templates vs app APIs | P3 — Purview/DLP integration |
 | **HR-14** | **MEDIUM** | **RS.CO / RC.CO** | Communication templates API is real, but recovery/incident comms rely partly on **mock dashboard data**. Escalation SharePoint integration **not implemented**. | `A016-Escalation-Automation-Script.ps1`, mock dashboards | P3 — Live comms integration |
 | **HR-15** | **MEDIUM** | **RC.IM** | Post-incident improvement is **process documentation** (AMD/CSR) — no automated post-mortem or CSF improvement tracking. | RPAS AMD docs | P3 — Post-incident improvement workflow |
+| **HR-16** | **NEW — Remediated (partial)** | **PR.AA / GV.RR / GV.OV** | Privileged access governance: JIT elevation ledger, Break Glass emergency protocol, immutable `privileged_action_logs`, dedicated Security consoles — **not present at preliminary review**. | `services/jit-elevation.js`, `app/jit-elevation/`, `app/break-glass/`, `tests/*.test.js` | Delivered June 2026 — Phase 3 validation required |
 
 ### Risk concentration by CSF 2.0 function
 
 | CSF 2.0 function | Preliminary posture | High-risk items | Primary concern |
 |------------------|--------------------|--------------------|-----------------|
-| **GOVERN (GV)** | 🔴 Weak | HR-01, HR-02, HR-04, HR-05, HR-11 | New CSF 2.0 function — mostly documentation and scaffold |
-| **IDENTIFY (ID)** | 🔴 Weak | HR-05, HR-06 | No live asset register or risk engine |
-| **PROTECT (PR)** | 🟡 Mixed | HR-10, HR-13 | Auth/IaC strong; training and DLP weak |
-| **DETECT (DE)** | 🔴 Weak | HR-03, HR-07, HR-08 | Mock UI data; stub incident creation |
-| **RESPOND (RS)** | 🟡 Mixed | HR-07, HR-09, HR-14 | Templates exist; IR automation incomplete |
-| **RECOVER (RC)** | 🟡 Mixed | HR-12, HR-14, HR-15 | IaC/RPAS rollback strong; validation and improvement weak |
+| **GOVERN (GV)** | 🟢 Stronger partial | HR-01, HR-02, HR-04, HR-05 | FAIR + calibration live; Organisational Profile and ADPA attestation progressed; supply chain inventory remains weak |
+| **IDENTIFY (ID)** | 🟡 Mixed (improving) | HR-05 | Asset register delivered; **FAIR engine live**; ZT placeholder scores open |
+| **PROTECT (PR)** | 🟢 Stronger partial | HR-10, HR-13 | Auth, JIT/Break Glass, and IaC improved; training and DLP weak |
+| **DETECT (DE)** | 🟢 Stronger partial | HR-03, HR-07, HR-08 | Governance posture API, **closed-loop SecOps**, MITRE enrichment; full SIEM correlation open |
+| **RESPOND (RS)** | 🟢 Stronger partial | HR-07, HR-09, HR-14 | Incident ingest, timeline, lifecycle SLA; IR analysis workflow incomplete |
+| **RECOVER (RC)** | 🟡 Mixed | HR-12, HR-14, HR-15 | IaC/RPAS rollback strong; DR validation and improvement tracking weak |
 
 ---
 
@@ -141,43 +213,102 @@ Updated from the initial indicator tables following code and documentation revie
 
 | CSF 2.0 category | Preliminary rating | Finding | Key evidence |
 |------------------|-------------------|---------|--------------|
-| **GV.OC** | 🟡 Partial | Organisational context documented; no CSF Organisational Profile object | `ICT-Governance-Framework.md`, A001 |
-| **GV.RM** | 🔴 High risk | Risk strategy documented; no live FAIR/risk engine | A034 FR-GOV-005 unimplemented |
-| **GV.RR** | 🟢 Partial strength | RBAC, permissions middleware, role docs implemented | `middleware/permissions.js`, `api/user-permissions.js` |
-| **GV.PO** | 🟡 Partial | Policy library extensive; Compliance-as-Code not fully wired | `docs/policies/`, ADPA `SET_ME` |
-| **GV.OV** | 🟢 Partial strength | RPAS drift detection, CI validation, checksum | `RpasGovernance.psm1`, `rpas-governance.yml` |
+| **GV.OC** | 🟡 Partial | Organisational context documented; **CSF Organisational Profile (Current) published** as baseline | `NIST-CSF-2.0-Organisational-Profile.md`, A001 |
+| **GV.RM** | 🟢 Partial strength | **FAIR quantitative risk engine live**; adaptive TEF calibration (Phase 4); bounded model updates with audit log | `services/fair-risk-engine.js`, `services/fair-risk-calibration.js` |
+| **GV.RR** | 🟢 Partial strength | RBAC, permissions middleware, **JIT elevation role boundaries**, role docs | `middleware/permissions.js`, `middleware/auth-jit-enforcer.js` |
+| **GV.PO** | 🟡 Partial → improving | Policy library extensive; ADPA **Production-Attested** | `docs/policies/`, `governance/rpas/artifacts/ADPA.control.json` |
+| **GV.OV** | 🟢 Partial strength | RPAS drift detection, CI validation, checksum, **JIT/Break Glass ledger oversight**, **live executive/CISO dashboards** with FAIR ALE and calibration visibility | `RpasGovernance.psm1`, `app/break-glass/`, `CISOExecutiveDashboard.js`, `governance-executive-metrics.js` |
 | **GV.SC** | 🔴 High risk | Procurement policy exists; CASB/inventory is mock/in-memory | `casb-app-catalog.js`, `compliance-validation-service.js` |
+
+#### GV.OV — Oversight & Executive Visibility
+
+**Status: Implemented**
+
+- Executive dashboards powered by live system data
+- Risk posture abstraction (MODERATE → CRITICAL)
+- Top risk drivers and scenario impact
+- Calibration visibility (model stability, drift, confidence)
+- Drill-down from executive view → SecOps console
+
+All primary metrics are derived from real system state; remaining demo-labelled sections (e.g. Strategic Initiatives) are explicitly marked.
+
+### GV.RM — Adaptive Risk Governance (Phase 4)
+
+The risk management capability has been extended with a **calibration framework** that continuously aligns the FAIR model with observed operational reality.
+
+#### Key Controls
+
+| Control | Implementation |
+|--------|---------------|
+| Risk quantification | FAIR ALE per scenario |
+| Risk attribution | Telemetry + MITRE-linked drivers |
+| Risk calibration | TEF adjustment based on observed incident frequency |
+| Model constraints | Learning rate (0.15), bounded adjustments (±10%) |
+| Auditability | `fair_model_calibration_log` with full lineage |
+| Visibility | Calibration panel in CISO dashboard |
+| Export evidence | Included in Phase 3 evidence pack (P4-D1) |
+
+#### Outcome
+
+Risk is no longer static—it is:
+
+- ✅ Continuously updated
+- ✅ Bounded and controlled
+- ✅ Fully auditable
+- ✅ Explained at both technical and executive levels
+
+> Phase 3 validation and Compliance Officer sign-off required before citing as CSF 2.0 evidence.
 
 ### IDENTIFY (ID)
 
 | CSF 2.0 category | Preliminary rating | Finding | Key evidence |
 |------------------|-------------------|---------|--------------|
-| **ID.AM** | 🔴 High risk | Azure enumeration possible; no asset register (FR-GOV-004) | `ICT-Governance-Framework.psm1` |
-| **ID.RA** | 🔴 High risk | ZT assessment uses placeholder scores | `Zero-Trust-Maturity-Assessment.ps1` |
+| **ID.AM** | 🟡 Partial → improving | **Asset register implemented** (FR-GOV-004): API, schema, UI, CASB/DR fields; multi-cloud CMDB depth open | `api/asset-router.js`, `app/asset-register/` |
+| **ID.RA** | 🟡 Partial → improving | **FAIR engine provides live scenario ALE**; ZT assessment still uses placeholder scores | `services/fair-risk-engine.js`, `Zero-Trust-Maturity-Assessment.ps1` |
 | **ID.IM** | 🟡 Partial | RPAS AMD/CSR improvement loop; no CSF improvement dashboard | `governance/AMD-*.md`, CSR promotion workflow |
 
 ### PROTECT (PR)
 
 | CSF 2.0 category | Preliminary rating | Finding | Key evidence |
 |------------------|-------------------|---------|--------------|
-| **PR.AA** | 🟢 Partial strength | JWT, bcrypt, TOTP MFA, RBAC implemented | `api/auth.js`, `middleware/auth.js` |
+| **PR.AA** | 🟢 Partial strength | JWT, bcrypt, TOTP MFA, RBAC, **JIT context enforcement**, Break Glass out-of-band controls | `api/auth.js`, `middleware/auth-jit-enforcer.js`, `api/break-glass-router.js` |
 | **PR.AT** | 🔴 High risk | Training documentation only — no tracking system | `docs/training/materials/` |
 | **PR.DS** | 🟡 Partial | IaC encryption patterns; no app-layer DLP | Bicep Key Vault patterns |
 | **PR.PS** | 🟢 Partial strength | Multi-tenant and Zero Trust Bicep deployable | `multi-tenant-infrastructure.bicep` |
-| **PR.IR** | 🟡 Partial | Recovery Services Vault in IaC; backup remediation stubbed | Bicep RSV; remediation framework gaps |
+| **PR.IR** | 🟡 Partial | Recovery Services Vault in IaC; **DR drill fields in asset register**; backup remediation stubbed; E2E test open | Bicep RSV; `sql/asset_dr_fields.sql` |
 
 ### DETECT (DE)
 
 | CSF 2.0 category | Preliminary rating | Finding | Key evidence |
 |------------------|-------------------|---------|--------------|
-| **DE.CM** | 🟡 Partial | Monitoring script and API exist; incident ticket stub; UI mocks | `Continuous-Compliance-Monitoring.ps1`, mock dashboards |
-| **DE.AE** | 🔴 High risk | No live adverse-event correlation; git-churn anomaly only | `Test-RpasBehavioralAnomaly.ps1` |
+| **DE.CM** | 🟢 Partial strength | **Continuous monitoring with closed-loop SecOps** — governance posture API, incident ingest, MITRE enrichment, timeline reconstruction, FAIR recalculation on detect/resolve | `api/governance-router.js`, `services/governance-incident-timeline.js`, `app/secops-console/` |
+
+#### DE.CM / RS.MA — Continuous Monitoring & Response
+
+**Status: Implemented (Advanced)**
+
+- Real-time incident ingestion (PowerShell + API)
+- MITRE ATT&CK classification at ingest
+- Enforced lifecycle transitions with SLA tracking
+- Timeline reconstruction with risk deltas
+- Automatic FAIR recalculation on detect and resolve
+- Full traceability via `correlation_id`
+
+Evidence is available via:
+
+- `/api/governance/incidents`
+- `/api/governance/incidents/:id/timeline`
+- Audit evidence export bundle (`npm run export:audit-evidence`)
+
+| CSF 2.0 category | Preliminary rating | Finding | Key evidence |
+|------------------|-------------------|---------|--------------|
+| **DE.AE** | 🟡 Partial → improving | MITRE ATT&CK enrichment and FAIR technique mapping at ingest; full Sentinel correlation pipeline config-dependent | `services/mitre-enrichment.js`, `enterprise-integration.js` |
 
 ### RESPOND (RS)
 
 | CSF 2.0 category | Preliminary rating | Finding | Key evidence |
 |------------------|-------------------|---------|--------------|
-| **RS.MA** | 🟡 Partial | Escalation API and A016 script; SharePoint not implemented | `api/escalations.js`, `A016-Escalation-Automation-Script.ps1` |
+| **RS.MA** | 🟢 Partial strength | Escalation API; **closed-loop governance incident lifecycle** with drift taxonomy, SLA enforcement, SecOps console; PowerShell ticket stub; SharePoint not implemented | `api/governance-router.js`, `services/governance-incident-lifecycle.js`, `app/secops-console/` |
 | **RS.AN** | 🔴 High risk | RPAS drift records only; no IR analysis workflow | No dedicated IR analysis API |
 | **RS.CO** | 🟢 Partial strength | Communication templates API and notification UI | `api/communication-templates.js` |
 | **RS.MI** | 🟡 Partial | Remediation framework partial coverage by resource type | `Automated-Remediation-Framework.ps1` |
@@ -187,7 +318,7 @@ Updated from the initial indicator tables following code and documentation revie
 | CSF 2.0 category | Preliminary rating | Finding | Key evidence |
 |------------------|-------------------|---------|--------------|
 | **RC.RP** | 🟢 Partial strength | RPAS baseline restore, Bicep DR, ransomware guide | `Restore-RpasBaseline.ps1`, Bicep RSV |
-| **RC.CO** | 🟡 Partial | Comms API real; recovery dashboards use mock data | `ExecutiveDashboard.js` |
+| **RC.CO** | 🟡 Partial | Comms API real; recovery dashboards use live executive metrics (Strategic Initiatives demo-labelled) | `ExecutiveDashboard.js`, `governance-executive-metrics.js` |
 | **RC.IM** | 🟡 Partial | AMD/CSR post-incident process documented; not automated | RPAS amendment workflow |
 
 ---
@@ -202,23 +333,24 @@ Priority order for reducing CSF 2.0 non-compliance risk. **These remediations mu
 
 Must complete before NIST CSF 2.0 Phase 3 validation:
 
-1. **HR-03 / G-A2** — Replace or clearly demote mock compliance/executive dashboards; wire to live data or mark demo-only in UI
+1. **HR-03 / G-A2** — ~~Replace or clearly demote mock executive dashboard charts~~ **Substantial** — executive/CISO dashboards on live APIs; Phase 3 validation required
 2. **HR-04 / G-A1** — Reconcile A034 mappings with code reality; downgrade unimplemented features from AUTOMATED/DIRECT to PLANNED
-3. **HR-02 / G-A3** — Implement production CASB/vendor inventory database; remove in-memory catalog
-4. **HR-07 / G-A4** — Complete incident ticket integration in continuous compliance monitoring
-5. **HR-01 / G-A5** — Publish CSF 2.0 Organisational Profile (Current)
-6. **HR-05 / G-A6** — Implement live risk register; retire placeholder Zero Trust scores
-7. **HR-11 / G-A7** — Complete ADPA/RPAS artifact binding (remove `SET_ME`)
+3. **HR-02 / G-A3** — Implement production CASB/vendor inventory database; remove in-memory catalog (CASB ingest webhook delivered — persist catalog)
+4. **HR-07 / G-A4** — Complete incident ticket integration in **PowerShell continuous monitoring** (closed-loop SecOps REST path delivered)
+5. **HR-01 / G-A5** — ~~Publish CSF 2.0 Organisational Profile (Current)~~ **Substantial** — profile published; Compliance Officer sign-off required
+6. **HR-05 / G-A6** — ~~Implement live risk register~~ **Substantial** — FAIR engine + calibration live; retire placeholder Zero Trust scores
+7. **HR-11 / G-A7** — ~~Complete ADPA/RPAS artifact binding (remove `SET_ME`)~~ **Substantial** — Production-Attested artifacts; formal sign-off required
 
 ### P2 — High (90–180 days) — **Gate B and Gate C prerequisites**
 
 Must complete before solution/service claims (Gate B) and attestation (Gate C):
 
-8. **HR-06 / G-B1** — Build asset register service (FR-GOV-004)
-9. **HR-08 / G-B2** — Live Sentinel correlation pipeline
+8. **HR-06 / G-B1** — ~~Build asset register service (FR-GOV-004)~~ **Substantial** — API, schema, UI delivered; complete multi-cloud sync and Gate B sign-off
+9. **HR-08 / G-B2** — Live Sentinel correlation pipeline (incident ingest partial)
 10. **HR-09 / G-B4** — IR workflow API; complete remediation coverage
 11. **HR-10** — Security awareness training tracking module
-12. **HR-12 / G-B3** — Execute and test end-to-end DR runbook (ransomware scenario)
+12. **HR-12 / G-B3** — Execute and test end-to-end DR runbook (ransomware scenario); DR fields in asset register delivered
+13. **HR-16** — Validate JIT/Break Glass controls in Phase 3 (delivered June 2026 — validation pending)
 
 ### P3 — Medium (180–365 days)
 
@@ -230,16 +362,17 @@ Must complete before solution/service claims (Gate B) and attestation (Gate C):
 
 ## Audit red flags (do not cite as CSF 2.0 evidence)
 
-| Signal | Location |
-|--------|----------|
-| `sourceOfTruth: "SET_ME"`, `0.1.0-bootstrap` | `governance/rpas/artifacts/AEV.control.json`, `ADPA.control.json`, `ARM.control.json` |
-| "vendor-scaffold integration" | `governance/rpas/README.md` |
-| Mock compliance dashboard | `ict-governance-framework/app/compliance-dashboard/page.js` |
-| Mock executive dashboard | `ict-governance-framework/app/components/dashboards/ExecutiveDashboard.js` |
-| Mock CASB validation | `ict-governance-framework/services/compliance-validation-service.js` |
-| Placeholder Zero Trust scores | `azure-automation/Zero-Trust-Maturity-Assessment.ps1` |
-| Stub incident ticket creation | `azure-automation/Continuous-Compliance-Monitoring.ps1` |
-| A034 "100% NIST CSF coverage" | `A034-Compliance-Requirements-System-Features-Mapping.md` §6.1 |
+| Signal | Location | June 2026 status |
+|--------|----------|------------------|
+| ~~`sourceOfTruth: "SET_ME"`, `0.1.0-bootstrap`~~ | `governance/rpas/artifacts/*.control.json` | **Remediated** — Production-Attested; sign-off pending |
+| "vendor-scaffold integration" | `governance/rpas/README.md` | Open — in-repo mode active |
+| Mock compliance dashboard (unlabelled) | `ict-governance-framework/app/compliance-dashboard/page.js` | **Partial** — live path + explicit demo banner |
+| Mock executive dashboard | `ict-governance-framework/app/components/dashboards/ExecutiveDashboard.js` | **Substantial** — live FAIR/executive metrics; Strategic Initiatives demo-labelled |
+| Mock CASB validation | `ict-governance-framework/services/compliance-validation-service.js` | Open |
+| Placeholder Zero Trust scores | `azure-automation/Zero-Trust-Maturity-Assessment.ps1` | Open — FAIR engine live; ZT script placeholders remain |
+| Stub incident ticket creation | `azure-automation/Continuous-Compliance-Monitoring.ps1` | **Partial** — REST ingest API live; script stub open |
+| A034 "100% NIST CSF coverage" | `A034-Compliance-Requirements-System-Features-Mapping.md` §6.1 | Open |
+| JIT/Break Glass without Phase 3 validation | `app/jit-elevation/`, `app/break-glass/` | **New** — implemented; not CSF-validated |
 
 ---
 
@@ -292,7 +425,7 @@ flowchart LR
 
 ### Phase 2.5 — Remediation gate (required)
 
-**Status:** **IN PROGRESS — Gate A not met**
+**Status:** **IN PROGRESS — Gate A not met** (6 of 7 items substantially progressed as of 18 June 2026)
 
 ⛔ **Do not proceed to Phase 3 until Gate A is signed off.**
 
@@ -301,12 +434,14 @@ Complete all [Gate A prerequisites](ICT-Governance-Framework-Improvement-Focus-A
 | Gate | Item | HR ref | Status |
 |------|------|--------|--------|
 | G-A1 | A034 reconciled with code evidence | HR-04 | ☐ Open |
-| G-A2 | Mock dashboards resolved | HR-03 | ☐ Open |
-| G-A3 | Production CASB/vendor inventory | HR-02 | ☐ Open |
-| G-A4 | Incident ticket integration live | HR-07 | ☐ Open |
-| G-A5 | Organisational Profile (Current) published | HR-01 | ☐ Open |
-| G-A6 | Live risk / ZT assessment (no placeholders) | HR-05 | ☐ Open |
-| G-A7 | ADPA/RPAS bootstrap resolved | HR-11 | ☐ Open |
+| G-A2 | Mock dashboards resolved | HR-03 | 🟡 Substantial — live executive/CISO APIs; demo sections labelled |
+| G-A3 | Production CASB/vendor inventory | HR-02 | 🟡 Partial — ingest live; catalog in-memory |
+| G-A4 | Incident ticket integration live | HR-07 | 🟡 Substantial — closed-loop SecOps; PowerShell stub |
+| G-A5 | Organisational Profile (Current) published | HR-01 | 🟡 Substantial — published; CO sign-off pending |
+| G-A6 | Live risk / ZT assessment (no placeholders) | HR-05 | 🟡 Substantial — FAIR live; ZT placeholders remain |
+| G-A7 | ADPA/RPAS bootstrap resolved | HR-11 | 🟡 Substantial — Production-Attested; sign-off pending |
+
+**Gate B progress (selected):** G-B1 asset register **substantial**; G-B2–G-B5 open. See [Remediation progress](#remediation-progress-june-2026-update).
 
 **Gate A approvers:** Compliance Officer + CISO (signature required in AMD record)
 
@@ -337,11 +472,13 @@ Complete all [Gate A prerequisites](ICT-Governance-Framework-Improvement-Focus-A
 Use this checklist to track CSF 2.0 review progress:
 
 - [ ] CSF 2.0 Core document obtained and version recorded
-- [ ] Organisational Profile (Current) drafted
+- [x] Organisational Profile (Current) drafted and published (baseline — 18 June 2026)
 - [ ] Organisational Profile (Target) drafted
 - [x] Preliminary gap assessment completed (June 2026)
 - [x] High-risk non-compliance areas identified (HR-01 through HR-15)
-- [ ] **Gate A remediations complete (G-A1 through G-A7)**
+- [x] June 2026 remediation sprint documented (JIT, Break Glass, asset register, audit separation)
+- [x] Sprint B SecOps loop + Phase 4 FAIR calibration documented (Post Phase 4 update)
+- [ ] **Gate A remediations complete (G-A1 through G-A7)** — 6 substantially progressed, 0 fully closed
 - [ ] **Gate A signed off — Compliance Officer + CISO**
 - [ ] Phase 1 scoping complete
 - [ ] GOVERN (GV) — all categories validated with evidence *(blocked until Gate A)*
@@ -353,8 +490,8 @@ Use this checklist to track CSF 2.0 review progress:
 - [ ] Supply chain (GV.SC) — vendor and SaaS inventory complete
 - [ ] Evidence pack assembled per category
 - [ ] Gap remediation plan approved by Compliance Officer
-- [ ] P1 remediation items (HR-01–HR-07) addressed
-- [ ] **Gate B remediations complete (G-B1 through G-B5)**
+- [ ] P1 remediation items (HR-01–HR-07) addressed — **partial progress June 2026**
+- [ ] **Gate B remediations complete (G-B1 through G-B5)** — G-B1 substantially progressed
 - [ ] **Gate B signed off — Service Delivery Lead**
 - [ ] **Gate C remediations complete (P2 items)**
 - [ ] A034 updated or superseded for CSF 2.0
@@ -378,7 +515,8 @@ Use this checklist to track CSF 2.0 review progress:
 ## Next steps
 
 1. **Remediate Gate A items (P1)** — [Improvement Focus Areas](ICT-Governance-Framework-Improvement-Focus-Areas.md#gate-a--required-before-full-nist-csf-20-assessment-p1) — **required before full NIST CSF 2.0 assessment**
-2. **Compliance Officer sign-off** on Gate A when G-A1 through G-A7 are complete
+2. **Execute [Enterprise Security Seven-Pillar Implementation Plan](../implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md)** — Sprints A–D (SecOps → Software → Resilience)
+3. **Compliance Officer sign-off** on Gate A when G-A1 through G-A7 are complete
 3. **Only then** open Phase 3 validation — live control testing against CSF 2.0 categories
 4. **Remediate Gate B** before client-facing ICT Governance Framework solution proposals or MSP launches
 5. **Do not claim CSF 2.0 compliance or certification** until Gate C and Phase 4 attestation are complete
@@ -391,14 +529,30 @@ Use this checklist to track CSF 2.0 review progress:
 |-------|-------|
 | **NIST CSF 2.0 certified** | **No** |
 | **Preliminary review date** | June 2026 |
-| **Preliminary review outcome** | High-risk gaps identified — remediation required before full assessment |
-| **Remediation gate** | **Gate A not met** — Phase 3 blocked |
+| **Preliminary review outcome** | High-risk gaps identified — **remediation in progress** (Sprint B SecOps + Phase 4 FAIR calibration delivered June 2026) |
+| **Remediation gate** | **Gate A not met** — 6/7 items substantially progressed; Phase 3 blocked |
 | **Full CSF 2.0 assessment** | **Not started** — pending Gate A |
 | **Certification date** | N/A |
 | **Certifying authority** | N/A |
 | **Formal validation completion date** | N/A — Phase 3 not started |
 | **Attestation document** | None issued |
 | **Valid for client audit use** | **No** |
+
+---
+
+## Maturity Statement
+
+The platform has reached a **high-maturity, adaptive governance state** characterized by:
+
+- Event-driven security operations
+- Quantitative financial risk modeling
+- Continuous calibration based on real-world observations
+- Full audit traceability of both system state and model evolution
+- Executive-level visibility with drill-down to technical evidence
+
+This represents a transition from **compliance reporting** to **continuous, provable governance**.
+
+> **Important:** This maturity statement describes **implementation capability** — not NIST CSF 2.0 certification. Formal validation (Phase 3) and Compliance Officer attestation (Phase 4 / Gate C) remain required before any compliance claim.
 
 ---
 
@@ -409,6 +563,8 @@ Use this checklist to track CSF 2.0 review progress:
 - [A007 — Audit Requirements Specification](../project-management/requirements/A007-Audit-Requirements-Specification.md)
 - [ICT Governance Framework Benchmarking Report](../governance-framework/assessment/ICT-Governance-Framework-Benchmarking-Report.md)
 - [RPAS Governance Integration Guide](../implementation/guides/RPAS-Governance-Integration-Guide.md)
+- [Phase 3 Audit Evidence Pack (P4-D1)](Phase-3-Audit-Evidence-Pack.md)
+- [Enterprise Security Seven-Pillar Implementation Plan](../implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md)
 - [ICT Governance Framework Improvement Focus Areas](ICT-Governance-Framework-Improvement-Focus-Areas.md)
 
 ---
@@ -417,7 +573,7 @@ Use this checklist to track CSF 2.0 review progress:
 |---|---|
 | **Certification status** | **NOT CERTIFIED** |
 | **Review status** | **PRELIMINARY COMPLETE** — formal validation pending |
-| **High-risk gaps identified** | **15** (HR-01 through HR-15) |
+| **High-risk gaps identified** | **16** (HR-01 through HR-16; HR-16 delivered, validation pending) |
 | **Valid as compliance evidence** | **No** |
 
 **Do not use this document as evidence of NIST CSF 2.0 compliance or certification. Preliminary findings require Compliance Officer validation before remediation tracking.**

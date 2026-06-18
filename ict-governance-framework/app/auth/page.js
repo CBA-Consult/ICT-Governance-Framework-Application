@@ -19,6 +19,14 @@ function AuthPageContent() {
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading } = useAuth();
 
+  const redirectTarget = (() => {
+    const redirect = searchParams.get('redirect');
+    if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+      return redirect;
+    }
+    return '/dashboard';
+  })();
+
   // Get mode from URL params (login or register)
   const initialMode = searchParams.get('mode') === 'register' ? 'register' : 'login';
   const [mode, setMode] = useState(initialMode);
@@ -26,18 +34,23 @@ function AuthPageContent() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      router.push('/dashboard');
+      router.push(redirectTarget);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, redirectTarget]);
 
   // Update URL when mode changes
   useEffect(() => {
-    const newUrl = mode === 'register' ? '/auth?mode=register' : '/auth';
+    const redirectQuery = redirectTarget !== '/dashboard'
+      ? `&redirect=${encodeURIComponent(redirectTarget)}`
+      : '';
+    const newUrl = mode === 'register'
+      ? `/auth?mode=register${redirectQuery}`
+      : `/auth${redirectQuery ? `?${redirectQuery.slice(1)}` : ''}`;
     window.history.replaceState(null, '', newUrl);
-  }, [mode]);
+  }, [mode, redirectTarget]);
 
   const handleLoginSuccess = () => {
-    router.push('/dashboard');
+    router.push(redirectTarget);
   };
 
   const handleSwitchToRegister = () => {

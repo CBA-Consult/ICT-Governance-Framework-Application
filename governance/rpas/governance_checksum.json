@@ -1,22 +1,46 @@
-﻿{
-    "governanceId":  "RPAS-CM-CORE",
-    "baselineVersion":  "2.3.0",
-    "algorithm":  "SHA256",
-    "generatedOnUtc":  "2026-04-12T23:19:44.1753423Z",
-    "fileCount":  3,
-    "combinedHash":  "28b7c54b98d8a02237cf694cf22ffda59d43b5b61710a9b49c9fbe687484e39a",
-    "files":  [
-                  {
-                      "RelativePath":  "governance/rpas/manifest.json",
-                      "Hash":  "37151e4776873b9ba7293980e9d33929809d48afbf2357e59c2e07add929be41"
-                  },
-                  {
-                      "RelativePath":  "governance/rpas/project.binding.json",
-                      "Hash":  "d50b5dd22af3030bdb0f6bb4a095202b1cebd3aa011447c4ae092c7c0db38b36"
-                  },
-                  {
-                      "RelativePath":  "governance/rpas/scripts/RpasGovernance.psm1",
-                      "Hash":  "2b6a8ba3701e4e9e55b4e2d2d909eeb6b04940335991d948aa2d98a0e72f44dd"
-                  }
-              ]
+{
+  "governanceId": "RPAS-CM-CORE",
+  "baselineVersion": "2.3.0",
+  "algorithm": "SHA256",
+  "generatedOnUtc": "2026-06-18T14:16:36.3322296Z",
+  "fileCount": 9,
+  "combinedHash": "5860483d630ae643158339117ed88e07303930ffa1d9cb1fec4500da391f7e71",
+  "files": [
+    {
+      "RelativePath": "governance/rpas/manifest.json",
+      "Hash": "18c1e360349bcd33234342453a55b85d98c16d6e570154e26807a97863362f0a"
+    },
+    {
+      "RelativePath": "governance/rpas/project.binding.json",
+      "Hash": "a88d7e0bdc4d8d5acbdbe31ab319e1f00b67a1d95739cd270accb561db1893e7"
+    },
+    {
+      "RelativePath": "governance/rpas/scripts/RpasGovernance.psm1",
+      "Hash": "2b6a8ba3701e4e9e55b4e2d2d909eeb6b04940335991d948aa2d98a0e72f44dd"
+    },
+    {
+      "RelativePath": "adpa/project.manifest.json",
+      "Hash": "3625a1e0da703ba2f480df1c4ad3f583cc50e074b5174149f02ba186bc0faaee"
+    },
+    {
+      "RelativePath": "adpa/templates/manifest.json",
+      "Hash": "93de743d69a33c94e0fb3be434e0a8930f587a936a5a867b89f318016fee701b"
+    },
+    {
+      "RelativePath": "governance/rpas/artifacts/ADPA.control.json",
+      "Hash": "c29fc726812fff8202e98d33c75c76f288eb8f0988877d2c6f29db684607fc3c"
+    },
+    {
+      "RelativePath": "governance/rpas/artifacts/ARM.control.json",
+      "Hash": "37412674efad7bde82216d20ecf4065bcf74d751556cff4d80b9b38a6316bdc6"
+    },
+    {
+      "RelativePath": "governance/rpas/artifacts/AEV.control.json",
+      "Hash": "130435fd835e841c1458c12ef53cb062ec98e08fc7429484ca5f678b4f6cadb0"
+    },
+    {
+      "RelativePath": "governance/rpas/schemas/rpas-tar-col.schema.json",
+      "Hash": "e18a6feb82f8f4d785eeb20681abcd6e75d4f19af26104125b6b2646251f2d31"
+    }
+  ]
 }

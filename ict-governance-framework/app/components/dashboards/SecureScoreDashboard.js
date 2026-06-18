@@ -10,7 +10,7 @@ import {
   XCircleIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
-import { TrendingUpIcon, TrendingDownIcon } from '@heroicons/react/24/solid';
+import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/solid';
 import { 
   LineChart, 
   Line, 
@@ -65,9 +65,9 @@ const MetricCard = ({ title, value, icon: Icon, unit = '', trend, color = 'blue'
           {trend && (
             <div className="flex items-center justify-end mt-2">
               {trend.direction === 'improving' ? (
-                <TrendingUpIcon className="h-4 w-4 text-green-500 mr-1" />
+                <ArrowTrendingUpIcon className="h-4 w-4 text-green-500 mr-1" />
               ) : trend.direction === 'declining' ? (
-                <TrendingDownIcon className="h-4 w-4 text-red-500 mr-1" />
+                <ArrowTrendingDownIcon className="h-4 w-4 text-red-500 mr-1" />
               ) : null}
               <span className={`text-sm ${
                 trend.direction === 'improving' ? 'text-green-600' : 
@@ -238,7 +238,8 @@ export default function SecureScoreDashboard({ timeRange = 30 }) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch secure score dashboard data');
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.message || body.error || 'Failed to fetch secure score dashboard data');
       }
 
       const result = await response.json();
@@ -270,8 +271,10 @@ export default function SecureScoreDashboard({ timeRange = 30 }) {
       });
 
       if (response.ok) {
-        // Refresh dashboard data after sync
         await fetchSecureScoreDashboard();
+      } else {
+        const body = await response.json().catch(() => ({}));
+        setError(body.message || body.error || 'Secure score sync failed');
       }
     } catch (err) {
       console.error('Error syncing secure scores:', err);

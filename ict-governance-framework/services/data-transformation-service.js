@@ -23,6 +23,10 @@ class DataTransformationService {
       await this.loadTransformationRules();
       console.log('Data Transformation Service initialized successfully');
     } catch (error) {
+      if (error.code === '42P01') {
+        console.warn('Data Transformation: tables missing — run npm run setup:enterprise');
+        return;
+      }
       console.error('Failed to initialize Data Transformation Service:', error);
       throw error;
     }

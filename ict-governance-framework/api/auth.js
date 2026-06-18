@@ -21,16 +21,37 @@ const {
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+function isLocalDevRequest(req) {
+  const ip = req.ip || req.socket?.remoteAddress || '';
+  return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+}
+
+function resolveAuthRateLimitMax() {
+  if (isProduction) {
+    return Number(process.env.AUTH_RATE_LIMIT_MAX) || 5;
+  }
+  const devMax = Number(process.env.AUTH_RATE_LIMIT_MAX_DEV);
+  if (devMax > 0) return devMax;
+  const configured = Number(process.env.AUTH_RATE_LIMIT_MAX);
+  // Ignore production-style low caps in development unless explicitly strict
+  if (process.env.AUTH_RATE_LIMIT_STRICT === 'true' && configured > 0) return configured;
+  if (configured >= 50) return configured;
+  return 500;
+}
+
 // Rate limiting for authentication endpoints
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: resolveAuthRateLimitMax(),
   message: {
     error: 'Too many authentication attempts, please try again later',
     code: 'RATE_LIMIT_EXCEEDED'
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => !isProduction && isLocalDevRequest(req),
 });
 
 const registerLimiter = rateLimit({

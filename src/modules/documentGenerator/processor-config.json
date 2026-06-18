@@ -23,6 +23,8 @@
     }
   },
   "activeProcessor": "default",
+  "ictGovernanceTemplates": "adpa/templates/manifest.json",
+  "canonicalPath": "adpa/config/processor-config.json",
   "templates": {
     "project-summary": { "processor": "default" },
     "user-stories": { "processor": "default" },
@@ -40,6 +42,9 @@
     "control-scope": { "processor": "default" },
     "scope-statement": { "processor": "default" },
     "risk-register": { "processor": "default" },
-    "project-charter": { "processor": "default" }
+    "project-charter": { "processor": "default" },
+    "policy-alignment": { "processor": "default", "ictTemplate": "policy-alignment" },
+    "compliance-as-code-map": { "processor": "default", "ictTemplate": "compliance-as-code-map" },
+    "zero-trust-assessment": { "processor": "default", "ictTemplate": "zero-trust-assessment" }
   }
 }

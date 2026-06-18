@@ -1,6 +1,8 @@
 # ✅ **RPAS‑CM‑ENV‑001 v2.3.0 (CSR‑42)**
 ## **ADPA Framework Agent Envelope**
 
+> **In-repo integration:** ADPA systematics live under [`adpa/`](adpa/README.md) in the ICT Governance Framework product repository. Use `npm run adpa:validate` and [ADPA Integration Guide](docs/implementation/guides/ADPA-ICT-Governance-Integration-Guide.md).
+
 ***
 
 ## ✅ **RPAS‑CM Naming Convention & Versioning System**

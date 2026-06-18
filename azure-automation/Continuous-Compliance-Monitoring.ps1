@@ -596,28 +596,178 @@ function Send-ViolationToLogAnalytics {
     }
 }
 
-function Create-IncidentTicket {
-    param($Violations)
+function Send-ViolationToLogAnalytics {
+    param($ViolationRecord, $Workspace)
     
     try {
-        Write-Log "Creating incident ticket for violations"
+        # Convert violation record to JSON for Log Analytics
+        $jsonData = $ViolationRecord | ConvertTo-Json -Compress
         
-        # Create incident in ticketing system (ServiceNow, Azure DevOps, etc.)
-        $incidentData = @{
-            "Title" = "Compliance Violation: $($Violations[0].RuleName)"
-            "Description" = "Multiple compliance violations detected requiring immediate attention"
-            "Severity" = $Violations[0].Severity
-            "Category" = "Compliance"
-            "AssignedTo" = Get-AssignedResponder -Severity $Violations[0].Severity
-            "CreatedDate" = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-            "ViolationCount" = $Violations.Count
-        }
+        # Send to custom log table
+        $logType = "ComplianceViolations"
         
-        Write-Log "Incident ticket created: $($incidentData.Title)" "DEBUG"
-        # Add incident creation logic here
+        # Use Log Analytics Data Collector API
+        Write-Log "Sending violation record to Log Analytics table: $logType" "DEBUG"
+        # Add Log Analytics ingestion logic here
         
     } catch {
-        Write-Log "Error creating incident ticket: $($_.Exception.Message)" "ERROR"
+        Write-Log "Error sending violation to Log Analytics: $($_.Exception.Message)" "ERROR"
+    }
+}
+
+function Map-ComplianceSeverityToGovernance {
+    param([string]$Severity)
+
+    switch ($Severity.ToLower()) {
+        'critical' { return 'CRITICAL' }
+        'high'     { return 'HIGH' }
+        'medium'   { return 'MEDIUM' }
+        'low'      { return 'LOW' }
+        default    { return 'HIGH' }
+    }
+}
+
+function Invoke-GovernanceIncidentApi {
+    param(
+        [string]$ApiUrl = $(if ($env:GOVERNANCE_API_URL) { $env:GOVERNANCE_API_URL } else { 'http://localhost:4000' }),
+        [string]$WebhookSecret = $env:GOVERNANCE_WEBHOOK_SECRET,
+        [hashtable]$Payload
+    )
+
+    if (-not $WebhookSecret) {
+        throw 'GOVERNANCE_WEBHOOK_SECRET environment variable is required for governance incident ingest.'
+    }
+
+    $headers = @{
+        'x-governance-webhook-secret' = $WebhookSecret
+        'Content-Type'                = 'application/json'
+    }
+
+    $uri = "$($ApiUrl.TrimEnd('/'))/api/governance/incidents"
+    $body = $Payload | ConvertTo-Json -Depth 10 -Compress
+
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
+    $stopwatch.Stop()
+
+    return @{
+        Response  = $response
+        LatencyMs = $stopwatch.ElapsedMilliseconds
+    }
+}
+
+function New-GovernanceIncidentPayload {
+    param(
+        $ViolationRecord,
+        $Violations
+    )
+
+    if ($ViolationRecord) {
+        $primary = $ViolationRecord
+        $count = 1
+    }
+    else {
+        $primary = $Violations[0]
+        $count = @($Violations).Count
+    }
+
+    $ruleName = if ($primary.RuleName) { $primary.RuleName } else { 'Compliance Violation' }
+    $severity = if ($primary.Severity) { $primary.Severity } else { 'High' }
+
+    if ($primary.Description) {
+        $description = $primary.Description
+    }
+    elseif ($count -gt 1) {
+        $description = "Multiple compliance violations detected for rule '$ruleName' ($count occurrences)."
+    }
+    else {
+        $description = "Compliance violation detected: $ruleName"
+    }
+
+    $assetId = $null
+    $rawData = $null
+    if ($primary.ViolationData) {
+        $rawData = $primary.ViolationData
+    }
+    elseif ($primary.Data) {
+        $rawData = $primary.Data
+    }
+
+    if ($rawData) {
+        try {
+            if ($rawData -is [string]) {
+                $parsed = $rawData | ConvertFrom-Json -ErrorAction Stop
+            }
+            else {
+                $parsed = $rawData
+            }
+            if ($parsed.resourceId) { $assetId = $parsed.resourceId }
+            elseif ($parsed.ResourceId) { $assetId = $parsed.ResourceId }
+            elseif ($parsed.assetId) { $assetId = $parsed.assetId }
+        }
+        catch {
+            Write-Log "Could not parse violation data for asset correlation: $($_.Exception.Message)" 'DEBUG'
+        }
+    }
+
+    $correlationId = [guid]::NewGuid().ToString()
+    $ticketId = "CCM-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+
+    $payload = @{
+        tenantId         = if ($env:DEFAULT_TENANT_ID) { $env:DEFAULT_TENANT_ID } else { 'tenant-01' }
+        driftType        = 'security'
+        severity         = Map-ComplianceSeverityToGovernance -Severity $severity
+        description      = $description
+        externalTicketId = $ticketId
+        correlationId    = $correlationId
+    }
+
+    if ($assetId) {
+        $payload.assetId = $assetId
+    }
+
+    return $payload
+}
+
+function Create-IncidentTicket {
+    param(
+        $Violation,
+        $Violations
+    )
+
+    try {
+        if (-not $Violation -and (-not $Violations -or @($Violations).Count -eq 0)) {
+            Write-Log 'Create-IncidentTicket called without violation data' 'WARNING'
+            return $null
+        }
+
+        $payload = New-GovernanceIncidentPayload -ViolationRecord $Violation -Violations $Violations
+
+        Write-Log "Posting governance incident to API (rule=$($payload.externalTicketId), correlation_id=$($payload.correlationId))"
+
+        $result = Invoke-GovernanceIncidentApi -Payload $payload
+        $response = $result.Response
+
+        $incidentId = $response.incident.incident_id
+        Write-Log "Governance incident created: incident_id=$incidentId correlation_id=$($response.correlation_id) round_trip_ms=$($result.LatencyMs)"
+
+        if ($response.fair_recalculation) {
+            $delta = $response.fair_recalculation.risk_delta_usd
+            Write-Log "FAIR risk delta USD: $delta (ale_before=$($response.fair_recalculation.ale_before_usd) ale_after=$($response.fair_recalculation.ale_after_usd))"
+        }
+
+        if ($response.correlated) {
+            Write-Log "Incident correlated to asset: $($response.incident.asset_id)" 'INFO'
+        }
+
+        return $response
+
+    } catch {
+        Write-Log "Error creating governance incident via API: $($_.Exception.Message)" 'ERROR'
+        if ($_.ErrorDetails -and $_.ErrorDetails.Message) {
+            Write-Log "API error detail: $($_.ErrorDetails.Message)" 'ERROR'
+        }
+        throw
     }
 }
 
