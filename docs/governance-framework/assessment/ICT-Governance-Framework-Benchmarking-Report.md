@@ -18,6 +18,8 @@ This benchmarking assessment uses a comprehensive methodology:
 
 ## Alignment by Industry Standard
 
+> **NIST CSF note (June 2026):** Alignment scores for **NIST CSF** in this report refer to **CSF 1.x** benchmarking only. **NIST CSF 2.0 is NOT CERTIFIED** — formal review is pending. See [NIST CSF 2.0 Compliance Review](../../compliance/NIST-CSF-2.0-Compliance-Review.md). Do not cite this report as CSF 2.0 compliance evidence.
+
 ### Overall Alignment Matrix
 
 | Industry Standard | Previous Alignment | Enhanced Alignment | Industry Average | Leading Practice |

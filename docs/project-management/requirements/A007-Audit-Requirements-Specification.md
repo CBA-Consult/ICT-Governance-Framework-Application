@@ -182,6 +182,11 @@ This Comprehensive Audit Requirements Specification provides a detailed identifi
 
 #### 2.3.2 NIST Cybersecurity Framework Assessment
 
+> ### ⚠️ NOT CERTIFIED — CSF 2.0 REVIEW PENDING
+>
+> Assessment below reflects **NIST CSF 1.1** (five functions) only. **Not certified against NIST CSF 2.0.**
+> See [NIST CSF 2.0 Compliance Review](../../compliance/NIST-CSF-2.0-Compliance-Review.md).
+
 **Audit Type:** INTERNAL  
 **Frequency:** Continuous  
 **Impact Level:** HIGH  

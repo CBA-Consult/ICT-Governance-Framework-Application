@@ -447,7 +447,7 @@ The regulatory frameworks have been classified using a multi-dimensional assessm
 | **CCPA/CPRA Compliance** | 9.2 | HIGH | 100 hours | March 2025 |
 | **SOX Controls Enhancement** | 8.8 | HIGH | 80 hours | February 2025 |
 | **ISO 27001 Gap Closure** | 8.5 | HIGH | 160 hours | March 2025 |
-| **NIST CSF 2.0 Implementation** | 8.2 | HIGH | 140 hours | March 2025 |
+| **NIST CSF 2.0 Implementation** | 8.2 | HIGH | 140 hours | March 2025 — **review pending, NOT CERTIFIED** ([status](../../compliance/NIST-CSF-2.0-Compliance-Review.md)) |
 | **ISO/IEC 38500 Enhancement** | 8.0 | HIGH | 100 hours | March 2025 |
 
 ### 5.2 Short-Term Implementation (Q2-Q3 2025)

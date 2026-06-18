@@ -113,7 +113,15 @@ This document provides a comprehensive mapping of compliance requirements to spe
 
 ### 2.3 NIST Cybersecurity Framework Mapping
 
-#### 2.3.1 Framework Core Functions
+> ### ⚠️ NOT CERTIFIED — CSF 2.0 REVIEW PENDING
+>
+> This section maps **NIST CSF 1.1** (five functions) only. It is **not** a NIST CSF 2.0 certification.
+>
+> - **NIST CSF 2.0 certification:** NOT CERTIFIED  
+> - **Full CSF 2.0 assessment:** BLOCKED — [Gate A remediation](NIST-CSF-2.0-Compliance-Review.md#phase-25--remediation-gate-required) must complete first  
+> - **Do not cite A034 as CSF 2.0 compliance evidence**
+
+#### 2.3.1 Framework Core Functions (CSF 1.1 — not CSF 2.0 certified)
 
 | NIST CSF Function | Requirement | System Feature | Implementation Type | Capability Description |
 |-------------------|-------------|----------------|-------------------|----------------------|
@@ -259,7 +267,7 @@ This document provides a comprehensive mapping of compliance requirements to spe
 |---------------------|-------------------|-------------------|-------------------|---------------------|
 | **GDPR** | 23 | 23 | 100% | COMPLETE |
 | **ISO 27001** | 35 | 35 | 100% | COMPLETE |
-| **NIST CSF** | 18 | 18 | 100% | COMPLETE |
+| **NIST CSF** | 18 | 18 | 100% | CSF 1.1 mapped only — **CSF 2.0 NOT CERTIFIED** ([review pending](NIST-CSF-2.0-Compliance-Review.md)) |
 | **Dutch BIO** | 28 | 28 | 100% | COMPLETE |
 | **CSA CCM** | 32 | 32 | 100% | COMPLETE |
 | **SOX** | 12 | 12 | 100% | COMPLETE |
