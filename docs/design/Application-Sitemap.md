@@ -12,7 +12,8 @@
 
 | Path | Page | Notes |
 |------|------|--------|
-| `/` | Home | Framework overview; redirects unauthenticated users to `/auth` |
+| `/` | Home | Public Aegis Control landing — hero, control loop, onboarding journey, system design |
+| `/onboarding/wizard` | Guided first experience | Contoso MFA demo: upload → extract → insight → escalation → remediation → verified |
 | `/auth` | Login | `?redirect=/path` supported |
 | `/auth?mode=register` | Register | Same route, register mode |
 
@@ -40,6 +41,15 @@
 | `/break-glass` | Break Glass console | Security | Emergency access + reconciliation |
 | `/policies` | Policies | Governance | `governance.read` |
 | `/blueprints` | Blueprints | Governance | `governance.read` |
+| `/coe` | Redirect → `/coe/overview` | Governance | CoE entry |
+| `/coe/overview` | Overview & Download | Governance | Goals, get started |
+| `/coe/admin` | Admin CoE | Governance | Set up · Use · Deep dive |
+| `/coe/govern` | Govern CoE | Governance | Audit, compliance, rollback |
+| `/coe/nurture` | Nurture CoE | Governance | Training, community |
+| `/coe/templates` | Template CoE | Governance | Onboarding, owners, audit, rollback |
+| `/coe/ai-providers` | AI Provider CoE | Governance | Provider lifecycle |
+| `/coe/artifacts` | Stored Artifacts CoE | Governance | Tenant JSON artifacts |
+| `/coe/documents` | Document Lifecycle CoE | Governance | Versioned governance DOCX |
 
 ---
 

@@ -6,6 +6,16 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  /* Aegis Control — governance state tokens */
+  --state-verified: #22C55E;
+  --state-consistent: #22C55E;
+  --state-divergent: #EF4444;
+  --state-failed: #DC2626;
+  --state-remediating: #3B82F6;
+  --state-partial: #F59E0B;
+  --state-pending: #6B7280;
+  --state-authority: #4338CA;
 }
 
 @media (prefers-color-scheme: dark) {

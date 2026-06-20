@@ -12,6 +12,7 @@ import {
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import NotificationCenter from './NotificationCenter';
+import AegisLogoPrimary from './governance/AegisLogoPrimary';
 
 export default function Header() {
   const { isAuthenticated, user, logout, hasPermission, hasRole } = useAuth();
@@ -32,13 +33,21 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                CBA Consult IT Management Framework
-              </h1>
-              <span className="ml-3 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                v3.2.0
-              </span>
+            <Link href="/" className="flex items-center gap-3">
+              <AegisLogoPrimary size={40} />
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Aegis Control
+                  </h1>
+                  <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 rounded-full">
+                    v3.2.0
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  ICT Governance Framework · ADPA Engine Powered
+                </p>
+              </div>
             </Link>
           </div>
 
@@ -60,6 +69,7 @@ export default function Header() {
                       <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</Link>
                       {hasPermission('governance.read') && <Link href="/policies" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Policies</Link>}
                       {hasPermission('governance.read') && <Link href="/blueprints" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Blueprints</Link>}
+                      {hasPermission('governance.read') && <Link href="/coe/overview" className="block px-4 py-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold">Centers of Excellence</Link>}
                     </div>
                   )}
                 </div>
@@ -76,6 +86,7 @@ export default function Header() {
                       <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
                         <Link href="/compliance" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Compliance</Link>
                         <Link href="/compliance-dashboard" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Compliance Dashboard</Link>
+                        <Link href="/compliance-escalations" className="block px-4 py-2 text-sm text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 font-semibold">Compliance Escalations</Link>
                         <Link href="/secops-console" className="block px-4 py-2 text-sm text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 font-semibold">SecOps Console</Link>
                         <Link href="/asset-register" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Asset Register</Link>
                       </div>
@@ -115,6 +126,8 @@ export default function Header() {
                     <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
                       {hasPermission('app.procurement') && <Link href="/employee-app-store" className="block px-4 py-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">App Store</Link>}
                       {hasPermission('app.procurement') && <Link href="/application-procurement" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Procurement</Link>}
+                      {hasPermission('app.procurement') && <Link href="/vendors" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Vendors</Link>}
+                      {hasPermission('app.procurement') && <Link href="/marketplace" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Marketplace</Link>}
                       {hasPermission('document.read') && <Link href="/documents" className="block px-4 py-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">Document Management System</Link>}
                       {hasPermission('workflow.approve') && <Link href="/workflows" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Workflows</Link>}
                       {hasPermission('system.audit') && <Link href="/defender-activities" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Defender Activities</Link>}
@@ -291,6 +304,9 @@ export default function Header() {
                   <Link href="/blueprints" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                     Blueprints
                   </Link>
+                  <Link href="/coe/overview" className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 font-semibold">
+                    Centers of Excellence
+                  </Link>
                 </>
               )}
 
@@ -313,6 +329,9 @@ export default function Header() {
                   </Link>
                   <Link href="/compliance-dashboard" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                     Compliance Dashboard
+                  </Link>
+                  <Link href="/compliance-escalations" className="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-semibold">
+                    Compliance Escalations
                   </Link>
                   <Link href="/secops-console" className="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-semibold">
                     SecOps Console

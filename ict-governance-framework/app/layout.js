@@ -6,8 +6,8 @@ import Header from './components/Header';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "ICT Governance Framework",
-  description: "Comprehensive ICT Governance and IT Management Framework",
+  title: "Aegis Control | ICT Governance Framework",
+  description: "Digital Governance Control System — verify, enforce, and restore governed state with independent evidence and controlled remediation.",
 };
 
 export default function RootLayout({ children }) {
