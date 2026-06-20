@@ -1,0 +1,121 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-06-20T00:00:00.000Z",
+  "vendors": [
+    {
+      "vendorId": "vendor-microsoft",
+      "displayName": "Microsoft Corporation",
+      "legalName": "Microsoft Corporation",
+      "website": "https://www.microsoft.com",
+      "contact": {
+        "email": "vendor-security@microsoft.com"
+      },
+      "status": "active",
+      "onboarding": {
+        "checklist": [
+          { "stepId": "company-profile", "label": "Company profile verified", "required": true },
+          { "stepId": "security-attestation", "label": "Security & compliance attestation received", "required": true },
+          { "stepId": "data-processing", "label": "DPA / data processing terms reviewed", "required": true },
+          { "stepId": "support-sla", "label": "Support & SLA terms agreed", "required": true },
+          { "stepId": "catalog-approved", "label": "Marketplace catalog approved", "required": true }
+        ],
+        "completedStepIds": ["company-profile", "security-attestation", "data-processing", "support-sla", "catalog-approved"],
+        "completedAt": "2026-06-20T00:00:00.000Z",
+        "completedBy": "system"
+      },
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "createdBy": "system"
+    },
+    {
+      "vendorId": "vendor-slack",
+      "displayName": "Slack Technologies",
+      "legalName": "Slack Technologies, LLC",
+      "website": "https://slack.com",
+      "contact": {
+        "email": "security@slack.com"
+      },
+      "status": "onboarding",
+      "onboarding": {
+        "checklist": [
+          { "stepId": "company-profile", "label": "Company profile verified", "required": true },
+          { "stepId": "security-attestation", "label": "Security & compliance attestation received", "required": true },
+          { "stepId": "data-processing", "label": "DPA / data processing terms reviewed", "required": true },
+          { "stepId": "support-sla", "label": "Support & SLA terms agreed", "required": true },
+          { "stepId": "catalog-approved", "label": "Marketplace catalog approved", "required": true }
+        ],
+        "completedStepIds": ["company-profile"],
+        "completedAt": null,
+        "completedBy": null
+      },
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "createdBy": "system"
+    },
+    {
+      "vendorId": "vendor-adobe",
+      "displayName": "Adobe Inc.",
+      "legalName": "Adobe Inc.",
+      "website": "https://www.adobe.com",
+      "contact": { "email": "security@adobe.com" },
+      "status": "onboarding",
+      "onboarding": {
+        "checklist": [
+          { "stepId": "company-profile", "label": "Company profile verified", "required": true },
+          { "stepId": "security-attestation", "label": "Security & compliance attestation received", "required": true },
+          { "stepId": "data-processing", "label": "DPA / data processing terms reviewed", "required": true },
+          { "stepId": "support-sla", "label": "Support & SLA terms agreed", "required": true },
+          { "stepId": "catalog-approved", "label": "Marketplace catalog approved", "required": true }
+        ],
+        "completedStepIds": [],
+        "completedAt": null,
+        "completedBy": null
+      },
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "createdBy": "system"
+    },
+    {
+      "vendorId": "vendor-salesforce",
+      "displayName": "Salesforce.com",
+      "legalName": "Salesforce, Inc.",
+      "website": "https://www.salesforce.com",
+      "contact": { "email": "security@salesforce.com" },
+      "status": "onboarding",
+      "onboarding": {
+        "checklist": [
+          { "stepId": "company-profile", "label": "Company profile verified", "required": true },
+          { "stepId": "security-attestation", "label": "Security & compliance attestation received", "required": true },
+          { "stepId": "data-processing", "label": "DPA / data processing terms reviewed", "required": true },
+          { "stepId": "support-sla", "label": "Support & SLA terms agreed", "required": true },
+          { "stepId": "catalog-approved", "label": "Marketplace catalog approved", "required": true }
+        ],
+        "completedStepIds": [],
+        "completedAt": null,
+        "completedBy": null
+      },
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "createdBy": "system"
+    },
+    {
+      "vendorId": "vendor-zoom",
+      "displayName": "Zoom Video Communications",
+      "legalName": "Zoom Video Communications, Inc.",
+      "website": "https://zoom.us",
+      "contact": { "email": "security@zoom.us" },
+      "status": "onboarding",
+      "onboarding": {
+        "checklist": [
+          { "stepId": "company-profile", "label": "Company profile verified", "required": true },
+          { "stepId": "security-attestation", "label": "Security & compliance attestation received", "required": true },
+          { "stepId": "data-processing", "label": "DPA / data processing terms reviewed", "required": true },
+          { "stepId": "support-sla", "label": "Support & SLA terms agreed", "required": true },
+          { "stepId": "catalog-approved", "label": "Marketplace catalog approved", "required": true }
+        ],
+        "completedStepIds": [],
+        "completedAt": null,
+        "completedBy": null
+      },
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "createdBy": "system"
+    }
+  ]
+}
+

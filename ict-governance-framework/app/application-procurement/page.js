@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ProcurementWizard from '@/app/components/procurement/ProcurementWizard'; // Using the new wizard
+import ComplianceProcurementSlaPanel from '@/app/components/procurement/ComplianceProcurementSlaPanel';
 
 // NOTE: Using a simplified mock data structure for the table display
 const mockRequests = [
@@ -124,6 +125,8 @@ export default function ApplicationProcurementPage() {
             </table>
           </div>
         </div>
+
+        <ComplianceProcurementSlaPanel />
       </main>
     </div>
   );

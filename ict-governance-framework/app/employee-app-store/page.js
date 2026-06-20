@@ -1,13 +1,18 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import GovernanceStateBadge from '../components/governance/GovernanceStateBadge';
 
 const EmployeeAppStore = () => {
+  const { isAuthenticated, isLoading: authLoading, hasPermission, apiClient } = useAuth();
   const [applications, setApplications] = useState([]);
   const [filteredApps, setFilteredApps] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
   const [userApps, setUserApps] = useState([]);
+  const [vendors, setVendors] = useState([]);
+  const [vendorError, setVendorError] = useState(null);
 
   // Mock data for predefined procured applications with compliance scores
   const mockApplications = [
@@ -16,7 +21,7 @@ const EmployeeAppStore = () => {
       name: 'Microsoft Office 365',
       description: 'Complete productivity suite with Word, Excel, PowerPoint, and Teams',
       category: 'Productivity',
-      publisher: 'Microsoft Corporation',
+      vendorId: 'vendor-microsoft',
       version: '2024.1',
       iconUrl: '/icons/office365.png',
       complianceScore: 95,
@@ -53,7 +58,7 @@ const EmployeeAppStore = () => {
       name: 'Slack',
       description: 'Team collaboration and communication platform',
       category: 'Communication',
-      publisher: 'Slack Technologies',
+      vendorId: 'vendor-slack',
       version: '4.35.0',
       iconUrl: '/icons/slack.png',
       complianceScore: 88,
@@ -90,7 +95,7 @@ const EmployeeAppStore = () => {
       name: 'Adobe Creative Cloud',
       description: 'Professional creative software suite including Photoshop, Illustrator, and InDesign',
       category: 'Design',
-      publisher: 'Adobe Inc.',
+      vendorId: 'vendor-adobe',
       version: '2024.0',
       iconUrl: '/icons/adobe-cc.png',
       complianceScore: 90,
@@ -127,7 +132,7 @@ const EmployeeAppStore = () => {
       name: 'Salesforce',
       description: 'Customer relationship management platform',
       category: 'CRM',
-      publisher: 'Salesforce.com',
+      vendorId: 'vendor-salesforce',
       version: 'Lightning',
       iconUrl: '/icons/salesforce.png',
       complianceScore: 93,
@@ -164,7 +169,7 @@ const EmployeeAppStore = () => {
       name: 'Zoom',
       description: 'Video conferencing and online meeting platform',
       category: 'Communication',
-      publisher: 'Zoom Video Communications',
+      vendorId: 'vendor-zoom',
       version: '5.16.0',
       iconUrl: '/icons/zoom.png',
       complianceScore: 82,
@@ -201,6 +206,16 @@ const EmployeeAppStore = () => {
   const categories = ['All', 'Productivity', 'Communication', 'Design', 'CRM', 'Development', 'Security'];
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      window.location.href = '/auth?redirect=/employee-app-store';
+      return;
+    }
+    if (!hasPermission('app.procurement')) {
+      window.location.href = '/auth?redirect=/employee-app-store';
+      return;
+    }
+
     // Simulate API call to load applications
     setTimeout(() => {
       setApplications(mockApplications);
@@ -210,7 +225,37 @@ const EmployeeAppStore = () => {
 
     // Load user's current applications
     setUserApps(['app-001']); // Mock user already has Office 365
-  }, []);
+  }, [authLoading, isAuthenticated]);
+
+  useEffect(() => {
+    if (authLoading || !isAuthenticated) return;
+    (async () => {
+      try {
+        setVendorError(null);
+        const res = await apiClient.get('/vendors');
+        setVendors(res.data?.data?.vendors || []);
+      } catch (err) {
+        const message = err.response?.data?.error || err.message || 'Failed to load vendor registry';
+        if (!err.response) {
+          setVendorError('API server unavailable — run npm run dev (starts API + Next) or npm run server in a separate terminal.');
+        } else if (err.response?.status === 404 || /Cannot GET \/api\//i.test(String(err.response?.data || ''))) {
+          setVendorError('API route not found — restart the Express API (npm run dev or npm run server).');
+        } else {
+          setVendorError(message);
+        }
+      }
+    })();
+  }, [authLoading, isAuthenticated, apiClient]);
+
+  const vendorById = useMemo(() => {
+    const map = new Map();
+    for (const v of vendors) map.set(v.vendorId, v);
+    return map;
+  }, [vendors]);
+
+  const vendorStatus = (app) => vendorById.get(app.vendorId)?.status || 'pending';
+  const vendorName = (app) => vendorById.get(app.vendorId)?.displayName || app.vendorId;
+  const isVendorApproved = (app) => vendorStatus(app) === 'active';
 
   useEffect(() => {
     let filtered = applications;
@@ -219,7 +264,7 @@ const EmployeeAppStore = () => {
       filtered = filtered.filter(app =>
         app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         app.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.publisher.toLowerCase().includes(searchTerm.toLowerCase())
+        vendorName(app).toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -227,7 +272,8 @@ const EmployeeAppStore = () => {
       filtered = filtered.filter(app => app.category === selectedCategory);
     }
 
-    setFilteredApps(filtered);
+    // Procurement enforcement: only show offerings from active vendors
+    setFilteredApps(filtered.filter((app) => isVendorApproved(app)));
   }, [searchTerm, selectedCategory, applications]);
 
   const handleRequestAccess = async (appId) => {
@@ -284,6 +330,11 @@ const EmployeeAppStore = () => {
       {/* Search and Filter Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          {vendorError && (
+            <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+              Vendor registry unavailable: {vendorError}
+            </div>
+          )}
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
@@ -334,7 +385,10 @@ const EmployeeAppStore = () => {
                     </div>
                     <div className="ml-3">
                       <h3 className="text-lg font-semibold text-gray-900">{app.name}</h3>
-                      <p className="text-sm text-gray-500">{app.publisher}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm text-gray-500">{vendorName(app)}</p>
+                        <GovernanceStateBadge state={vendorStatus(app)} />
+                      </div>
                     </div>
                   </div>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(app.riskLevel)}`}>
@@ -397,6 +451,13 @@ const EmployeeAppStore = () => {
                       className="w-full bg-gray-100 text-gray-500 py-2 px-4 rounded-md text-sm font-medium cursor-not-allowed"
                     >
                       Already Installed
+                    </button>
+                  ) : !isVendorApproved(app) ? (
+                    <button
+                      onClick={() => window.location.href = '/vendors'}
+                      className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-md text-sm font-medium transition-colors"
+                    >
+                      Vendor not approved — request onboarding
                     </button>
                   ) : app.requiresApproval ? (
                     <button

@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XMarkIcon } from '@heroicons/react/24/solid';
+import { useAuth } from '../../contexts/AuthContext';
+import GovernanceStateBadge from '../governance/GovernanceStateBadge';
 
 const steps = [
   { id: 'Step 1', name: 'Application Details' },
@@ -12,10 +14,13 @@ const steps = [
 ];
 
 export default function ProcurementWizard({ onClose }) {
+  const { apiClient } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
+  const [vendors, setVendors] = useState([]);
+  const [vendorLoadError, setVendorLoadError] = useState(null);
   const [formData, setFormData] = useState({
     applicationName: '',
-    vendor: '',
+    vendorId: '',
     department: '',
     businessJustification: '',
     estimatedUsers: '',
@@ -27,6 +32,43 @@ export default function ProcurementWizard({ onClose }) {
 
   const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
   const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
+
+  const selectedVendor = useMemo(
+    () => vendors.find((v) => v.vendorId === formData.vendorId) || null,
+    [vendors, formData.vendorId]
+  );
+
+  const canSubmit = useMemo(() => {
+    if (!selectedVendor) return false;
+    return selectedVendor.status === 'active';
+  }, [selectedVendor]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setVendorLoadError(null);
+        const res = await apiClient.get('/vendors');
+        setVendors(res.data?.data?.vendors || []);
+      } catch (err) {
+        const message = err.response?.data?.error || err.message || 'Failed to load vendor registry';
+        if (!err.response) {
+          setVendorLoadError('API server unavailable — run npm run dev or npm run server.');
+        } else {
+          setVendorLoadError(message);
+        }
+      }
+    })();
+  }, [apiClient]);
+
+  const handleSubmit = () => {
+    if (!canSubmit) {
+      window.location.href = '/vendors';
+      return;
+    }
+    // Minimal enforcement slice: keep the existing mock workflow behavior,
+    // but ensure all requests are vendor-governed before submission.
+    onClose?.();
+  };
 
   const variants = {
     initial: { x: 300, opacity: 0 },
@@ -72,10 +114,24 @@ export default function ProcurementWizard({ onClose }) {
               transition={{ type: 'tween', ease: 'easeInOut', duration: 0.5 }}
             >
               {/* Render current step component */}
-              {currentStep === 0 && <Step1 formData={formData} setFormData={setFormData} />}
+              {currentStep === 0 && (
+                <Step1
+                  formData={formData}
+                  setFormData={setFormData}
+                  vendors={vendors}
+                  vendorLoadError={vendorLoadError}
+                  selectedVendor={selectedVendor}
+                />
+              )}
               {currentStep === 1 && <Step2 formData={formData} setFormData={setFormData} />}
               {currentStep === 2 && <Step3 formData={formData} setFormData={setFormData} />}
-              {currentStep === 3 && <Step4 formData={formData} />}
+              {currentStep === 3 && (
+                <Step4
+                  formData={formData}
+                  selectedVendor={selectedVendor}
+                  canSubmit={canSubmit}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -88,7 +144,11 @@ export default function ProcurementWizard({ onClose }) {
             Next
           </button>
           {currentStep === steps.length - 1 && (
-            <button onClick={onClose} className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <button
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+            >
               Submit Request
             </button>
           )}
@@ -100,12 +160,48 @@ export default function ProcurementWizard({ onClose }) {
 
 // Step Components (defined in the same file for mockup simplicity)
 
-const Step1 = ({ formData, setFormData }) => (
+const Step1 = ({ formData, setFormData, vendors, vendorLoadError, selectedVendor }) => (
   <div>
     <h3 className="text-xl font-semibold mb-4">Application Details</h3>
     <div className="space-y-4">
       <input type="text" placeholder="Application Name" value={formData.applicationName} onChange={(e) => setFormData({ ...formData, applicationName: e.target.value })} className="w-full p-2 border rounded" />
-      <input type="text" placeholder="Vendor" value={formData.vendor} onChange={(e) => setFormData({ ...formData, vendor: e.target.value })} className="w-full p-2 border rounded" />
+      <div>
+        <label className="block text-sm font-medium mb-1">Select Vendor</label>
+        <select
+          className="w-full p-2 border rounded"
+          value={formData.vendorId || ''}
+          onChange={(e) => setFormData({ ...formData, vendorId: e.target.value })}
+        >
+          <option value="">-- Select vendor --</option>
+          {vendors.map((v) => (
+            <option key={v.vendorId} value={v.vendorId}>
+              {v.displayName} ({v.status})
+            </option>
+          ))}
+        </select>
+        {vendorLoadError && (
+          <p className="mt-2 text-sm text-amber-600">
+            Vendor registry unavailable: {vendorLoadError}
+          </p>
+        )}
+        {selectedVendor && (
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <GovernanceStateBadge state={selectedVendor.status} />
+            {selectedVendor.status !== 'active' && (
+              <p className="text-sm text-amber-600">
+                Vendor is not approved yet. Complete onboarding before procurement.
+                <button
+                  type="button"
+                  className="ml-2 text-blue-600 underline"
+                  onClick={() => { window.location.href = '/vendors'; }}
+                >
+                  Complete vendor onboarding
+                </button>
+              </p>
+            )}
+          </div>
+        )}
+      </div>
       <input type="text" placeholder="Department" value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="w-full p-2 border rounded" />
     </div>
   </div>
@@ -155,7 +251,7 @@ const Step3 = ({ formData, setFormData }) => (
   </div>
 );
 
-const Step4 = ({ formData }) => (
+const Step4 = ({ formData, selectedVendor, canSubmit }) => (
   <div>
     <h3 className="text-xl font-semibold mb-4">Review & Submit</h3>
     <div className="space-y-2 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
@@ -165,6 +261,22 @@ const Step4 = ({ formData }) => (
           <span>{Array.isArray(value) ? value.join(', ') : value}</span>
         </div>
       ))}
+    </div>
+    <div className="mt-4">
+      <p className="text-sm font-medium">Vendor approval gate</p>
+      {selectedVendor ? (
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="text-sm">{selectedVendor.displayName}</span>
+          <GovernanceStateBadge state={selectedVendor.status} />
+        </div>
+      ) : (
+        <p className="text-sm text-amber-600 mt-2">Select a vendor to proceed.</p>
+      )}
+      {!canSubmit && (
+        <p className="text-sm text-amber-600 mt-2">
+          Submission is blocked until the vendor is active.
+        </p>
+      )}
     </div>
   </div>
 );

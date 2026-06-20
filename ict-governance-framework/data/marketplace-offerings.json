@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-06-20T00:00:00.000Z",
+  "offerings": [
+    {
+      "offeringId": "off-microsoft-office365",
+      "name": "Microsoft Office 365",
+      "vendorId": "vendor-microsoft",
+      "category": "productivity",
+      "status": "published",
+      "governanceMapping": {
+        "supportedControls": [],
+        "limitations": []
+      },
+      "createdAt": "2026-06-20T00:00:00.000Z",
+      "createdBy": "system"
+    },
+    {
+      "offeringId": "ms-ca-policy",
+      "name": "Azure Conditional Access Policy",
+      "vendorId": "vendor-microsoft",
+      "category": "identity",
+      "status": "published",
+      "governanceMapping": {
+        "supportedControls": ["identity-mfa-enforcement"],
+        "limitations": []
+      },
+      "createdAt": "2026-06-20T10:00:00.000Z",
+      "createdBy": "system"
+    }
+  ]
+}
+
