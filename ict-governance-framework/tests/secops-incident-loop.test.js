@@ -251,12 +251,14 @@ const { SLA_TARGETS_MS } = require('../services/governance-sla');
   );
   assert('mitre_to_fair_mapping seed includes T1003', mappingRows.rows[0]?.count === 1);
 
-  await pool.query('DELETE FROM incident_workflow_events WHERE incident_id = ANY($1)', [
-    [incidentId, breachIncident.incident.incident_id, mitreIncidentId, sentinelMitreResult.incident.incident_id]
-  ]);
-  await pool.query('DELETE FROM governance_incidents WHERE incident_id = ANY($1)', [
-    [incidentId, breachIncident.incident.incident_id, mitreIncidentId, sentinelMitreResult.incident.incident_id]
-  ]);
+  if (!process.env.VERIFICATION_RUN_ID) {
+    await pool.query('DELETE FROM incident_workflow_events WHERE incident_id = ANY($1)', [
+      [incidentId, breachIncident.incident.incident_id, mitreIncidentId, sentinelMitreResult.incident.incident_id]
+    ]);
+    await pool.query('DELETE FROM governance_incidents WHERE incident_id = ANY($1)', [
+      [incidentId, breachIncident.incident.incident_id, mitreIncidentId, sentinelMitreResult.incident.incident_id]
+    ]);
+  }
   await pool.end();
 
   console.log(`\nSecOps incident loop tests: ${passed} passed, ${failed} failed`);

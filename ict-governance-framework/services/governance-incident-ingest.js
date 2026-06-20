@@ -12,6 +12,7 @@ const {
   resolveMitreFairMapping,
   buildMitreResponse
 } = require('./mitre-enrichment');
+const { resolveVerificationRunId } = require('./verification-checkpoint');
 
 const VALID_DRIFT_TYPES = [
   'governance', 'architectural', 'process', 'documentation', 'observability', 'security'
@@ -105,16 +106,28 @@ async function getCurrentEnterpriseAle(pool) {
   }
 }
 
-async function logIncidentIngest(pool, { correlationId, incidentId, rawPayload, processedFields }) {
+async function logIncidentIngest(pool, { correlationId, incidentId, rawPayload, processedFields, verificationRunId }) {
   try {
     await pool.query(
       `
-      INSERT INTO governance_incident_ingest_log (correlation_id, incident_id, raw_payload, processed_fields)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO governance_incident_ingest_log (
+        correlation_id, incident_id, raw_payload, processed_fields, verification_run_id
+      )
+      VALUES ($1, $2, $3, $4, $5)
       `,
-      [correlationId, incidentId, rawPayload, processedFields]
+      [correlationId, incidentId, rawPayload, processedFields, verificationRunId]
     );
   } catch (err) {
+    if (err.code === '42703') {
+      await pool.query(
+        `
+        INSERT INTO governance_incident_ingest_log (correlation_id, incident_id, raw_payload, processed_fields)
+        VALUES ($1, $2, $3, $4)
+        `,
+        [correlationId, incidentId, rawPayload, processedFields]
+      );
+      return;
+    }
     if (err.code !== '42P01') throw err;
     console.warn('[SecOps] governance_incident_ingest_log unavailable — run setup-incident-secops-controls');
   }
@@ -177,6 +190,10 @@ async function ingestGovernanceIncident(pool, { body, correlationId: incomingCor
     || headers['x-correlation-id']
     || crypto.randomUUID();
 
+  const verificationRunId = resolveVerificationRunId(
+    body.verificationRunId || headers['x-verification-run-id']
+  );
+
   const { verifiedAssetId, extendedDescription } = await correlateAsset(pool, assetId);
   const fullDescription = description + (extendedDescription || '');
 
@@ -189,9 +206,9 @@ async function ingestGovernanceIncident(pool, { body, correlationId: incomingCor
     INSERT INTO governance_incidents (
       tenant_id, external_ticket_id, drift_type, severity, description, asset_id, status, correlation_id,
       mitre_tactic, mitre_technique, mitre_technique_name, fair_scenario_id,
-      mitre_severity_weight, mitre_mapping_confidence
+      mitre_severity_weight, mitre_mapping_confidence, verification_run_id
     )
-    VALUES ($1, $2, $3, $4, $5, $6, 'Detected', $7, $8, $9, $10, $11, $12, $13)
+    VALUES ($1, $2, $3, $4, $5, $6, 'Detected', $7, $8, $9, $10, $11, $12, $13, $14)
     RETURNING *
     `,
     [
@@ -207,7 +224,8 @@ async function ingestGovernanceIncident(pool, { body, correlationId: incomingCor
       mitre?.technique_name || fairMapping?.technique_name || null,
       fairScenarioId,
       fairMapping?.severity_weight ?? null,
-      fairMapping?.confidence_score ?? null
+      fairMapping?.confidence_score ?? null,
+      verificationRunId
     ]
   );
 
@@ -221,9 +239,11 @@ async function ingestGovernanceIncident(pool, { body, correlationId: incomingCor
       ...fields,
       verifiedAssetId,
       correlationId,
+      verificationRunId,
       mitre: mitre ? buildMitreResponse({ ...mitre, ...incident, fair_scenario_id: fairScenarioId }) : null,
       fair_mapping: fairMapping
-    }
+    },
+    verificationRunId
   });
 
   console.log(
