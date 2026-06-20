@@ -24,6 +24,7 @@ function printReport(report) {
 
   for (const row of report.pillars) {
     const name = formatPillarLabel(row.pillar).padEnd(nameWidth);
+    const slug = row.contractSlug ? ` (${row.contractSlug})` : '';
     const tests =
       row.realTestCount === 0
         ? '0 tests'
@@ -31,7 +32,7 @@ function printReport(report) {
     const todos = row.todoTestCount > 0 ? `, ${row.todoTestCount} todo` : '';
     const state = row.status === 'active' ? 'active' : 'pending';
     console.log(
-      `${name}  ${statusIcon(row.status)} ${state.padEnd(7)} (${tests}${todos})`
+      `${name}${slug}  ${statusIcon(row.status)} ${state.padEnd(7)} (${tests}${todos})`
     );
     if (row.status === 'pending' && row.realTestCount > 0) {
       console.log(`         ↳ ${row.activationReason}`);

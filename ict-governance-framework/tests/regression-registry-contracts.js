@@ -56,6 +56,11 @@ function pillarFromFileName(fileName) {
   return match ? match[1].toLowerCase() : null;
 }
 
+/** Stable slug from `client-compliance-escalation.contract.test.js` → `client-compliance-escalation`. */
+function contractSlugFromFileName(fileName) {
+  return fileName.replace(/\.contract\.test\.js$/i, '').toLowerCase();
+}
+
 function stripBlockComments(content) {
   return content.replace(/\/\*[\s\S]*?\*\//g, '');
 }
@@ -125,9 +130,11 @@ function analyzeContractFile({ fileName, contractFile, fullPath }) {
   const realTestCount = countRunnableTests(content);
   const todoTestCount = countTodoTests(content);
   const { status, activationReason } = resolveContractActivation(header, realTestCount);
+  const contractSlug = contractSlugFromFileName(fileName);
 
   return {
-    id: `contracts-${pillar}`,
+    id: `contracts-${contractSlug}`,
+    contractSlug,
     pillar,
     contractFile,
     realTestCount,
@@ -146,12 +153,13 @@ function discoverContractSuites() {
 
     return {
       id: analysis.id,
-      label: `${pillar.charAt(0).toUpperCase()}${pillar.slice(1)} pillar contracts`,
+      label: `${pillar.charAt(0).toUpperCase()}${pillar.slice(1)} — ${analysis.contractSlug}`,
       pillar,
       kind: 'jest-contract',
-      npmScript: `test:contracts:${pillar}`,
+      npmScript: 'test:contracts',
       setup: analysis.setup.length ? analysis.setup : undefined,
       contractFile: analysis.contractFile,
+      contractSlug: analysis.contractSlug,
       status: analysis.status,
       scope: 'pillar',
       requires: { database: true },
@@ -192,5 +200,6 @@ module.exports = {
   analyzeContractFile,
   buildContractCoverageReport,
   listContractFiles,
-  parseContractHeader
+  parseContractHeader,
+  contractSlugFromFileName
 };

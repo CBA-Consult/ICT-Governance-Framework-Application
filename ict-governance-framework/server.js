@@ -71,6 +71,14 @@ const riskRouter = require('./api/risk-router');
 const assetRouter = require('./api/asset-router');
 const devicesRouter = require('./api/devices-router');
 const softwareRouter = require('./api/software-router');
+const adpaLifecycleRouter = require('./api/adpa-lifecycle-router');
+const coeRouter = require('./api/coe-router');
+const templateLifecycleRouter = require('./api/template-lifecycle-router');
+const aiControlPlaneRouter = require('./api/ai-control-plane-router');
+const traceabilityRouter = require('./api/traceability-router');
+const remediationRouter = require('./api/remediation-router');
+const vendorRegistryRouter = require('./api/vendor-registry-router');
+const marketplaceOfferingsRouter = require('./api/marketplace-offerings-router');
 
 // Break Glass / JIT analytics trend streams
 const analyticsRouter = require('./api/analytics-router');
@@ -230,6 +238,16 @@ app.use('/api/devices', devicesRouter);
 // Software supply chain / CASB ingest (Software pillar)
 app.use('/api/software', softwareRouter);
 
+// ADPA Governance Lifecycle Center (templates, providers, artifacts, documents)
+app.use('/api/lifecycle', adpaLifecycleRouter);
+app.use('/api/coe', coeRouter);
+app.use('/api/templates/lifecycle', templateLifecycleRouter);
+app.use('/api/ai/control-plane', aiControlPlaneRouter);
+app.use('/api/traceability', traceabilityRouter);
+app.use('/api/remediation', remediationRouter);
+app.use('/api/vendors', vendorRegistryRouter);
+app.use('/api/marketplace', marketplaceOfferingsRouter);
+
 // Governance analytics (Break Glass reconciliation trends)
 app.use('/api/analytics', analyticsRouter);
 
@@ -285,7 +303,9 @@ app.get('/api/health', (req, res) => {
     diagnostics: 'enabled',
     alerting: 'enabled',
     secureScore: 'enabled',
-    casbAppCatalog: 'enabled'
+    casbAppCatalog: 'enabled',
+    vendorRegistry: 'enabled',
+    marketplace: 'enabled'
   };
   // Check enabled connectors and add to health check
   Object.entries(connectorConfig).forEach(([key, value]) => {

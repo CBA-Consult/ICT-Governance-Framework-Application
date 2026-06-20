@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Fail if contract discovery breaks or registry entries point at missing files/scripts.
- * Contract suites are auto-discovered — add *.contract.test.js + test:contracts:<pillar>.
+ * Contract suites are auto-discovered — add *.contract.test.js with @contract pillar:<name>.
  */
 const fs = require('fs');
 const path = require('path');

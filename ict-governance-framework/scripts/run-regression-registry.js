@@ -103,6 +103,23 @@ function runNpmScript(scriptName, env) {
   return result.status === 0;
 }
 
+function runJestContractFile(contractFile, env) {
+  const result = spawnSync(npmCmd, ['exec', '--', 'jest', '--config', 'jest.config.js', contractFile], {
+    cwd: ROOT,
+    stdio: 'inherit',
+    env,
+    shell: isWin
+  });
+  return result.status === 0;
+}
+
+function runSuite(suite, env) {
+  if (suite.kind === 'jest-contract' && suite.contractFile) {
+    return runJestContractFile(suite.contractFile, env);
+  }
+  return runNpmScript(suite.npmScript, env);
+}
+
 function printRegistryTable(suites) {
   console.log('\nRegression registry\n');
   console.log(
@@ -206,14 +223,16 @@ async function main() {
         console.log('  note: requires API server on port 4000 (npm run server)');
       }
 
-      const ok = runNpmScript(suite.npmScript, childEnv);
+      const ok = runSuite(suite, childEnv);
       if (!ok) suitesFailed = true;
       results.push({
         id: suite.id,
         label: suite.label,
         ok,
         ms: Date.now() - started,
-        error: ok ? null : `npm run ${suite.npmScript} failed`
+        error: ok ? null : suite.kind === 'jest-contract'
+          ? `jest ${suite.contractFile} failed`
+          : `npm run ${suite.npmScript} failed`
       });
     }
   } finally {
