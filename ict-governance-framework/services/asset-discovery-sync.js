@@ -9,6 +9,7 @@ const VALID_COMPLIANCE = ['Compliant', 'NonCompliant', 'Unevaluated'];
 const VALID_DR_STATUS = ['Stable', 'DR_Hydrated', 'Stale_Drill', 'Failed_Validation'];
 
 const { handleDrillStateTransition } = require('./drill-state-metrics');
+const { resolveVerificationRunId } = require('./verification-checkpoint');
 
 function isAzureConfigured() {
   return !!(process.env.AZURE_TENANT_ID && process.env.AZURE_CLIENT_ID && process.env.AZURE_CLIENT_SECRET);
@@ -100,8 +101,11 @@ async function upsertAsset(pool, payload) {
     drAuditLedgerReference,
     rtoSeconds,
     rpoFlagTriggered,
-    lastDrDrillTimestamp
+    lastDrDrillTimestamp,
+    verificationRunId: payloadVerificationRunId
   } = payload;
+
+  const verificationRunId = resolveVerificationRunId(payloadVerificationRunId);
 
   if (!assetId || !tenantId || !provider || !name) {
     throw new Error('Missing mandatory identification tracking parameters.');
@@ -126,8 +130,8 @@ async function upsertAsset(pool, payload) {
     INSERT INTO asset_register (
       asset_id, tenant_id, provider, resource_type, name, location, tags, compliance_state,
       dr_status, dr_audit_ledger_reference, rto_seconds, rpo_flag_triggered, last_dr_drill_timestamp,
-      last_discovered
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP)
+      last_discovered, verification_run_id
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP, $14)
     ON CONFLICT (asset_id) DO UPDATE SET
       name = EXCLUDED.name,
       resource_type = EXCLUDED.resource_type,
@@ -139,7 +143,8 @@ async function upsertAsset(pool, payload) {
       rto_seconds = COALESCE(EXCLUDED.rto_seconds, asset_register.rto_seconds),
       rpo_flag_triggered = COALESCE(EXCLUDED.rpo_flag_triggered, asset_register.rpo_flag_triggered),
       last_dr_drill_timestamp = COALESCE(EXCLUDED.last_dr_drill_timestamp, asset_register.last_dr_drill_timestamp),
-      last_discovered = CURRENT_TIMESTAMP
+      last_discovered = CURRENT_TIMESTAMP,
+      verification_run_id = COALESCE(EXCLUDED.verification_run_id, asset_register.verification_run_id)
     RETURNING *
     `,
     [
@@ -155,7 +160,8 @@ async function upsertAsset(pool, payload) {
       drAuditLedgerReference || null,
       rtoSeconds ?? null,
       rpoFlagTriggered ?? false,
-      lastDrDrillTimestamp || (drStatus === 'DR_Hydrated' ? new Date().toISOString() : null)
+      lastDrDrillTimestamp || (drStatus === 'DR_Hydrated' ? new Date().toISOString() : null),
+      verificationRunId
     ]
   );
 
