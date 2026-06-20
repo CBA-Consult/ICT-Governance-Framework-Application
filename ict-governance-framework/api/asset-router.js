@@ -205,7 +205,11 @@ router.post('/casb-ingest', authorizeCasbIngest, enforceJitContext({
   requireTenantScopeMatch: true
 }), async (req, res) => {
   try {
-    const result = await ingestCasbDiscoveries(pool, req.body);
+    const body = {
+      ...req.body,
+      verificationRunId: req.body.verificationRunId || req.headers['x-verification-run-id']
+    };
+    const result = await ingestCasbDiscoveries(pool, body);
 
     if (req.body.createIncident === true && result.ingested > 0) {
       await ingestGovernanceIncident(pool, {
@@ -215,7 +219,8 @@ router.post('/casb-ingest', authorizeCasbIngest, enforceJitContext({
           severity: 'MEDIUM',
           externalTicketId: `CASB-INGEST-${result.ingestId}`,
           description: `CASB ingest registered ${result.ingested} shadow IT asset(s); ${result.skipped} skipped as noise.`,
-          correlationId: result.ingestId
+          correlationId: result.ingestId,
+          verificationRunId: body.verificationRunId
         }
       });
     }
@@ -296,7 +301,8 @@ router.post('/sync', authorizeAssetSync, enforceJitContext({
       drAuditLedgerReference: req.body.drAuditLedgerReference,
       rtoSeconds: req.body.rtoSeconds,
       rpoFlagTriggered: req.body.rpoFlagTriggered,
-      lastDrDrillTimestamp: req.body.lastDrDrillTimestamp
+      lastDrDrillTimestamp: req.body.lastDrDrillTimestamp,
+      verificationRunId: req.body.verificationRunId || req.headers['x-verification-run-id']
     });
     const { metricPatch, ...asset } = result;
     res.status(200).json({ success: true, asset, metricPatch });

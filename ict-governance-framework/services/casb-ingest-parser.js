@@ -3,6 +3,7 @@
  * Normalizes high-velocity multi-tenant CASB payloads into asset_register rows.
  */
 const { randomUUID } = require('crypto');
+const { resolveVerificationRunId } = require('./verification-checkpoint');
 
 const NOISE_BLOCKLIST = new Set([
   'microsoft.com',
@@ -103,7 +104,8 @@ function normalizeCasbPayload(body) {
     tenantId,
     source,
     discoveries: extractDiscoveries(body).map((item) => normalizeDiscovery(item, tenantId)),
-    createIncident: body.createIncident === true
+    createIncident: body.createIncident === true,
+    verificationRunId: resolveVerificationRunId(body.verificationRunId)
   };
 }
 
@@ -140,8 +142,8 @@ async function upsertShadowAsset(pool, record) {
     INSERT INTO asset_register (
       asset_id, tenant_id, provider, resource_type, name, location, tags, compliance_state,
       asset_origin, validation_posture, casb_source_id, casb_discovered_at, casb_risk_score,
-      last_discovered
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP)
+      last_discovered, verification_run_id
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP, $14)
     ON CONFLICT (asset_id) DO UPDATE SET
       name = EXCLUDED.name,
       resource_type = EXCLUDED.resource_type,
@@ -149,6 +151,7 @@ async function upsertShadowAsset(pool, record) {
       casb_risk_score = EXCLUDED.casb_risk_score,
       casb_discovered_at = EXCLUDED.casb_discovered_at,
       last_discovered = CURRENT_TIMESTAMP,
+      verification_run_id = COALESCE(EXCLUDED.verification_run_id, asset_register.verification_run_id),
       validation_posture = CASE
         WHEN asset_register.validation_posture IN ('Verified', 'Remediated') THEN asset_register.validation_posture
         ELSE EXCLUDED.validation_posture
@@ -168,7 +171,8 @@ async function upsertShadowAsset(pool, record) {
       record.validationPosture,
       record.casbSourceId,
       record.casbDiscoveredAt,
-      record.casbRiskScore
+      record.casbRiskScore,
+      record.verificationRunId || null
     ]
   );
   return rows[0];
@@ -243,6 +247,7 @@ async function ingestCasbDiscoveries(pool, body) {
     }
 
     const record = toAssetRecord(discovery, payload.source);
+    record.verificationRunId = payload.verificationRunId;
     const asset = await upsertShadowAsset(pool, record);
     ingested.push(asset);
   }
@@ -250,8 +255,9 @@ async function ingestCasbDiscoveries(pool, body) {
   await pool.query(
     `
     INSERT INTO casb_ingest_audit (
-      ingest_id, tenant_id, source_platform, received_count, ingested_count, skipped_count, ingest_payload
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      ingest_id, tenant_id, source_platform, received_count, ingested_count, skipped_count, ingest_payload,
+      verification_run_id
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `,
     [
       ingestId,
@@ -260,7 +266,8 @@ async function ingestCasbDiscoveries(pool, body) {
       payload.discoveries.length,
       ingested.length,
       skipped.length,
-      JSON.stringify({ source: payload.source, sampleCount: payload.discoveries.length })
+      JSON.stringify({ source: payload.source, sampleCount: payload.discoveries.length }),
+      payload.verificationRunId
     ]
   );
 

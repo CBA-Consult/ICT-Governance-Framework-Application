@@ -30,6 +30,13 @@ CREATE TABLE IF NOT EXISTS casb_ingest_audit (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE casb_ingest_audit
+  ADD COLUMN IF NOT EXISTS verification_run_id UUID;
+
+CREATE INDEX IF NOT EXISTS idx_casb_ingest_audit_verification_run
+  ON casb_ingest_audit(verification_run_id)
+  WHERE verification_run_id IS NOT NULL;
+
 INSERT INTO compliance_controls (control_id, framework, category, name, implementation_status, code_evidence_url, notes)
 VALUES (
   'GV.SC.01',
