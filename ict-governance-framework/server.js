@@ -69,6 +69,8 @@ const riskRouter = require('./api/risk-router');
 
 // Gate B G-B1: Multi-cloud asset register
 const assetRouter = require('./api/asset-router');
+const devicesRouter = require('./api/devices-router');
+const softwareRouter = require('./api/software-router');
 
 // Break Glass / JIT analytics trend streams
 const analyticsRouter = require('./api/analytics-router');
@@ -123,9 +125,10 @@ function isTrustedWebhookRequest(req) {
     if (assetHeader && assetHeader === assetSecret) return true;
   }
 
-  const casbSecret = process.env.CASB_INGEST_WEBHOOK_SECRET;
+  const casbSecret = process.env.CASB_INGEST_WEBHOOK_SECRET
+    || process.env.SOFTWARE_INGEST_WEBHOOK_SECRET;
   if (casbSecret) {
-    const casbHeader = req.headers['x-casb-ingest-secret'];
+    const casbHeader = req.headers['x-casb-ingest-secret'] || req.headers['x-webhook-signature'];
     if (casbHeader && casbHeader === casbSecret) return true;
   }
 
@@ -220,6 +223,12 @@ app.use('/api/governance/risk', riskRouter);
 
 // Multi-cloud asset register (Gate B G-B1)
 app.use('/api/assets', assetRouter);
+
+// Managed endpoint devices (Devices pillar)
+app.use('/api/devices', devicesRouter);
+
+// Software supply chain / CASB ingest (Software pillar)
+app.use('/api/software', softwareRouter);
 
 // Governance analytics (Break Glass reconciliation trends)
 app.use('/api/analytics', analyticsRouter);
