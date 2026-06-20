@@ -13,11 +13,15 @@ const INCIDENT_PAYLOAD = {
 };
 
 (async () => {
+  const verificationRunId = process.env.VERIFICATION_RUN_ID || null;
   const login = await axios.post('http://localhost:4000/api/auth/login', {
     username: 'superadmin',
     password: 'Admin123!'
   });
-  const headers = { Authorization: `Bearer ${login.data.tokens.accessToken}` };
+  const headers = {
+    Authorization: `Bearer ${login.data.tokens.accessToken}`,
+    ...(verificationRunId ? { 'x-verification-run-id': verificationRunId } : {})
+  };
 
   const assetList = await axios.get('http://localhost:4000/api/assets?tenantId=tenant-01', { headers });
   if (!assetList.data.count) {
@@ -30,11 +34,19 @@ const INCIDENT_PAYLOAD = {
       name: 'vm-app-prod-01',
       location: 'westeurope',
       tags: { environment: 'production', criticality: 'high' },
-      complianceState: 'Compliant'
+      complianceState: 'Compliant',
+      ...(verificationRunId ? { verificationRunId } : {})
     }, { headers });
   }
 
-  const ingest = await axios.post('http://localhost:4000/api/governance/incidents', INCIDENT_PAYLOAD, { headers });
+  const ingest = await axios.post(
+    'http://localhost:4000/api/governance/incidents',
+    {
+      ...INCIDENT_PAYLOAD,
+      ...(verificationRunId ? { verificationRunId } : {})
+    },
+    { headers }
+  );
   console.log('INGEST correlated:', ingest.data.correlated);
   console.log('INCIDENT asset_id:', ingest.data.incident?.asset_id || 'none');
 

@@ -1,7 +1,7 @@
 // Gate A: Live compliance posture & Sentinel/SIEM incident ingestion API
 const express = require('express');
 const { Pool } = require('pg');
-const { authenticateToken, requirePermissions } = require('../middleware/auth');
+const { authenticateToken, requirePermissions, requireAnyPermissions } = require('../middleware/auth');
 const {
   AUTOMATION_METRIC,
   handleDrillStateTransition,
@@ -14,9 +14,18 @@ const { patchIncidentStatus } = require('../services/governance-incident-lifecyc
 const { getIncidentTimeline } = require('../services/governance-incident-timeline');
 const { listMitreFairMappings } = require('../services/mitre-enrichment');
 const { getExecutiveMetrics } = require('../services/governance-executive-metrics');
+const { submitBreakGlassInterventionRequest } = require('../services/break-glass-intervention-request');
 
 const router = express.Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+const BREAK_GLASS_INTERVENTION_PERMISSIONS = [
+  'user.read',
+  'role.read',
+  'feedback.create',
+  'compliance.manage',
+  'system.admin'
+];
 
 function authorizeIncidentIngestion(req, res, next) {
   const webhookSecret = process.env.GOVERNANCE_WEBHOOK_SECRET;
@@ -274,5 +283,30 @@ router.post('/measurement-plan/patch', authenticateToken, requirePermissions(['c
     res.status(500).json({ error: 'Failed to patch metric snapshot', details: err.message });
   }
 });
+
+/**
+ * POST /api/governance/break-glass/intervention-request
+ * Queue a GA intervention request for audit review (does not activate break glass).
+ */
+router.post(
+  '/break-glass/intervention-request',
+  authenticateToken,
+  requireAnyPermissions(BREAK_GLASS_INTERVENTION_PERMISSIONS),
+  async (req, res) => {
+    try {
+      const result = await submitBreakGlassInterventionRequest(req.body, req.user);
+      res.status(201).json({ success: true, ...result });
+    } catch (err) {
+      if (err.statusCode === 400) {
+        return res.status(400).json({ error: err.message });
+      }
+      console.error('Break Glass intervention request failed:', err);
+      res.status(500).json({
+        error: 'Failed to submit Break Glass intervention request',
+        details: err.message
+      });
+    }
+  }
+);
 
 module.exports = router;

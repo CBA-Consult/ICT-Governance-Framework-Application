@@ -60,6 +60,8 @@ export default function BreakGlassTrend() {
   );
   const integrityScore = Number(analyticsData?.currentKpiScore ?? 100);
   const scoreWarning = integrityScore < 90;
+  const volume = analyticsData?.volumeAssessment;
+  const volumeElevated = volume?.level === 'elevated' || volume?.level === 'review_recommended';
 
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm mb-6">
@@ -74,6 +76,11 @@ export default function BreakGlassTrend() {
           {(analyticsData?.emergencyTotal > 0 || analyticsData?.standardJitTotal > 0) && (
             <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
               {analyticsData.emergencyTotal} emergency · {analyticsData.standardJitTotal} standard JIT
+              {volume?.expectedEmergencyPer30Days != null && (
+                <span className="ml-1">
+                  (expected ≤{volume.expectedEmergencyPer30Days} emergency / 30 days in production)
+                </span>
+              )}
             </p>
           )}
         </div>
@@ -95,6 +102,23 @@ export default function BreakGlassTrend() {
           )}
         </div>
       </header>
+
+      {volumeElevated && volume?.messages?.length > 0 && (
+        <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 dark:bg-rose-950/30 dark:border-rose-800 p-3 text-xs text-rose-900 dark:text-rose-100">
+          <p className="font-semibold">Volume above production baseline</p>
+          {volume.messages.map((msg) => (
+            <p key={msg} className="mt-1 leading-relaxed">{msg}</p>
+          ))}
+        </div>
+      )}
+
+      {volume?.level === 'development_noise' && !volumeElevated && volume?.messages?.length > 0 && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-3 text-xs text-amber-900 dark:text-amber-100">
+          {volume.messages.map((msg) => (
+            <p key={msg}>{msg}</p>
+          ))}
+        </div>
+      )}
 
       {trend.length === 0 ? (
         <p className="text-xs text-gray-500 dark:text-gray-400 py-8 text-center border border-dashed border-gray-200 dark:border-gray-600 rounded-lg">

@@ -101,7 +101,8 @@ router.get('/telemetry-log', authenticateToken, requirePermissions(['compliance.
 router.get('/calibration', authenticateToken, requirePermissions(['compliance.read']), async (req, res) => {
   try {
     const status = await getCalibrationStatus({
-      limit: Math.min(parseInt(req.query.limit, 10) || 20, 100)
+      limit: Math.min(parseInt(req.query.limit, 10) || 20, 100),
+      pendingLimit: Math.min(parseInt(req.query.pending_limit, 10) || 50, 100)
     });
     res.status(200).json(status);
   } catch (err) {

@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { ShieldExclamationIcon } from '@heroicons/react/24/outline';
 import BreakGlassTrend from './BreakGlassTrend';
+import BreakGlassProcedureModal from './BreakGlassProcedureModal';
 import { authFetch, getStoredAccessToken, parseApiError } from '../../lib/authFetch';
 import { runManualLedgerReconciliation } from '../../lib/handleDrillStateTransition';
 
@@ -24,6 +26,7 @@ export default function BreakGlassConsole() {
   const [reconciling, setReconciling] = useState(false);
   const [auditFeedback, setAuditFeedback] = useState(null);
   const [error, setError] = useState(null);
+  const [procedureOpen, setProcedureOpen] = useState(false);
 
   const loadTickets = useCallback(async () => {
     setLoading(true);
@@ -81,15 +84,27 @@ export default function BreakGlassConsole() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Break Glass Emergency Console</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Out-of-band emergency privileged access when identity infrastructure is degraded. Managed independently from the asset register.
-        </p>
-        <p className="text-xs text-amber-700 dark:text-amber-400 mt-2">
-          Emergency activation uses the out-of-band API (<code className="font-mono">POST /api/auth/jit/emergency/activate</code>) with your configured system secret — not exposed in this UI.
-        </p>
+      <header className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Break Glass Emergency Console</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Out-of-band emergency privileged access when identity infrastructure is degraded. Managed independently from the asset register.
+          </p>
+          <p className="text-xs text-amber-700 dark:text-amber-400 mt-2">
+            Emergency activation uses the out-of-band API (<code className="font-mono">POST /api/auth/jit/emergency/activate</code>) with your configured system secret — not exposed in this UI.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setProcedureOpen(true)}
+          className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold shadow-sm"
+        >
+          <ShieldExclamationIcon className="h-5 w-5" />
+          Break Glass procedure
+        </button>
       </header>
+
+      <BreakGlassProcedureModal open={procedureOpen} onClose={() => setProcedureOpen(false)} />
 
       <BreakGlassTrend />
 

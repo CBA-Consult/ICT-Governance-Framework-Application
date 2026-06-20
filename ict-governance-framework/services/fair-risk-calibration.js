@@ -458,6 +458,18 @@ async function getAverageMappingConfidence(client) {
   }
 }
 
+async function countPendingApprovals() {
+  try {
+    const { rows } = await pool.query(
+      `SELECT COUNT(*)::int AS count FROM fair_calibration_approvals WHERE status = 'pending'`
+    );
+    return rows[0]?.count ?? 0;
+  } catch (err) {
+    if (err.code === '42P01') return 0;
+    throw err;
+  }
+}
+
 async function getPendingApprovals({ limit = 20 } = {}) {
   try {
     const { rows } = await pool.query(
@@ -662,7 +674,7 @@ async function setScenarioCalibrationLock({ scenarioId, locked }) {
   return rows[0];
 }
 
-async function getCalibrationStatus({ limit = 20 } = {}) {
+async function getCalibrationStatus({ limit = 20, pendingLimit = 50 } = {}) {
   const client = await pool.connect();
   try {
     let scenarios;
@@ -706,16 +718,21 @@ async function getCalibrationStatus({ limit = 20 } = {}) {
 
     const mappingConfidence = await getAverageMappingConfidence(client);
     const scenarioDrift = buildScenarioDrift(scenarios.rows);
-    const pendingApprovals = await getPendingApprovals({ limit: 10 });
+    const pendingListLimit = Math.min(Math.max(parseInt(pendingLimit, 10) || 50, 1), 100);
+    const [pendingApprovals, pendingApprovalCount] = await Promise.all([
+      getPendingApprovals({ limit: pendingListLimit }),
+      countPendingApprovals()
+    ]);
 
     return {
       scenarios: scenarios.rows,
       scenario_drift: scenarioDrift,
       recent_adjustments: recentLog,
       pending_approvals: pendingApprovals,
+      pending_approvals_truncated: pendingApprovalCount > pendingApprovals.length,
       summary: {
         ...buildCalibrationSummary(scenarios.rows, recentLog, mappingConfidence.average),
-        pending_approval_count: pendingApprovals.length
+        pending_approval_count: pendingApprovalCount
       },
       mapping_confidence: mappingConfidence,
       governance: {

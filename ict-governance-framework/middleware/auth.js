@@ -171,6 +171,41 @@ const requirePermissions = (requiredPermissions) => {
 };
 
 /**
+ * Middleware — user must hold at least one of the listed permissions (super_admin bypasses).
+ */
+const requireAnyPermissions = (requiredPermissions) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED'
+      });
+    }
+
+    const userPermissions = req.user.permissions || [];
+    const userRoles = req.user.roles || [];
+    const required = Array.isArray(requiredPermissions) ? requiredPermissions : [requiredPermissions];
+
+    if (userRoles.includes('super_admin')) {
+      return next();
+    }
+
+    const hasAny = required.some((permission) => userPermissions.includes(permission));
+    if (!hasAny) {
+      logUserActivity(req, 'UNAUTHORIZED_ACCESS', 'Access denied - insufficient permissions', false);
+      return res.status(403).json({
+        error: 'Insufficient permissions',
+        code: 'INSUFFICIENT_PERMISSIONS',
+        required,
+        current: userPermissions
+      });
+    }
+
+    next();
+  };
+};
+
+/**
  * Middleware to check if user has any of the required roles
  */
 const requireRoles = (requiredRoles) => {
@@ -376,6 +411,7 @@ function verifyRefreshToken(token) {
 module.exports = {
   authenticateToken,
   requirePermissions,
+  requireAnyPermissions,
   requireRoles,
   logActivity,
   logUserActivity,

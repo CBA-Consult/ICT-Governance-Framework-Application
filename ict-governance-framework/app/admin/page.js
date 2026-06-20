@@ -318,6 +318,24 @@ function AdminDashboard() {
           )}
         </div>
 
+        {/* Emergency access — not for daily use */}
+        <div className="mb-8 rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/20 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+            Emergency privileged access
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 max-w-3xl">
+            Break Glass is for Global Administrator lockout or identity infrastructure failure only.
+            Activation remains out-of-band; this console is for audit, reconciliation, and compliance review.
+          </p>
+          <Link
+            href="/break-glass"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold shadow-sm transition-colors"
+          >
+            <ExclamationTriangleIcon className="h-5 w-5" />
+            Open Break Glass Console
+          </Link>
+        </div>
+
         {/* System Health */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">System Health</h2>

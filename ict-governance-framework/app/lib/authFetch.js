@@ -40,8 +40,9 @@ async function refreshAccessToken() {
 
 export async function authFetch(url, options = {}) {
   let token = getStoredAccessToken();
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const headers = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(options.headers || {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {})
   };
@@ -51,9 +52,14 @@ export async function authFetch(url, options = {}) {
   if (response.status === 401 && token) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
+      token = refreshed;
       response = await fetch(url, {
         ...options,
-        headers: { ...headers, Authorization: `Bearer ${refreshed}` }
+        headers: {
+          ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+          ...(options.headers || {}),
+          Authorization: `Bearer ${refreshed}`
+        }
       });
     }
   }
@@ -63,8 +69,19 @@ export async function authFetch(url, options = {}) {
 
 export async function parseApiError(response, fallbackMessage) {
   try {
-    const body = await response.json();
-    return body.error || body.message || fallbackMessage;
+    const text = await response.text();
+    try {
+      const body = JSON.parse(text);
+      const parts = [body.error || body.message, body.details].filter(Boolean);
+      if (parts.length > 0) {
+        return parts.join(': ');
+      }
+    } catch {
+      if (text && text.length > 0 && text.length < 300) {
+        return text;
+      }
+    }
+    return `${fallbackMessage} (HTTP ${response.status})`;
   } catch {
     return fallbackMessage;
   }

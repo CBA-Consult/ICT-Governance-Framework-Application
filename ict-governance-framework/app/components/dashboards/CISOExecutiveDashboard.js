@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import { authFetch, getStoredAccessToken, parseApiError } from '../../lib/authFetch';
+import { submitCalibrationGovernanceAction } from '../../lib/handleDrillStateTransition';
 import {
   deriveRiskPosture,
   formatScenarioLabel,
@@ -53,7 +54,7 @@ const RISK_COLORS = {
 
 export default function CISOExecutiveDashboard({ timeRange = 30 }) {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, tokens } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, tokens, hasPermission } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
   const [fairRisk, setFairRisk] = useState(null);
   const [govMetrics, setGovMetrics] = useState(null);
@@ -62,6 +63,12 @@ export default function CISOExecutiveDashboard({ timeRange = 30 }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [approvalModal, setApprovalModal] = useState(null);
+  const [approvalNotes, setApprovalNotes] = useState('');
+  const [approvalBusy, setApprovalBusy] = useState(false);
+  const [approvalError, setApprovalError] = useState(null);
+
+  const canManageCalibration = hasPermission('compliance.manage');
 
   const fetchExecutiveSummary = useCallback(async () => {
     const token = tokens?.accessToken || getStoredAccessToken();
@@ -77,7 +84,7 @@ export default function CISOExecutiveDashboard({ timeRange = 30 }) {
         authFetch(`/api/secure-scores/executive-summary?timeRange=${timeRange}`),
         authFetch('/api/governance/risk/exposure'),
         authFetch(`/api/governance/executive/metrics?days=${timeRange}`),
-        authFetch('/api/governance/risk/calibration?limit=10'),
+        authFetch('/api/governance/risk/calibration?limit=10&pending_limit=100'),
         authFetch('/api/governance/mitre/mappings')
       ]);
 
@@ -156,6 +163,48 @@ export default function CISOExecutiveDashboard({ timeRange = 30 }) {
     if (label === 'Stable') return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200';
     if (label === 'Moderate') return 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200';
     return 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200';
+  };
+
+  const openApprovalModal = (item) => {
+    setApprovalError(null);
+    setApprovalNotes('');
+    setApprovalModal(item);
+  };
+
+  const closeApprovalModal = () => {
+    if (approvalBusy) return;
+    setApprovalModal(null);
+    setApprovalNotes('');
+    setApprovalError(null);
+  };
+
+  const handleCalibrationDecision = async (action) => {
+    if (!approvalModal?.approval_id) return;
+    const token = tokens?.accessToken || getStoredAccessToken();
+    if (!token) {
+      setApprovalError('Session expired — please sign in again.');
+      return;
+    }
+
+    setApprovalBusy(true);
+    setApprovalError(null);
+    try {
+      await submitCalibrationGovernanceAction({
+        approvalId: approvalModal.approval_id,
+        action,
+        notes: approvalNotes.trim() || undefined,
+        token,
+        justification: `CISO dashboard: ${action} calibration #${approvalModal.approval_id} for ${approvalModal.scenario_id || approvalModal.technique || 'model factor'}`
+      });
+      setApprovalModal(null);
+      setApprovalNotes('');
+      setApprovalError(null);
+      await fetchExecutiveSummary();
+    } catch (err) {
+      setApprovalError(err.message);
+    } finally {
+      setApprovalBusy(false);
+    }
   };
 
   useEffect(() => {
@@ -260,6 +309,8 @@ export default function CISOExecutiveDashboard({ timeRange = 30 }) {
   const calSummary = calibration?.summary;
   const scenarioDrift = calibration?.scenario_drift || [];
   const pendingApprovals = calibration?.pending_approvals || [];
+  const pendingApprovalTotal = calSummary?.pending_approval_count ?? pendingApprovals.length;
+  const pendingApprovalsTruncated = calibration?.pending_approvals_truncated === true;
 
   const enterpriseAle = Number(liveFair?.total_enterprise_ale_usd ?? liveFair?.totalAle ?? 0);
   const riskPosture = deriveRiskPosture(enterpriseAle);
@@ -433,9 +484,9 @@ export default function CISOExecutiveDashboard({ timeRange = 30 }) {
             <span className={`px-2 py-1 text-xs font-bold rounded uppercase ${stabilityBadgeClass(calSummary?.model_stability?.label || 'Stable')}`}>
               {calSummary?.model_stability?.label || 'Stable'} ({calSummary?.model_stability?.band || '±5%'})
             </span>
-            {(calSummary?.pending_approval_count ?? pendingApprovals.length) > 0 && (
+            {(pendingApprovalTotal > 0) && (
               <span className="px-2 py-1 text-xs font-bold rounded uppercase bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200">
-                {calSummary?.pending_approval_count ?? pendingApprovals.length} pending approval
+                {pendingApprovalTotal} pending approval{pendingApprovalTotal === 1 ? '' : 's'}
               </span>
             )}
           </div>
@@ -460,13 +511,137 @@ export default function CISOExecutiveDashboard({ timeRange = 30 }) {
                         ({Number(item.proposed_adjustment_pct) >= 0 ? '+' : ''}{Number(item.proposed_adjustment_pct).toFixed(1)}%)
                       </span>
                     </span>
-                    <span className="text-xs text-gray-500">Awaiting approval · #{item.approval_id}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">#{item.approval_id}</span>
+                      {canManageCalibration ? (
+                        <button
+                          type="button"
+                          onClick={() => openApprovalModal(item)}
+                          className="text-xs font-semibold px-2.5 py-1 rounded bg-rose-600 text-white hover:bg-rose-700"
+                        >
+                          Review
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-500">Awaiting approval</span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Approve via POST /api/governance/risk/calibration/approve (compliance.manage)
-              </p>
+              {!canManageCalibration && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Sign in with <code className="text-xs">compliance.manage</code> to approve or reject adjustments.
+                </p>
+              )}
+              {pendingApprovalsTruncated && (
+                <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
+                  Showing {pendingApprovals.length} of {pendingApprovalTotal} pending — use SecOps or API for the full queue.
+                </p>
+              )}
+            </div>
+          )}
+
+          {approvalModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full p-6 border border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Review calibration adjustment
+                    </h4>
+                    <p className="text-sm text-gray-500 mt-1">Approval #{approvalModal.approval_id}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeApprovalModal}
+                    disabled={approvalBusy}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    aria-label="Close"
+                  >
+                    <XCircleIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <dl className="space-y-3 text-sm mb-4">
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-gray-500">Scenario</dt>
+                    <dd className="font-medium text-gray-900 dark:text-white text-right">
+                      {formatScenarioLabel(approvalModal.scenario_id)}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-gray-500">TEF factor change</dt>
+                    <dd className="font-mono text-gray-900 dark:text-white">
+                      {Number(approvalModal.previous_value).toFixed(3)} → {Number(approvalModal.proposed_value).toFixed(3)}
+                      <span className={`ml-2 ${Number(approvalModal.proposed_adjustment_pct) >= 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        ({Number(approvalModal.proposed_adjustment_pct) >= 0 ? '+' : ''}
+                        {Number(approvalModal.proposed_adjustment_pct).toFixed(1)}%)
+                      </span>
+                    </dd>
+                  </div>
+                  {approvalModal.governance_tier && (
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-gray-500">Governance tier</dt>
+                      <dd className="text-gray-900 dark:text-white">{approvalModal.governance_tier}</dd>
+                    </div>
+                  )}
+                  {approvalModal.requested_at && (
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-gray-500">Requested</dt>
+                      <dd className="text-gray-900 dark:text-white">
+                        {new Date(approvalModal.requested_at).toLocaleString()}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Review notes (optional)
+                </label>
+                <textarea
+                  value={approvalNotes}
+                  onChange={(e) => setApprovalNotes(e.target.value)}
+                  rows={3}
+                  disabled={approvalBusy}
+                  placeholder="Rationale for approval or rejection — recorded in calibration audit log"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white mb-4"
+                />
+
+                {approvalError && (
+                  <p className="text-sm text-red-600 dark:text-red-400 mb-4">{approvalError}</p>
+                )}
+
+                <p className="text-xs text-gray-500 mb-4">
+                  Approving applies the proposed factor and triggers a FAIR recalculation. JIT elevation may be requested if enforcement is enabled.
+                </p>
+
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={closeApprovalModal}
+                    disabled={approvalBusy}
+                    className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCalibrationDecision('reject')}
+                    disabled={approvalBusy}
+                    className="px-4 py-2 text-sm border border-rose-300 text-rose-700 dark:text-rose-300 rounded-md hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:opacity-50"
+                  >
+                    {approvalBusy ? 'Working…' : 'Reject'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCalibrationDecision('approve')}
+                    disabled={approvalBusy}
+                    className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50"
+                  >
+                    {approvalBusy ? 'Working…' : 'Approve & apply'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

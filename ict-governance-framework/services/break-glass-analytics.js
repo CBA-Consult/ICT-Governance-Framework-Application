@@ -5,6 +5,44 @@ const { pool } = require('./jit-elevation');
 
 const BREAK_GLASS_METRIC = 'KPI-GOV-BREAK-GLASS-AUDIT';
 const DEFAULT_DAYS = 30;
+/** Production expectation: GA lockout is rare — more than one emergency per 30 days warrants audit review. */
+const EMERGENCY_BASELINE_PER_30_DAYS = 1;
+const ELEVATED_EMERGENCY_THRESHOLD = 2;
+
+function assessVolume(emergencyTotal, standardJitTotal, windowDays = DEFAULT_DAYS) {
+  const scale = windowDays / 30;
+  const emergencyBaseline = Math.ceil(EMERGENCY_BASELINE_PER_30_DAYS * scale);
+
+  let level = 'within_baseline';
+  const messages = [];
+
+  if (emergencyTotal > ELEVATED_EMERGENCY_THRESHOLD * scale) {
+    level = 'elevated';
+    messages.push(
+      `${emergencyTotal} emergency activations in ${windowDays} days exceeds the production baseline (≤${emergencyBaseline}). ` +
+        'This volume is atypical for Global Administrator lockout — audit review is required.'
+    );
+  } else if (emergencyTotal > emergencyBaseline) {
+    level = 'review_recommended';
+    messages.push(
+      `Emergency count (${emergencyTotal}) is above the expected ≤${emergencyBaseline} per ${windowDays} days. Confirm events are genuine production incidents.`
+    );
+  }
+
+  if (emergencyTotal >= 5 || standardJitTotal >= 15) {
+    if (level === 'within_baseline') level = 'development_noise';
+    messages.push(
+      'High privileged-action volume often reflects SecOps verification runs (npm run verify:secops) or calibration tests — not repeated GA lockouts.'
+    );
+  }
+
+  return {
+    level,
+    messages,
+    emergencyBaselinePerWindow: emergencyBaseline,
+    expectedEmergencyPer30Days: EMERGENCY_BASELINE_PER_30_DAYS
+  };
+}
 
 async function getBreakGlassTrend(days = DEFAULT_DAYS) {
   const { rows } = await pool.query(
@@ -63,6 +101,7 @@ async function getBreakGlassAnalytics(days = DEFAULT_DAYS) {
 
   const emergencyTotal = trend.reduce((s, r) => s + Number(r.emergency_count || 0), 0);
   const standardJitTotal = trend.reduce((s, r) => s + Number(r.standard_jit_count || 0), 0);
+  const volumeAssessment = assessVolume(emergencyTotal, standardJitTotal, days);
 
   return {
     trend,
@@ -70,6 +109,7 @@ async function getBreakGlassAnalytics(days = DEFAULT_DAYS) {
     metricCode: BREAK_GLASS_METRIC,
     emergencyTotal,
     standardJitTotal,
+    volumeAssessment,
     snapshot: snapshot
       ? {
           currentValue: Number(snapshot.current_value),
@@ -84,6 +124,8 @@ async function getBreakGlassAnalytics(days = DEFAULT_DAYS) {
 
 module.exports = {
   BREAK_GLASS_METRIC,
+  EMERGENCY_BASELINE_PER_30_DAYS,
+  assessVolume,
   getBreakGlassTrend,
   getBreakGlassKpiSnapshot,
   computeAuditIntegrityScore,

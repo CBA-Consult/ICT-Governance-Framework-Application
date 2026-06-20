@@ -1,57 +1,73 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { authFetch } from '../lib/authFetch';
 
 const EscalationsPage = () => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [escalations, setEscalations] = useState([]);
   const [feedbackItems, setFeedbackItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [selectedEscalation, setSelectedEscalation] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    fetchEscalations();
-    fetchFeedbackItems();
+  const fetchEscalations = useCallback(async () => {
+    const response = await authFetch('/api/escalations/list');
+    if (response.ok) {
+      const data = await response.json();
+      setEscalations(data);
+      return;
+    }
+    if (response.status === 401) {
+      throw new Error('Session expired — please sign in again.');
+    }
+    throw new Error('Failed to load escalations');
   }, []);
 
-  const fetchEscalations = async () => {
-    try {
-      const response = await fetch('/api/escalations/list');
-      if (response.ok) {
-        const data = await response.json();
-        setEscalations(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch escalations:', error);
+  const fetchFeedbackItems = useCallback(async () => {
+    const response = await authFetch('/api/feedback/list');
+    if (response.ok) {
+      const data = await response.json();
+      setFeedbackItems(data);
+      return;
     }
-  };
+    if (response.status === 401) {
+      throw new Error('Session expired — please sign in again.');
+    }
+    throw new Error('Failed to load feedback items');
+  }, []);
 
-  const fetchFeedbackItems = async () => {
-    try {
-      const response = await fetch('/api/feedback/list');
-      if (response.ok) {
-        const data = await response.json();
-        setFeedbackItems(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch feedback items:', error);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      window.location.href = '/auth';
+      return;
     }
-  };
+
+    (async () => {
+      try {
+        setError(null);
+        await Promise.all([fetchEscalations(), fetchFeedbackItems()]);
+      } catch (err) {
+        console.error('Failed to load escalation data:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [authLoading, isAuthenticated, fetchEscalations, fetchFeedbackItems]);
 
   const handleEscalationAction = async (escalationId, action, notes = '') => {
     try {
-      const response = await fetch(`/api/escalations/${escalationId}/action`, {
+      const response = await authFetch(`/api/escalations/${escalationId}/action`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ action, notes }),
       });
 
       if (response.ok) {
-        fetchEscalations();
+        await fetchEscalations();
         setShowModal(false);
         setSelectedEscalation(null);
       }
@@ -175,12 +191,23 @@ const EscalationsPage = () => {
     );
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-300">Loading escalations...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center max-w-md px-4">
+          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+          <a href="/auth" className="text-blue-600 hover:underline">Sign in</a>
         </div>
       </div>
     );
