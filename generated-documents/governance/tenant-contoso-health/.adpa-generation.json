@@ -1,0 +1,18 @@
+[
+  {
+    "templateId": "tenant-governance-documentation",
+    "tenantId": "tenant-contoso-health",
+    "generatedAt": "2026-06-20T08:54:39.146Z",
+    "markdownPath": "generated-documents\\governance\\tenant-contoso-health\\ICT-Governance-tenant-contoso-health-v1.0.0.md",
+    "docxPath": "generated-documents\\governance\\tenant-contoso-health\\ICT-Governance-tenant-contoso-health-v1.0.0.docx",
+    "documentVersion": "1.0.0"
+  },
+  {
+    "templateId": "tenant-governance-documentation",
+    "tenantId": "tenant-contoso-health",
+    "generatedAt": "2026-06-20T08:55:10.252Z",
+    "markdownPath": "generated-documents\\governance\\tenant-contoso-health\\ICT-Governance-tenant-contoso-health-v1.0.0.md",
+    "docxPath": "generated-documents\\governance\\tenant-contoso-health\\ICT-Governance-tenant-contoso-health-v1.0.0.docx",
+    "documentVersion": "1.0.0"
+  }
+]
