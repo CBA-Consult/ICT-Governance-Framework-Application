@@ -18,9 +18,12 @@ async function handleDrillStateTransition(pool, assetId, newState, context = '')
     const { rows } = await pool.query(
       `
       INSERT INTO governance_metric_snapshots (metric_code, current_value, target_value, last_context)
-      VALUES ($1, LEAST($2, $3), $3, $4)
+      VALUES ($1, LEAST($2::numeric, $3::numeric), $3::numeric, $4)
       ON CONFLICT (metric_code) DO UPDATE SET
-        current_value = LEAST(governance_metric_snapshots.current_value + $2, $3),
+        current_value = LEAST(
+          governance_metric_snapshots.current_value + $2::numeric,
+          $3::numeric
+        ),
         last_updated = CURRENT_TIMESTAMP,
         last_context = $4
       RETURNING metric_code, current_value, target_value, last_updated

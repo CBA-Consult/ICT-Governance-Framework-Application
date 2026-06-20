@@ -23,8 +23,8 @@ param(
     [string]$CsrId = "CSR-42",
     [string]$TenantId = "tenant-01",
     [string]$ApiUrl = "http://localhost:4000",
-    [string]$Username = "superadmin",
-    [string]$Password = "Admin123!"
+    [string]$Username = $(if ($env:GOVERNANCE_API_USERNAME) { $env:GOVERNANCE_API_USERNAME } else { "superadmin" }),
+    [string]$Password = $(if ($env:GOVERNANCE_API_PASSWORD) { $env:GOVERNANCE_API_PASSWORD } else { "Admin123!" })
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,21 +34,26 @@ Import-Module (Join-Path $PSScriptRoot "RpasGovernance.psm1") -Force
 function Get-GovernanceApiHeaders {
     param([string]$BaseUrl)
 
-    $webhook = $env:GOVERNANCE_WEBHOOK_SECRET
-    if ($webhook) {
-        return @{
-            'x-governance-webhook-secret' = $webhook
-            'x-asset-sync-secret'         = $webhook
-            'Content-Type'                = 'application/json'
-        }
-    }
-
+    # JWT is required for posture/read endpoints; webhook alone is insufficient.
     $loginBody = @{ username = $Username; password = $Password } | ConvertTo-Json
     $login = Invoke-RestMethod -Uri "$BaseUrl/api/auth/login" -Method Post -Body $loginBody -ContentType "application/json"
-    return @{
+    if (-not $login.tokens.accessToken) {
+        throw 'API login did not return an access token'
+    }
+
+    $headers = @{
         Authorization  = "Bearer $($login.tokens.accessToken)"
         'Content-Type' = 'application/json'
     }
+
+    # Optional: also send webhook headers for sync/ingest routes that accept trusted-system auth.
+    $webhook = $env:GOVERNANCE_WEBHOOK_SECRET
+    if ($webhook) {
+        $headers['x-governance-webhook-secret'] = $webhook
+        $headers['x-asset-sync-secret'] = $webhook
+    }
+
+    return $headers
 }
 
 function Write-Phase {
@@ -177,7 +182,11 @@ try {
         drStatus                = "DR_Hydrated"
         drAuditLedgerReference  = "governance/rpas/status/gb3-recovery-drill-$drillId.json"
         rpoFlagTriggered        = $false
-    } | ConvertTo-Json -Depth 5
+    }
+    if ($env:VERIFICATION_RUN_ID) {
+        $assetPayload.verificationRunId = $env:VERIFICATION_RUN_ID
+    }
+    $assetPayload = $assetPayload | ConvertTo-Json -Depth 5
 
     $syncResponse = Invoke-RestMethod -Uri "$ApiUrl/api/assets/sync" -Method Post -Body $assetPayload -Headers $apiHeaders -TimeoutSec 15
     if (-not $syncResponse.asset) {
@@ -215,7 +224,11 @@ try {
         assetId          = $SimulatedAssetId
         description      = "Automated Git-to-Cloud recovery runbook loop executed successfully. Recovery validation drill marked complete."
         externalTicketId = "DR-TEST-RUN-$(Get-Date -Format 'yyyy')"
-    } | ConvertTo-Json -Depth 5
+    }
+    if ($env:VERIFICATION_RUN_ID) {
+        $incidentPayload.verificationRunId = $env:VERIFICATION_RUN_ID
+    }
+    $incidentPayload = $incidentPayload | ConvertTo-Json -Depth 5
 
     $incidentResponse = Invoke-RestMethod -Uri "$ApiUrl/api/governance/incidents" -Method Post -Body $incidentPayload -Headers $apiHeaders -TimeoutSec 15
     if (-not $incidentResponse.correlated) {

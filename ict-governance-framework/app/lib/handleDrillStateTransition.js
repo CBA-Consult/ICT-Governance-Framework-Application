@@ -189,3 +189,56 @@ export async function promoteAssetValidation(assetId, token, options = {}) {
 
   return response.json();
 }
+
+/**
+ * Approve or reject a pending FAIR calibration adjustment (compliance.manage + JIT when enforced).
+ */
+export async function submitCalibrationGovernanceAction({
+  approvalId,
+  action,
+  notes,
+  token,
+  jitContextToken: initialJitToken,
+  justification,
+  scopeTenant = 'tenant-01'
+}) {
+  const endpoint =
+    action === 'reject'
+      ? '/api/governance/risk/calibration/reject'
+      : '/api/governance/risk/calibration/approve';
+
+  let jitContextToken = initialJitToken;
+
+  const execute = () =>
+    fetch(endpoint, {
+      method: 'POST',
+      headers: buildAuthHeaders(token, jitContextToken),
+      body: JSON.stringify({
+        approval_id: approvalId,
+        ...(notes ? { notes } : {})
+      })
+    });
+
+  let response = await execute();
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    if (body.code === 'JIT_CONTEXT_MISSING' && !jitContextToken) {
+      jitContextToken = await requestJitElevation({
+        justification:
+          justification ||
+          `FAIR calibration ${action} for pending adjustment #${approvalId}`,
+        scopeTenant,
+        token
+      });
+      response = await execute();
+    }
+
+    if (!response.ok) {
+      const retryBody = await response.json().catch(() => body);
+      throw new Error(retryBody.error || `Calibration ${action} failed`);
+    }
+  }
+
+  return response.json();
+}
