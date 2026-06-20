@@ -1,0 +1,49 @@
+{
+  "escalationId": "ces-evidence-divergent-demo",
+  "tenantId": "tenant-contoso-health",
+  "escalationClass": "client-infrastructure-compliance",
+  "status": "Open",
+  "priority": "High",
+  "assetId": "/subscriptions/sub-contoso-prod-001/providers/Microsoft.Authorization/policyAssignments/identity-mfa-enforcement",
+  "requirementId": "identity-mfa-requirement",
+  "validationId": "val-identity-mfa-divergent-demo",
+  "monitorId": "monitor-identity-mfa-contoso-demo",
+  "lineageId": null,
+  "summary": "Evidence conflict — Azure Policy and Graph API report compliant MFA enrollment but Sentinel detected MFA bypass sign-in events. Trust breakdown between control plane and runtime behavior.",
+  "frameworkImpacts": [
+    {
+      "certificationId": "NIST-CSF-2.0",
+      "certificationLabel": "NIST Cybersecurity Framework 2.0",
+      "framework": "NIST-CSF-2.0",
+      "controlId": "PR.AA.01",
+      "controlName": "Identities and credentials are managed",
+      "complianceStatus": "non-conformant",
+      "triggeredBy": [
+        {
+          "triggerType": "control",
+          "ruleId": "identity-mfa-enrollment",
+          "controlId": "identity-mfa-enforcement",
+          "expected": "100% of active-eligible users enrolled in MFA",
+          "observed": "Policy compliant but Sentinel reports MFA bypass",
+          "enrollmentBreakdown": {
+            "aggregateEnrolledPercent": 100,
+            "activeEligibleEnrolledPercent": 100,
+            "activeEligibleMeetsTarget": true
+          },
+          "contextSignals": {
+            "mfaBypassDetected": true
+          },
+          "assetId": "/subscriptions/sub-contoso-prod-001/providers/Microsoft.Authorization/policyAssignments/identity-mfa-enforcement",
+          "mapsToAcceptanceCriteria": 0
+        }
+      ]
+    }
+  ],
+  "mitigationPlan": {
+    "remediationTemplateId": "identity-access-control",
+    "requirementId": "identity-mfa-requirement",
+    "requirementTitle": "Mandatory MFA for all privileged and standard users",
+    "clientActions": []
+  },
+  "issuedAt": "2026-06-20T14:00:00.000Z"
+}

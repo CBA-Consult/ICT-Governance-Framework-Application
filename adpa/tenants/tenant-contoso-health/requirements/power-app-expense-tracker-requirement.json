@@ -1,0 +1,39 @@
+{
+  "requirementId": "power-app-expense-tracker-requirement",
+  "tenantId": "tenant-contoso-health",
+  "templateId": "power-platform-application",
+  "title": "Expense Tracker canvas app — governed software artifact",
+  "statement": "The Expense Tracker canvas app must be registered as an approved software artifact with DLP-enforced connectors, Dataverse backend in the production environment, and no connections to unapproved SaaS.",
+  "priority": "high",
+  "status": "approved",
+  "pillar": "software",
+  "controlObjective": "Treat each Power App as a first-class ICT software asset under the Software pillar with full CoE lifecycle traceability.",
+  "acceptanceCriteria": [
+    "App registered in asset register with assetClass software-power-platform-app",
+    "DLP policy blocks consumer connectors in production environment",
+    "Owner assigned and business justification documented in CoE",
+    "Solution exported and version-controlled for rollback"
+  ],
+  "scope": {
+    "cloudProviders": ["power-platform", "azure"],
+    "workloads": ["power-apps", "dataverse"]
+  },
+  "parameters": {
+    "applicationType": "canvas-app",
+    "applicationId": "00000000-0000-0000-0000-expense001",
+    "environmentId": "contoso-prod-env",
+    "environmentType": "production",
+    "dataClassification": "confidential",
+    "managedEnvironment": true,
+    "dlpPolicyRef": "contoso-health-dlp-prod",
+    "ownerUpn": "app-owner@contoso-health.example",
+    "connectorInventory": ["Microsoft Dataverse", "Office 365 Outlook", "SharePoint"]
+  },
+  "frameworkMappings": [
+    { "framework": "NIST-CSF-2.0", "controlId": "GV.SC-01", "controlName": "Supply chain risk management" },
+    { "framework": "NIST-CSF-2.0", "controlId": "ID.AM-01", "controlName": "Asset inventory" }
+  ],
+  "approvedAt": "2026-06-19T12:00:00Z",
+  "createdAt": "2026-06-19T10:00:00Z",
+  "updatedAt": "2026-06-19T12:00:00Z"
+}

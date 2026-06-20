@@ -1,0 +1,50 @@
+{
+  "slaId": "proc-sla-1781954617037-d71f0a7b",
+  "tenantId": "tenant-contract-proc-sla-test",
+  "status": "active",
+  "title": "Compliance mitigation SLA — ces-1781954617036-f47ecc50",
+  "draftedBy": "procurement@test.com",
+  "linkedEscalationId": "ces-1781954617036-f47ecc50",
+  "linkedRequirementId": null,
+  "linkedAssetIds": [],
+  "linkedRuleIds": [],
+  "slaTerms": {
+    "priority": "High",
+    "acknowledgeMs": 172800000,
+    "checkValidationMs": 432000000,
+    "resolutionMs": 1209600000,
+    "labels": {
+      "acknowledgeMs": "48 hours",
+      "checkValidationMs": "5 days",
+      "resolutionMs": "14 days"
+    }
+  },
+  "mitigationControlCostCoverage": {
+    "coversAdditionalControls": true,
+    "coverageBasis": "non-compliant-asset-exposed-risk",
+    "budgetCeilingUsd": 9000,
+    "currency": "USD",
+    "coveredControlTypes": [
+      "compensating-control",
+      "monitoring-enhancement"
+    ],
+    "costItems": [
+      {
+        "itemId": "cost-1",
+        "description": "Access hardening",
+        "estimatedUsd": 9000,
+        "controlPurpose": null,
+        "linkedRuleId": null,
+        "linkedAssetId": null
+      }
+    ],
+    "totalEstimatedCoverageUsd": 9000,
+    "notes": null
+  },
+  "internalControlDiscountPolicyRef": "internalControlDiscountPolicy",
+  "draftedAt": "2026-06-20T11:23:37.037Z",
+  "approvedBy": "lead@test.com",
+  "approvedAt": "2026-06-20T11:23:37.049Z",
+  "activatedAt": "2026-06-20T11:23:37.061Z",
+  "activatedBy": "procurement@test.com"
+}

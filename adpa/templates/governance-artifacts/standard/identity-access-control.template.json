@@ -1,0 +1,157 @@
+{
+  "templateId": "identity-access-control",
+  "version": "1.0.0",
+  "artifactType": "hybrid",
+  "pillar": "identity",
+  "displayName": "Identity & Access Control",
+  "description": "Converts identity governance requirements (MFA, RBAC, privileged access, conditional access) into IaC and policy specifications.",
+  "frameworkRefs": [
+    "docs/policies/governance/ICT-Governance-Policies.md",
+    "blueprint-templates/security-blueprints/identity-access-management.bicep"
+  ],
+  "nistCategories": ["PR.AA", "GV.RR"],
+  "governanceRequirement": {
+    "schemaRef": "adpa/schemas/governance-requirement.schema.json",
+    "requiredFields": [
+      "requirementId",
+      "title",
+      "statement",
+      "scope.cloudProviders",
+      "parameters.mfaRequired",
+      "parameters.privilegedAccessModel"
+    ],
+    "optionalFields": [
+      "parameters.conditionalAccessPolicies",
+      "parameters.guestAccessAllowed",
+      "parameters.breakGlassEnabled"
+    ],
+    "examplePath": "adpa/tenants/tenant-contoso-health/requirements/identity-mfa-requirement.json"
+  },
+  "llmProcessing": {
+    "systemInstructionsRef": "adpa/templates/governance-artifacts/llm-prompts/system-instructions.json",
+    "userPromptTemplate": "Convert the following identity governance requirement into a hybrid IaC and Compliance-as-Code specification.\n\nRequirement ID: {{requirementId}}\nTitle: {{title}}\nStatement: {{statement}}\nAcceptance criteria: {{acceptanceCriteria}}\nScope: {{scope}}\nParameters: {{parameters}}\nFramework mappings: {{frameworkMappings}}\n\nProduce JSON matching artifactKind hybrid-specification with controls for authentication, authorization, and privileged access enforcement.",
+    "outputFormat": "json",
+    "temperature": 0.2,
+    "validationRules": [
+      "MFA enforcement must appear as both implementation and complianceCheck when mfaRequired is true",
+      "Privileged access model must map to JIT or PIM-equivalent controls",
+      "Guest access must be explicitly denied or restricted when guestAccessAllowed is false"
+    ]
+  },
+  "outputSchema": {
+    "schemaRef": "adpa/schemas/generated-artifact.schema.json",
+    "artifactKind": "hybrid-specification"
+  },
+  "iacTargets": {
+    "azure": {
+      "format": "bicep",
+      "translatorModule": "adpa/translators/azure/identity-access-control.bicep.js",
+      "referenceBlueprint": "blueprint-templates/security-blueprints/identity-access-management.bicep",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/identity-{{requirementId}}.bicep"
+    },
+    "aws": {
+      "format": "terraform",
+      "translatorModule": "adpa/translators/aws/identity-access-control.tf.js",
+      "referenceBlueprint": "blueprint-templates/infrastructure-blueprints/multi-cloud-infrastructure.bicep",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/aws/identity-{{requirementId}}.tf"
+    },
+    "gcp": {
+      "format": "terraform",
+      "translatorModule": "adpa/translators/gcp/identity-access-control.tf.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/gcp/identity-{{requirementId}}.tf"
+    }
+  },
+  "complianceTargets": {
+    "azurePolicy": {
+      "format": "azure-policy",
+      "translatorModule": "adpa/translators/azure/identity-access-control.policy.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/policies/identity-{{requirementId}}.json"
+    },
+    "awsConfig": {
+      "format": "aws-config-rule",
+      "translatorModule": "adpa/translators/aws/identity-access-control.config.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/aws/config/identity-{{requirementId}}.json"
+    },
+    "gcpOrgPolicy": {
+      "format": "gcp-org-policy",
+      "translatorModule": "adpa/translators/gcp/identity-access-control.orgpolicy.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/gcp/policies/identity-{{requirementId}}.yaml"
+    }
+  },
+  "rpasBinding": {
+    "csrBaseline": "CSR-42",
+    "driftClass": "security",
+    "tarColArtifactId": "TAR-ADPA-001"
+  },
+  "deploymentExpectationsDefaults": {
+    "expectedHealthState": "healthy",
+    "expectedComplianceState": "Compliant",
+    "vendorDeliverableProfile": {
+      "summary": "Identity platform must enforce MFA, JIT privileged access, and conditional access aligned to requirement parameters.",
+      "requiredCapabilities": [
+        "multi-factor-authentication",
+        "privileged-identity-management-or-jit",
+        "conditional-access-policies",
+        "guest-access-restrictions"
+      ],
+      "evidenceTypes": ["azure-policy-compliance", "entra-sign-in-logs", "pim-activation-logs"]
+    },
+    "onFailure": {
+      "driftType": "security",
+      "severity": "CRITICAL",
+      "remediationTemplateId": "identity-access-control",
+      "emitClientEscalation": true,
+      "emitSecOpsIncident": false,
+      "blockCsrBaseline": true
+    },
+    "monitoringRules": [
+      {
+        "ruleId": "identity-mfa-enrollment",
+        "controlId": "identity-mfa-enforcement",
+        "mapsToAcceptanceCriteria": 0,
+        "checkType": "azure-policy-scan",
+        "frequency": "daily",
+        "expectedState": "MFA required for all users",
+        "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01",
+        "severityOnFail": "critical",
+        "remediationTemplateId": "identity-access-control"
+      },
+      {
+        "ruleId": "identity-jit-privileged",
+        "controlId": "identity-jit-privileged",
+        "mapsToAcceptanceCriteria": 1,
+        "checkType": "azure-policy-scan",
+        "frequency": "daily",
+        "expectedState": "Privileged roles use JIT elevation with maximum 4-hour sessions",
+        "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01",
+        "severityOnFail": "high",
+        "remediationTemplateId": "identity-access-control"
+      },
+      {
+        "ruleId": "identity-guest-block",
+        "controlId": "identity-guest-restriction",
+        "mapsToAcceptanceCriteria": 2,
+        "checkType": "azure-policy-scan",
+        "frequency": "daily",
+        "expectedState": "Guest users blocked from administrative roles",
+        "severityOnFail": "high",
+        "remediationTemplateId": "identity-access-control"
+      },
+      {
+        "ruleId": "identity-compliant-device",
+        "controlId": "identity-device-compliance",
+        "mapsToAcceptanceCriteria": 3,
+        "checkType": "azure-policy-scan",
+        "frequency": "daily",
+        "expectedState": "Conditional access policies enforce compliant device state",
+        "severityOnFail": "high",
+        "remediationTemplateId": "identity-access-control"
+      }
+    ],
+    "cloudProfiles": {
+      "azure": { "checkType": "azure-policy-scan", "complianceTarget": "azurePolicy", "iacFormat": "bicep" },
+      "aws": { "checkType": "aws-config-eval", "complianceTarget": "awsConfig", "iacFormat": "terraform" },
+      "gcp": { "checkType": "gcp-org-policy", "complianceTarget": "gcpOrgPolicy", "iacFormat": "terraform" }
+    }
+  }
+}

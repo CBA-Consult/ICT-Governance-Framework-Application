@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/lineage-envelope.schema.json",
+  "title": "ADPA Lineage Envelope",
+  "description": "Shared traceability envelope — RPAS T1/T2 compliant links from source through Layer 2, validation, and asset monitoring.",
+  "type": "object",
+  "required": ["lineageId", "artifactLayer", "recordedAt"],
+  "properties": {
+    "lineageId": { "type": "string", "format": "uuid" },
+    "artifactLayer": {
+      "type": "string",
+      "enum": ["layer-0-entity", "layer-1-spec", "definition", "layer-2-export", "deployed", "validation", "asset-monitor", "export-presentation"]
+    },
+    "outputType": { "type": "string" },
+    "cloudProvider": {
+      "type": "string",
+      "enum": ["azure", "aws", "gcp", "vmware", "alibaba", "oci", "power-platform", "multi-cloud", "in-repo"]
+    },
+    "pillar": {
+      "type": "string",
+      "enum": ["identity", "devices", "software", "network", "data", "secops", "resilience", "governance"]
+    },
+    "upstream": {
+      "type": "object",
+      "properties": {
+        "entityIds": { "type": "array", "items": { "type": "string" } },
+        "telemetryEventIds": { "type": "array", "items": { "type": "string" } },
+        "requirementId": { "type": "string" },
+        "artifactId": { "type": "string" },
+        "templateId": { "type": "string" },
+        "templateVersion": { "type": "string" },
+        "definitionRefs": { "type": "array", "items": { "type": "string" } },
+        "layer2OutputPath": { "type": "string" },
+        "validationId": { "type": "string" }
+      }
+    },
+    "downstream": {
+      "type": "object",
+      "properties": {
+        "translationIds": { "type": "array", "items": { "type": "string" } },
+        "deployedResourceIds": { "type": "array", "items": { "type": "string" } },
+        "assetIds": { "type": "array", "items": { "type": "string" } },
+        "complianceMonitorIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "tarCol": {
+      "type": "object",
+      "properties": {
+        "origin": { "type": "string", "enum": ["Generated", "Telemetry", "Manual", "Imported"] },
+        "artifactId": { "type": "string" },
+        "humanDecisionId": { "type": "string" },
+        "amendmentId": { "type": "string" },
+        "csrVersion": { "type": "string" }
+      }
+    },
+    "actors": {
+      "type": "object",
+      "properties": {
+        "proposer": { "type": "string" },
+        "approver": { "type": "string" },
+        "executor": { "type": "string" },
+        "systemId": { "type": "string" }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "properties": {
+        "contentChecksum": { "type": "string" },
+        "supersedes": { "type": "string" },
+        "supersededBy": { "type": "string" }
+      }
+    },
+    "recordedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

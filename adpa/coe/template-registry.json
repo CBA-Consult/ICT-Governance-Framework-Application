@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "description": "File-based template lifecycle registry (fallback when CoE database unavailable).",
+  "items": {
+    "framework-charter": {
+      "externalRef": "framework-charter",
+      "displayName": "framework-charter",
+      "lifecyclePhase": "initiation",
+      "currentVersion": 1,
+      "metadata": {
+        "id": "framework-charter",
+        "kind": "document",
+        "file": "ict-governance/framework-charter.template.md",
+        "frameworkSource": "docs/governance-framework/core-framework/ICT-Governance-Framework.md",
+        "outputCategory": "project-charter",
+        "outputFormat": "markdown",
+        "pmbokDomain": "stakeholder",
+        "lifecycleStage": "ideation",
+        "status": "active"
+      },
+      "qcGates": {},
+      "owners": [],
+      "justification": null,
+      "onboarding": {},
+      "auditTrail": [],
+      "createdAt": "2026-06-20T09:51:56.160Z",
+      "updatedAt": "2026-06-20T09:51:56.161Z"
+    }
+  }
+}

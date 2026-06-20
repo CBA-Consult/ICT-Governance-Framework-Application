@@ -1,0 +1,93 @@
+{
+  "monitorId": "monitor-identity-mfa-contoso-demo",
+  "tenantId": "tenant-contoso-health",
+  "assetId": "/subscriptions/sub-contoso-prod-001/providers/Microsoft.Authorization/policyAssignments/identity-mfa-enforcement",
+  "displayName": "Identity MFA policy assignment — Contoso Health",
+  "pillar": "identity",
+  "cloudProvider": "azure",
+  "assetClass": "infrastructure-identity",
+    "governanceLinks": {
+    "entityId": "tenant-contoso-health",
+    "requirementId": "identity-mfa-requirement",
+    "artifactId": "identity-mfa-requirement-demo",
+    "templateId": "identity-access-control",
+    "validationId": "val-identity-mfa-demo",
+    "layer2OutputPath": "adpa/tenants/tenant-contoso-health/deployed/azure/identity-identity-mfa-requirement.bicep",
+    "controlIds": ["identity-mfa-enforcement", "identity-jit-privileged", "identity-guest-restriction", "identity-device-compliance"],
+    "vendorDeliverableProfile": {
+      "summary": "Microsoft Entra ID and Conditional Access must deliver MFA for all users, JIT for privileged roles, guest restrictions, and compliant-device enforcement per approved parameters.",
+      "requiredCapabilities": [
+        "entra-id-mfa-enrollment-100pct",
+        "privileged-identity-management-jit-4h-max",
+        "conditional-access-require-mfa",
+        "conditional-access-require-compliant-device"
+      ]
+    }
+  },
+  "monitoringRules": [
+    {
+      "ruleId": "rule-identity-mfa-enforcement",
+      "controlId": "identity-mfa-enforcement",
+      "checkType": "azure-policy-scan",
+      "frequency": "daily",
+      "expectedState": "MFA required for all users",
+      "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01",
+      "severityOnFail": "critical",
+      "remediationTemplateId": "identity-access-control"
+    },
+    {
+      "ruleId": "rule-identity-jit-privileged",
+      "controlId": "identity-jit-privileged",
+      "checkType": "azure-policy-scan",
+      "frequency": "daily",
+      "expectedState": "Privileged roles use JIT elevation",
+      "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01",
+      "severityOnFail": "high",
+      "remediationTemplateId": "identity-access-control"
+    }
+  ],
+  "complianceState": "Compliant",
+  "healthState": "healthy",
+  "lastEvaluatedAt": "2026-06-20T15:00:00Z",
+  "lastValidationId": "val-identity-mfa-demo",
+  "deploymentExpectationsRef": {
+    "expectedHealthState": "healthy",
+    "expectedComplianceState": "Compliant"
+  },
+  "status": "active",
+  "lineage": {
+    "lineageId": "00000000-0000-4000-8000-000000000001",
+    "artifactLayer": "asset-monitor",
+    "cloudProvider": "azure",
+    "pillar": "identity",
+    "upstream": {
+      "entityIds": ["tenant-contoso-health"],
+      "telemetryEventIds": ["sentinel-incident-demo-001"],
+      "requirementId": "identity-mfa-requirement",
+      "artifactId": "identity-mfa-requirement-demo",
+      "templateId": "identity-access-control",
+      "templateVersion": "1.0.0",
+      "validationId": "val-identity-mfa-demo"
+    },
+    "downstream": {
+      "assetIds": [
+        "/subscriptions/sub-contoso-prod-001/providers/Microsoft.Authorization/policyAssignments/identity-mfa-enforcement"
+      ]
+    },
+    "tarCol": {
+      "origin": "Generated",
+      "artifactId": "RPAS-CM-ADPA-003",
+      "csrVersion": "CSR-42 v2.3.0"
+    },
+    "recordedAt": "2026-06-20T15:00:00Z"
+  },
+  "evaluationHistory": [
+    {
+      "evaluatedAt": "2026-06-20T15:00:00Z",
+      "validationId": "val-identity-mfa-demo",
+      "complianceState": "Compliant",
+      "healthState": "healthy",
+      "checksum": "demo-seed"
+    }
+  ]
+}

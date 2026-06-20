@@ -1,0 +1,97 @@
+{
+  "version": "1.0.0",
+  "description": "Center of Excellence definitions for ICT Governance lifecycle management",
+  "lifecyclePhases": [
+    { "id": "initiation", "name": "Initiation", "description": "Register item, business justification, propose owner" },
+    { "id": "onboarding", "name": "Onboarding", "description": "Checklist, training assignment, stakeholder sign-off" },
+    { "id": "active", "name": "Active", "description": "Approved for use in production governance" },
+    { "id": "build_update", "name": "Build & Update", "description": "Versioned changes, IaC/CaC generation, document refresh" },
+    { "id": "retiring", "name": "Retiring", "description": "Deprecation notice, migration plan, stakeholder communication" },
+    { "id": "retired", "name": "Retired", "description": "Removed from active use; audit trail preserved" }
+  ],
+  "centers": [
+    {
+      "id": "templates",
+      "name": "Template CoE",
+      "description": "Governance document and artifact templates — initiation through retirement with full traceability.",
+      "icon": "document-duplicate",
+      "inventorySource": "adpa/templates",
+      "permissions": ["governance.read"],
+      "onboardingChecklist": [
+        { "id": "business-case", "label": "Business justification documented", "required": true },
+        { "id": "owner-assigned", "label": "Domain owner assigned", "required": true },
+        { "id": "framework-alignment", "label": "Framework source mapped", "required": true },
+        { "id": "schema-validated", "label": "JSON schema validation passed", "required": true },
+        { "id": "training-complete", "label": "Template author training completed", "required": true },
+        { "id": "coe-approval", "label": "CoE governance council approval", "required": true }
+      ],
+      "trainingModules": [
+        { "id": "tpl-101", "title": "Template authoring fundamentals", "durationMinutes": 45 },
+        { "id": "tpl-102", "title": "LLM prompt design for governance artifacts", "durationMinutes": 60 },
+        { "id": "tpl-103", "title": "Seven-pillar template mapping", "durationMinutes": 30 }
+      ]
+    },
+    {
+      "id": "ai-providers",
+      "name": "AI Provider CoE",
+      "description": "LLM provider registry, routing, cost governance, and model lifecycle management.",
+      "icon": "cpu-chip",
+      "inventorySource": "adpa/config/processor-config.json",
+      "permissions": ["governance.read"],
+      "onboardingChecklist": [
+        { "id": "business-case", "label": "Business justification and cost model", "required": true },
+        { "id": "owner-assigned", "label": "AI platform owner assigned", "required": true },
+        { "id": "security-review", "label": "Data residency and security review", "required": true },
+        { "id": "fallback-defined", "label": "Fallback provider configured", "required": true },
+        { "id": "training-complete", "label": "Responsible AI usage training", "required": true },
+        { "id": "coe-approval", "label": "CoE approval for production routing", "required": true }
+      ],
+      "trainingModules": [
+        { "id": "ai-101", "title": "Responsible AI for governance generation", "durationMinutes": 60 },
+        { "id": "ai-102", "title": "Provider routing and failover", "durationMinutes": 30 },
+        { "id": "ai-103", "title": "Prompt injection and data handling", "durationMinutes": 45 }
+      ]
+    },
+    {
+      "id": "artifacts",
+      "name": "Stored Artifacts CoE",
+      "description": "Tenant JSON requirements, approved infrastructure baselines, and generated IaC/CaC specifications.",
+      "icon": "circle-stack",
+      "inventorySource": "adpa/tenants",
+      "permissions": ["governance.read"],
+      "onboardingChecklist": [
+        { "id": "business-case", "label": "Tenant business justification", "required": true },
+        { "id": "owner-assigned", "label": "Tenant governance owner assigned", "required": true },
+        { "id": "requirements-baseline", "label": "Initial requirements registered", "required": true },
+        { "id": "infra-approved", "label": "Approved infrastructure baseline", "required": false },
+        { "id": "training-complete", "label": "Artifact lifecycle training", "required": true },
+        { "id": "coe-approval", "label": "Tenant onboarding approved", "required": true }
+      ],
+      "trainingModules": [
+        { "id": "art-101", "title": "Governance requirement authoring", "durationMinutes": 45 },
+        { "id": "art-102", "title": "JSON artifact to IaC translation", "durationMinutes": 60 },
+        { "id": "art-103", "title": "Tenant isolation and data handling", "durationMinutes": 30 }
+      ]
+    },
+    {
+      "id": "documents",
+      "name": "Document Lifecycle CoE",
+      "description": "Versioned ICT Governance documentation — DOCX/Markdown packs with audit trail and rollback.",
+      "icon": "book-open",
+      "inventorySource": "generated-documents/governance",
+      "permissions": ["governance.read"],
+      "onboardingChecklist": [
+        { "id": "business-case", "label": "Document purpose and audience defined", "required": true },
+        { "id": "owner-assigned", "label": "Document owner and approver assigned", "required": true },
+        { "id": "template-linked", "label": "Source template and tenant linked", "required": true },
+        { "id": "training-complete", "label": "Governance documentation standards training", "required": true },
+        { "id": "coe-approval", "label": "Publication approval", "required": true }
+      ],
+      "trainingModules": [
+        { "id": "doc-101", "title": "ICT Governance documentation standards", "durationMinutes": 30 },
+        { "id": "doc-102", "title": "Version control and rollback procedures", "durationMinutes": 45 },
+        { "id": "doc-103", "title": "Audit evidence and RPAS certification", "durationMinutes": 60 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/artifact-validation-record.schema.json",
+  "title": "Post-Deploy Artifact Validation Record",
+  "description": "Health and compliance validation after Layer 2 export and deploy — loops back to asset register and compliance monitors.",
+  "type": "object",
+  "required": [
+    "validationId",
+    "tenantId",
+    "artifactId",
+    "requirementId",
+    "healthState",
+    "validatedAt",
+    "lineage"
+  ],
+  "properties": {
+    "validationId": { "type": "string" },
+    "tenantId": { "type": "string" },
+    "artifactId": { "type": "string" },
+    "requirementId": { "type": "string" },
+    "templateId": { "type": "string" },
+    "layer2Ref": {
+      "type": "object",
+      "required": ["outputType", "outputPath", "checksum"],
+      "properties": {
+        "outputType": { "type": "string" },
+        "outputPath": { "type": "string" },
+        "checksum": { "type": "string" },
+        "cloudProvider": { "type": "string" }
+      }
+    },
+    "deployedRef": {
+      "type": "object",
+      "properties": {
+        "cloudProvider": { "type": "string" },
+        "resourceIds": { "type": "array", "items": { "type": "string" } },
+        "deployRunId": { "type": "string" },
+        "deployedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "healthState": {
+      "type": "object",
+      "required": ["overall"],
+      "properties": {
+        "overall": {
+          "type": "string",
+          "enum": ["healthy", "degraded", "non-compliant", "unknown", "failed"]
+        },
+        "structural": {
+          "type": "string",
+          "enum": ["passed", "failed", "skipped", "unknown"]
+        },
+        "compliance": {
+          "type": "string",
+          "enum": ["compliant", "non-compliant", "partial", "unevaluated"]
+        },
+        "operational": {
+          "type": "string",
+          "enum": ["healthy", "degraded", "unhealthy", "unknown"]
+        }
+      }
+    },
+    "controlResults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["controlId", "status"],
+        "properties": {
+          "controlId": { "type": "string" },
+          "expected": { "type": "string" },
+          "observed": { "type": "string" },
+          "status": { "type": "string", "enum": ["pass", "fail", "warn", "skipped"] },
+          "evidenceRef": { "type": "string" },
+          "frameworkMapping": { "type": "string" }
+        }
+      }
+    },
+    "assetLoopBack": {
+      "type": "object",
+      "description": "Links validation results to asset register entries and compliance monitors.",
+      "properties": {
+        "assetIds": { "type": "array", "items": { "type": "string" } },
+        "complianceMonitorIds": { "type": "array", "items": { "type": "string" } },
+        "complianceStateApplied": {
+          "type": "string",
+          "enum": ["Compliant", "NonCompliant", "Partial", "Unevaluated"]
+        },
+        "appliedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "validatedAt": { "type": "string", "format": "date-time" },
+    "validatedBy": { "type": "string" },
+    "lineage": { "$ref": "lineage-envelope.schema.json" },
+    "rpasEvidence": {
+      "type": "object",
+      "properties": {
+        "humanDecisionId": { "type": "string" },
+        "csrVersion": { "type": "string" },
+        "aevGateRef": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

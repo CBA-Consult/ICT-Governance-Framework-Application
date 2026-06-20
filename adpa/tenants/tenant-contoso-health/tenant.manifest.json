@@ -1,0 +1,45 @@
+{
+  "tenantId": "tenant-contoso-health",
+  "displayName": "Contoso Health (demo)",
+  "version": "1.0.0",
+  "entityRef": "adpa/entities/tenant-contoso-health.json",
+  "cloudProfile": {
+    "primaryProvider": "azure",
+    "enabledProviders": ["azure", "aws"],
+    "defaultRegion": "westeurope"
+  },
+  "artifactPaths": {
+    "requirements": "adpa/tenants/tenant-contoso-health/requirements",
+    "generated": "adpa/tenants/tenant-contoso-health/generated",
+    "deployed": "adpa/tenants/tenant-contoso-health/deployed"
+  },
+  "requirements": [
+    {
+      "requirementId": "identity-mfa-requirement",
+      "templateId": "identity-access-control",
+      "status": "approved",
+      "path": "adpa/tenants/tenant-contoso-health/requirements/identity-mfa-requirement.json",
+      "artifactIds": []
+    },
+    {
+      "requirementId": "network-segmentation-requirement",
+      "templateId": "network-segmentation",
+      "status": "draft",
+      "path": "adpa/tenants/tenant-contoso-health/requirements/network-segmentation-requirement.json",
+      "artifactIds": []
+    },
+    {
+      "requirementId": "power-app-expense-tracker-requirement",
+      "templateId": "power-platform-application",
+      "status": "approved",
+      "path": "adpa/tenants/tenant-contoso-health/requirements/power-app-expense-tracker-requirement.json",
+      "artifactIds": ["pp-app-expense-tracker"]
+    }
+  ],
+  "standardTemplatesApplied": [
+    "identity-access-control",
+    "network-segmentation",
+    "power-platform-application"
+  ],
+  "lastUpdatedAt": "2026-06-20T00:00:00Z"
+}

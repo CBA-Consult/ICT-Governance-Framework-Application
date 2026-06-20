@@ -1,0 +1,66 @@
+{
+  "templateId": "software-supply-chain",
+  "version": "1.0.0",
+  "artifactType": "compliance-policy",
+  "pillar": "software",
+  "displayName": "Software Supply Chain Governance",
+  "description": "Converts software governance requirements (approved catalog, SBOM, vulnerability gating) into Compliance-as-Code policy specifications.",
+  "frameworkRefs": [
+    "docs/policies/governance/ICT-Governance-Policies.md",
+    "blueprint-templates/policy-templates/technology-selection-policy.md"
+  ],
+  "nistCategories": ["GV.SC", "ID.RA"],
+  "governanceRequirement": {
+    "schemaRef": "adpa/schemas/governance-requirement.schema.json",
+    "requiredFields": [
+      "requirementId",
+      "title",
+      "statement",
+      "parameters.approvedCatalogEnforced",
+      "parameters.vulnerabilityThreshold"
+    ],
+    "optionalFields": [
+      "parameters.sbomRequired",
+      "parameters.shadowItDetection",
+      "parameters.thirdPartyRiskTier"
+    ]
+  },
+  "llmProcessing": {
+    "systemInstructionsRef": "adpa/templates/governance-artifacts/llm-prompts/system-instructions.json",
+    "userPromptTemplate": "Convert the following software supply chain governance requirement into a compliance-policy-specification.\n\nRequirement ID: {{requirementId}}\nTitle: {{title}}\nStatement: {{statement}}\nParameters: {{parameters}}\n\nProduce JSON with complianceCheck controls for application approval, vulnerability thresholds, and shadow IT detection.",
+    "outputFormat": "json",
+    "temperature": 0.2,
+    "validationRules": [
+      "Vulnerability threshold must map to deny or audit effect based on severity",
+      "Approved catalog enforcement must block unapproved SaaS when enabled"
+    ]
+  },
+  "outputSchema": {
+    "schemaRef": "adpa/schemas/generated-artifact.schema.json",
+    "artifactKind": "compliance-policy-specification"
+  },
+  "iacTargets": {
+    "azure": {
+      "format": "bicep",
+      "translatorModule": "adpa/translators/azure/software-supply-chain.bicep.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/software-{{requirementId}}.bicep"
+    }
+  },
+  "complianceTargets": {
+    "azurePolicy": {
+      "format": "azure-policy",
+      "translatorModule": "adpa/translators/azure/software-supply-chain.policy.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/policies/software-{{requirementId}}.json"
+    },
+    "awsConfig": {
+      "format": "aws-config-rule",
+      "translatorModule": "adpa/translators/aws/software-supply-chain.config.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/aws/config/software-{{requirementId}}.json"
+    }
+  },
+  "rpasBinding": {
+    "csrBaseline": "CSR-42",
+    "driftClass": "governance",
+    "tarColArtifactId": "TAR-ARM-002"
+  }
+}

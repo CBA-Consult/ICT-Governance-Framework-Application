@@ -1,0 +1,64 @@
+{
+  "version": "1.0.0",
+  "namespace": "governance-artifacts",
+  "description": "Standard JSON templates for LLM-driven conversion of governance requirements into IaC and Compliance-as-Code specifications.",
+  "schemaRef": "adpa/schemas/governance-artifact-template.schema.json",
+  "templates": [
+    {
+      "id": "identity-access-control",
+      "file": "standard/identity-access-control.template.json",
+      "pillar": "identity",
+      "artifactType": "hybrid",
+      "nistCategories": ["PR.AA", "GV.RR"]
+    },
+    {
+      "id": "device-compliance",
+      "file": "standard/device-compliance.template.json",
+      "pillar": "devices",
+      "artifactType": "hybrid",
+      "nistCategories": ["ID.AM", "PR.PS"]
+    },
+    {
+      "id": "software-supply-chain",
+      "file": "standard/software-supply-chain.template.json",
+      "pillar": "software",
+      "artifactType": "compliance-policy",
+      "nistCategories": ["GV.SC", "ID.RA"]
+    },
+    {
+      "id": "network-segmentation",
+      "file": "standard/network-segmentation.template.json",
+      "pillar": "network",
+      "artifactType": "infrastructure",
+      "nistCategories": ["PR.PS", "DE.CM"]
+    },
+    {
+      "id": "data-protection",
+      "file": "standard/data-protection.template.json",
+      "pillar": "data",
+      "artifactType": "hybrid",
+      "nistCategories": ["PR.DS", "GV.PO"]
+    },
+    {
+      "id": "security-monitoring",
+      "file": "standard/security-monitoring.template.json",
+      "pillar": "secops",
+      "artifactType": "hybrid",
+      "nistCategories": ["DE.AE", "DE.CM", "RS.AN"]
+    },
+    {
+      "id": "resilience-backup",
+      "file": "standard/resilience-backup.template.json",
+      "pillar": "resilience",
+      "artifactType": "infrastructure",
+      "nistCategories": ["RC.RP", "RC.CO"]
+    },
+    {
+      "id": "power-platform-application",
+      "file": "standard/power-platform-application.template.json",
+      "pillar": "software",
+      "artifactType": "hybrid",
+      "nistCategories": ["GV.SC", "ID.AM"]
+    }
+  ]
+}

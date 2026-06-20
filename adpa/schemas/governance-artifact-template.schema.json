@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/governance-artifact-template.schema.json",
+  "title": "Governance Artifact Template",
+  "description": "Defines how an LLM ingests a governance requirement and produces intermediate JSON for IaC and Compliance-as-Code translation.",
+  "type": "object",
+  "required": [
+    "templateId",
+    "version",
+    "artifactType",
+    "pillar",
+    "governanceRequirement",
+    "llmProcessing",
+    "outputSchema",
+    "iacTargets",
+    "complianceTargets"
+  ],
+  "properties": {
+    "templateId": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "artifactType": {
+      "type": "string",
+      "enum": ["infrastructure", "compliance-policy", "hybrid"]
+    },
+    "pillar": {
+      "type": "string",
+      "enum": ["identity", "devices", "software", "network", "data", "secops", "resilience", "governance"]
+    },
+    "displayName": { "type": "string" },
+    "description": { "type": "string" },
+    "frameworkRefs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "nistCategories": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "governanceRequirement": {
+      "type": "object",
+      "required": ["schemaRef", "requiredFields"],
+      "properties": {
+        "schemaRef": { "type": "string" },
+        "requiredFields": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "optionalFields": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "examplePath": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "llmProcessing": {
+      "type": "object",
+      "required": ["systemInstructionsRef", "userPromptTemplate", "outputFormat"],
+      "properties": {
+        "systemInstructionsRef": { "type": "string" },
+        "userPromptTemplate": { "type": "string" },
+        "outputFormat": {
+          "type": "string",
+          "enum": ["json"]
+        },
+        "temperature": { "type": "number", "minimum": 0, "maximum": 1 },
+        "validationRules": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "outputSchema": {
+      "type": "object",
+      "required": ["schemaRef", "artifactKind"],
+      "properties": {
+        "schemaRef": { "type": "string" },
+        "artifactKind": {
+          "type": "string",
+          "enum": ["iac-specification", "compliance-policy-specification", "hybrid-specification"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "iacTargets": {
+      "type": "object",
+      "required": ["azure"],
+      "properties": {
+        "azure": { "$ref": "#/definitions/cloudIacTarget" },
+        "aws": { "$ref": "#/definitions/cloudIacTarget" },
+        "gcp": { "$ref": "#/definitions/cloudIacTarget" }
+      },
+      "additionalProperties": false
+    },
+    "complianceTargets": {
+      "type": "object",
+      "properties": {
+        "azurePolicy": { "$ref": "#/definitions/complianceTarget" },
+        "awsConfig": { "$ref": "#/definitions/complianceTarget" },
+        "gcpOrgPolicy": { "$ref": "#/definitions/complianceTarget" }
+      },
+      "additionalProperties": false
+    },
+    "rpasBinding": {
+      "type": "object",
+      "properties": {
+        "csrBaseline": { "type": "string" },
+        "driftClass": {
+          "type": "string",
+          "enum": ["governance", "architectural", "process", "documentation", "observability", "security", "configuration"]
+        },
+        "tarColArtifactId": { "type": "string" }
+      }
+    },
+    "deploymentExpectationsDefaults": {
+      "$ref": "deployment-expectations.schema.json",
+      "description": "Template defaults merged into tenant requirements at registration or generation"
+    }
+  },
+  "definitions": {
+    "cloudIacTarget": {
+      "type": "object",
+      "required": ["format", "translatorModule"],
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["bicep", "arm", "cloudformation", "terraform", "deployment-manager"]
+        },
+        "translatorModule": { "type": "string" },
+        "referenceBlueprint": { "type": "string" },
+        "outputPathPattern": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "complianceTarget": {
+      "type": "object",
+      "required": ["format", "translatorModule"],
+      "properties": {
+        "format": { "type": "string" },
+        "translatorModule": { "type": "string" },
+        "outputPathPattern": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

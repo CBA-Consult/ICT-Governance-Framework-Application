@@ -1,0 +1,37 @@
+{
+  "requirementId": "network-segmentation-requirement",
+  "tenantId": "tenant-contoso-health",
+  "templateId": "network-segmentation",
+  "title": "Hub-spoke network segmentation with default deny",
+  "statement": "Production workloads must be deployed in a hub-spoke topology with default-deny ingress. Private endpoints required for PaaS services handling PHI data.",
+  "priority": "high",
+  "status": "draft",
+  "pillar": "network",
+  "controlObjective": "Isolate workloads by sensitivity tier and enforce zero-trust network access.",
+  "acceptanceCriteria": [
+    "All production subnets use default-deny NSG rules",
+    "Hub-spoke peering configured with no transitive routing to internet",
+    "Private endpoints enforced for storage and database services"
+  ],
+  "scope": {
+    "subscriptions": ["sub-contoso-prod-001"],
+    "resourceGroups": ["rg-contoso-prod-network"],
+    "cloudProviders": ["azure"]
+  },
+  "parameters": {
+    "segmentationModel": "hub-spoke",
+    "defaultDenyIngress": true,
+    "privateEndpointRequired": true,
+    "hubSpokeTopology": true,
+    "allowedCidrRanges": ["10.0.0.0/16", "10.1.0.0/16"]
+  },
+  "frameworkMappings": [
+    {
+      "framework": "NIST-CSF-2.0",
+      "controlId": "PR.PS-01",
+      "controlName": "Network infrastructure is managed"
+    }
+  ],
+  "createdAt": "2026-06-19T11:00:00Z",
+  "updatedAt": "2026-06-19T11:00:00Z"
+}

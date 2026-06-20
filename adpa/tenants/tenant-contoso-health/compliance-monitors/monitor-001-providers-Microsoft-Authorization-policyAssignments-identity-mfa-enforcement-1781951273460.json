@@ -1,0 +1,81 @@
+{
+  "monitorId": "monitor-001-providers-Microsoft-Authorization-policyAssignments-identity-mfa-enforcement-1781951273460",
+  "tenantId": "tenant-contoso-health",
+  "assetId": "/subscriptions/sub-contoso-prod-001/providers/Microsoft.Authorization/policyAssignments/identity-mfa-enforcement",
+  "displayName": "Compliance monitor for /subscriptions/sub-contoso-prod-001/providers/Microsoft.Authorization/policyAssignments/identity-mfa-enforcement",
+  "pillar": "identity",
+  "cloudProvider": "azure",
+  "assetClass": "infrastructure-security",
+  "governanceLinks": {
+    "requirementId": "identity-mfa-requirement",
+    "artifactId": "identity-mfa-requirement-demo",
+    "templateId": "identity-access-control",
+    "validationId": "val-1781951273455",
+    "layer2OutputPath": "adpa/tenants/tenant-contoso-health/deployed/azure/identity-identity-mfa-requirement.bicep",
+    "controlIds": [
+      "identity-mfa-enforcement"
+    ]
+  },
+  "monitoringRules": [
+    {
+      "ruleId": "rule-identity-mfa-enforcement",
+      "controlId": "identity-mfa-enforcement",
+      "checkType": "azure-policy-scan",
+      "frequency": "daily",
+      "expectedState": "MFA required",
+      "frameworkControlRef": null,
+      "severityOnFail": "medium",
+      "remediationTemplateId": "identity-access-control"
+    }
+  ],
+  "complianceState": "Compliant",
+  "healthState": "healthy",
+  "lastEvaluatedAt": "2026-06-20T10:27:53.457Z",
+  "lastValidationId": "val-1781951273455",
+  "status": "active",
+  "lineage": {
+    "lineageId": "5d85ff5f-9d07-4e0d-aad1-effbbebc1596",
+    "artifactLayer": "asset-monitor",
+    "outputType": "bicep",
+    "cloudProvider": "azure",
+    "pillar": "identity",
+    "upstream": {
+      "entityIds": [],
+      "telemetryEventIds": [],
+      "requirementId": "identity-mfa-requirement",
+      "artifactId": "identity-mfa-requirement-demo",
+      "templateId": "identity-access-control",
+      "definitionRefs": [],
+      "layer2OutputPath": "adpa/tenants/tenant-contoso-health/deployed/azure/identity-identity-mfa-requirement.bicep"
+    },
+    "downstream": {
+      "complianceMonitorIds": [
+        "monitor-001-providers-Microsoft-Authorization-policyAssignments-identity-mfa-enforcement-1781951273460"
+      ],
+      "assetIds": [
+        "/subscriptions/sub-contoso-prod-001/providers/Microsoft.Authorization/policyAssignments/identity-mfa-enforcement"
+      ]
+    },
+    "tarCol": {},
+    "actors": {
+      "proposer": "test",
+      "executor": "traceability-service",
+      "systemId": "ict-governance-framework-api"
+    },
+    "integrity": {
+      "contentChecksum": "13a1036094e2b1545cdd3ba1f9feeb66d1e4262ef942373c7e4b043b87955d34",
+      "supersedes": null,
+      "supersededBy": null
+    },
+    "recordedAt": "2026-06-20T10:27:53.457Z"
+  },
+  "evaluationHistory": [
+    {
+      "evaluatedAt": "2026-06-20T10:27:53.457Z",
+      "validationId": "val-1781951273455",
+      "complianceState": "Compliant",
+      "healthState": "healthy",
+      "checksum": "68d06328dc6acc641ffe6d87462db7396a4bf6a21595e7c6c5fc832b8a0028a4"
+    }
+  ]
+}

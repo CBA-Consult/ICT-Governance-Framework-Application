@@ -1,0 +1,56 @@
+{
+  "slaId": "proc-sla-1781954617031-2c9cf575",
+  "tenantId": "tenant-contract-proc-sla-test",
+  "status": "draft",
+  "title": "Compliance mitigation SLA — identity-mfa-requirement",
+  "draftedBy": "procurement@test.com",
+  "linkedEscalationId": "ces-1781954617029-f3d9d5e5",
+  "linkedRequirementId": "identity-mfa-requirement",
+  "linkedAssetIds": [],
+  "linkedRuleIds": [
+    "identity-mfa-enrollment"
+  ],
+  "slaTerms": {
+    "priority": "Critical",
+    "acknowledgeMs": 86400000,
+    "checkValidationMs": 259200000,
+    "resolutionMs": 604800000,
+    "labels": {
+      "acknowledgeMs": "24 hours",
+      "checkValidationMs": "72 hours",
+      "resolutionMs": "7 days"
+    }
+  },
+  "mitigationControlCostCoverage": {
+    "coversAdditionalControls": true,
+    "coverageBasis": "non-compliant-asset-exposed-risk",
+    "budgetCeilingUsd": 17300,
+    "currency": "USD",
+    "coveredControlTypes": [
+      "compensating-control",
+      "monitoring-enhancement"
+    ],
+    "costItems": [
+      {
+        "itemId": "cost-1",
+        "description": "Conditional Access MFA enforcement rollout",
+        "estimatedUsd": 12500,
+        "controlPurpose": "compensating-control",
+        "linkedRuleId": "identity-mfa-enrollment",
+        "linkedAssetId": null
+      },
+      {
+        "itemId": "cost-2",
+        "description": "Enhanced identity monitoring for partial MFA enrollment",
+        "estimatedUsd": 4800,
+        "controlPurpose": "monitoring-enhancement",
+        "linkedRuleId": "identity-mfa-enrollment",
+        "linkedAssetId": null
+      }
+    ],
+    "totalEstimatedCoverageUsd": 17300,
+    "notes": null
+  },
+  "internalControlDiscountPolicyRef": "internalControlDiscountPolicy",
+  "draftedAt": "2026-06-20T11:23:37.031Z"
+}

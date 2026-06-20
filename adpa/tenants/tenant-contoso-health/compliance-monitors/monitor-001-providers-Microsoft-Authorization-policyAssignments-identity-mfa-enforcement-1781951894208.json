@@ -1,0 +1,146 @@
+{
+  "monitorId": "monitor-001-providers-Microsoft-Authorization-policyAssignments-identity-mfa-enforcement-1781951894208",
+  "tenantId": "tenant-contoso-health",
+  "assetId": "/subscriptions/sub-contoso-prod-001/providers/Microsoft.Authorization/policyAssignments/identity-mfa-enforcement",
+  "displayName": "Compliance monitor — Mandatory MFA for all privileged and standard users",
+  "pillar": "identity",
+  "cloudProvider": "azure",
+  "assetClass": "infrastructure-identity",
+  "governanceLinks": {
+    "entityId": "tenant-contoso-health",
+    "requirementId": "identity-mfa-requirement",
+    "artifactId": "demo",
+    "templateId": "identity-access-control",
+    "validationId": "val-1781951894202",
+    "layer2OutputPath": "x",
+    "controlIds": [
+      "identity-mfa-enforcement",
+      "identity-jit-privileged",
+      "identity-guest-restriction",
+      "identity-device-compliance"
+    ],
+    "vendorDeliverableProfile": {
+      "summary": "Microsoft Entra ID and Conditional Access must deliver MFA for all users, JIT for privileged roles, guest restrictions, and compliant-device enforcement per approved parameters.",
+      "requiredCapabilities": [
+        "entra-id-mfa-enrollment-100pct",
+        "privileged-identity-management-jit-4h-max",
+        "conditional-access-require-mfa",
+        "conditional-access-require-compliant-device",
+        "guest-administrative-role-block"
+      ],
+      "evidenceTypes": [
+        "azure-policy-compliance-state",
+        "microsoft-entra-sign-in-logs",
+        "pim-activation-audit"
+      ]
+    }
+  },
+  "monitoringRules": [
+    {
+      "ruleId": "identity-mfa-enrollment",
+      "controlId": "identity-mfa-enforcement",
+      "mapsToAcceptanceCriteria": 0,
+      "checkType": "azure-policy-scan",
+      "frequency": "daily",
+      "expectedState": "100% of users enrolled in MFA",
+      "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01",
+      "severityOnFail": "critical",
+      "remediationTemplateId": "identity-access-control",
+      "lastObservedState": "Policy active",
+      "lastStatus": "pass"
+    },
+    {
+      "ruleId": "identity-jit-privileged",
+      "controlId": "identity-jit-privileged",
+      "mapsToAcceptanceCriteria": 1,
+      "checkType": "azure-policy-scan",
+      "frequency": "daily",
+      "expectedState": "Privileged roles use JIT elevation with maximum 4-hour sessions",
+      "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01",
+      "severityOnFail": "high",
+      "remediationTemplateId": "identity-access-control",
+      "lastObservedState": null,
+      "lastStatus": "pending"
+    },
+    {
+      "ruleId": "identity-guest-block",
+      "controlId": "identity-guest-restriction",
+      "mapsToAcceptanceCriteria": 2,
+      "checkType": "azure-policy-scan",
+      "frequency": "daily",
+      "expectedState": "Guest users blocked from administrative roles",
+      "frameworkControlRef": null,
+      "severityOnFail": "high",
+      "remediationTemplateId": "identity-access-control",
+      "lastObservedState": null,
+      "lastStatus": "pending"
+    },
+    {
+      "ruleId": "identity-compliant-device",
+      "controlId": "identity-device-compliance",
+      "mapsToAcceptanceCriteria": 3,
+      "checkType": "azure-policy-scan",
+      "frequency": "daily",
+      "expectedState": "Conditional access policies enforce compliant device state",
+      "frameworkControlRef": null,
+      "severityOnFail": "high",
+      "remediationTemplateId": "identity-access-control",
+      "lastObservedState": null,
+      "lastStatus": "pending"
+    }
+  ],
+  "complianceState": "Compliant",
+  "healthState": "healthy",
+  "lastEvaluatedAt": "2026-06-20T10:38:14.203Z",
+  "lastValidationId": "val-1781951894202",
+  "status": "active",
+  "deploymentExpectationsRef": {
+    "expectedHealthState": "healthy",
+    "expectedComplianceState": "Compliant"
+  },
+  "lineage": {
+    "lineageId": "0352c1d2-7ecb-46a9-8401-d8d10822b2b3",
+    "artifactLayer": "asset-monitor",
+    "outputType": "bicep",
+    "cloudProvider": "azure",
+    "pillar": "identity",
+    "upstream": {
+      "entityIds": [],
+      "telemetryEventIds": [],
+      "requirementId": "identity-mfa-requirement",
+      "artifactId": "demo",
+      "templateId": "identity-access-control",
+      "definitionRefs": [],
+      "layer2OutputPath": "x"
+    },
+    "downstream": {
+      "complianceMonitorIds": [
+        "monitor-001-providers-Microsoft-Authorization-policyAssignments-identity-mfa-enforcement-1781951894208"
+      ],
+      "assetIds": [
+        "/subscriptions/sub-contoso-prod-001/providers/Microsoft.Authorization/policyAssignments/identity-mfa-enforcement"
+      ]
+    },
+    "tarCol": {},
+    "actors": {
+      "proposer": "test",
+      "executor": "traceability-service",
+      "systemId": "ict-governance-framework-api"
+    },
+    "integrity": {
+      "contentChecksum": "69562dc40fe74806e8cedcfa93dc570faa115f485f811ab694a83d8b3e8a1ef9",
+      "supersedes": null,
+      "supersededBy": null
+    },
+    "recordedAt": "2026-06-20T10:38:14.203Z"
+  },
+  "evaluationHistory": [
+    {
+      "evaluatedAt": "2026-06-20T10:38:14.203Z",
+      "validationId": "val-1781951894202",
+      "complianceState": "Compliant",
+      "healthState": "healthy",
+      "checksum": "a9cd036a11ad6c477cc8c7e71212142002fb189166e0651283dbef62ac1375a5"
+    }
+  ]
+}

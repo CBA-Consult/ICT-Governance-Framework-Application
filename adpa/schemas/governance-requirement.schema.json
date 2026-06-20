@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/governance-requirement.schema.json",
+  "title": "Governance Requirement",
+  "description": "Tenant-scoped governance requirement ingested by an artifact template and passed to the LLM pipeline.",
+  "type": "object",
+  "required": [
+    "requirementId",
+    "tenantId",
+    "templateId",
+    "title",
+    "statement",
+    "status"
+  ],
+  "properties": {
+    "requirementId": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "tenantId": { "type": "string" },
+    "templateId": { "type": "string" },
+    "title": { "type": "string" },
+    "statement": { "type": "string" },
+    "rationale": { "type": "string" },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "approved", "in-generation", "generated", "deployed", "superseded"]
+    },
+    "pillar": {
+      "type": "string",
+      "enum": ["identity", "devices", "software", "network", "data", "secops", "resilience", "governance"]
+    },
+    "controlObjective": { "type": "string" },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "subscriptions": { "type": "array", "items": { "type": "string" } },
+        "resourceGroups": { "type": "array", "items": { "type": "string" } },
+        "workloads": { "type": "array", "items": { "type": "string" } },
+        "cloudProviders": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["azure", "aws", "gcp"] }
+        }
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "frameworkMappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["framework", "controlId"],
+        "properties": {
+          "framework": { "type": "string" },
+          "controlId": { "type": "string" },
+          "controlName": { "type": "string" }
+        }
+      }
+    },
+    "approvedBy": { "type": "string" },
+    "approvedAt": { "type": "string", "format": "date-time" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "deploymentExpectations": {
+      "$ref": "deployment-expectations.schema.json",
+      "description": "Expected compliance and monitoring health for resources deployed from this requirement"
+    }
+  },
+  "additionalProperties": false
+}

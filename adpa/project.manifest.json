@@ -16,7 +16,10 @@
     "webApp": "ict-governance-framework",
     "schemas": "adpa/schemas",
     "templates": "adpa/templates",
-    "entities": "adpa/entities"
+    "governanceArtifactTemplates": "adpa/templates/governance-artifacts",
+    "entities": "adpa/entities",
+    "tenants": "adpa/tenants",
+    "translators": "adpa/translators"
   },
   "rpasBinding": {
     "projectId": "ADPA-ICT-GOV",
@@ -26,5 +29,9 @@
   },
   "tiers": "adpa/systematics/tiers.json",
   "lifecycle": "adpa/systematics/lifecycle.json",
-  "templateRegistry": "adpa/templates/manifest.json"
+  "templateRegistry": "adpa/templates/manifest.json",
+  "governanceArtifactRegistry": "adpa/templates/governance-artifacts/manifest.json",
+  "tenantRegistry": "adpa/tenants/registry.json",
+  "traceabilityBridge": "adpa/coe/traceability-bridge.json",
+  "traceabilityRegistry": "adpa/coe/traceability-registry.json"
 }

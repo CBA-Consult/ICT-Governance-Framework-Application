@@ -16,9 +16,18 @@ function getPaths() {
     adpaRoot: getAdpaRoot(),
     projectManifest: path.join(getAdpaRoot(), 'project.manifest.json'),
     templateManifest: path.join(getAdpaRoot(), 'templates', 'manifest.json'),
+    governanceArtifactManifest: path.join(
+      getAdpaRoot(),
+      'templates',
+      'governance-artifacts',
+      'manifest.json'
+    ),
     processorConfig: path.join(getAdpaRoot(), 'config', 'processor-config.json'),
     generatedOutput: path.join(REPO_ROOT, 'generated-documents'),
     entitiesDir: path.join(getAdpaRoot(), 'entities'),
+    tenantsDir: path.join(getAdpaRoot(), 'tenants'),
+    tenantRegistry: path.join(getAdpaRoot(), 'tenants', 'registry.json'),
+    translatorsDir: path.join(getAdpaRoot(), 'translators'),
     governanceRoot: path.join(REPO_ROOT, 'governance', 'rpas')
   };
 }

@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "description": "AI Provider / Model / Assignment control plane — lifecycle, output types, and routing rules.",
+  "outputTypes": [
+    { "id": "json", "label": "Governance JSON artifact", "artifactLayer": "specification", "mimeType": "application/json" },
+    { "id": "document-md", "label": "Governance document (Markdown)", "artifactLayer": "document", "mimeType": "text/markdown" },
+    { "id": "document-docx", "label": "Governance document (DOCX)", "artifactLayer": "document", "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+    { "id": "bicep", "label": "Azure Bicep IaC", "artifactLayer": "iac", "mimeType": "text/plain", "cloudProvider": "azure" },
+    { "id": "terraform", "label": "Terraform IaC", "artifactLayer": "iac", "mimeType": "text/plain", "cloudProviders": ["aws", "gcp", "azure"] },
+    { "id": "azure-policy", "label": "Azure Policy JSON", "artifactLayer": "compliance", "mimeType": "application/json", "cloudProvider": "azure" },
+    { "id": "aws-config", "label": "AWS Config rule JSON", "artifactLayer": "compliance", "mimeType": "application/json", "cloudProvider": "aws" },
+    { "id": "ui-spec", "label": "UI-as-code specification", "artifactLayer": "experience", "mimeType": "application/json" },
+    { "id": "compliance-policy", "label": "Compliance-as-Code policy", "artifactLayer": "compliance", "mimeType": "application/json" }
+  ],
+  "providerTypes": [
+    { "id": "azure", "label": "Azure OpenAI / AI Foundry", "supportsEntraId": true },
+    { "id": "google", "label": "Google Gemini", "supportsEntraId": false },
+    { "id": "ollama", "label": "Ollama (local)", "supportsEntraId": false },
+    { "id": "openai", "label": "OpenAI", "supportsEntraId": false },
+    { "id": "anthropic", "label": "Anthropic", "supportsEntraId": false }
+  ],
+  "lifecyclePhases": [
+    { "id": "initiation", "label": "Initiation" },
+    { "id": "onboarding", "label": "Onboarding" },
+    { "id": "active", "label": "Active" },
+    { "id": "build_update", "label": "Build & Update" },
+    { "id": "retiring", "label": "Retiring" },
+    { "id": "retired", "label": "Retired" }
+  ],
+  "assignmentRules": {
+    "defaultOutputTypeForDocumentTemplate": "document-md",
+    "defaultOutputTypeForArtifactTemplate": "json",
+    "fallbackProcessorRef": "fallback",
+    "requireActiveProviderForGeneration": true,
+    "requireActiveModelForGeneration": true
+  }
+}

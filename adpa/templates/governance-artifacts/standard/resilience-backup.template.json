@@ -1,0 +1,73 @@
+{
+  "templateId": "resilience-backup",
+  "version": "1.0.0",
+  "artifactType": "infrastructure",
+  "pillar": "resilience",
+  "displayName": "Resilience, Backup & Disaster Recovery",
+  "description": "Converts resilience governance requirements (RPO/RTO, backup policies, geo-redundancy) into multi-cloud IaC specifications.",
+  "frameworkRefs": [
+    "blueprint-templates/infrastructure-blueprints/multi-cloud-infrastructure.bicep",
+    "docs/implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md"
+  ],
+  "nistCategories": ["RC.RP", "RC.CO"],
+  "governanceRequirement": {
+    "schemaRef": "adpa/schemas/governance-requirement.schema.json",
+    "requiredFields": [
+      "requirementId",
+      "title",
+      "statement",
+      "parameters.rpoMinutes",
+      "parameters.rtoMinutes",
+      "parameters.backupFrequency"
+    ],
+    "optionalFields": [
+      "parameters.geoRedundant",
+      "parameters.crossRegionFailover",
+      "parameters.recoveryTestFrequencyDays"
+    ]
+  },
+  "llmProcessing": {
+    "systemInstructionsRef": "adpa/templates/governance-artifacts/llm-prompts/system-instructions.json",
+    "userPromptTemplate": "Convert the following resilience governance requirement into an iac-specification for backup and disaster recovery.\n\nRequirement ID: {{requirementId}}\nTitle: {{title}}\nStatement: {{statement}}\nParameters: {{parameters}}\n\nProduce JSON with implementation controls for backup vaults, replication, recovery plans, and monitoring.",
+    "outputFormat": "json",
+    "temperature": 0.2,
+    "validationRules": [
+      "RPO and RTO must be reflected in backup schedule and failover configuration",
+      "Geo-redundancy must define secondary region when enabled"
+    ]
+  },
+  "outputSchema": {
+    "schemaRef": "adpa/schemas/generated-artifact.schema.json",
+    "artifactKind": "iac-specification"
+  },
+  "iacTargets": {
+    "azure": {
+      "format": "bicep",
+      "translatorModule": "adpa/translators/azure/resilience-backup.bicep.js",
+      "referenceBlueprint": "blueprint-templates/infrastructure-blueprints/multi-cloud-infrastructure.bicep",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/resilience-{{requirementId}}.bicep"
+    },
+    "aws": {
+      "format": "terraform",
+      "translatorModule": "adpa/translators/aws/resilience-backup.tf.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/aws/resilience-{{requirementId}}.tf"
+    },
+    "gcp": {
+      "format": "terraform",
+      "translatorModule": "adpa/translators/gcp/resilience-backup.tf.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/gcp/resilience-{{requirementId}}.tf"
+    }
+  },
+  "complianceTargets": {
+    "azurePolicy": {
+      "format": "azure-policy",
+      "translatorModule": "adpa/translators/azure/resilience-backup.policy.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/policies/resilience-{{requirementId}}.json"
+    }
+  },
+  "rpasBinding": {
+    "csrBaseline": "CSR-42",
+    "driftClass": "architectural",
+    "tarColArtifactId": "TAR-ARM-002"
+  }
+}

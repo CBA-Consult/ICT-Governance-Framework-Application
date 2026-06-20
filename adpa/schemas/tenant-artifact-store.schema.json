@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/tenant-artifact-store.schema.json",
+  "title": "Tenant Artifact Store Manifest",
+  "description": "Index of a tenant's governance requirements, generated artifacts, and deployment state.",
+  "type": "object",
+  "required": ["tenantId", "displayName", "version", "entityRef", "artifactPaths"],
+  "properties": {
+    "tenantId": { "type": "string" },
+    "displayName": { "type": "string" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "entityRef": { "type": "string" },
+    "cloudProfile": {
+      "type": "object",
+      "properties": {
+        "primaryProvider": {
+          "type": "string",
+          "enum": ["azure", "aws", "gcp", "multi-cloud"]
+        },
+        "enabledProviders": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["azure", "aws", "gcp"] }
+        },
+        "defaultRegion": { "type": "string" }
+      }
+    },
+    "artifactPaths": {
+      "type": "object",
+      "required": ["requirements", "generated", "deployed"],
+      "properties": {
+        "requirements": { "type": "string" },
+        "generated": { "type": "string" },
+        "deployed": { "type": "string" }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requirementId", "templateId", "status"],
+        "properties": {
+          "requirementId": { "type": "string" },
+          "templateId": { "type": "string" },
+          "status": { "type": "string" },
+          "path": { "type": "string" },
+          "artifactIds": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "standardTemplatesApplied": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "lastUpdatedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

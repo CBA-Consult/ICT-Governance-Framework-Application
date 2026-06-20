@@ -1,0 +1,194 @@
+{
+  "version": "1.0.0",
+  "name": "ICT Governance Full Scope Model",
+  "description": "Unified governance scope: in-platform ADPA and web application, Power Platform software assets (each Power App = one software artifact), and Azure, AWS, GCP multi-cloud infrastructure.",
+  "frameworkRef": "docs/governance-framework/core-framework/Multi-Cloud-Multi-Tenant-ICT-Governance-Framework.md",
+  "scopeLayers": [
+    {
+      "id": "governance-platform",
+      "name": "Governance Platform",
+      "description": "In-repository ADPA, CoE lifecycle, web application, PostgreSQL registry, and generated governance documents.",
+      "components": [
+        { "id": "adpa", "name": "ADPA policy-to-code bridge", "path": "adpa/" },
+        { "id": "coe", "name": "Centers of Excellence", "path": "adpa/coe/" },
+        { "id": "web-app", "name": "ICT Governance web application", "path": "ict-governance-framework/" },
+        { "id": "postgresql", "name": "Governance PostgreSQL (CoE, assets, compliance)", "path": "ict-governance-framework/sql/" },
+        { "id": "blueprint-templates", "name": "Compliance-as-Code blueprints", "path": "blueprint-templates/" }
+      ],
+      "coeCenters": ["templates", "ai-providers", "artifacts", "documents"],
+      "cloudProvider": "in-repo"
+    },
+    {
+      "id": "power-platform",
+      "name": "Power Platform & Low-Code",
+      "description": "Each canvas app, model-driven app, and cloud flow is a separate software artifact asset governed under the Software pillar and Artifacts CoE.",
+      "components": [
+        { "id": "power-apps", "name": "Power Apps (canvas & model-driven)", "assetClass": "software-power-platform-app" },
+        { "id": "power-automate", "name": "Power Automate flows", "assetClass": "software-power-platform-flow" },
+        { "id": "power-pages", "name": "Power Pages sites", "assetClass": "software-application" },
+        { "id": "copilot-studio", "name": "Copilot Studio agents", "assetClass": "software-application" },
+        { "id": "dataverse", "name": "Dataverse tables & environments", "assetClass": "platform-service" }
+      ],
+      "discoverySources": ["power-platform-admin-center", "dataverse", "casb"],
+      "adminCenterRef": "https://admin.powerplatform.microsoft.com",
+      "coeCenters": ["artifacts", "documents"],
+      "pillar": "software",
+      "cloudProvider": "power-platform"
+    },
+    {
+      "id": "azure-cloud",
+      "name": "Microsoft Azure",
+      "description": "Azure infrastructure, identity, security, data, and platform services under seven-pillar governance.",
+      "serviceDomains": [
+        { "domain": "identity", "services": ["Entra ID", "Conditional Access", "PIM", "Defender for Identity"], "iacFormat": "bicep", "pillar": "identity" },
+        { "domain": "devices", "services": ["Intune", "Defender for Endpoint"], "iacFormat": "bicep", "pillar": "devices" },
+        { "domain": "network", "services": ["VNet", "Azure Firewall", "Private Link", "Front Door"], "iacFormat": "bicep", "pillar": "network" },
+        { "domain": "data", "services": ["Purview", "Key Vault", "Storage", "SQL", "Cosmos DB"], "iacFormat": "bicep", "pillar": "data" },
+        { "domain": "secops", "services": ["Sentinel", "Defender XDR", "Azure Policy"], "iacFormat": "bicep", "pillar": "secops" },
+        { "domain": "resilience", "services": ["Backup", "Site Recovery", "Availability Zones"], "iacFormat": "bicep", "pillar": "resilience" }
+      ],
+      "discoverySources": ["azure-resource-graph", "azure-policy"],
+      "coeCenters": ["artifacts", "templates"],
+      "cloudProvider": "azure"
+    },
+    {
+      "id": "aws-cloud",
+      "name": "Amazon Web Services",
+      "description": "AWS infrastructure and security services governed via Terraform/CloudFormation and AWS Config.",
+      "serviceDomains": [
+        { "domain": "identity", "services": ["IAM", "IAM Identity Center", "Organizations"], "iacFormat": "terraform", "pillar": "identity" },
+        { "domain": "network", "services": ["VPC", "Security Groups", "Transit Gateway", "PrivateLink"], "iacFormat": "terraform", "pillar": "network" },
+        { "domain": "data", "services": ["S3", "KMS", "RDS", "Macie"], "iacFormat": "terraform", "pillar": "data" },
+        { "domain": "secops", "services": ["GuardDuty", "Security Hub", "CloudTrail", "Config"], "iacFormat": "terraform", "pillar": "secops" },
+        { "domain": "resilience", "services": ["Backup", "DRS", "S3 replication"], "iacFormat": "terraform", "pillar": "resilience" }
+      ],
+      "discoverySources": ["aws-config"],
+      "coeCenters": ["artifacts", "templates"],
+      "cloudProvider": "aws"
+    },
+    {
+      "id": "gcp-cloud",
+      "name": "Google Cloud Platform",
+      "description": "GCP infrastructure and org policies governed via Terraform and Deployment Manager.",
+      "serviceDomains": [
+        { "domain": "identity", "services": ["Cloud IAM", "Identity Platform", "Organization policies"], "iacFormat": "terraform", "pillar": "identity" },
+        { "domain": "network", "services": ["VPC", "Cloud Armor", "Private Service Connect"], "iacFormat": "terraform", "pillar": "network" },
+        { "domain": "data", "services": ["Cloud KMS", "Cloud Storage", "DLP", "BigQuery"], "iacFormat": "terraform", "pillar": "data" },
+        { "domain": "secops", "services": ["Security Command Center", "Chronicle", "Cloud Logging"], "iacFormat": "terraform", "pillar": "secops" },
+        { "domain": "resilience", "services": ["Backup for GKE", "Cloud DR"], "iacFormat": "terraform", "pillar": "resilience" }
+      ],
+      "discoverySources": ["gcp-asset-inventory"],
+      "coeCenters": ["artifacts", "templates"],
+      "cloudProvider": "gcp"
+    },
+    {
+      "id": "cross-cloud",
+      "name": "Cross-Cloud Orchestration",
+      "description": "Unified policies, asset register, multi-cloud orchestrator, and tenant-scoped governance baselines.",
+      "components": [
+        { "id": "asset-register", "name": "Multi-cloud asset register", "path": "ict-governance-framework/api/asset-router.js" },
+        { "id": "orchestrator", "name": "Multi-cloud orchestrator", "path": "ict-governance-framework/services/multi-cloud-orchestrator.js" },
+        { "id": "tenant-baselines", "name": "Per-tenant approved infrastructure", "path": "adpa/tenants/*/approved-infrastructure.json" }
+      ],
+      "coeCenters": ["artifacts", "govern"],
+      "cloudProvider": "multi-cloud"
+    }
+  ],
+  "assetClassRules": [
+    {
+      "rule": "One Power App = one software artifact asset",
+      "assetClass": "software-power-platform-app",
+      "scopeLayer": "power-platform",
+      "pillar": "software",
+      "coeCenterId": "artifacts",
+      "templateId": "power-platform-application",
+      "lifecycle": "Same CoE lifecycle as all artifacts: initiation → onboarding → active → build_update → retiring → retired"
+    },
+    {
+      "rule": "One Power Automate flow = one software artifact asset",
+      "assetClass": "software-power-platform-flow",
+      "scopeLayer": "power-platform",
+      "pillar": "software",
+      "coeCenterId": "artifacts",
+      "templateId": "power-platform-application"
+    },
+    {
+      "rule": "Each cloud resource in asset register = infrastructure artifact",
+      "assetClass": "infrastructure-compute",
+      "scopeLayer": "azure-cloud|aws-cloud|gcp-cloud",
+      "pillar": "mapped-by-resource-type",
+      "coeCenterId": "artifacts",
+      "discoverySource": "asset-register"
+    },
+    {
+      "rule": "ADPA JSON requirement = governance artifact",
+      "assetClass": "governance-artifact-json",
+      "scopeLayer": "governance-platform",
+      "coeCenterId": "artifacts"
+    }
+  ],
+  "cloudProviders": [
+    {
+      "id": "azure",
+      "name": "Microsoft Azure",
+      "iacFormats": ["bicep", "arm"],
+      "complianceFormats": ["azure-policy", "m365dsc"],
+      "scopeLayerId": "azure-cloud"
+    },
+    {
+      "id": "aws",
+      "name": "Amazon Web Services",
+      "iacFormats": ["terraform", "cloudformation"],
+      "complianceFormats": ["aws-config", "scp"],
+      "scopeLayerId": "aws-cloud"
+    },
+    {
+      "id": "gcp",
+      "name": "Google Cloud Platform",
+      "iacFormats": ["terraform", "deployment-manager"],
+      "complianceFormats": ["gcp-org-policy", "vpc-sc"],
+      "scopeLayerId": "gcp-cloud"
+    },
+    {
+      "id": "power-platform",
+      "name": "Power Platform",
+      "iacFormats": ["solution-package", "dataverse-schema"],
+      "complianceFormats": ["dlp-policy", "managed-environments"],
+      "scopeLayerId": "power-platform"
+    },
+    {
+      "id": "in-repo",
+      "name": "Governance Platform (in-repo)",
+      "iacFormats": ["bicep", "terraform", "json-artifact"],
+      "complianceFormats": ["rpas", "azure-policy-json"],
+      "scopeLayerId": "governance-platform"
+    }
+  ],
+  "pillarCoverageMatrix": {
+    "identity": { "layers": ["governance-platform", "azure-cloud", "aws-cloud", "gcp-cloud", "power-platform"], "templateId": "identity-access-control" },
+    "devices": { "layers": ["azure-cloud"], "templateId": "device-compliance" },
+    "software": { "layers": ["governance-platform", "power-platform", "azure-cloud", "aws-cloud", "gcp-cloud"], "templateId": "software-supply-chain" },
+    "network": { "layers": ["azure-cloud", "aws-cloud", "gcp-cloud"], "templateId": "network-segmentation" },
+    "data": { "layers": ["azure-cloud", "aws-cloud", "gcp-cloud", "power-platform"], "templateId": "data-protection" },
+    "secops": { "layers": ["governance-platform", "azure-cloud", "aws-cloud", "gcp-cloud"], "templateId": "security-monitoring" },
+    "resilience": { "layers": ["azure-cloud", "aws-cloud", "gcp-cloud"], "templateId": "resilience-backup" }
+  },
+  "coeCenterMapping": {
+    "templates": {
+      "scope": "Governance templates for all layers and pillars",
+      "layers": ["governance-platform", "azure-cloud", "aws-cloud", "gcp-cloud", "power-platform"]
+    },
+    "ai-providers": {
+      "scope": "LLM routing for requirement → artifact → IaC generation",
+      "layers": ["governance-platform"]
+    },
+    "artifacts": {
+      "scope": "All governed assets: Power Apps, cloud resources, JSON requirements, tenant baselines",
+      "layers": ["governance-platform", "power-platform", "azure-cloud", "aws-cloud", "gcp-cloud", "cross-cloud"]
+    },
+    "documents": {
+      "scope": "Versioned ICT Governance DOCX/Markdown per tenant across full scope",
+      "layers": ["governance-platform", "cross-cloud"]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "tenants": [
+    {
+      "tenantId": "tenant-contoso-health",
+      "displayName": "Contoso Health (demo)",
+      "manifestPath": "adpa/tenants/tenant-contoso-health/tenant.manifest.json",
+      "entityRef": "adpa/entities/tenant-contoso-health.json"
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/compliance-procurement-sla.schema.json",
+  "title": "Compliance Procurement SLA",
+  "description": "Procurement-drafted SLA for non-compliance escalations, including cost coverage for additional mitigating controls on exposed assets.",
+  "type": "object",
+  "required": ["slaId", "tenantId", "status", "slaTerms", "mitigationControlCostCoverage", "draftedAt"],
+  "properties": {
+    "slaId": { "type": "string" },
+    "tenantId": { "type": "string" },
+    "status": { "type": "string", "enum": ["draft", "approved", "active", "superseded"] },
+    "title": { "type": "string" },
+    "draftedBy": { "type": "string" },
+    "approvedBy": { "type": "string" },
+    "linkedEscalationId": { "type": "string" },
+    "linkedRequirementId": { "type": "string" },
+    "linkedAssetIds": { "type": "array", "items": { "type": "string" } },
+    "linkedRuleIds": { "type": "array", "items": { "type": "string" } },
+    "slaTerms": {
+      "type": "object",
+      "required": ["priority"],
+      "properties": {
+        "priority": { "type": "string", "enum": ["Critical", "High", "Medium", "Low"] },
+        "acknowledgeMs": { "type": "number" },
+        "checkValidationMs": { "type": "number" },
+        "resolutionMs": { "type": "number" },
+        "labels": { "type": "object" }
+      }
+    },
+    "mitigationControlCostCoverage": {
+      "type": "object",
+      "required": ["coversAdditionalControls", "coverageBasis"],
+      "properties": {
+        "coversAdditionalControls": { "type": "boolean" },
+        "coverageBasis": {
+          "type": "string",
+          "enum": ["non-compliant-asset-exposed-risk", "compensating-control-initiation", "vendor-remediation-support"]
+        },
+        "coverageModel": {
+          "type": "string",
+          "enum": ["vendor-accountability", "shared-accountability", "tco-estimate"],
+          "default": "vendor-accountability",
+          "description": "Control placement is typically not line-item priced; vendor-accountability binds service obligations to mitigation plan actions."
+        },
+        "pricingApproach": {
+          "type": "string",
+          "enum": ["not-line-item-priced", "tco-band-estimate", "fair-exposure-cap"],
+          "default": "not-line-item-priced"
+        },
+        "vendorAccountability": {
+          "type": "object",
+          "properties": {
+            "accountableParty": { "type": "string", "enum": ["vendor", "client", "shared"] },
+            "vendorName": { "type": "string" },
+            "serviceScope": { "type": "string" },
+            "complianceRequirementsCovered": { "type": "array", "items": { "type": "string" } },
+            "obligation": { "type": "string" }
+          }
+        },
+        "controlObligations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["obligationId", "description"],
+            "properties": {
+              "obligationId": { "type": "string" },
+              "description": { "type": "string" },
+              "linkedRuleId": { "type": "string" },
+              "linkedActionId": { "type": "string" },
+              "linkedAssetId": { "type": "string" },
+              "controlType": { "type": "string" },
+              "accountableParty": { "type": "string", "enum": ["vendor", "client", "shared"] },
+              "effectiveWhen": { "type": "string" }
+            }
+          }
+        },
+        "financialExposure": {
+          "type": "object",
+          "description": "Optional FAIR/ALE/TCO proxy — not a line-item price for control placement.",
+          "properties": {
+            "reportingBoundary": { "type": "string", "default": "fair-ale-tco-only" },
+            "estimatedUsd": { "type": ["number", "null"] },
+            "estimateBand": { "type": "string", "enum": ["low", "medium", "high", "unknown"] },
+            "note": { "type": "string" }
+          }
+        },
+        "budgetCeilingUsd": { "type": "number" },
+        "currency": { "type": "string", "default": "USD" },
+        "coveredControlTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["compensating-control", "monitoring-enhancement", "access-control", "encryption-control", "process-control", "vendor-uplift"]
+          }
+        },
+        "costItems": {
+          "type": "array",
+          "description": "Optional TCO band line items — not required when control placement is not line-item priced.",
+          "items": {
+            "type": "object",
+            "required": ["itemId", "description"],
+            "properties": {
+              "itemId": { "type": "string" },
+              "description": { "type": "string" },
+              "estimatedUsd": { "type": "number" },
+              "controlPurpose": { "type": "string" },
+              "linkedRuleId": { "type": "string" },
+              "linkedAssetId": { "type": "string" }
+            }
+          }
+        },
+        "totalEstimatedCoverageUsd": { "type": "number" },
+        "notes": { "type": "string" }
+      }
+    },
+    "internalControlDiscountPolicyRef": { "type": "string" },
+    "draftedAt": { "type": "string", "format": "date-time" },
+    "approvedAt": { "type": "string", "format": "date-time" },
+    "activatedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

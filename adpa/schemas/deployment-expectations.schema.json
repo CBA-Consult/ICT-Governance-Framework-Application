@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/deployment-expectations.schema.json",
+  "title": "Deployment Expectations",
+  "description": "Authoritative guidance for expected compliance and monitoring health after a resource is deployed from a governance requirement — closes the loop between requirement intent and vendor-delivered posture.",
+  "type": "object",
+  "required": ["expectedHealthState", "expectedComplianceState", "monitoringRules"],
+  "properties": {
+    "expectedHealthState": {
+      "type": "string",
+      "enum": ["healthy", "degraded", "non-compliant", "unknown", "failed"],
+      "description": "Target operational health once deploy completes successfully"
+    },
+    "expectedComplianceState": {
+      "type": "string",
+      "enum": ["Compliant", "NonCompliant", "Partial", "Unevaluated"],
+      "description": "Target compliance posture on asset register after validation"
+    },
+    "vendorDeliverableProfile": {
+      "type": "object",
+      "description": "What the software/cloud vendor must deliver for this requirement to be satisfied",
+      "properties": {
+        "summary": { "type": "string" },
+        "requiredCapabilities": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "evidenceTypes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "onFailure": {
+      "type": "object",
+      "properties": {
+        "driftType": {
+          "type": "string",
+          "enum": ["governance", "architectural", "process", "documentation", "observability", "security", "configuration"]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+        },
+        "remediationTemplateId": { "type": "string" },
+        "emitSecOpsIncident": { "type": "boolean", "default": false },
+        "emitClientEscalation": { "type": "boolean", "default": true },
+        "blockCsrBaseline": { "type": "boolean", "default": true }
+      }
+    },
+    "monitoringRules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "checkType", "frequency", "expectedState"],
+        "properties": {
+          "ruleId": { "type": "string" },
+          "controlId": { "type": "string" },
+          "mapsToAcceptanceCriteria": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Index into requirement.acceptanceCriteria[]"
+          },
+          "checkType": {
+            "type": "string",
+            "enum": [
+              "azure-policy-scan",
+              "aws-config-eval",
+              "gcp-org-policy",
+              "resource-graph-drift",
+              "sentinel-analytic",
+              "casb-posture",
+              "custom-health-probe",
+              "iac-state-diff"
+            ]
+          },
+          "frequency": {
+            "type": "string",
+            "enum": ["continuous", "hourly", "daily", "weekly", "on-deploy", "on-drift-event"]
+          },
+          "expectedState": { "type": "string" },
+          "frameworkControlRef": { "type": "string" },
+          "severityOnFail": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low"]
+          },
+          "remediationTemplateId": { "type": "string" },
+          "responsibleParty": {
+            "type": "string",
+            "enum": ["governance-service", "client", "vendor"],
+            "description": "Who is accountable when this rule fails — defaults to governance-service when system monitors the rule."
+          },
+          "enrollmentDenominator": {
+            "type": "string",
+            "enum": ["active-eligible-users", "all-users"],
+            "description": "For MFA enrollment rules — count only users who should be active, not user-account-created onboarding states."
+          },
+          "onboardingGracePeriodDays": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Days after account creation before user must be MFA-enrolled and counted as active-eligible."
+          },
+          "excludeAccountStatesFromRisk": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["user-account-created", "pending-onboarding", "disabled-pending-mfa", "inactive-not-yet-eligible"]
+            },
+            "description": "Account lifecycle states excluded from FAIR/ALE risk and enrollment failure denominator."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "cloudProfiles": {
+      "type": "object",
+      "description": "Per-cloud evaluator and compliance target for deployed resources",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "checkType": { "type": "string" },
+          "complianceTarget": { "type": "string" },
+          "iacFormat": { "type": "string" }
+        }
+      }
+    },
+    "serviceResponsibilityBoundary": {
+      "$ref": "service-responsibility-boundary.schema.json",
+      "description": "What the governance service ensures vs client-premises obligations — enables distinct partnership requirements per compliance standard."
+    },
+    "timeboundOnboarding": {
+      "$ref": "timebound-onboarding.schema.json",
+      "description": "Time-limited onboarding window — user-account-created states excluded from risk until MFA registration or window expiry."
+    }
+  },
+  "additionalProperties": false
+}

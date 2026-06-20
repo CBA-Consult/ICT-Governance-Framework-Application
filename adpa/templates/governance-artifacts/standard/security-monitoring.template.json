@@ -1,0 +1,72 @@
+{
+  "templateId": "security-monitoring",
+  "version": "1.0.0",
+  "artifactType": "hybrid",
+  "pillar": "secops",
+  "displayName": "Security Monitoring & Incident Response",
+  "description": "Converts SecOps governance requirements (SIEM, alerting, incident workflows, log retention) into observability IaC and policy specs.",
+  "frameworkRefs": [
+    "docs/implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md",
+    "blueprint-templates/policy-templates/incident-response-policy.md"
+  ],
+  "nistCategories": ["DE.AE", "DE.CM", "RS.AN"],
+  "governanceRequirement": {
+    "schemaRef": "adpa/schemas/governance-requirement.schema.json",
+    "requiredFields": [
+      "requirementId",
+      "title",
+      "statement",
+      "parameters.siemEnabled",
+      "parameters.logRetentionDays",
+      "parameters.incidentSlaMinutes"
+    ],
+    "optionalFields": [
+      "parameters.alertSeverityThreshold",
+      "parameters.autoTicketCreation",
+      "parameters.correlationEnabled"
+    ]
+  },
+  "llmProcessing": {
+    "systemInstructionsRef": "adpa/templates/governance-artifacts/llm-prompts/system-instructions.json",
+    "userPromptTemplate": "Convert the following SecOps governance requirement into a hybrid-specification for security monitoring and incident response.\n\nRequirement ID: {{requirementId}}\nTitle: {{title}}\nStatement: {{statement}}\nParameters: {{parameters}}\nAcceptance criteria: {{acceptanceCriteria}}\n\nProduce JSON with controls for log ingestion, alerting rules, diagnostic settings, and incident routing.",
+    "outputFormat": "json",
+    "temperature": 0.2,
+    "validationRules": [
+      "Log retention must meet or exceed logRetentionDays",
+      "Incident SLA must map to alert action groups or automation runbooks"
+    ]
+  },
+  "outputSchema": {
+    "schemaRef": "adpa/schemas/generated-artifact.schema.json",
+    "artifactKind": "hybrid-specification"
+  },
+  "iacTargets": {
+    "azure": {
+      "format": "bicep",
+      "translatorModule": "adpa/translators/azure/security-monitoring.bicep.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/secops-{{requirementId}}.bicep"
+    },
+    "aws": {
+      "format": "terraform",
+      "translatorModule": "adpa/translators/aws/security-monitoring.tf.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/aws/secops-{{requirementId}}.tf"
+    },
+    "gcp": {
+      "format": "terraform",
+      "translatorModule": "adpa/translators/gcp/security-monitoring.tf.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/gcp/secops-{{requirementId}}.tf"
+    }
+  },
+  "complianceTargets": {
+    "azurePolicy": {
+      "format": "azure-policy",
+      "translatorModule": "adpa/translators/azure/security-monitoring.policy.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/policies/secops-{{requirementId}}.json"
+    }
+  },
+  "rpasBinding": {
+    "csrBaseline": "CSR-42",
+    "driftClass": "observability",
+    "tarColArtifactId": "TAR-AEV-003"
+  }
+}

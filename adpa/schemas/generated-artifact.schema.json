@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/generated-artifact.schema.json",
+  "title": "Generated Governance Artifact",
+  "description": "Intermediate JSON output from LLM processing, prior to cloud-specific IaC and Compliance-as-Code translation.",
+  "type": "object",
+  "required": [
+    "artifactId",
+    "tenantId",
+    "requirementId",
+    "templateId",
+    "templateVersion",
+    "artifactKind",
+    "generatedAt",
+    "specification"
+  ],
+  "properties": {
+    "artifactId": { "type": "string" },
+    "tenantId": { "type": "string" },
+    "requirementId": { "type": "string" },
+    "templateId": { "type": "string" },
+    "templateVersion": { "type": "string" },
+    "artifactKind": {
+      "type": "string",
+      "enum": ["iac-specification", "compliance-policy-specification", "hybrid-specification"]
+    },
+    "generationStatus": {
+      "type": "string",
+      "enum": ["pending", "llm-complete", "translated", "validated", "deployed", "failed"]
+    },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "generatedBy": {
+      "type": "object",
+      "properties": {
+        "processor": { "type": "string" },
+        "model": { "type": "string" },
+        "runId": { "type": "string" }
+      }
+    },
+    "specification": {
+      "type": "object",
+      "required": ["summary", "controls"],
+      "properties": {
+        "summary": { "type": "string" },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["controlId", "description", "implementation"],
+            "properties": {
+              "controlId": { "type": "string" },
+              "description": { "type": "string" },
+              "implementation": {
+                "type": "object",
+                "properties": {
+                  "resourceType": { "type": "string" },
+                  "configuration": { "type": "object" },
+                  "dependencies": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              },
+              "complianceCheck": {
+                "type": "object",
+                "properties": {
+                  "ruleType": { "type": "string" },
+                  "effect": { "type": "string" },
+                  "parameters": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "translations": {
+      "type": "object",
+      "properties": {
+        "iac": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "format": { "type": "string" },
+              "outputPath": { "type": "string" },
+              "checksum": { "type": "string" },
+              "translatedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        },
+        "compliance": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "format": { "type": "string" },
+              "outputPath": { "type": "string" },
+              "checksum": { "type": "string" },
+              "translatedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      }
+    },
+    "validationResults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "validator": { "type": "string" },
+          "passed": { "type": "boolean" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "rpasEvidence": {
+      "type": "object",
+      "properties": {
+        "humanDecisionId": { "type": "string" },
+        "csrVersion": { "type": "string" },
+        "aevGateRef": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

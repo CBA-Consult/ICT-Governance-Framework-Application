@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/compliance-client-escalation.schema.json",
+  "title": "Compliance Client Escalation",
+  "description": "Structured client-facing escalation when infrastructure drifts from standard compliance. Separate from internal SecOps incidents — includes explicit control failure detail and executable mitigation actions.",
+  "type": "object",
+  "required": [
+    "escalationId",
+    "tenantId",
+    "escalationClass",
+    "status",
+    "frameworkImpacts",
+    "mitigationPlan",
+    "complianceNotification",
+    "issuedAt"
+  ],
+  "properties": {
+    "escalationId": { "type": "string" },
+    "tenantId": { "type": "string" },
+    "escalationClass": {
+      "type": "string",
+      "const": "client-infrastructure-compliance"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["Open", "Acknowledged", "Mitigating", "Resolved", "Closed"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["Critical", "High", "Medium", "Low"]
+    },
+    "assetId": { "type": "string" },
+    "requirementId": { "type": "string" },
+    "validationId": { "type": "string" },
+    "monitorId": { "type": "string" },
+    "lineageId": { "type": "string" },
+    "summary": { "type": "string" },
+    "frameworkImpacts": { "type": "array", "minItems": 1 },
+    "mitigationPlan": {
+      "type": "object",
+      "required": ["clientActions"],
+      "properties": {
+        "remediationTemplateId": { "type": "string" },
+        "requirementId": { "type": "string" },
+        "requirementTitle": { "type": "string" },
+        "clientActions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["actionId", "title", "description", "priority"],
+            "properties": {
+              "actionId": { "type": "string" },
+              "title": { "type": "string" },
+              "description": { "type": "string" },
+              "priority": { "type": "string" },
+              "linkedRuleId": { "type": "string" },
+              "linkedControlId": { "type": "string" },
+              "linkedCertificationId": { "type": "string" },
+              "linkedFrameworkControlId": { "type": "string" },
+              "acceptanceCriteriaIndex": { "type": "integer" },
+              "evidenceRequired": { "type": "array", "items": { "type": "string" } },
+              "status": {
+                "type": "string",
+                "enum": ["pending", "in-progress", "completed", "waived"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "complianceNotification": { "type": "object" },
+    "clientDisposition": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["remediate", "compensating-control", "accepted-risk", "unable-to-mitigate", "downstream-liability-escalated"]
+        },
+        "notes": { "type": "string" },
+        "decidedBy": { "type": "string" },
+        "decidedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "clientCheckValidation": {
+      "type": "object",
+      "description": "Client-assessed internal check/validation that may prevent downstream escalation of framework-detected non-compliance.",
+      "properties": {
+        "assessedAt": { "type": "string", "format": "date-time" },
+        "assessedBy": { "type": "string" },
+        "checkValidationInPlace": { "type": "boolean" },
+        "checkValidationDescription": { "type": "string" },
+        "linkedRuleIds": { "type": "array", "items": { "type": "string" } },
+        "preventsDownstreamEscalation": { "type": "boolean" },
+        "evidenceRef": { "type": "string" },
+        "reviewExpiry": { "type": "string", "format": "date-time" }
+      }
+    },
+    "downstreamLiabilityEscalation": {
+      "type": "object",
+      "description": "Client formal escalation of downstream liability on their premises when framework non-compliance may propagate beyond governed entities.",
+      "properties": {
+        "escalatedAt": { "type": "string", "format": "date-time" },
+        "escalatedBy": { "type": "string" },
+        "liabilityScope": {
+          "type": "string",
+          "enum": ["client-premises-downstream", "business-process", "third-party-chain", "operational-impact"]
+        },
+        "description": { "type": "string" },
+        "linkedRuleIds": { "type": "array", "items": { "type": "string" } },
+        "impactAssessment": { "type": "string" },
+        "mitigationDeadline": { "type": "string", "format": "date-time" },
+        "status": {
+          "type": "string",
+          "enum": ["escalated", "contained", "resolved"]
+        }
+      }
+    },
+    "liabilityRouting": {
+      "type": "object",
+      "description": "After internal control assessment — whether non-compliance remains with the vendor or escalates into governance products/services.",
+      "properties": {
+        "assessedAt": { "type": "string", "format": "date-time" },
+        "assessedBy": { "type": "string" },
+        "internalMitigationSufficient": { "type": "boolean" },
+        "routingDecision": {
+          "type": "string",
+          "enum": ["remains-with-vendor", "escalates-to-governance-products-services"]
+        },
+        "vendorId": { "type": "string" },
+        "vendorName": { "type": "string" },
+        "linkedRuleIds": { "type": "array", "items": { "type": "string" } },
+        "rationale": { "type": "string" },
+        "immediateVendorBlockApplied": {
+          "type": "boolean",
+          "description": "Policy default false — vendor is not blocked until routing and mitigation assessment complete."
+        }
+      }
+    },
+    "secOpsIncidentId": { "type": ["integer", "null"] },
+    "issuedAt": { "type": "string", "format": "date-time" },
+    "acknowledgedAt": { "type": "string", "format": "date-time" },
+    "resolvedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

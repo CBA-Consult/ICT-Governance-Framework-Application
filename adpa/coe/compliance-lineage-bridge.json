@@ -1,0 +1,305 @@
+{
+  "version": "1.0.0",
+  "description": "Maps framework mappings and monitoring rules to compliance_controls and certifications for non-compliance flagging.",
+  "certificationFrameworks": [
+    { "certificationId": "ISO-27001", "label": "ISO/IEC 27001", "frameworkKeys": ["ISO-27001", "ISO_27001"] },
+    { "certificationId": "NIST-CSF-2.0", "label": "NIST Cybersecurity Framework 2.0", "frameworkKeys": ["NIST-CSF-2.0", "NIST_CSF_2.0"] },
+    { "certificationId": "SOC-2", "label": "SOC 2 Type II", "frameworkKeys": ["SOC-2", "SOC2"] },
+    { "certificationId": "HIPAA", "label": "HIPAA Security Rule", "frameworkKeys": ["HIPAA"] },
+    { "certificationId": "GDPR", "label": "GDPR", "frameworkKeys": ["GDPR"] }
+  ],
+  "controlIdNormalization": {
+    "description": "Maps requirement framework controlId to compliance_controls.control_id",
+    "rules": [
+      { "pattern": "PR.AA-01", "controlId": "PR.AA.01" },
+      { "pattern": "PR.PS-01", "controlId": "PR.PS.01" },
+      { "pattern": "PR.PS-02", "controlId": "PR.PS.01" },
+      { "pattern": "A.9.2.1", "controlId": "A.9.2.1" }
+    ]
+  },
+  "nonComplianceStates": {
+    "assetCompliance": ["NonCompliant", "Partial"],
+    "healthState": ["non-compliant", "failed", "degraded"],
+    "monitorCompliance": ["NonCompliant", "Partial"],
+    "validationOverall": ["non-compliant", "failed", "degraded"]
+  },
+  "clientNotificationPolicy": {
+    "description": "Client non-compliance notifications must never be sent without explicit control-level framework impact.",
+    "requireNotificationClass": "compliance-non-conformance",
+    "requireFrameworkImpacts": true,
+    "minimumFieldsPerImpact": ["certificationId", "framework", "controlId", "controlName", "triggeredBy"],
+    "forbiddenPatterns": [
+      "whole-certification-failure-without-control-detail",
+      "generic-non-compliant-without-framework-mapping"
+    ]
+  },
+  "escalationChannels": {
+    "clientInfrastructureCompliance": {
+      "escalationClass": "client-infrastructure-compliance",
+      "description": "Structured client escalation with control failure detail and executable mitigation actions.",
+      "defaultOnFailure": true,
+      "storePathPattern": "adpa/tenants/{tenantId}/compliance-escalations/{escalationId}.json"
+    },
+    "secOpsIncident": {
+      "description": "Internal SecOps incident — optional, separate from client channel.",
+      "defaultOnFailure": false,
+      "noisy": true
+    }
+  },
+  "nonComplianceResponsePolicy": {
+    "description": "Non-compliance does not trigger immediate vendor block. Assess internal controls first, then route liability.",
+    "immediateVendorBlock": false,
+    "requireInternalControlAssessmentBeforeBlock": true,
+    "liabilityRoutingOptions": [
+      {
+        "id": "remains-with-vendor",
+        "label": "Remains with non-compliant vendor",
+        "description": "Failure is contained at the vendor; internal controls mitigate risk to client and governance products."
+      },
+      {
+        "id": "escalates-to-governance-products-services",
+        "label": "Escalates into governance products and services",
+        "description": "Failure propagates into ICT Governance Framework deliverables — requires remediation or service-level response."
+      }
+    ]
+  },
+  "reportingScope": {
+    "description": "ICT Governance Framework reporting boundary — financial exposure only from within the framework.",
+    "inScope": {
+      "financialMetrics": [
+        "fair_risk_scenarios.current_ale_usd",
+        "fair_risk_enterprise_history.total_ale_usd",
+        "fair_risk_telemetry_log.risk_delta_usd"
+      ],
+      "sources": [
+        "governance_incidents",
+        "compliance-monitors",
+        "validations",
+        "asset_register",
+        "compliance-escalations"
+      ],
+      "reportFormat": "dollar-exposure-only",
+      "apiEndpoint": "/api/governance/executive/metrics"
+    },
+    "outOfScope": {
+      "description": "Do not chart or report BPO SOPs or downstream client operational non-compliance outside the governance framework boundary.",
+      "excluded": [
+        "bpo-standard-operating-procedures",
+        "client-downstream-process-non-compliance",
+        "client-built-on-top-workflows",
+        "third-party-operational-sop-chains"
+      ],
+      "note": "Client escalations provide control-level remediation detail; executive reporting surfaces only ICT Governance Framework dollar exposure (ALE/TCO)."
+    }
+  },
+  "complianceEscalationSla": {
+    "description": "SLA targets for client compliance escalations — breach voids internal control discount.",
+    "Critical": {
+      "acknowledgeMs": 86400000,
+      "checkValidationMs": 259200000,
+      "resolutionMs": 604800000,
+      "labels": { "acknowledgeMs": "24 hours", "checkValidationMs": "72 hours", "resolutionMs": "7 days" }
+    },
+    "High": {
+      "acknowledgeMs": 172800000,
+      "checkValidationMs": 432000000,
+      "resolutionMs": 1209600000,
+      "labels": { "acknowledgeMs": "48 hours", "checkValidationMs": "5 days", "resolutionMs": "14 days" }
+    },
+    "Medium": {
+      "acknowledgeMs": 259200000,
+      "checkValidationMs": 604800000,
+      "resolutionMs": 1814400000,
+      "labels": { "acknowledgeMs": "72 hours", "checkValidationMs": "7 days", "resolutionMs": "21 days" }
+    }
+  },
+  "obligationControlSlas": {
+    "description": "Control-level SLA definitions — referenced by obligation.slaBinding.slaId; hydrated at runtime, not duplicated on requirements.",
+    "identity-mfa-enrollment-sla": {
+      "slaId": "identity-mfa-enrollment-sla",
+      "title": "MFA enrollment — 100% active-eligible within 30 days",
+      "enforcedByRules": ["identity-mfa-enrollment"],
+      "appliesToObligationIds": ["svc-mfa-approval-enforcement"],
+      "enrollmentDenominator": "active-eligible-users",
+      "contractClauseRef": "SLA-4.2",
+      "targets": {
+        "threshold": "100%",
+        "breachCondition": "active-eligible enrollment below threshold",
+        "remediationTimeMs": 86400000,
+        "remediationTimeLabel": "24h"
+      }
+    },
+    "identity-mfa-login-gate-sla": {
+      "slaId": "identity-mfa-login-gate-sla",
+      "title": "Login gate — no access without MFA registration",
+      "enforcedByRules": ["identity-mfa-login-registration-gate"],
+      "appliesToObligationIds": ["svc-mfa-login-registration-gate"],
+      "contractClauseRef": "SLA-4.3",
+      "targets": {
+        "threshold": "100%",
+        "breachCondition": "users obtain access without MFA device registration",
+        "remediationTimeMs": 3600000,
+        "remediationTimeLabel": "1h"
+      }
+    },
+    "identity-ca-policy-sla": {
+      "slaId": "identity-ca-policy-sla",
+      "title": "Conditional Access — compliant device enforcement",
+      "enforcedByRules": ["identity-compliant-device"],
+      "appliesToObligationIds": ["ca-policy-control"],
+      "contractClauseRef": "SLA-4.4",
+      "targets": {
+        "threshold": "100%",
+        "breachCondition": "CA policy not enforcing compliant device state",
+        "remediationTimeMs": 86400000,
+        "remediationTimeLabel": "24h"
+      }
+    }
+  },
+  "internalControlDiscountPolicy": {
+    "description": "TCO discount when clients maintain internal controls that prevent product and downstream liability escalation.",
+    "maxDiscountPercent": 15,
+    "slaBreachVoidsDiscount": true,
+    "tiers": [
+      { "id": "check-validation", "discountPercent": 5, "requires": "clientCheckValidation.preventsDownstreamEscalation" },
+      { "id": "vendor-contained", "discountPercent": 5, "requires": "liabilityRouting.remains-with-vendor" },
+      { "id": "no-downstream-escalation", "discountPercent": 5, "requires": "no downstream or governance-products escalation" }
+    ]
+  },
+  "clientCheckValidationPolicy": {
+    "description": "Clients assess internal check/validation against explicit failed rules.",
+    "requiresLinkedRuleIds": true,
+    "decisionWhenValidated": "compensating-control",
+    "statusWhenPreventsDownstream": "Mitigating"
+  },
+  "frameworkExposurePolicy": {
+    "description": "Executive dollar exposure (FAIR/ALE/TCO) within governance boundary. Null when access gates prevent system access or user-account-created onboarding states are excluded from risk.",
+    "reportingBoundary": "fair-ale-tco-only",
+    "nullExposureWhenAccessGateContainsRisk": true,
+    "accessGateContainedStatus": "contained-at-access-gate",
+    "excludeAccountStatesFromRiskDefault": ["user-account-created", "pending-onboarding", "inactive-not-yet-eligible"],
+    "enrollmentDenominatorDefault": "active-eligible-users"
+  },
+  "timeboundOnboardingPolicy": {
+    "description": "Partnership timebound onboarding window from account creation through MFA registration. User-account-created states are not active, excluded from FAIR/ALE risk denominator, and blocked from sign-in until registration completes or the window expires.",
+    "defaultWindowDays": 30,
+    "defaultWindowStartsAt": "account-created",
+    "defaultAccessDuringWindow": "blocked-until-mfa-registered",
+    "defaultRiskTreatment": "excluded-from-fair-denominator",
+    "escalateWhenWindowExpiresWithoutMfa": true,
+    "storePathPattern": "adpa/tenants/{tenantId}/requirements/{requirementId}.json#deploymentExpectations.timeboundOnboarding"
+  },
+  "serviceResponsibilityBoundaryPolicy": {
+    "description": "Define what the governance service ensures and maintains versus client-premises obligations — distinct per compliance standard for partnership clarity.",
+    "accountableParties": ["governance-service", "client", "vendor"],
+    "responsibilityTypes": ["service", "client", "shared"],
+    "monitorabilityTypes": ["deterministic", "inferred", "non-monitorable"],
+    "serviceEnsuresClasses": ["automated-control", "monitoring-rule"],
+    "clientPremisesClasses": ["client-specification", "operational-practice"],
+    "sharedFailureAttribution": ["rule-based", "context-based"],
+    "requireFrameworkResponsibilityMaps": true,
+    "storePathPattern": "adpa/tenants/{tenantId}/requirements/{requirementId}.json#deploymentExpectations.serviceResponsibilityBoundary",
+    "onRuleFailureDefaultAccountableParty": "governance-service",
+    "clientSpecificationsNotMonitoredByDefault": true
+  },
+  "evidenceProvenancePolicy": {
+    "description": "Independent evidence sources proving control outcomes — stored outside cloud provider boundary.",
+    "allowedSourceTypes": ["azure-policy-scan", "graph-api", "sentinel-query", "conditional-access-policy", "config-api", "manual-attestation", "client-attestation", "attestation"],
+    "defaultExternalStore": "adpa-artifact",
+    "deterministicServiceRequiresTelemetryOrConfig": true,
+    "clientNonMonitorableRequiresAttestation": true,
+    "multiSourceReady": true
+  },
+  "evidenceValidationPolicy": {
+    "description": "Cross-source evidence resolution — detect trust breakdown when independent sources diverge.",
+    "resolutionOutcomes": ["consistent", "divergent", "partial"],
+    "divergentTriggersEscalationClass": "evidence-conflict",
+    "normalizeTo": ["PASS", "FAIL", "PARTIAL", "ENFORCED"]
+  },
+  "evidenceDivergenceRemediationPolicy": {
+    "description": "Auto-remediation pipeline when independent evidence sources diverge — trust breakdown detection with safeguards against false-positive rebuild.",
+    "triggerWhen": {
+      "resolution": "divergent",
+      "confidence": "low",
+      "minSources": 2
+    },
+    "escalationClassOnTrigger": "evidence-conflict",
+    "priorityOnTrigger": "Critical",
+    "safeguards": {
+      "requireMultiSourceConflict": true,
+      "blockOnPartialOnly": true,
+      "requireApprovalForDestructive": true
+    },
+    "actionPipeline": [
+      { "actionId": "isolate-tenant-sessions", "label": "Isolate tenant sessions", "phase": "contain", "automated": true },
+      { "actionId": "revoke-active-sessions", "label": "Revoke active sessions", "phase": "contain", "automated": true },
+      { "actionId": "queue-layer2-redeploy", "label": "Queue Layer 2 baseline redeploy", "phase": "restore", "automated": false },
+      { "actionId": "revalidate-evidence-chain", "label": "Re-validate evidence chain", "phase": "verify", "automated": true }
+    ]
+  },
+  "remediationPlans": {
+    "mfa-redeploy-plan": {
+      "remediationPlanId": "mfa-redeploy-plan",
+      "requirementId": "identity-mfa-requirement",
+      "title": "MFA baseline redeploy and session reset",
+      "description": "Deterministic manual remediation — redeploy Conditional Access, invalidate sessions, re-validate evidence chain.",
+      "triggerMode": "manual-only",
+      "steps": [
+        {
+          "stepId": "reapply-ca-policy",
+          "type": "deploy",
+          "target": "conditional-access",
+          "method": "translator-redeploy"
+        },
+        {
+          "stepId": "invalidate-sessions",
+          "type": "security-action",
+          "target": "identity",
+          "method": "graph-api"
+        },
+        {
+          "stepId": "revalidate",
+          "type": "validation",
+          "method": "trigger-validation"
+        }
+      ]
+    }
+  },
+  "remediationLifecycle": {
+    "description": "Governed state transitions for manual remediation runs — pending → running → completed → verified → closed.",
+    "states": ["pending", "running", "failed", "completed", "verified", "closed"],
+    "terminalStates": ["failed", "closed"],
+    "verificationCriteria": {
+      "resolution": "consistent",
+      "confidence": "high"
+    },
+    "closeRequiresStatus": "verified"
+  },
+  "procurementSlaPolicy": {
+    "description": "Procurement drafts compliance mitigation SLAs binding vendor accountability for additional controls when non-compliance is triggered. Control placement is not line-item priced — obligations tie to mitigation plan actions; dollar exposure is reported separately via FAIR/ALE/TCO.",
+    "draftedByRole": "procurement",
+    "requireMitigationCoverage": true,
+    "requireCoversAdditionalControls": true,
+    "requireControlObligations": true,
+    "requireLineItemPricing": false,
+    "coverageModelDefault": "vendor-accountability",
+    "pricingApproachDefault": "not-line-item-priced",
+    "financialReportingBoundary": "fair-ale-tco-only",
+    "coverageBasisDefault": "non-compliant-asset-exposed-risk",
+    "storePathPattern": "adpa/tenants/{tenantId}/procurement-slas/{slaId}.json",
+    "activationLinksEscalation": true,
+    "coveredControlTypesDefault": [
+      "compensating-control",
+      "monitoring-enhancement",
+      "access-hardening",
+      "segmentation-control"
+    ]
+  },
+  "metrics": [
+    { "id": "nonCompliantAssets", "label": "Non-compliant assets", "source": "asset_register" },
+    { "id": "failedMonitoringRules", "label": "Failed monitoring rules", "source": "compliance-monitors" },
+    { "id": "validationGaps", "label": "Validation expectation gaps", "source": "validations" },
+    { "id": "flaggedControls", "label": "Flagged compliance controls", "source": "compliance_controls" },
+    { "id": "flaggedCertifications", "label": "Impacted certifications", "source": "certificationFrameworks" }
+  ]
+}

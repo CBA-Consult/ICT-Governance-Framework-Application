@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/asset-compliance-monitor.schema.json",
+  "title": "Asset Compliance Monitor",
+  "description": "Required compliance monitoring definition for a governed asset — links lineage from source through Layer 2 deploy to ongoing health checks.",
+  "type": "object",
+  "required": [
+    "monitorId",
+    "tenantId",
+    "assetId",
+    "pillar",
+    "cloudProvider",
+    "monitoringRules",
+    "lineage",
+    "status"
+  ],
+  "properties": {
+    "monitorId": { "type": "string" },
+    "tenantId": { "type": "string" },
+    "assetId": { "type": "string" },
+    "displayName": { "type": "string" },
+    "pillar": {
+      "type": "string",
+      "enum": ["identity", "devices", "software", "network", "data", "secops", "resilience", "governance"]
+    },
+    "cloudProvider": {
+      "type": "string",
+      "enum": ["azure", "aws", "gcp", "vmware", "alibaba", "oci", "power-platform", "multi-cloud", "in-repo"]
+    },
+    "assetClass": { "type": "string" },
+    "governanceLinks": {
+      "type": "object",
+      "required": ["requirementId", "artifactId"],
+      "properties": {
+        "entityId": { "type": "string" },
+        "requirementId": { "type": "string" },
+        "artifactId": { "type": "string" },
+        "templateId": { "type": "string" },
+        "validationId": { "type": "string" },
+        "layer2OutputPath": { "type": "string" },
+        "controlIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "monitoringRules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "checkType", "frequency", "expectedState"],
+        "properties": {
+          "ruleId": { "type": "string" },
+          "controlId": { "type": "string" },
+          "checkType": {
+            "type": "string",
+            "enum": [
+              "azure-policy-scan",
+              "aws-config-eval",
+              "gcp-org-policy",
+              "resource-graph-drift",
+              "sentinel-analytic",
+              "casb-posture",
+              "custom-health-probe",
+              "iac-state-diff"
+            ]
+          },
+          "frequency": {
+            "type": "string",
+            "enum": ["continuous", "hourly", "daily", "weekly", "on-deploy", "on-drift-event"]
+          },
+          "expectedState": { "type": "string" },
+          "frameworkControlRef": { "type": "string" },
+          "mapsToAcceptanceCriteria": { "type": "integer", "minimum": 0 },
+          "severityOnFail": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low"]
+          },
+          "remediationTemplateId": { "type": "string" }
+        }
+      }
+    },
+    "complianceState": {
+      "type": "string",
+      "enum": ["Compliant", "NonCompliant", "Partial", "Unevaluated"]
+    },
+    "healthState": {
+      "type": "string",
+      "enum": ["healthy", "degraded", "non-compliant", "unknown", "failed"]
+    },
+    "lastEvaluatedAt": { "type": "string", "format": "date-time" },
+    "lastValidationId": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["active", "paused", "retired"]
+    },
+    "deploymentExpectationsRef": {
+      "type": "object",
+      "properties": {
+        "expectedHealthState": { "type": "string" },
+        "expectedComplianceState": { "type": "string" }
+      }
+    },
+    "lineage": { "$ref": "lineage-envelope.schema.json" },
+    "evaluationHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "evaluatedAt": { "type": "string", "format": "date-time" },
+          "validationId": { "type": "string" },
+          "complianceState": { "type": "string" },
+          "healthState": { "type": "string" },
+          "checksum": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

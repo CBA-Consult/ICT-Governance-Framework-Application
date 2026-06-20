@@ -1,0 +1,64 @@
+{
+  "slaId": "proc-sla-1781957585300-e970fdfc",
+  "tenantId": "tenant-contract-proc-sla-test",
+  "status": "draft",
+  "title": "Compliance mitigation SLA — identity-mfa-requirement",
+  "draftedBy": "procurement@test.com",
+  "linkedEscalationId": "ces-1781957585298-91e2e432",
+  "linkedRequirementId": "identity-mfa-requirement",
+  "linkedAssetIds": [],
+  "linkedRuleIds": [],
+  "slaTerms": {
+    "priority": "Critical",
+    "acknowledgeMs": 86400000,
+    "checkValidationMs": 259200000,
+    "resolutionMs": 604800000,
+    "labels": {
+      "acknowledgeMs": "24 hours",
+      "checkValidationMs": "72 hours",
+      "resolutionMs": "7 days"
+    }
+  },
+  "mitigationControlCostCoverage": {
+    "coversAdditionalControls": true,
+    "coverageBasis": "non-compliant-asset-exposed-risk",
+    "coverageModel": "vendor-accountability",
+    "pricingApproach": "not-line-item-priced",
+    "vendorAccountability": {
+      "accountableParty": "vendor",
+      "obligation": "Vendor remains accountable for contracted compliance requirements and must initiate controls per the linked mitigation plan when non-compliance is triggered.",
+      "complianceRequirementsCovered": []
+    },
+    "controlObligations": [
+      {
+        "obligationId": "act-identity-mfa-enrollment",
+        "description": "100% of active-eligible users enrolled in MFA within 30 days of account creation (user-account-created states excluded from risk denominator)",
+        "linkedRuleId": "identity-mfa-enrollment",
+        "linkedActionId": "act-identity-mfa-enrollment",
+        "linkedAssetId": "/subscriptions/sub-test/policyAssignments/identity-mfa-enforcement",
+        "controlType": "compensating-control",
+        "accountableParty": "vendor",
+        "effectiveWhen": "non-compliance-triggered"
+      }
+    ],
+    "financialExposure": {
+      "reportingBoundary": "fair-ale-tco-only",
+      "estimatedUsd": null,
+      "estimateBand": "unknown",
+      "note": "Control placement is not line-item priced. Executive reporting uses FAIR/ALE/TCO exposure within the governance framework boundary."
+    },
+    "budgetCeilingUsd": null,
+    "currency": "USD",
+    "coveredControlTypes": [
+      "compensating-control",
+      "monitoring-enhancement",
+      "access-hardening",
+      "segmentation-control"
+    ],
+    "costItems": [],
+    "totalEstimatedCoverageUsd": null,
+    "notes": null
+  },
+  "internalControlDiscountPolicyRef": "internalControlDiscountPolicy",
+  "draftedAt": "2026-06-20T12:13:05.317Z"
+}

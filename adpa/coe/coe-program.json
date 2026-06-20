@@ -1,0 +1,120 @@
+{
+  "version": "1.0.0",
+  "name": "ICT Governance Center of Excellence",
+  "tagline": "Govern templates, AI providers, artifacts, and documents with full lifecycle traceability.",
+  "sections": [
+    {
+      "id": "overview",
+      "name": "Overview",
+      "description": "Define goals and expected outcomes of your CoE and get started.",
+      "phases": [
+        {
+          "id": "overview",
+          "name": "Overview",
+          "description": "CoE mission, goals, and expected outcomes"
+        },
+        {
+          "id": "download",
+          "name": "Download",
+          "description": "Starter kit, documentation, and governance pack exports"
+        }
+      ]
+    },
+    {
+      "id": "admin",
+      "name": "Admin",
+      "description": "Gain insights into your ICT Governance adoption across templates, AI, artifacts, and documents.",
+      "phases": [
+        {
+          "id": "setup",
+          "name": "Set up",
+          "description": "Sync ADPA inventory, register lifecycle centers, assign CoE administrators"
+        },
+        {
+          "id": "use",
+          "name": "Use",
+          "description": "Adoption dashboards, inventory health, and center KPIs"
+        },
+        {
+          "id": "deep-dive",
+          "name": "Deep dive",
+          "description": "Per-center lifecycle registries — templates, AI providers, artifacts, documents"
+        }
+      ]
+    },
+    {
+      "id": "govern",
+      "name": "Govern",
+      "description": "Establish required audit and compliance processes with immutable trails and rollback.",
+      "phases": [
+        {
+          "id": "setup",
+          "name": "Set up",
+          "description": "Onboarding checklists, business justification, owner assignment, RPAS binding"
+        },
+        {
+          "id": "use",
+          "name": "Use",
+          "description": "Lifecycle transitions, audit review, compliance posture"
+        },
+        {
+          "id": "deep-dive",
+          "name": "Deep dive",
+          "description": "Immutable audit log, version history, rollback procedures"
+        }
+      ]
+    },
+    {
+      "id": "nurture",
+      "name": "Nurture",
+      "description": "Accelerate adoption by thriving with a community of governance practitioners and makers.",
+      "phases": [
+        {
+          "id": "setup",
+          "name": "Set up",
+          "description": "Training catalog, L&D modules, community channels"
+        },
+        {
+          "id": "use",
+          "name": "Use",
+          "description": "Complete training, track certifications, share best practices"
+        }
+      ]
+    }
+  ],
+  "goals": [
+    {
+      "id": "standardize",
+      "title": "Standardize governance delivery",
+      "outcome": "Every tenant uses approved templates, artifacts, and documentation with consistent seven-pillar coverage."
+    },
+    {
+      "id": "automate",
+      "title": "Automate policy-to-code",
+      "outcome": "Governance requirements flow through LLM pipelines to IaC and Compliance-as-Code with traceability."
+    },
+    {
+      "id": "assure",
+      "title": "Assure audit readiness",
+      "outcome": "Immutable audit trails, version rollback, and RPAS-certified baselines for every lifecycle item."
+    },
+    {
+      "id": "multicloud",
+      "title": "Govern Azure, AWS, GCP and Power Platform as one scope",
+      "outcome": "Each Power App is a software artifact asset; cloud resources map to pillars with Bicep/Terraform/Policy per provider."
+    },
+  ],
+  "getStartedSteps": [
+    { "step": 1, "title": "Run CoE schema setup", "command": "npm run setup:coe-lifecycle", "path": "ict-governance-framework" },
+    { "step": 2, "title": "Sync ADPA inventory", "action": "Admin → Set up → Sync from ADPA" },
+    { "step": 3, "title": "Initiate lifecycle items", "action": "Admin → Deep dive → select a center → Initiate" },
+    { "step": 4, "title": "Complete Govern onboarding", "action": "Govern → Set up → owners, justification, checklist" },
+    { "step": 5, "title": "Generate tenant governance pack", "action": "Documents center or npm run adpa:generate:governance-doc" },
+    { "step": 6, "title": "Complete Nurture training", "action": "Nurture → Use → mark training modules complete" }
+  ],
+  "downloads": [
+    { "id": "coe-readme", "title": "CoE Program Guide", "path": "adpa/coe/README.md", "type": "markdown" },
+    { "id": "centers-config", "title": "Center definitions (JSON)", "path": "adpa/coe/centers.json", "type": "json" },
+    { "id": "governance-doc", "title": "Sample tenant governance DOCX", "path": "generated-documents/governance/tenant-contoso-health/ICT-Governance-tenant-contoso-health-v1.0.0.docx", "type": "docx" }
+  ]
+}

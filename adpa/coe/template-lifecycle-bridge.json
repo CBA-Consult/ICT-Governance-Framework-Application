@@ -1,0 +1,185 @@
+{
+  "version": "1.0.0",
+  "description": "ADPA Template CoE lifecycle bridge — phase guidance, QC gates, and ADPA ritual stage mapping.",
+  "adpaStages": [
+    { "id": "ideation", "name": "Ideation", "description": "Draft template concept and advisory JSON" },
+    { "id": "business-case", "name": "Business Case", "description": "Value assessment and cost of inaction documented" },
+    { "id": "approval", "name": "Approval", "description": "Human decision and stakeholder sign-off" },
+    { "id": "rtm-seed", "name": "RTM Seed", "description": "Requirements traceability and framework crosswalk" },
+    { "id": "execution", "name": "Execution", "description": "Template approved for generation and IaC translation" },
+    { "id": "csr-baseline", "name": "CSR Baseline", "description": "Certified stable release with checksum evidence" }
+  ],
+  "phases": {
+    "initiation": {
+      "label": "Initiation",
+      "intent": "create",
+      "summary": "Register a new template or bring an existing ADPA template into governed lifecycle.",
+      "adpaStage": "ideation",
+      "guidance": [
+        "Define template purpose, audience, and pillar mapping.",
+        "Link to framework source document or governance requirement.",
+        "Assign a domain owner before advancing to onboarding."
+      ],
+      "requiredActions": [
+        { "id": "register", "label": "Template registered in CoE", "auto": true },
+        { "id": "owner-assigned", "label": "Domain owner assigned", "gateRef": "owner-assigned" }
+      ],
+      "nextPhases": ["onboarding", "retired"]
+    },
+    "onboarding": {
+      "label": "Onboarding",
+      "intent": "validate",
+      "summary": "Complete business justification, schema validation, training, and CoE checklist.",
+      "adpaStage": "business-case",
+      "guidance": [
+        "Submit business justification with value proposition and risk assessment.",
+        "Run schema validation gate — all required keys must pass.",
+        "Complete template author training modules.",
+        "Obtain CoE governance council approval via checklist."
+      ],
+      "requiredActions": [
+        { "id": "business-case", "label": "Business justification submitted" },
+        { "id": "schema-validate", "label": "Schema validation passed", "gateRef": "schema-validate" },
+        { "id": "framework-alignment", "label": "Framework source mapped", "gateRef": "framework-alignment" },
+        { "id": "training-complete", "label": "Author training completed" },
+        { "id": "coe-approval", "label": "CoE council approval recorded" }
+      ],
+      "nextPhases": ["active", "initiation", "retired"]
+    },
+    "active": {
+      "label": "Active",
+      "intent": "operate",
+      "summary": "Template is approved for production use in governance generation and artifact translation.",
+      "adpaStage": "execution",
+      "guidance": [
+        "Template may be used for LLM-driven artifact generation and document output.",
+        "Monitor telemetry triggers and drift against certified baseline.",
+        "Use Build & Update phase for material changes — never edit certified templates without version bump."
+      ],
+      "requiredActions": [
+        { "id": "human-approval", "label": "Human approver recorded", "gateRef": "human-approval" },
+        { "id": "onboarding-complete", "label": "Onboarding checklist complete", "auto": true }
+      ],
+      "nextPhases": ["build_update", "retiring"]
+    },
+    "build_update": {
+      "label": "Build & Update",
+      "intent": "maintain",
+      "summary": "Apply versioned changes to template content, re-run QC gates, and return to active.",
+      "adpaStage": "amendment-proposal",
+      "guidance": [
+        "Document change summary and link to AMD record if material.",
+        "Re-run schema validation and DRACO review (blocking mode).",
+        "Run AEV attestation before returning to Active.",
+        "Increment template version in manifest and file metadata."
+      ],
+      "requiredActions": [
+        { "id": "change-summary", "label": "Change summary documented" },
+        { "id": "schema-validate", "label": "Schema re-validation passed", "gateRef": "schema-validate" },
+        { "id": "draco-review", "label": "DRACO quality review passed", "gateRef": "draco-review" },
+        { "id": "aev-attestation", "label": "AEV attestation recorded", "gateRef": "aev-attestation" }
+      ],
+      "nextPhases": ["active", "retiring"]
+    },
+    "retiring": {
+      "label": "Retiring",
+      "intent": "deprecate",
+      "summary": "Deprecate template with migration plan and stakeholder communication.",
+      "adpaStage": "amendment-decision",
+      "guidance": [
+        "Publish deprecation notice and sunset date.",
+        "Define migration path to replacement template.",
+        "Notify all template consumers and tenant owners.",
+        "Complete deprecation plan gate before final retirement."
+      ],
+      "requiredActions": [
+        { "id": "deprecation-notice", "label": "Deprecation notice published" },
+        { "id": "migration-plan", "label": "Migration plan documented", "gateRef": "deprecation-plan" },
+        { "id": "stakeholder-comms", "label": "Stakeholders notified" }
+      ],
+      "nextPhases": ["retired", "active"]
+    },
+    "retired": {
+      "label": "Retired",
+      "intent": "archive",
+      "summary": "Template removed from active use. Audit trail and versions preserved immutably.",
+      "adpaStage": "csr-baseline",
+      "guidance": [
+        "Template must not be used for new generations.",
+        "Historical artifacts and documents remain valid for audit.",
+        "Reactivation requires new initiation through CoE council."
+      ],
+      "requiredActions": [],
+      "nextPhases": []
+    }
+  },
+  "qcGates": [
+    {
+      "id": "schema-validate",
+      "name": "Schema Validation",
+      "description": "Validate template file structure, manifest registration, and required keys.",
+      "mode": "blocking",
+      "runner": "adpa-validate-template",
+      "appliesToPhases": ["onboarding", "build_update", "active"]
+    },
+    {
+      "id": "framework-alignment",
+      "name": "Framework Alignment",
+      "description": "Verify frameworkSource path exists and pillar/category mapping is consistent.",
+      "mode": "advisory",
+      "runner": "framework-alignment-check",
+      "appliesToPhases": ["onboarding"]
+    },
+    {
+      "id": "draco-review",
+      "name": "DRACO Quality Review",
+      "description": "AI review board — advisory during onboarding, blocking during build & update.",
+      "mode": "advisory",
+      "blockingInPhases": ["build_update"],
+      "runner": "draco-simulated",
+      "appliesToPhases": ["onboarding", "build_update"]
+    },
+    {
+      "id": "human-approval",
+      "name": "Human Approval",
+      "description": "Governor sign-off required before template enters active production use.",
+      "mode": "blocking",
+      "runner": "manual",
+      "appliesToPhases": ["onboarding", "active"]
+    },
+    {
+      "id": "aev-attestation",
+      "name": "AEV Attestation",
+      "description": "Atomic Execution & Validation attestation for material template changes.",
+      "mode": "blocking",
+      "runner": "aev-check",
+      "appliesToPhases": ["build_update"]
+    },
+    {
+      "id": "deprecation-plan",
+      "name": "Deprecation Plan",
+      "description": "Migration plan and stakeholder communication verified before retirement.",
+      "mode": "blocking",
+      "runner": "manual",
+      "appliesToPhases": ["retiring"]
+    },
+    {
+      "id": "owner-assigned",
+      "name": "Owner Assigned",
+      "description": "At least one domain owner must be assigned.",
+      "mode": "blocking",
+      "runner": "owner-check",
+      "appliesToPhases": ["initiation", "onboarding"]
+    }
+  ],
+  "transitionGateRequirements": {
+    "initiation:onboarding": ["owner-assigned"],
+    "onboarding:active": ["schema-validate", "framework-alignment", "human-approval"],
+    "active:build_update": [],
+    "build_update:active": ["schema-validate", "draco-review", "aev-attestation"],
+    "active:retiring": [],
+    "retiring:retired": ["deprecation-plan"],
+    "onboarding:initiation": [],
+    "retiring:active": ["human-approval"]
+  }
+}

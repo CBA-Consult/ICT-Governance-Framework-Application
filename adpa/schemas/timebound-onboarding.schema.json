@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/timebound-onboarding.schema.json",
+  "title": "Timebound Onboarding",
+  "description": "Partnership window from account creation through MFA registration — created accounts are not active, not risk-weighted, and cannot access systems until registration completes or the window expires.",
+  "type": "object",
+  "required": ["enabled", "windowDays", "windowStartsAt", "accessDuringWindow"],
+  "properties": {
+    "enabled": { "type": "boolean" },
+    "windowDays": { "type": "integer", "minimum": 1 },
+    "windowStartsAt": {
+      "type": "string",
+      "enum": ["account-created", "hr-provisioned", "first-login-attempt"]
+    },
+    "windowEndsAt": {
+      "type": "string",
+      "enum": ["mfa-registered", "window-expired", "account-disabled"],
+      "description": "When the onboarding window closes — user becomes active-eligible or is disabled."
+    },
+    "accountStatesInWindow": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["user-account-created", "pending-onboarding", "inactive-not-yet-eligible"]
+      }
+    },
+    "accessDuringWindow": {
+      "type": "string",
+      "enum": ["blocked-until-mfa-registered", "limited-access", "none"]
+    },
+    "riskTreatment": {
+      "type": "string",
+      "enum": ["excluded-from-fair-denominator", "included-after-window-expiry"],
+      "default": "excluded-from-fair-denominator"
+    },
+    "escalateWhenWindowExpiresWithoutMfa": { "type": "boolean", "default": true },
+    "linkedRuleIds": { "type": "array", "items": { "type": "string" } },
+    "summary": { "type": "string" }
+  },
+  "additionalProperties": false
+}

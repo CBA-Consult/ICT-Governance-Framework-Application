@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/service-responsibility-boundary.schema.json",
+  "title": "Service Responsibility Boundary",
+  "description": "Partnership boundary defining what the governance service ensures and maintains versus client-premises obligations per compliance standard.",
+  "type": "object",
+  "required": ["serviceObligations", "clientPremisesObligations"],
+  "properties": {
+    "summary": { "type": "string" },
+    "serviceObligations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/obligation" }
+    },
+    "clientPremisesObligations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/obligation" }
+    },
+    "sharedObligations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sharedObligation" },
+      "description": "Hybrid controls — service and client both contribute; failure attribution is rule- or context-based."
+    },
+    "frameworkResponsibilityMaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["certificationId", "framework", "controlId"],
+        "properties": {
+          "certificationId": { "type": "string" },
+          "framework": { "type": "string" },
+          "controlId": { "type": "string" },
+          "controlName": { "type": "string" },
+          "serviceEnsures": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "obligationId values the governance service ensures"
+          },
+          "clientResponsibleFor": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "obligationId values the client maintains on-premises"
+          },
+          "sharedControls": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "obligationId values with shared responsibilityType"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "monitorability": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["deterministic", "inferred", "non-monitorable"]
+        },
+        "confidenceLevel": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "sharedResponsibilityModel": {
+      "type": "object",
+      "required": ["serviceEnsures", "clientEnsures", "failureAttributionLogic"],
+      "properties": {
+        "serviceEnsures": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "clientEnsures": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "failureAttributionLogic": {
+          "type": "string",
+          "enum": ["rule-based", "context-based"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidenceSource": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "azure-policy-scan",
+            "graph-api",
+            "sentinel-query",
+            "conditional-access-policy",
+            "config-api",
+            "manual-attestation",
+            "client-attestation",
+            "attestation"
+          ]
+        },
+        "role": { "type": "string", "enum": ["service", "client", "shared"] },
+        "confidence": { "type": "string", "enum": ["high", "medium", "low"] }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "source": { "type": "string" },
+        "primarySource": { "type": "string" },
+        "ownership": { "type": "string", "enum": ["service", "client", "shared", "governance-service"] },
+        "auditFrequency": {
+          "type": "string",
+          "enum": ["continuous", "periodic", "quarterly", "on-demand"]
+        },
+        "externalStore": { "type": "string", "enum": ["postgresql", "adpa-artifact"] },
+        "evidenceType": { "type": "string", "enum": ["telemetry", "configuration", "attestation"] },
+        "lastObservedAt": { "type": "string", "format": "date-time" },
+        "sources": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceSource" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "obligation": {
+      "type": "object",
+      "required": ["obligationId", "title", "accountableParty"],
+      "properties": {
+        "obligationId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "accountableParty": {
+          "type": "string",
+          "enum": ["governance-service", "client", "vendor"]
+        },
+        "responsibilityType": {
+          "type": "string",
+          "enum": ["service", "client", "shared"],
+          "default": "service"
+        },
+        "monitorability": { "$ref": "#/$defs/monitorability" },
+        "obligationClass": {
+          "type": "string",
+          "enum": ["automated-control", "monitoring-rule", "client-specification", "operational-practice", "vendor-deliverable"]
+        },
+        "linkedRuleIds": { "type": "array", "items": { "type": "string" } },
+        "linkedAcceptanceCriteriaIndex": { "type": "integer", "minimum": 0 },
+        "monitoredBySystem": { "type": "boolean", "default": false },
+        "slaBinding": {
+          "type": "object",
+          "required": ["slaId"],
+          "properties": {
+            "slaId": {
+              "type": "string",
+              "description": "Reference into adpa/coe/compliance-lineage-bridge.json#obligationControlSlas"
+            }
+          },
+          "additionalProperties": false
+        },
+        "evidence": { "$ref": "#/$defs/evidence" }
+      },
+      "additionalProperties": false
+    },
+    "sharedObligation": {
+      "allOf": [
+        { "$ref": "#/$defs/obligation" },
+        {
+          "required": ["responsibilityType", "sharedResponsibilityModel"],
+          "properties": {
+            "responsibilityType": { "const": "shared" },
+            "accountableParty": {
+              "type": "string",
+              "enum": ["governance-service", "client", "vendor"]
+            },
+            "sharedResponsibilityModel": { "$ref": "#/$defs/sharedResponsibilityModel" }
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

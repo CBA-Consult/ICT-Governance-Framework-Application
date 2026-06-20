@@ -74,6 +74,14 @@
       "pmbokDomain": "uncertainty",
       "outputCategory": "core-analysis",
       "telemetryTriggers": ["security-incident", "access-anomaly", "observability-gap"]
+    },
+    {
+      "id": "tenant-governance-documentation",
+      "file": "ict-governance/tenant-governance-documentation.template.md",
+      "frameworkSource": "docs/implementation/guides/Enterprise-Security-Seven-Pillar-Implementation-Plan.md",
+      "pmbokDomain": "quality",
+      "outputCategory": "governance",
+      "outputFormat": "docx"
     }
   ],
   "pmbokTemplates": {

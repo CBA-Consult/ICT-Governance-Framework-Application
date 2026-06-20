@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "description": "Append-only traceability audit registry for validation and asset loop-back events.",
+  "entries": [
+    {
+      "auditId": "2d1e52f0-1b74-4176-85f6-30656434e404",
+      "recordedAt": "2026-06-20T10:38:14.222Z",
+      "checksum": "51b25455810b3cd7ec0eb98b16fb38e93ec3644439cf0a2cad0eeb8c422cedf2",
+      "eventType": "asset-loop-back",
+      "eventAction": "applied",
+      "validationId": "val-1781951894202",
+      "tenantId": "tenant-contoso-health",
+      "assetCount": 1,
+      "actorEmail": "test"
+    },
+    {
+      "auditId": "90a538cc-ce78-4ad3-87d8-0ebaf69f9f08",
+      "recordedAt": "2026-06-20T10:38:14.206Z",
+      "checksum": "6f3380f1abf1e48a85af70ddefcdee0470d67aafc1df6b4752e31c46eec56971",
+      "eventType": "validation",
+      "eventAction": "created",
+      "validationId": "val-1781951894202",
+      "tenantId": "tenant-contoso-health"
+    },
+    {
+      "auditId": "572a22dd-5887-4019-8e27-ba05148c7a31",
+      "recordedAt": "2026-06-20T10:27:53.474Z",
+      "checksum": "7bfae1756e4127da4ca19225041a222fa30a172674880f2400a94ec355a0b799",
+      "eventType": "asset-loop-back",
+      "eventAction": "applied",
+      "validationId": "val-1781951273455",
+      "tenantId": "tenant-contoso-health",
+      "assetCount": 1,
+      "actorEmail": "test"
+    },
+    {
+      "auditId": "7a9c9e3f-4fba-4fd7-b3e3-52a87e4b96ef",
+      "recordedAt": "2026-06-20T10:27:53.458Z",
+      "checksum": "d295c7d9ccdabb16cc6cc232dfd047e32464f31478f90c7fc39a06baa5a7f3ce",
+      "eventType": "validation",
+      "eventAction": "created",
+      "validationId": "val-1781951273455",
+      "tenantId": "tenant-contoso-health"
+    }
+  ]
+}

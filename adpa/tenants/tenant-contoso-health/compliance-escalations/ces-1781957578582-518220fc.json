@@ -1,0 +1,376 @@
+{
+  "escalationId": "ces-1781957578582-518220fc",
+  "tenantId": "tenant-contoso-health",
+  "escalationClass": "client-infrastructure-compliance",
+  "status": "Open",
+  "priority": "Critical",
+  "assetId": "/subscriptions/sub-contoso/policyAssignments/identity-mfa-enforcement",
+  "requirementId": "identity-mfa-requirement",
+  "validationId": "val-exposure-test",
+  "monitorId": null,
+  "lineageId": null,
+  "summary": "Infrastructure compliance escalation — explicit control failure detail for client remediation.\nNIST Cybersecurity Framework 2.0 (NIST-CSF-2.0) control PR.AA.01 — Identities and credentials are managed: non-conformant. Triggered by: rule identity-mfa-enrollment; expected \"100% of users enrolled in MFA\", observed \"72% enrolled\"; entity /subscriptions/sub-contoso/policyAssignments/identity-mfa-enforcement\nISO/IEC 27001 (ISO-27001) control A.9.2.1 — User registration and de-registration: non-conformant. Triggered by: rule identity-mfa-enrollment; expected \"100% of users enrolled in MFA\", observed \"72% enrolled\"; entity /subscriptions/sub-contoso/policyAssignments/identity-mfa-enforcement",
+  "frameworkImpacts": [
+    {
+      "certificationId": "NIST-CSF-2.0",
+      "certificationLabel": "NIST Cybersecurity Framework 2.0",
+      "framework": "NIST-CSF-2.0",
+      "controlId": "PR.AA.01",
+      "controlName": "Identities and credentials are managed",
+      "complianceStatus": "non-conformant",
+      "triggeredBy": [
+        {
+          "triggerType": "control",
+          "ruleId": "identity-mfa-enrollment",
+          "controlId": "identity-mfa-enforcement",
+          "expected": "100% of users enrolled in MFA",
+          "observed": "72% enrolled",
+          "assetId": "/subscriptions/sub-contoso/policyAssignments/identity-mfa-enforcement",
+          "mapsToAcceptanceCriteria": 0,
+          "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01",
+          "responsibility": {
+            "accountableParty": "governance-service",
+            "classification": "service-ensures",
+            "obligationId": "svc-mfa-approval-enforcement"
+          }
+        }
+      ],
+      "responsibilityBoundary": {
+        "serviceEnsures": [
+          "svc-mfa-approval-enforcement",
+          "svc-mfa-login-registration-gate",
+          "svc-jit-privileged-access",
+          "svc-guest-admin-block",
+          "svc-compliant-device-ca"
+        ],
+        "clientResponsibleFor": [
+          "client-new-user-onboarding-mfa",
+          "client-no-password-sharing",
+          "client-delegation-on-behalf",
+          "client-credential-hygiene-awareness"
+        ]
+      }
+    },
+    {
+      "certificationId": "ISO-27001",
+      "certificationLabel": "ISO/IEC 27001",
+      "framework": "ISO-27001",
+      "controlId": "A.9.2.1",
+      "controlName": "User registration and de-registration",
+      "complianceStatus": "non-conformant",
+      "triggeredBy": [
+        {
+          "triggerType": "control",
+          "ruleId": "identity-mfa-enrollment",
+          "controlId": "identity-mfa-enforcement",
+          "expected": "100% of users enrolled in MFA",
+          "observed": "72% enrolled",
+          "assetId": "/subscriptions/sub-contoso/policyAssignments/identity-mfa-enforcement",
+          "mapsToAcceptanceCriteria": 0,
+          "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01",
+          "responsibility": {
+            "accountableParty": "governance-service",
+            "classification": "service-ensures",
+            "obligationId": "svc-mfa-approval-enforcement"
+          }
+        }
+      ],
+      "responsibilityBoundary": {
+        "serviceEnsures": [
+          "svc-mfa-approval-enforcement",
+          "svc-mfa-login-registration-gate",
+          "svc-guest-admin-block"
+        ],
+        "clientResponsibleFor": [
+          "client-new-user-onboarding-mfa",
+          "client-no-password-sharing",
+          "client-delegation-on-behalf",
+          "client-credential-hygiene-awareness"
+        ]
+      }
+    }
+  ],
+  "mitigationPlan": {
+    "remediationTemplateId": "identity-access-control",
+    "requirementId": "identity-mfa-requirement",
+    "requirementTitle": "Mandatory MFA for all privileged and standard users",
+    "acceptanceCriteria": [
+      "100% of active-eligible users enrolled in MFA within 30 days of account creation (user-account-created states excluded from risk denominator)",
+      "Users cannot sign in until MFA device registration is complete — registration prompt enforced at login",
+      "Privileged roles use JIT elevation with maximum 4-hour sessions",
+      "Guest users blocked from administrative roles",
+      "Conditional access policies enforce compliant device state"
+    ],
+    "vendorDeliverableProfile": {
+      "summary": "Microsoft Entra ID and Conditional Access must deliver MFA for all users, JIT for privileged roles, guest restrictions, and compliant-device enforcement per approved parameters.",
+      "requiredCapabilities": [
+        "entra-id-mfa-enrollment-100pct",
+        "privileged-identity-management-jit-4h-max",
+        "conditional-access-require-mfa",
+        "conditional-access-require-compliant-device",
+        "conditional-access-block-until-mfa-registered",
+        "guest-administrative-role-block"
+      ],
+      "evidenceTypes": [
+        "azure-policy-compliance-state",
+        "microsoft-entra-sign-in-logs",
+        "pim-activation-audit"
+      ]
+    },
+    "clientActions": [
+      {
+        "actionId": "act-identity-mfa-enrollment",
+        "title": "100% of active-eligible users enrolled in MFA within 30 days of account creation (user-account-created states excluded from risk denominator)",
+        "description": "Restore compliance for monitoring rule \"identity-mfa-enrollment\". Target state: 100% of users enrolled in MFA. Current observed state: 72% enrolled.",
+        "priority": "Critical",
+        "linkedRuleId": "identity-mfa-enrollment",
+        "linkedControlId": "identity-mfa-enforcement",
+        "linkedCertificationId": "NIST-CSF-2.0",
+        "linkedFrameworkControlId": "PR.AA.01",
+        "acceptanceCriteriaIndex": 0,
+        "evidenceRequired": [
+          "azure-policy-compliance-state",
+          "microsoft-entra-sign-in-logs",
+          "pim-activation-audit"
+        ],
+        "status": "pending"
+      }
+    ]
+  },
+  "complianceNotification": {
+    "notificationClass": "compliance-non-conformance",
+    "tenantId": "tenant-contoso-health",
+    "requirementId": "identity-mfa-requirement",
+    "validationId": "val-exposure-test",
+    "assetId": "/subscriptions/sub-contoso/policyAssignments/identity-mfa-enforcement",
+    "lineage": null,
+    "frameworkImpacts": [
+      {
+        "certificationId": "NIST-CSF-2.0",
+        "certificationLabel": "NIST Cybersecurity Framework 2.0",
+        "framework": "NIST-CSF-2.0",
+        "controlId": "PR.AA.01",
+        "controlName": "Identities and credentials are managed",
+        "complianceStatus": "non-conformant",
+        "triggeredBy": [
+          {
+            "triggerType": "control",
+            "ruleId": "identity-mfa-enrollment",
+            "controlId": "identity-mfa-enforcement",
+            "expected": "100% of users enrolled in MFA",
+            "observed": "72% enrolled",
+            "assetId": "/subscriptions/sub-contoso/policyAssignments/identity-mfa-enforcement",
+            "mapsToAcceptanceCriteria": 0,
+            "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01"
+          }
+        ]
+      },
+      {
+        "certificationId": "ISO-27001",
+        "certificationLabel": "ISO/IEC 27001",
+        "framework": "ISO-27001",
+        "controlId": "A.9.2.1",
+        "controlName": "User registration and de-registration",
+        "complianceStatus": "non-conformant",
+        "triggeredBy": [
+          {
+            "triggerType": "control",
+            "ruleId": "identity-mfa-enrollment",
+            "controlId": "identity-mfa-enforcement",
+            "expected": "100% of users enrolled in MFA",
+            "observed": "72% enrolled",
+            "assetId": "/subscriptions/sub-contoso/policyAssignments/identity-mfa-enforcement",
+            "mapsToAcceptanceCriteria": 0,
+            "frameworkControlRef": "NIST-CSF-2.0 PR.AA-01"
+          }
+        ]
+      }
+    ],
+    "mitigationPlan": {
+      "remediationTemplateId": "identity-access-control",
+      "requirementId": "identity-mfa-requirement",
+      "requirementTitle": "Mandatory MFA for all privileged and standard users",
+      "acceptanceCriteria": [
+        "100% of active-eligible users enrolled in MFA within 30 days of account creation (user-account-created states excluded from risk denominator)",
+        "Users cannot sign in until MFA device registration is complete — registration prompt enforced at login",
+        "Privileged roles use JIT elevation with maximum 4-hour sessions",
+        "Guest users blocked from administrative roles",
+        "Conditional access policies enforce compliant device state"
+      ],
+      "vendorDeliverableProfile": {
+        "summary": "Microsoft Entra ID and Conditional Access must deliver MFA for all users, JIT for privileged roles, guest restrictions, and compliant-device enforcement per approved parameters.",
+        "requiredCapabilities": [
+          "entra-id-mfa-enrollment-100pct",
+          "privileged-identity-management-jit-4h-max",
+          "conditional-access-require-mfa",
+          "conditional-access-require-compliant-device",
+          "conditional-access-block-until-mfa-registered",
+          "guest-administrative-role-block"
+        ],
+        "evidenceTypes": [
+          "azure-policy-compliance-state",
+          "microsoft-entra-sign-in-logs",
+          "pim-activation-audit"
+        ]
+      },
+      "failedRules": [
+        {
+          "ruleId": "identity-mfa-enrollment",
+          "controlId": "identity-mfa-enforcement",
+          "expectedState": "100% of users enrolled in MFA",
+          "observed": "72% enrolled"
+        }
+      ]
+    },
+    "gaps": [
+      {
+        "type": "control",
+        "ruleId": "identity-mfa-enrollment",
+        "controlId": "identity-mfa-enforcement",
+        "expectedState": "100% of users enrolled in MFA",
+        "observed": "72% enrolled",
+        "mapsToAcceptanceCriteria": 0
+      }
+    ],
+    "issuedAt": "2026-06-20T12:12:58.581Z"
+  },
+  "secOpsIncidentId": null,
+  "issuedAt": "2026-06-20T12:12:58.582Z",
+  "serviceResponsibilityBoundary": {
+    "summary": "The governance service enforces MFA at login — users cannot access systems until device registration is complete. The client maintains new-user onboarding on-premises; account creation and MFA device registration take time, but access remains blocked until registration succeeds.",
+    "serviceObligations": [
+      {
+        "obligationId": "svc-mfa-approval-enforcement",
+        "title": "MFA enrollment for active-eligible users only",
+        "description": "System monitors MFA enrollment against active-eligible users within the 30-day onboarding window. User-account-created and pending-onboarding accounts are excluded from the risk denominator — they should not be active and cannot sign in until MFA registration completes.",
+        "accountableParty": "governance-service",
+        "obligationClass": "automated-control",
+        "linkedRuleIds": [
+          "identity-mfa-enrollment"
+        ],
+        "linkedAcceptanceCriteriaIndex": 0,
+        "monitoredBySystem": true
+      },
+      {
+        "obligationId": "svc-mfa-login-registration-gate",
+        "title": "Login blocked until MFA device registration complete",
+        "description": "System enforces Conditional Access so users cannot sign in without MFA registration. At first login the user is prompted to complete MFA device registration before any system access is granted — no bypass except approved break-glass.",
+        "accountableParty": "governance-service",
+        "obligationClass": "automated-control",
+        "linkedRuleIds": [
+          "identity-mfa-login-registration-gate"
+        ],
+        "linkedAcceptanceCriteriaIndex": 1,
+        "monitoredBySystem": true
+      },
+      {
+        "obligationId": "svc-jit-privileged-access",
+        "title": "JIT elevation for privileged roles",
+        "description": "System enforces and monitors privileged identity management with maximum 4-hour sessions.",
+        "accountableParty": "governance-service",
+        "obligationClass": "monitoring-rule",
+        "linkedRuleIds": [
+          "identity-jit-privileged"
+        ],
+        "linkedAcceptanceCriteriaIndex": 2,
+        "monitoredBySystem": true
+      },
+      {
+        "obligationId": "svc-guest-admin-block",
+        "title": "Guest user administrative role restriction",
+        "description": "System monitors and enforces guest users blocked from administrative roles.",
+        "accountableParty": "governance-service",
+        "obligationClass": "monitoring-rule",
+        "linkedRuleIds": [
+          "identity-guest-block"
+        ],
+        "linkedAcceptanceCriteriaIndex": 3,
+        "monitoredBySystem": true
+      },
+      {
+        "obligationId": "svc-compliant-device-ca",
+        "title": "Compliant device conditional access",
+        "description": "System monitors conditional access policies requiring compliant device state.",
+        "accountableParty": "governance-service",
+        "obligationClass": "monitoring-rule",
+        "linkedRuleIds": [
+          "identity-compliant-device"
+        ],
+        "linkedAcceptanceCriteriaIndex": 4,
+        "monitoredBySystem": true
+      }
+    ],
+    "clientPremisesObligations": [
+      {
+        "obligationId": "client-new-user-onboarding-mfa",
+        "title": "Timebound onboarding (30 days from account creation)",
+        "description": "Client-premises timebound onboarding policy: MFA registration must complete within 30 days of account creation. User-account-created accounts are not active, are excluded from FAIR/ALE risk, and cannot sign in until MFA registration completes. Client owns HR provisioning, welcome communications, and helpdesk support during the window.",
+        "accountableParty": "client",
+        "obligationClass": "operational-practice",
+        "monitoredBySystem": false
+      },
+      {
+        "obligationId": "client-no-password-sharing",
+        "title": "No password sharing",
+        "description": "Client specification: employees must not share credentials. Enforced through HR policy, awareness training, and client operational procedures — not an automated governance monitoring rule.",
+        "accountableParty": "client",
+        "obligationClass": "client-specification",
+        "monitoredBySystem": false
+      },
+      {
+        "obligationId": "client-delegation-on-behalf",
+        "title": "Delegation and act-on-behalf restrictions",
+        "description": "Client defines who may delegate access or act on behalf of others. Remains a client-premises operational specification distinct from MFA technical enforcement.",
+        "accountableParty": "client",
+        "obligationClass": "client-specification",
+        "monitoredBySystem": false
+      },
+      {
+        "obligationId": "client-credential-hygiene-awareness",
+        "title": "Credential hygiene awareness programme",
+        "description": "Client maintains security awareness covering phishing, credential reuse, and reporting — complementary to technical MFA controls the service provides.",
+        "accountableParty": "client",
+        "obligationClass": "operational-practice",
+        "monitoredBySystem": false
+      }
+    ],
+    "frameworkResponsibilityMaps": [
+      {
+        "certificationId": "NIST-CSF-2.0",
+        "framework": "NIST-CSF-2.0",
+        "controlId": "PR.AA.01",
+        "controlName": "Identities and credentials are managed",
+        "serviceEnsures": [
+          "svc-mfa-approval-enforcement",
+          "svc-mfa-login-registration-gate",
+          "svc-jit-privileged-access",
+          "svc-guest-admin-block",
+          "svc-compliant-device-ca"
+        ],
+        "clientResponsibleFor": [
+          "client-new-user-onboarding-mfa",
+          "client-no-password-sharing",
+          "client-delegation-on-behalf",
+          "client-credential-hygiene-awareness"
+        ]
+      },
+      {
+        "certificationId": "ISO-27001",
+        "framework": "ISO-27001",
+        "controlId": "A.9.2.1",
+        "controlName": "User registration and de-registration",
+        "serviceEnsures": [
+          "svc-mfa-approval-enforcement",
+          "svc-mfa-login-registration-gate",
+          "svc-guest-admin-block"
+        ],
+        "clientResponsibleFor": [
+          "client-new-user-onboarding-mfa",
+          "client-no-password-sharing",
+          "client-delegation-on-behalf",
+          "client-credential-hygiene-awareness"
+        ]
+      }
+    ]
+  }
+}

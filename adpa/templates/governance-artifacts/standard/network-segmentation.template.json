@@ -1,0 +1,73 @@
+{
+  "templateId": "network-segmentation",
+  "version": "1.0.0",
+  "artifactType": "infrastructure",
+  "pillar": "network",
+  "displayName": "Network Segmentation & Zero Trust",
+  "description": "Converts network governance requirements (segmentation, NSG rules, private endpoints) into multi-cloud IaC specifications.",
+  "frameworkRefs": [
+    "blueprint-templates/security-blueprints/zero-trust-architecture.bicep",
+    "docs/architecture/target-state/Zero-Trust-Maturity-Model.md"
+  ],
+  "nistCategories": ["PR.PS", "DE.CM"],
+  "governanceRequirement": {
+    "schemaRef": "adpa/schemas/governance-requirement.schema.json",
+    "requiredFields": [
+      "requirementId",
+      "title",
+      "statement",
+      "scope.cloudProviders",
+      "parameters.segmentationModel",
+      "parameters.defaultDenyIngress"
+    ],
+    "optionalFields": [
+      "parameters.privateEndpointRequired",
+      "parameters.allowedCidrRanges",
+      "parameters.hubSpokeTopology"
+    ]
+  },
+  "llmProcessing": {
+    "systemInstructionsRef": "adpa/templates/governance-artifacts/llm-prompts/system-instructions.json",
+    "userPromptTemplate": "Convert the following network governance requirement into an iac-specification for zero-trust network segmentation.\n\nRequirement ID: {{requirementId}}\nTitle: {{title}}\nStatement: {{statement}}\nScope: {{scope}}\nParameters: {{parameters}}\n\nProduce JSON with implementation controls for VNets/VPCs, subnets, security groups, and private connectivity.",
+    "outputFormat": "json",
+    "temperature": 0.2,
+    "validationRules": [
+      "Default deny ingress must be reflected in all security group or firewall rules",
+      "Hub-spoke topology must define explicit peering when enabled"
+    ]
+  },
+  "outputSchema": {
+    "schemaRef": "adpa/schemas/generated-artifact.schema.json",
+    "artifactKind": "iac-specification"
+  },
+  "iacTargets": {
+    "azure": {
+      "format": "bicep",
+      "translatorModule": "adpa/translators/azure/network-segmentation.bicep.js",
+      "referenceBlueprint": "blueprint-templates/security-blueprints/zero-trust-architecture.bicep",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/network-{{requirementId}}.bicep"
+    },
+    "aws": {
+      "format": "terraform",
+      "translatorModule": "adpa/translators/aws/network-segmentation.tf.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/aws/network-{{requirementId}}.tf"
+    },
+    "gcp": {
+      "format": "terraform",
+      "translatorModule": "adpa/translators/gcp/network-segmentation.tf.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/gcp/network-{{requirementId}}.tf"
+    }
+  },
+  "complianceTargets": {
+    "azurePolicy": {
+      "format": "azure-policy",
+      "translatorModule": "adpa/translators/azure/network-segmentation.policy.js",
+      "outputPathPattern": "adpa/tenants/{{tenantId}}/deployed/azure/policies/network-{{requirementId}}.json"
+    }
+  },
+  "rpasBinding": {
+    "csrBaseline": "CSR-42",
+    "driftClass": "architectural",
+    "tarColArtifactId": "TAR-ARM-002"
+  }
+}

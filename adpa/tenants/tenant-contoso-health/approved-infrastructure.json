@@ -1,0 +1,88 @@
+{
+  "tenantId": "tenant-contoso-health",
+  "displayName": "Contoso Health (demo)",
+  "baselineVersion": "1.0.0",
+  "approvedBy": "ICT Governance Council",
+  "approvedAt": "2026-06-18T16:00:00Z",
+  "csrBaseline": "CSR-42 v2.3.0",
+  "primaryRegion": "westeurope",
+  "components": [
+    {
+      "componentId": "azure-identity-platform",
+      "name": "Azure AD / Entra ID Identity Platform",
+      "pillar": "identity",
+      "status": "approved",
+      "cloudProvider": "azure",
+      "blueprintRef": "blueprint-templates/security-blueprints/identity-access-management.bicep",
+      "description": "Central identity provider with conditional access, MFA, and JIT privileged access for all corporate workloads.",
+      "services": ["Microsoft Entra ID", "Conditional Access", "Privileged Identity Management", "Break Glass accounts"],
+      "complianceControls": ["PR.AA-01", "PR.AA-03", "GV.RR-02"]
+    },
+    {
+      "componentId": "endpoint-management",
+      "name": "Endpoint Management & Device Compliance",
+      "pillar": "devices",
+      "status": "approved",
+      "cloudProvider": "azure",
+      "blueprintRef": "blueprint-templates/infrastructure-blueprints/multi-tenant-infrastructure.bicep",
+      "description": "Intune-managed endpoints with compliance baselines, encryption, and minimum OS enforcement.",
+      "services": ["Microsoft Intune", "Defender for Endpoint", "Device compliance policies"],
+      "complianceControls": ["ID.AM-01", "PR.PS-02"]
+    },
+    {
+      "componentId": "approved-software-catalog",
+      "name": "Approved Software & SaaS Catalog",
+      "pillar": "software",
+      "status": "approved",
+      "cloudProvider": "azure",
+      "blueprintRef": "blueprint-templates/policy-templates/technology-selection-policy.md",
+      "description": "Governed application catalog with CASB shadow-IT detection and vulnerability gating for third-party SaaS.",
+      "services": ["Defender for Cloud Apps", "Software catalog API", "SBOM registry"],
+      "complianceControls": ["GV.SC-01", "ID.RA-01"]
+    },
+    {
+      "componentId": "hub-spoke-network",
+      "name": "Hub-Spoke Network Architecture",
+      "pillar": "network",
+      "status": "approved",
+      "cloudProvider": "azure",
+      "blueprintRef": "blueprint-templates/security-blueprints/zero-trust-architecture.bicep",
+      "description": "Zero-trust hub-spoke topology with default-deny NSGs, private endpoints for PaaS, and Azure Firewall.",
+      "services": ["Virtual WAN Hub", "Azure Firewall", "Private Endpoints", "NSG default-deny rules"],
+      "complianceControls": ["PR.PS-01", "DE.CM-01"]
+    },
+    {
+      "componentId": "data-protection-platform",
+      "name": "Data Classification & Protection",
+      "pillar": "data",
+      "status": "approved",
+      "cloudProvider": "azure",
+      "blueprintRef": "blueprint-templates/compliance-blueprints/gdpr-compliance.bicep",
+      "description": "Sensitivity labels, encryption at rest and in transit, DLP policies for PHI and confidential data.",
+      "services": ["Microsoft Purview", "Azure Key Vault", "Storage encryption", "DLP policies"],
+      "complianceControls": ["PR.DS-01", "PR.DS-02", "GV.PO-01"]
+    },
+    {
+      "componentId": "security-operations",
+      "name": "Security Operations & SIEM",
+      "pillar": "secops",
+      "status": "approved",
+      "cloudProvider": "azure",
+      "blueprintRef": "blueprint-templates/policy-templates/incident-response-policy.md",
+      "description": "Sentinel SIEM with automated incident ingest, FAIR risk scoring, and SLA-tracked response workflows.",
+      "services": ["Microsoft Sentinel", "Defender XDR", "Governance incident API", "FAIR risk engine"],
+      "complianceControls": ["DE.AE-01", "DE.CM-03", "RS.AN-01"]
+    },
+    {
+      "componentId": "backup-disaster-recovery",
+      "name": "Backup & Disaster Recovery",
+      "pillar": "resilience",
+      "status": "approved",
+      "cloudProvider": "azure",
+      "blueprintRef": "blueprint-templates/infrastructure-blueprints/multi-cloud-infrastructure.bicep",
+      "description": "Geo-redundant backup vaults, cross-region replication, and tested recovery runbooks aligned to RPO/RTO targets.",
+      "services": ["Azure Backup", "Site Recovery", "Recovery Services Vault", "Git-to-cloud recovery"],
+      "complianceControls": ["RC.RP-01", "RC.CO-02"]
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/governance-asset.schema.json",
+  "title": "Governance Asset",
+  "description": "Unified ICT infrastructure, software, or platform artifact under governance — including each Power App as a distinct software asset.",
+  "type": "object",
+  "required": ["assetId", "assetClass", "displayName", "scopeLayer", "pillar", "governanceStatus"],
+  "properties": {
+    "assetId": { "type": "string" },
+    "assetClass": {
+      "type": "string",
+      "enum": [
+        "governance-template",
+        "governance-document",
+        "governance-artifact-json",
+        "software-application",
+        "software-power-platform-app",
+        "software-power-platform-flow",
+        "software-saas",
+        "infrastructure-compute",
+        "infrastructure-network",
+        "infrastructure-data",
+        "infrastructure-identity",
+        "infrastructure-security",
+        "platform-service"
+      ]
+    },
+    "assetSubtype": { "type": "string" },
+    "displayName": { "type": "string" },
+    "description": { "type": "string" },
+    "scopeLayer": {
+      "type": "string",
+      "enum": [
+        "governance-platform",
+        "power-platform",
+        "azure-cloud",
+        "aws-cloud",
+        "gcp-cloud",
+        "cross-cloud"
+      ]
+    },
+    "pillar": {
+      "type": "string",
+      "enum": ["identity", "devices", "software", "network", "data", "secops", "resilience", "governance"]
+    },
+    "tenantId": { "type": "string" },
+    "cloudProvider": {
+      "type": "string",
+      "enum": ["azure", "aws", "gcp", "multi-cloud", "power-platform", "in-repo"]
+    },
+    "environmentId": { "type": "string" },
+    "resourceGroupOrProject": { "type": "string" },
+    "region": { "type": "string" },
+    "discoverySource": {
+      "type": "string",
+      "enum": [
+        "adpa",
+        "asset-register",
+        "power-platform-admin-center",
+        "dataverse",
+        "azure-resource-graph",
+        "aws-config",
+        "gcp-asset-inventory",
+        "casb",
+        "manual"
+      ]
+    },
+    "governanceStatus": {
+      "type": "string",
+      "enum": ["initiation", "onboarding", "active", "build_update", "retiring", "retired", "unevaluated"]
+    },
+    "complianceState": {
+      "type": "string",
+      "enum": ["Compliant", "NonCompliant", "Partial", "Unevaluated"]
+    },
+    "coeCenterId": {
+      "type": "string",
+      "enum": ["templates", "ai-providers", "artifacts", "documents"]
+    },
+    "templateId": { "type": "string" },
+    "requirementRef": { "type": "string" },
+    "blueprintRef": { "type": "string" },
+    "iacFormat": { "type": "string", "enum": ["bicep", "terraform", "cloudformation", "deployment-manager", "none"] },
+    "ownerEmail": { "type": "string" },
+    "frameworkMappings": { "type": "array" },
+    "tags": { "type": "object" },
+    "lastObservedAt": { "type": "string", "format": "date-time" },
+    "lineageRef": {
+      "type": "string",
+      "description": "lineageId linking asset to source → spec → Layer 2 → validation chain"
+    },
+    "complianceMonitorId": {
+      "type": "string",
+      "description": "Required monitor when asset is deployed from ADPA governance pipeline"
+    },
+    "governanceLinks": {
+      "type": "object",
+      "properties": {
+        "requirementId": { "type": "string" },
+        "artifactId": { "type": "string" },
+        "validationId": { "type": "string" },
+        "layer2OutputPath": { "type": "string" }
+      }
+    },
+    "healthState": {
+      "type": "string",
+      "enum": ["healthy", "degraded", "non-compliant", "unknown", "failed"]
+    }
+  },
+  "additionalProperties": false
+}

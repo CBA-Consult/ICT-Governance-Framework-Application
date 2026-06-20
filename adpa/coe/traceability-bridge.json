@@ -1,0 +1,178 @@
+{
+  "version": "1.0.0",
+  "description": "End-to-end traceability from source entities through Layer 2 export, deploy validation, and asset compliance monitoring loop-back.",
+  "schemaRefs": {
+    "lineageEnvelope": "adpa/schemas/lineage-envelope.schema.json",
+    "generatedArtifact": "adpa/schemas/generated-artifact.schema.json",
+    "validationRecord": "adpa/schemas/artifact-validation-record.schema.json",
+    "assetComplianceMonitor": "adpa/schemas/asset-compliance-monitor.schema.json",
+    "deploymentExpectations": "adpa/schemas/deployment-expectations.schema.json",
+    "governanceAsset": "adpa/schemas/governance-asset.schema.json",
+    "governanceRequirement": "adpa/schemas/governance-requirement.schema.json",
+    "telemetryEntity": "adpa/schemas/telemetry-entity.schema.json"
+  },
+  "pipelineHops": [
+    {
+      "id": "source",
+      "label": "Source signals",
+      "artifactLayer": "layer-0-entity",
+      "stores": ["telemetryEventIds", "discoverySource"],
+      "requiredLineage": ["telemetryEventIds", "entityIds"]
+    },
+    {
+      "id": "entity",
+      "label": "ADPA entity",
+      "artifactLayer": "layer-0-entity",
+      "schemaRef": "adpa/schemas/telemetry-entity.schema.json",
+      "pathPattern": "adpa/entities/{entityType}-{entityId}.json",
+      "requiredLineage": ["entityId", "discoverySource", "lastObservedAt"]
+    },
+    {
+      "id": "requirement",
+      "label": "Governance requirement",
+      "artifactLayer": "layer-0-entity",
+      "schemaRef": "adpa/schemas/governance-requirement.schema.json",
+      "pathPattern": "adpa/tenants/{tenantId}/requirements/{requirementId}.json",
+      "requiredLineage": ["requirementId", "tenantId", "templateId", "pillar", "status"],
+      "requiredFields": ["deploymentExpectations"]
+    },
+    {
+      "id": "layer-1-spec",
+      "label": "Generated JSON specification",
+      "artifactLayer": "layer-1-spec",
+      "schemaRef": "adpa/schemas/generated-artifact.schema.json",
+      "pathPattern": "adpa/tenants/{tenantId}/generated/{artifactId}.json",
+      "requiredLineage": ["artifactId", "requirementId", "templateId", "templateVersion", "generatedBy"],
+      "generationStatusGate": "llm-complete"
+    },
+    {
+      "id": "definition",
+      "label": "Template / translator / blueprint definition",
+      "artifactLayer": "definition",
+      "requiredLineage": ["templateId", "definitionRefs", "translatorModule", "referenceBlueprint"]
+    },
+    {
+      "id": "layer-2-export",
+      "label": "Layer 2 platform artifact",
+      "artifactLayer": "layer-2-export",
+      "pathPattern": "adpa/tenants/{tenantId}/deployed/{cloudProvider}/",
+      "requiredLineage": ["outputType", "outputPath", "checksum", "artifactId", "definitionRefs"]
+    },
+    {
+      "id": "deployed",
+      "label": "Deployed cloud resources",
+      "artifactLayer": "deployed",
+      "requiredLineage": ["deployRunId", "resourceIds", "deployedAt", "layer2OutputPath"]
+    },
+    {
+      "id": "validation",
+      "label": "Post-deploy health & compliance validation",
+      "artifactLayer": "validation",
+      "schemaRef": "adpa/schemas/artifact-validation-record.schema.json",
+      "pathPattern": "adpa/tenants/{tenantId}/validations/{validationId}.json",
+      "requiredLineage": ["validationId", "healthState", "controlResults", "lineage"],
+      "generationStatusGate": "validated"
+    },
+    {
+      "id": "asset-monitor",
+      "label": "Asset compliance monitor (loop-back)",
+      "artifactLayer": "asset-monitor",
+      "schemaRef": "adpa/schemas/asset-compliance-monitor.schema.json",
+      "pathPattern": "adpa/tenants/{tenantId}/compliance-monitors/{monitorId}.json",
+      "requiredLineage": ["monitorId", "assetId", "monitoringRules", "governanceLinks", "lineage"]
+    },
+    {
+      "id": "asset-register",
+      "label": "Asset register (PostgreSQL + governed JSON)",
+      "artifactLayer": "asset-monitor",
+      "storeRef": "ict-governance-framework/sql/assets.sql",
+      "requiredFields": ["asset_id", "tenant_id", "compliance_state", "tags.adpaLineageId", "tags.complianceMonitorId"]
+    },
+    {
+      "id": "export-presentation",
+      "label": "Presentation exports (markdown, webview, docx)",
+      "artifactLayer": "export-presentation",
+      "requiredLineage": ["artifactId", "outputType", "serializerRef"]
+    }
+  ],
+  "healthStateMapping": {
+    "validationToComplianceState": {
+      "healthy": "Compliant",
+      "degraded": "Partial",
+      "non-compliant": "NonCompliant",
+      "failed": "NonCompliant",
+      "unknown": "Unevaluated"
+    },
+    "validationHealthToAssetHealth": {
+      "healthy": "healthy",
+      "degraded": "degraded",
+      "non-compliant": "non-compliant",
+      "failed": "failed",
+      "unknown": "unknown"
+    }
+  },
+  "assetLoopBack": {
+    "description": "After validation, update assets and create required compliance monitors.",
+    "triggers": ["validation.complete", "scheduled-monitor-eval", "drift-event"],
+    "steps": [
+      {
+        "id": "map-resources-to-assets",
+        "action": "resolve_asset_ids",
+        "from": "validation.deployedRef.resourceIds",
+        "to": "asset_register.asset_id"
+      },
+      {
+        "id": "apply-compliance-state",
+        "action": "upsert_asset_compliance",
+        "field": "compliance_state",
+        "source": "healthStateMapping.validationToComplianceState"
+      },
+      {
+        "id": "stamp-lineage-tags",
+        "action": "merge_asset_tags",
+        "tags": ["adpaLineageId", "complianceMonitorId", "requirementId", "artifactId", "validationId", "lastValidatedAt"]
+      },
+      {
+        "id": "create-or-update-monitor",
+        "action": "upsert_compliance_monitor",
+        "schemaRef": "adpa/schemas/asset-compliance-monitor.schema.json",
+        "required": true
+      },
+      {
+        "id": "append-evaluation-history",
+        "action": "append_monitor_history",
+        "appendOnly": true
+      },
+      {
+        "id": "re-enter-telemetry-loop",
+        "action": "emit_measure_event",
+        "on": ["non-compliant", "failed", "degraded"],
+        "target": "adpa/systematics/lifecycle.json#telemetryLoop.sense"
+      }
+    ],
+    "rules": {
+      "requireMonitorForDeployedAssets": true,
+      "minMonitoringRulesPerAsset": 1,
+      "blockCsrBaselineOnNonCompliant": true,
+      "retainSupersededMonitors": true
+    }
+  },
+  "generationStatusFlow": [
+    "pending",
+    "llm-complete",
+    "translated",
+    "validated",
+    "deployed",
+    "failed"
+  ],
+  "rpasAlignment": {
+    "protocol": "RPAS-CM-TAR-COL-001",
+    "t1ArtifactTraceability": ["origin", "humanDecisionId", "amendmentId", "csrVersion", "integrity.supersedes"],
+    "t2ActorTraceability": ["proposer", "approver", "executor", "systemId"]
+  },
+  "auditStore": {
+    "registryPath": "adpa/coe/traceability-registry.json",
+    "appendOnly": true,
+    "maxEntries": 1000
+  }
+}

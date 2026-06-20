@@ -1,0 +1,73 @@
+{
+  "slaId": "proc-sla-1781961768900-d5d6f509",
+  "tenantId": "tenant-contract-proc-sla-test",
+  "status": "draft",
+  "title": "Compliance mitigation SLA — ces-1781961768894-8972f0a6",
+  "draftedBy": "procurement@test.com",
+  "linkedEscalationId": "ces-1781961768894-8972f0a6",
+  "linkedRequirementId": null,
+  "linkedAssetIds": [],
+  "linkedRuleIds": [],
+  "slaTerms": {
+    "priority": "High",
+    "acknowledgeMs": 172800000,
+    "checkValidationMs": 432000000,
+    "resolutionMs": 1209600000,
+    "labels": {
+      "acknowledgeMs": "48 hours",
+      "checkValidationMs": "5 days",
+      "resolutionMs": "14 days"
+    }
+  },
+  "mitigationControlCostCoverage": {
+    "coversAdditionalControls": true,
+    "coverageBasis": "non-compliant-asset-exposed-risk",
+    "coverageModel": "vendor-accountability",
+    "pricingApproach": "not-line-item-priced",
+    "vendorAccountability": {
+      "accountableParty": "vendor",
+      "obligation": "Vendor remains accountable for contracted compliance requirements and must initiate controls per the linked mitigation plan when non-compliance is triggered.",
+      "complianceRequirementsCovered": []
+    },
+    "controlObligations": [
+      {
+        "obligationId": "act-identity-mfa-enrollment",
+        "description": "100% of active-eligible users enrolled in MFA within 30 days of account creation (user-account-created states excluded from risk denominator)",
+        "linkedRuleId": "identity-mfa-enrollment",
+        "linkedActionId": "act-identity-mfa-enrollment",
+        "linkedAssetId": "/subscriptions/sub-test/policyAssignments/identity-mfa-enforcement",
+        "controlType": "compensating-control",
+        "accountableParty": "vendor",
+        "effectiveWhen": "non-compliance-triggered"
+      }
+    ],
+    "financialExposure": {
+      "reportingBoundary": "fair-ale-tco-only",
+      "estimatedUsd": null,
+      "estimateBand": "unknown",
+      "note": "Control placement is not line-item priced. Executive reporting uses FAIR/ALE/TCO exposure within the governance framework boundary."
+    },
+    "budgetCeilingUsd": 4800,
+    "currency": "USD",
+    "coveredControlTypes": [
+      "compensating-control",
+      "monitoring-enhancement",
+      "access-hardening",
+      "segmentation-control"
+    ],
+    "costItems": [
+      {
+        "itemId": "cost-1",
+        "description": "Optional TCO band estimate",
+        "estimatedUsd": 4800,
+        "controlPurpose": null,
+        "linkedRuleId": null,
+        "linkedAssetId": null
+      }
+    ],
+    "totalEstimatedCoverageUsd": 4800,
+    "notes": null
+  },
+  "internalControlDiscountPolicyRef": "internalControlDiscountPolicy",
+  "draftedAt": "2026-06-20T13:22:48.921Z"
+}

@@ -23,11 +23,18 @@ adpa/
 │   └── lifecycle.json          Proposal → Decision → Execution stages
 ├── templates/
 │   ├── manifest.json           ICT Governance Framework template registry
-│   └── ict-governance/         Ten canonical ADPA templates
+│   ├── ict-governance/         Ten canonical ADPA document templates
+│   └── governance-artifacts/   JSON templates for IaC / CaC generation (seven pillars)
 ├── schemas/
 │   ├── telemetry-entity.schema.json
-│   └── generation-request.schema.json
+│   ├── generation-request.schema.json
+│   ├── governance-artifact-template.schema.json
+│   ├── governance-requirement.schema.json
+│   ├── generated-artifact.schema.json
+│   └── tenant-artifact-store.schema.json
 ├── entities/                   Telemetry-hydrated entity catalog
+├── tenants/                    Per-tenant requirements and generated artifacts
+├── translators/                Cloud JSON → IaC/CaC translators (future phase)
 ├── bridge/
 │   └── ict-governance-framework.json
 ├── runtime/                    Future Aspire orchestrator (see README)
@@ -43,7 +50,10 @@ From repository root:
 
 ```bash
 npm run adpa:validate          # Validate ADPA project structure
+npm run adpa:validate:templates # Validate governance artifact templates + tenant store
 npm run adpa:list              # List ICT framework templates
+npm run adpa:list:artifacts    # List governance artifact templates (seven pillars)
+npm run adpa:generate:governance-doc -- tenant-contoso-health  # Governance DOCX + Markdown
 npm run adpa:generate -- policy-alignment --var entityId=tenant-01
 npm run adpa:prioritize        # Demo telemetry → template queue
 npm run governance:validate    # RPAS / AEV baseline validation
@@ -63,6 +73,22 @@ npm run governance:validate    # RPAS / AEV baseline validation
 | `compliance-as-code-map` | IaC Integration guide |
 | `iso38500-crosswalk` | ISO/IEC 38500 Standards |
 | `zero-trust-assessment` | Zero Trust Maturity Model |
+
+## Governance artifact templates (IaC / Compliance-as-Code)
+
+JSON templates under `templates/governance-artifacts/` define the LLM pipeline from **governance requirement** → **generated artifact JSON** → **cloud IaC/CaC**. One template per seven-pillar domain:
+
+| Template ID | Pillar | Output type |
+|-------------|--------|-------------|
+| `identity-access-control` | Identity | hybrid |
+| `device-compliance` | Devices | hybrid |
+| `software-supply-chain` | Software | compliance-policy |
+| `network-segmentation` | Network | infrastructure |
+| `data-protection` | Data | hybrid |
+| `security-monitoring` | SecOps | hybrid |
+| `resilience-backup` | Resilience | infrastructure |
+
+Tenant requirements and outputs: `adpa/tenants/`. See [templates/governance-artifacts/README.md](templates/governance-artifacts/README.md).
 
 Outputs are written to `generated-documents/` with generation metadata in `.adpa-generation.json`.
 

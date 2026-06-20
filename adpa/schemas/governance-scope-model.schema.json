@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ict-governance.local/adpa/schemas/governance-scope-model.schema.json",
+  "title": "ICT Governance Scope Model",
+  "description": "Full governance scope spanning in-platform assets, Power Platform software, and Azure/AWS/GCP multi-cloud infrastructure.",
+  "type": "object",
+  "required": ["version", "scopeLayers", "assetClasses", "cloudProviders"],
+  "properties": {
+    "version": { "type": "string" },
+    "scopeLayers": { "type": "array" },
+    "assetClasses": { "type": "array" },
+    "cloudProviders": { "type": "array" },
+    "coeCenterMapping": { "type": "object" }
+  }
+}
