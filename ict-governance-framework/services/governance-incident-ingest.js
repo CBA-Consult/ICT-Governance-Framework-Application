@@ -13,6 +13,10 @@ const {
   buildMitreResponse
 } = require('./mitre-enrichment');
 const { resolveVerificationRunId } = require('./verification-checkpoint');
+const {
+  validateComplianceNotification,
+  formatClientNotificationDescription
+} = require('./compliance-notification-service');
 
 const VALID_DRIFT_TYPES = [
   'governance', 'architectural', 'process', 'documentation', 'observability', 'security'
@@ -158,7 +162,22 @@ async function triggerFairRecalculation(pool, { correlationId, incidentId, sever
 
 async function ingestGovernanceIncident(pool, { body, correlationId: incomingCorrelationId, headers = {} }) {
   const fields = extractIncidentFields(body);
-  const { tenantId, driftType, severity, description, externalTicketId, assetId } = fields;
+  let { tenantId, driftType, severity, description, externalTicketId, assetId } = fields;
+
+  if (body.requirementId && !body.complianceNotification) {
+    const error = new Error(
+      'Compliance validation incidents require complianceNotification with explicit frameworkImpacts '
+      + '(certificationId, framework, controlId) — clients must not receive generic non-compliance alerts.'
+    );
+    error.statusCode = 400;
+    throw error;
+  }
+
+  let complianceNotification = body.complianceNotification || null;
+  if (complianceNotification) {
+    validateComplianceNotification(complianceNotification);
+    description = formatClientNotificationDescription(complianceNotification, description);
+  }
 
   if (!tenantId || !driftType || !severity || !description) {
     const error = new Error('Missing required fields: tenantId, driftType, severity, description');
@@ -240,6 +259,9 @@ async function ingestGovernanceIncident(pool, { body, correlationId: incomingCor
       verifiedAssetId,
       correlationId,
       verificationRunId,
+      requirementId: body.requirementId || null,
+      validationId: body.validationId || null,
+      complianceNotification,
       mitre: mitre ? buildMitreResponse({ ...mitre, ...incident, fair_scenario_id: fairScenarioId }) : null,
       fair_mapping: fairMapping
     },
@@ -273,6 +295,7 @@ async function ingestGovernanceIncident(pool, { body, correlationId: incomingCor
     incident,
     correlated: verifiedAssetId !== null,
     correlationId,
+    complianceNotification,
     mitre: buildMitreResponse(incident),
     fairRecalculation: fairResult
       ? {

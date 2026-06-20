@@ -63,6 +63,68 @@ describe('SecOps pillar contracts', () => {
     expect(VALID_TRANSITIONS.Resolved).toEqual([]);
   });
 
+  it('rejects compliance validation incidents without explicit frameworkImpacts', async () => {
+    await expect(ingestGovernanceIncident(pool, {
+      body: {
+        tenantId: 'tenant-01',
+        driftType: 'governance',
+        severity: 'CRITICAL',
+        description: 'Generic non-compliance — must not reach client',
+        requirementId: 'identity-mfa-requirement',
+        validationId: 'val-test'
+      }
+    })).rejects.toMatchObject({ statusCode: 400 });
+  });
+
+  it('ingests compliance notification with explicit ISO-27001 control detail', async () => {
+    const {
+      buildComplianceNotificationEnvelope,
+      formatClientNotificationDescription
+    } = require('../../services/compliance-notification-service');
+    const requirement = require('../../../adpa/tenants/tenant-contoso-health/requirements/identity-mfa-requirement.json');
+    const evaluation = {
+      meetsExpectations: false,
+      gaps: [{
+        type: 'control',
+        ruleId: 'identity-mfa-enrollment',
+        controlId: 'identity-mfa-enforcement',
+        expectedState: '100% of users enrolled in MFA',
+        observed: '72% enrolled'
+      }]
+    };
+    const complianceNotification = buildComplianceNotificationEnvelope({
+      tenantId: 'tenant-01',
+      requirement,
+      evaluation,
+      assetId: '/subscriptions/sub-contoso/policyAssignments/identity-mfa-enforcement',
+      validationId: 'val-contract-test',
+      requirementId: 'identity-mfa-requirement'
+    });
+    const correlationId = crypto.randomUUID();
+    const result = await ingestGovernanceIncident(pool, {
+      body: {
+        tenantId: 'tenant-01',
+        driftType: 'governance',
+        severity: 'CRITICAL',
+        description: formatClientNotificationDescription(complianceNotification, 'Validation failed.'),
+        requirementId: 'identity-mfa-requirement',
+        validationId: 'val-contract-test',
+        complianceNotification,
+        externalTicketId: `CONTRACT-NC-${Date.now()}`
+      },
+      correlationId
+    });
+
+    expect(result.complianceNotification.frameworkImpacts.some((i) => i.certificationId === 'ISO-27001')).toBe(true);
+    expect(result.incident.description).toContain('A.9.2.1');
+
+    const log = await pool.query(
+      `SELECT processed_fields FROM governance_incident_ingest_log WHERE correlation_id = $1`,
+      [correlationId]
+    );
+    expect(log.rows[0].processed_fields.complianceNotification.frameworkImpacts.length).toBeGreaterThan(0);
+  });
+
   it('patches Detected → Acknowledged with actor', async () => {
     const correlationId = crypto.randomUUID();
     const ingested = await ingestGovernanceIncident(pool, {
