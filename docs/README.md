@@ -66,7 +66,7 @@ Reusable templates and methodologies for governance activities.
 | Charter               | 5+    | Project charter documents                                   |
 | Checklists            | 8+    | Project and governance checklists                           |
 | Communication         | 10+   | Communication plans, templates, and strategies              |
-| Compliance            | 10+   | Compliance, audit, regulatory, monitoring                   |
+| Compliance            | 10+   | Compliance, audit, regulatory, monitoring; [ISO Standards Library](compliance/ISO/README.md) |
 | Escalation            | 4+    | Escalation procedures and logs                              |
 | Foundation            | 6+    | Foundation phase documentation                              |
 | Governance            | 15+   | Governance process documentation                            |

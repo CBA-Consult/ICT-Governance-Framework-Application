@@ -19,6 +19,8 @@
 
 **Status:** Active planning document — **remediation in progress** (18 June 2026)
 
+> **ISO alignment:** Per-standard library, crosswalks, and [June 2026 reassessment](ISO/ISO-Standards-Reassessment-2026.md) are in **[docs/compliance/ISO/](ISO/README.md)**.
+
 > **June 2026 sprint:** JIT/Break Glass consoles, privileged-action ledger, RPAS asset register, governance incident ingest, Organisational Profile, and ADPA Production-Attested artifacts delivered. See [NIST CSF 2.0 Compliance Review — Remediation progress](NIST-CSF-2.0-Compliance-Review.md#remediation-progress-june-2026-update). **Gate A not met** — sign-off pending.
 
 The ICT Governance Framework has a **strong documentation and policy foundation**, **working RBAC/authentication**, **RPAS governance scaffold**, and **deployable IaC patterns**. The largest gaps are where **documentation and UI overstate live capability** — mock dashboards, unimplemented mapped features, and bootstrap governance artifacts.

@@ -15,6 +15,7 @@ A comprehensive governance framework, documentation library, automation tooling,
 | New to the project | [Project scope and objectives](docs/project-management/A001-Project-Scope-and-Objectives.md) |
 | Governance teams | [Core ICT Governance Framework](docs/governance-framework/core-framework/ICT-Governance-Framework.md) |
 | Improvement priorities | [Improvement focus areas](docs/compliance/ICT-Governance-Framework-Improvement-Focus-Areas.md) |
+| ISO standards alignment | [ISO Standards Library](docs/compliance/ISO/README.md) — inventory, crosswalks, [2026 reassessment](docs/compliance/ISO/ISO-Standards-Reassessment-2026.md) |
 | RPAS / agent governance | [RPAS Governance](#rpas-governance), [ADPA module](adpa/README.md), and [Integration Guide](docs/implementation/guides/ADPA-ICT-Governance-Integration-Guide.md) |
 | Client / service providers | [Business Continuity Services](#business-continuity-services) |
 | Implementers | [Implementation summary](docs/implementation/summaries/IMPLEMENTATION-SUMMARY.md) |

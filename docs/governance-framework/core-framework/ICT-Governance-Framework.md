@@ -4,7 +4,7 @@
 
 This ICT Governance Framework establishes a comprehensive structure for managing information and communication technology assets, services, and resources across the organization through a **Unified Governance Platform**. Its purpose is to ensure technology alignment with business objectives, security, compliance, and efficient use of ICT resources through a shared responsibility model aligned with industry best practices (COBIT, ITIL, ISO/IEC 38500).
 
-The framework implements the **ISO/IEC 38500 Corporate Governance of IT** standard as its foundational governance model, incorporating the six core principles of Responsibility, Strategy, Acquisition, Performance, Conformance, and Human Behavior through the Evaluate-Direct-Monitor governance cycle. For detailed implementation guidance, refer to [ISO/IEC 38500 Governance Standards](../../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md).
+The framework implements the **ISO/IEC 38500 Corporate Governance of IT** standard as its foundational governance model, incorporating the six core principles of Responsibility, Strategy, Acquisition, Performance, Conformance, and Human Behavior through the Evaluate-Direct-Monitor governance cycle. For the full ISO standards library (38500, 27001, 31000, 22301, crosswalks, and June 2026 reassessment), see the **[ISO Standards Library](../../compliance/ISO/README.md)**. For detailed 38500 implementation guidance, refer to [ISO/IEC 38500 Governance Standards](../../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md).
 
 The framework has evolved from siloed governance tools to an integrated platform that provides:
 - **Unified Oversight**: Single pane of glass for all governance activities
@@ -861,14 +861,16 @@ The FAIR risk assessment framework integrates with the Business Value Quantifica
 
 ## Compliance and Regulatory Alignment
 
-The framework ensures compliance with relevant regulations and standards:
+The framework ensures compliance with relevant regulations and standards. **ISO alignment** is maintained in the dedicated **[ISO Standards Library](../../compliance/ISO/README.md)** — including [framework-wide ISO mapping](../../compliance/ISO/ICT-Governance-Framework-ISO-Alignment.md) and [June 2026 reassessment](../../compliance/ISO/ISO-Standards-Reassessment-2026.md).
 
-* **🔐 ISO/IEC 27001:** Information security management
+* **📚 ISO Standards Library:** [docs/compliance/ISO/](../../compliance/ISO/README.md) — inventory, per-standard entries, crosswalks, roadmap
+* **🔐 ISO/IEC 27001:** Information security management — [library entry](../../compliance/ISO/standards/ISO-IEC-27001-Information-Security.md)
 * **🌐 GDPR/CCPA:** Data privacy and protection
 * **📊 SOX:** Financial reporting controls
 * **🏥 HIPAA:** Healthcare data protection (if applicable)
 * **💳 PCI DSS:** Payment data security (if applicable)
-* **🔍 ISO/IEC 38500:** Corporate governance of IT standard - **[Full Implementation Guide](../../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md)**
+* **🔍 ISO/IEC 38500:** Corporate governance of IT — [library entry](../../compliance/ISO/standards/ISO-IEC-38500-IT-Governance.md) · [implementation guide](../../compliance/regulatory/ISO-IEC-38500-Governance-Standards.md)
+* **⚖️ ISO 31000 / ISO 22301 / ISO 20000:** Risk, continuity, service management — see [ISO inventory](../../compliance/ISO/ISO-Standards-Inventory.md)
 
 ### ISO/IEC 38500 Implementation Highlights
 

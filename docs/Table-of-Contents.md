@@ -17,7 +17,7 @@ This document lists all major documents and directories in the repository for ea
 - **🏛️ Governance Teams**: [Governance Framework Documentation](docs/governance-framework/)
 - **🔧 Implementers**: [Implementation Guides](docs/implementation/)
 - **👨‍💻 Developers**: [Technical Architecture](docs/architecture/)
-- **✅ Compliance Teams**: [Compliance Documentation](docs/compliance/)
+- **✅ Compliance Teams**: [Compliance Documentation](docs/compliance/) · [ISO Standards Library](docs/compliance/ISO/README.md)
 
 ## Top-Level Documents
 
@@ -36,6 +36,7 @@ This document lists all major documents and directories in the repository for ea
 - [checklists/](checklists/) — Project and governance checklists
 - [communication/](communication/) — Communication plans and templates
 - [compliance/](compliance/) — Compliance and audit documentation
+  - [compliance/ISO/](compliance/ISO/) — **ISO Standards Library** (inventory, alignment, crosswalks, reassessment)
 - [escalation/](escalation/) — Escalation procedures and logs
 - [foundation/](foundation/) — Foundation phase documentation
 - [governance/](governance/) — Governance process documentation
