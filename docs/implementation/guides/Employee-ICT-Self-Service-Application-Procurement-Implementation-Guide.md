@@ -563,6 +563,10 @@ const compliancePolicy = {
    - Check installation instructions
    - Review system requirements
 
+## Related guides
+
+- **[Pax8 Employee Store Mapping](Pax8-Employee-Store-Mapping.md)** — Pax8 Storefront ↔ vendor registry / marketplace offerings field mapping, three-tier product matrix, and Request Access approved → Pax8 order webhook flow (design).
+
 ## Conclusion
 
 The Employee ICT Self Service Application Procurement system provides a comprehensive solution for managing business applications while ensuring compliance with legal, security, and company requirements. Through integration with Microsoft Defender Cloud App Security, the system automates compliance validation and provides real-time risk assessment.
