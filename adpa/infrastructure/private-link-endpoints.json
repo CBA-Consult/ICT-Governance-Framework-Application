@@ -1,0 +1,138 @@
+{
+  "version": "1.0.0",
+  "name": "Spoke Private Link Endpoints",
+  "description": "Private endpoints for PaaS workloads in spoke VNets. Step 11 — client opt-in per endpoint; targets must exist in Azure.",
+  "hubRegistryRef": "adpa/infrastructure/global-network-hubs.json",
+  "spokeRegistryRef": "adpa/infrastructure/spoke-hub-peering.json",
+  "privateDnsRegistryRef": "adpa/infrastructure/private-dns-zones.json",
+  "setupScript": {
+    "powershell": "scripts/setup-global-network-hubs.ps1 -PrivateLinkOnly -AcknowledgePrivateLinkCost",
+    "bash": "PRIVATE_LINK_ONLY=1 ACKNOWLEDGE_PRIVATE_LINK_COST=1 ./scripts/setup-global-network-hubs.sh"
+  },
+  "optionalAddOn": {
+    "optInRequired": true,
+    "provisionedByDefault": false,
+    "billing": "direct-azure-subscription",
+    "costAcknowledgmentRequired": true,
+    "estimatedMonthlyUsdPerEndpoint": {
+      "hourlyPerEndpoint": 0.01,
+      "approximateMonthlyPerEndpoint": 7.3,
+      "dataProcessingPerGb": 0.01,
+      "notes": "Approximate ~$0.01/hour per private endpoint plus data processing. Verify region on Azure Private Link pricing."
+    },
+    "prerequisites": [
+      "Step 10 private DNS zones and VNet links must exist in the hub region",
+      "Target PaaS resource (Key Vault, Storage, SQL, etc.) must already be deployed",
+      "Spoke subnet (typically snet-data) must exist; script disables private-endpoint network policies on that subnet",
+      "Spoke-to-hub peering recommended so hub-linked DNS resolves from workloads"
+    ]
+  },
+  "privateLink": {
+    "setupStep": 11,
+    "defaultSubnetName": "snet-data",
+    "dnsZoneGroupName": "default",
+    "dnsZoneResourceGroup": "hub",
+    "skipIfTargetMissing": true,
+    "connectionNameTemplate": "{endpointName}-connection",
+    "endpoints": [
+      {
+        "endpointId": "pe-kv-apac",
+        "spokeId": "app-apac-prod",
+        "endpointName": "pe-kv-apac",
+        "subnetName": "snet-data",
+        "privateDnsZoneName": "privatelink.vaultcore.azure.net",
+        "groupId": "vault",
+        "target": {
+          "resourceType": "Microsoft.KeyVault/vaults",
+          "resourceGroupName": "rg-app-apac",
+          "resourceName": "kv-contoso-apac"
+        },
+        "status": "planned"
+      },
+      {
+        "endpointId": "pe-st-apac",
+        "spokeId": "app-apac-prod",
+        "endpointName": "pe-st-apac",
+        "subnetName": "snet-data",
+        "privateDnsZoneName": "privatelink.blob.core.windows.net",
+        "groupId": "blob",
+        "target": {
+          "resourceType": "Microsoft.Storage/storageAccounts",
+          "resourceGroupName": "rg-app-apac",
+          "resourceName": "stcontosoapac"
+        },
+        "status": "planned"
+      },
+      {
+        "endpointId": "pe-sql-apac",
+        "spokeId": "app-apac-prod",
+        "endpointName": "pe-sql-apac",
+        "subnetName": "snet-data",
+        "privateDnsZoneName": "privatelink.database.windows.net",
+        "groupId": "sqlServer",
+        "target": {
+          "resourceType": "Microsoft.Sql/servers",
+          "resourceGroupName": "rg-app-apac",
+          "resourceName": "sql-contoso-apac"
+        },
+        "status": "planned"
+      },
+      {
+        "endpointId": "pe-kv-emea",
+        "spokeId": "app-emea-prod",
+        "endpointName": "pe-kv-emea",
+        "subnetName": "snet-data",
+        "privateDnsZoneName": "privatelink.vaultcore.azure.net",
+        "groupId": "vault",
+        "target": {
+          "resourceType": "Microsoft.KeyVault/vaults",
+          "resourceGroupName": "rg-app-emea",
+          "resourceName": "kv-contoso-emea"
+        },
+        "status": "planned"
+      },
+      {
+        "endpointId": "pe-st-emea",
+        "spokeId": "app-emea-prod",
+        "endpointName": "pe-st-emea",
+        "subnetName": "snet-data",
+        "privateDnsZoneName": "privatelink.blob.core.windows.net",
+        "groupId": "blob",
+        "target": {
+          "resourceType": "Microsoft.Storage/storageAccounts",
+          "resourceGroupName": "rg-app-emea",
+          "resourceName": "stcontosoemea"
+        },
+        "status": "planned"
+      },
+      {
+        "endpointId": "pe-kv-amers",
+        "spokeId": "app-amers-prod",
+        "endpointName": "pe-kv-amers",
+        "subnetName": "snet-data",
+        "privateDnsZoneName": "privatelink.vaultcore.azure.net",
+        "groupId": "vault",
+        "target": {
+          "resourceType": "Microsoft.KeyVault/vaults",
+          "resourceGroupName": "rg-app-amers",
+          "resourceName": "kv-contoso-amers"
+        },
+        "status": "planned"
+      },
+      {
+        "endpointId": "pe-st-amers",
+        "spokeId": "app-amers-prod",
+        "endpointName": "pe-st-amers",
+        "subnetName": "snet-data",
+        "privateDnsZoneName": "privatelink.blob.core.windows.net",
+        "groupId": "blob",
+        "target": {
+          "resourceType": "Microsoft.Storage/storageAccounts",
+          "resourceGroupName": "rg-app-amers",
+          "resourceName": "stcontosoamers"
+        },
+        "status": "planned"
+      }
+    ]
+  }
+}

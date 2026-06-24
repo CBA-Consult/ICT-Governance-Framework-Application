@@ -8,3 +8,7 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 governance/rpas/.state/
+
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md

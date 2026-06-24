@@ -19,6 +19,7 @@
     "governanceArtifactTemplates": "adpa/templates/governance-artifacts",
     "entities": "adpa/entities",
     "tenants": "adpa/tenants",
+    "infrastructure": "adpa/infrastructure",
     "translators": "adpa/translators"
   },
   "rpasBinding": {

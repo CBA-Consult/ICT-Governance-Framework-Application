@@ -34,6 +34,7 @@ adpa/
 │   └── tenant-artifact-store.schema.json
 ├── entities/                   Telemetry-hydrated entity catalog
 ├── tenants/                    Per-tenant requirements and generated artifacts
+├── infrastructure/             Global regional hub registry and network topology
 ├── translators/                Cloud JSON → IaC/CaC translators (future phase)
 ├── bridge/
 │   └── ict-governance-framework.json

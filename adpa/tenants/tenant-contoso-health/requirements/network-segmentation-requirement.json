@@ -15,15 +15,22 @@
   ],
   "scope": {
     "subscriptions": ["sub-contoso-prod-001"],
-    "resourceGroups": ["rg-contoso-prod-network"],
-    "cloudProviders": ["azure"]
+    "resourceGroups": [
+      "rg-contoso-prod-network",
+      "rg-hub-apac",
+      "rg-hub-emea",
+      "rg-hub-amers"
+    ],
+    "cloudProviders": ["azure"],
+    "globalHubRegistryRef": "adpa/infrastructure/global-network-hubs.json"
   },
   "parameters": {
     "segmentationModel": "hub-spoke",
     "defaultDenyIngress": true,
     "privateEndpointRequired": true,
     "hubSpokeTopology": true,
-    "allowedCidrRanges": ["10.0.0.0/16", "10.1.0.0/16"]
+    "globalRegionalHubs": ["hub-apac", "hub-emea", "hub-amers"],
+    "allowedCidrRanges": ["10.10.0.0/16", "10.20.0.0/16", "10.30.0.0/16", "10.0.0.0/16", "10.1.0.0/16"]
   },
   "frameworkMappings": [
     {

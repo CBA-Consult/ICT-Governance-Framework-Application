@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "name": "Regional Private DNS for Hub-Spoke",
+  "description": "Private DNS zones for Azure Private Link resolution. Step 10 — client opt-in per region.",
+  "hubRegistryRef": "adpa/infrastructure/global-network-hubs.json",
+  "spokeRegistryRef": "adpa/infrastructure/spoke-hub-peering.json",
+  "setupScript": {
+    "powershell": "scripts/setup-global-network-hubs.ps1 -PrivateDnsOnly -AcknowledgePrivateDnsCost",
+    "bash": "PRIVATE_DNS_ONLY=1 ACKNOWLEDGE_PRIVATE_DNS_COST=1 ./scripts/setup-global-network-hubs.sh"
+  },
+  "optionalAddOn": {
+    "optInRequired": true,
+    "provisionedByDefault": false,
+    "billing": "direct-azure-subscription",
+    "costAcknowledgmentRequired": true,
+    "estimatedMonthlyUsdPerHub": {
+      "perZone": 0.5,
+      "notes": "Approximate ~$0.50/zone/month per region plus negligible query charges. Verify on Azure Private DNS pricing."
+    },
+    "prerequisites": [
+      "Hub VNet must exist; spoke VNets optional but recommended for Private Link resolution in workloads",
+      "registration-enabled false for privatelink.* zones (auto-registration not used)",
+      "Step 11 private endpoints register A records via DNS zone groups on these zones"
+    ]
+  },
+  "privateDns": {
+    "setupStep": 10,
+    "resourceGroup": "hub",
+    "registrationEnabledDefault": false,
+    "linkHubVnet": true,
+    "linkSpokeVnets": true,
+    "hubLinkNameTemplate": "link-{regionCode}",
+    "spokeLinkNameTemplate": "link-{regionCode}-{spokeId}",
+    "zones": [
+      {
+        "zoneName": "privatelink.database.windows.net",
+        "purpose": "azure-sql-database"
+      },
+      {
+        "zoneName": "privatelink.blob.core.windows.net",
+        "purpose": "azure-storage-blob"
+      },
+      {
+        "zoneName": "privatelink.vaultcore.azure.net",
+        "purpose": "azure-key-vault"
+      },
+      {
+        "zoneName": "privatelink.azurewebsites.net",
+        "purpose": "app-service"
+      }
+    ]
+  }
+}

@@ -6,6 +6,7 @@
   "approvedAt": "2026-06-18T16:00:00Z",
   "csrBaseline": "CSR-42 v2.3.0",
   "primaryRegion": "westeurope",
+  "globalHubRegistryRef": "adpa/infrastructure/global-network-hubs.json",
   "components": [
     {
       "componentId": "azure-identity-platform",
@@ -41,12 +42,31 @@
       "complianceControls": ["GV.SC-01", "ID.RA-01"]
     },
     {
+      "componentId": "global-regional-hubs",
+      "name": "Global Regional Network Hubs",
+      "pillar": "network",
+      "status": "provisioning",
+      "cloudProvider": "azure",
+      "blueprintRef": "blueprint-templates/infrastructure-blueprints/global-hub-foundation.bicep",
+      "registryRef": "adpa/infrastructure/global-network-hubs.json",
+      "description": "Regional hub resource groups in APAC (Singapore), EMEA (West Europe), and AMERS (West US) for hub-spoke peering and shared network services.",
+      "services": ["Virtual WAN Hub", "Azure Firewall", "ExpressRoute/VPN Gateway", "Private DNS"],
+      "regions": [
+        { "hubId": "hub-apac", "location": "southeastasia", "resourceGroup": "rg-hub-apac", "vnetName": "vnet-hub-apac-01", "addressPrefix": "10.10.0.0/16" },
+        { "hubId": "hub-emea", "location": "westeurope", "resourceGroup": "rg-hub-emea", "vnetName": "vnet-hub-emea-01", "addressPrefix": "10.20.0.0/16" },
+        { "hubId": "hub-amers", "location": "westus", "resourceGroup": "rg-hub-amers", "vnetName": "vnet-hub-amers-01", "addressPrefix": "10.30.0.0/16" }
+      ],
+      "complianceControls": ["PR.PS-01", "DE.CM-01"]
+    },
+    {
       "componentId": "hub-spoke-network",
       "name": "Hub-Spoke Network Architecture",
       "pillar": "network",
       "status": "approved",
       "cloudProvider": "azure",
       "blueprintRef": "blueprint-templates/security-blueprints/zero-trust-architecture.bicep",
+      "spokeRegistryRef": "adpa/infrastructure/spoke-hub-peering.json",
+      "privateLinkRegistryRef": "adpa/infrastructure/private-link-endpoints.json",
       "description": "Zero-trust hub-spoke topology with default-deny NSGs, private endpoints for PaaS, and Azure Firewall.",
       "services": ["Virtual WAN Hub", "Azure Firewall", "Private Endpoints", "NSG default-deny rules"],
       "complianceControls": ["PR.PS-01", "DE.CM-01"]

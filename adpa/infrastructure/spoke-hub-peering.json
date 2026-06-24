@@ -1,0 +1,121 @@
+{
+  "version": "1.0.0",
+  "name": "Spoke-to-Hub VNet Peering",
+  "description": "Workload (spoke) VNets peered to regional hub VNets. Steps 8–9 — client opt-in per spoke.",
+  "hubRegistryRef": "adpa/infrastructure/global-network-hubs.json",
+  "setupScript": {
+    "peering": {
+      "powershell": "scripts/setup-global-network-hubs.ps1 -SpokePeeringOnly -AcknowledgeSpokePeeringCost",
+      "bash": "SPOKE_PEERING_ONLY=1 ACKNOWLEDGE_SPOKE_PEERING_COST=1 ./scripts/setup-global-network-hubs.sh"
+    },
+    "routing": {
+      "powershell": "scripts/setup-global-network-hubs.ps1 -SpokeRoutingOnly -AcknowledgeSpokeRoutingCost",
+      "bash": "SPOKE_ROUTING_ONLY=1 ACKNOWLEDGE_SPOKE_ROUTING_COST=1 ./scripts/setup-global-network-hubs.sh"
+    },
+    "privateLink": {
+      "powershell": "scripts/setup-global-network-hubs.ps1 -PrivateLinkOnly -AcknowledgePrivateLinkCost",
+      "bash": "PRIVATE_LINK_ONLY=1 ACKNOWLEDGE_PRIVATE_LINK_COST=1 ./scripts/setup-global-network-hubs.sh"
+    }
+  },
+  "optionalAddOn": {
+    "optInRequired": true,
+    "provisionedByDefault": false,
+    "billing": "direct-azure-subscription-data-transfer",
+    "costAcknowledgmentRequired": true,
+    "estimatedMonthlyUsd": {
+      "fixedHourlyCharge": 0,
+      "sameRegionDataTransferPerGb": 0.02,
+      "notes": "No hourly peering fee. Same-region spoke↔hub transfer is ~$0.01/GB inbound + ~$0.01/GB outbound (~$0.02/GB total). Scales with workload traffic."
+    },
+    "prerequisites": [
+      "Spoke and hub VNets must exist with non-overlapping address spaces",
+      "Hub VPN/ExpressRoute gateway must be deployed before useRemoteGateways on spokes",
+      "Hub leg must set allowGatewayTransit when spokes use remote gateways",
+      "Azure Firewall inspection requires Step 9 spoke UDRs — peering alone does not force traffic through the firewall"
+    ]
+  },
+  "spokePeeringPolicy": {
+    "policyRef": "non-transitive-no-internet-bypass",
+    "hubLeg": {
+      "peeringNameTemplate": "peer-hub-to-{spokeId}",
+      "allowVnetAccess": true,
+      "allowForwardedTraffic": false,
+      "allowGatewayTransit": true,
+      "useRemoteGateways": false
+    },
+    "spokeLeg": {
+      "peeringName": "spoke-to-hub",
+      "allowVnetAccess": true,
+      "allowForwardedTraffic": false,
+      "allowGatewayTransit": false,
+      "useRemoteGateways": true
+    }
+  },
+  "spokeRouting": {
+    "setupStep": 9,
+    "policyRef": "force-tunnel-via-hub-firewall",
+    "routeTableNameTemplate": "rt-{regionCode}",
+    "routeTableResourceGroup": "hub",
+    "defaultRoute": {
+      "name": "default-route",
+      "addressPrefix": "0.0.0.0/0",
+      "nextHopType": "VirtualAppliance"
+    },
+    "optionalAddOn": {
+      "optInRequired": true,
+      "provisionedByDefault": false,
+      "billing": "route-table-free-firewall-processing-applies",
+      "costAcknowledgmentRequired": true,
+      "notes": "Route tables are free. Traffic inspected by Azure Firewall incurs firewall hourly + per-GB processing (Step 4)."
+    },
+    "prerequisites": [
+      "Hub Azure Firewall must be deployed and ip-config connected (Step 4)",
+      "Spoke-to-hub peering should be Connected (Step 8)",
+      "Firewall private IP is resolved automatically from the deployed firewall"
+    ]
+  },
+  "spokes": [
+    {
+      "spokeId": "app-apac-prod",
+      "displayName": "Contoso APAC production workloads",
+      "tenantId": "tenant-contoso-health",
+      "hubId": "hub-apac",
+      "resourceGroupName": "rg-app-apac",
+      "vnetName": "vnet-app-apac",
+      "addressPrefix": "10.11.0.0/16",
+      "workloadType": "production",
+      "routeTableAssociation": {
+        "subnetNames": ["snet-workload", "snet-data"]
+      },
+      "status": "planned"
+    },
+    {
+      "spokeId": "app-emea-prod",
+      "displayName": "Contoso EMEA production workloads",
+      "tenantId": "tenant-contoso-health",
+      "hubId": "hub-emea",
+      "resourceGroupName": "rg-app-emea",
+      "vnetName": "vnet-app-emea",
+      "addressPrefix": "10.21.0.0/16",
+      "workloadType": "production",
+      "routeTableAssociation": {
+        "subnetNames": ["snet-workload", "snet-data"]
+      },
+      "status": "planned"
+    },
+    {
+      "spokeId": "app-amers-prod",
+      "displayName": "Contoso AMERS production workloads",
+      "tenantId": "tenant-contoso-health",
+      "hubId": "hub-amers",
+      "resourceGroupName": "rg-app-amers",
+      "vnetName": "vnet-app-amers",
+      "addressPrefix": "10.31.0.0/16",
+      "workloadType": "production",
+      "routeTableAssociation": {
+        "subnetNames": ["snet-workload", "snet-data"]
+      },
+      "status": "planned"
+    }
+  ]
+}

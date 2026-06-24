@@ -2,9 +2,9 @@
   "governanceId": "RPAS-CM-CORE",
   "baselineVersion": "2.3.0",
   "algorithm": "SHA256",
-  "generatedOnUtc": "2026-06-18T14:16:36.3322296Z",
+  "generatedOnUtc": "2026-06-24T13:48:56.8332016Z",
   "fileCount": 9,
-  "combinedHash": "5860483d630ae643158339117ed88e07303930ffa1d9cb1fec4500da391f7e71",
+  "combinedHash": "140df7ad294f97a4dc06dfb65a12608ef5960fc9dda31ac0fcdd60bae0fb28dd",
   "files": [
     {
       "RelativePath": "governance/rpas/manifest.json",
@@ -20,11 +20,11 @@
     },
     {
       "RelativePath": "adpa/project.manifest.json",
-      "Hash": "3625a1e0da703ba2f480df1c4ad3f583cc50e074b5174149f02ba186bc0faaee"
+      "Hash": "f4789584a54fb1bd65bad6c3d758db9e79f46a8690f82b42e7a5c5e64bbec879"
     },
     {
       "RelativePath": "adpa/templates/manifest.json",
-      "Hash": "93de743d69a33c94e0fb3be434e0a8930f587a936a5a867b89f318016fee701b"
+      "Hash": "5722a383d2627cd6d031b78ef60877ebacd738e190add42d3243cd271771cb6e"
     },
     {
       "RelativePath": "governance/rpas/artifacts/ADPA.control.json",

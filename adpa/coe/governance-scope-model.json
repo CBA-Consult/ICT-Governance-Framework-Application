@@ -42,7 +42,7 @@
       "serviceDomains": [
         { "domain": "identity", "services": ["Entra ID", "Conditional Access", "PIM", "Defender for Identity"], "iacFormat": "bicep", "pillar": "identity" },
         { "domain": "devices", "services": ["Intune", "Defender for Endpoint"], "iacFormat": "bicep", "pillar": "devices" },
-        { "domain": "network", "services": ["VNet", "Azure Firewall", "Private Link", "Front Door"], "iacFormat": "bicep", "pillar": "network" },
+        { "domain": "network", "services": ["VNet", "Azure Firewall", "Private Link", "Front Door", "Virtual WAN Hub"], "iacFormat": "bicep", "pillar": "network", "globalHubRegistry": "adpa/infrastructure/global-network-hubs.json" },
         { "domain": "data", "services": ["Purview", "Key Vault", "Storage", "SQL", "Cosmos DB"], "iacFormat": "bicep", "pillar": "data" },
         { "domain": "secops", "services": ["Sentinel", "Defender XDR", "Azure Policy"], "iacFormat": "bicep", "pillar": "secops" },
         { "domain": "resilience", "services": ["Backup", "Site Recovery", "Availability Zones"], "iacFormat": "bicep", "pillar": "resilience" }
@@ -88,7 +88,8 @@
       "components": [
         { "id": "asset-register", "name": "Multi-cloud asset register", "path": "ict-governance-framework/api/asset-router.js" },
         { "id": "orchestrator", "name": "Multi-cloud orchestrator", "path": "ict-governance-framework/services/multi-cloud-orchestrator.js" },
-        { "id": "tenant-baselines", "name": "Per-tenant approved infrastructure", "path": "adpa/tenants/*/approved-infrastructure.json" }
+        { "id": "tenant-baselines", "name": "Per-tenant approved infrastructure", "path": "adpa/tenants/*/approved-infrastructure.json" },
+        { "id": "global-network-hubs", "name": "Global regional hub registry", "path": "adpa/infrastructure/global-network-hubs.json" }
       ],
       "coeCenters": ["artifacts", "govern"],
       "cloudProvider": "multi-cloud"

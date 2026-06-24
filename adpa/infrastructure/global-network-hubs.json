@@ -1,0 +1,349 @@
+{
+  "version": "1.0.0",
+  "name": "Global Network Hub Topology",
+  "description": "Regional Azure hub resource groups, hub VNets, and required subnets for APAC, EMEA, and AMERS.",
+  "topology": "hub-spoke-regional",
+  "status": "provisioning",
+  "cloudProvider": "azure",
+  "approvedBy": "ICT Governance Council",
+  "approvedAt": "2026-06-20T00:00:00Z",
+  "csrBaseline": "CSR-42 v2.3.0",
+  "blueprintRef": "blueprint-templates/infrastructure-blueprints/global-hub-foundation.bicep",
+  "setupScript": {
+    "powershell": "scripts/setup-global-network-hubs.ps1",
+    "bash": "scripts/setup-global-network-hubs.sh",
+    "defaultScope": "resource-groups-vnets-subnets",
+    "notes": "Default run does not deploy billable add-ons. Use optionalAddOns for client opt-in."
+  },
+  "optionalAddOns": {
+    "azureFirewall": {
+      "optInRequired": true,
+      "provisionedByDefault": false,
+      "billing": "direct-azure-subscription",
+      "costAcknowledgmentRequired": true,
+      "estimatedMonthlyUsdPerHub": {
+        "standardDeployment": 912,
+        "dataProcessingPerGb": 0.016,
+        "notes": "Approximate; verify region and SKU on Azure pricing page before client approval."
+      },
+      "setup": {
+        "powershell": "scripts/setup-global-network-hubs.ps1 -FirewallOnly -AcknowledgeFirewallCost",
+        "bash": "FIREWALL_ONLY=1 ACKNOWLEDGE_FIREWALL_COST=1 ./scripts/setup-global-network-hubs.sh",
+        "perHubExample": "HUB_ID=hub-apac FIREWALL_ONLY=1 ACKNOWLEDGE_FIREWALL_COST=1 ./scripts/setup-global-network-hubs.sh"
+      },
+      "prerequisite": "AzureFirewallSubnet must exist on the hub VNet"
+    },
+    "vpnGateway": {
+      "optInRequired": true,
+      "provisionedByDefault": false,
+      "billing": "direct-azure-subscription",
+      "costAcknowledgmentRequired": true,
+      "estimatedMonthlyUsdPerHub": {
+        "vpnGw1Az": 153,
+        "publicIpStandard": 4,
+        "notes": "Approximate; verify region and SKU on Azure VPN Gateway pricing before client approval."
+      },
+      "setup": {
+        "powershell": "scripts/setup-global-network-hubs.ps1 -VpnGatewayOnly -AcknowledgeVpnGatewayCost",
+        "bash": "VPN_GATEWAY_ONLY=1 ACKNOWLEDGE_VPN_GATEWAY_COST=1 ./scripts/setup-global-network-hubs.sh",
+        "perHubExample": "HUB_ID=hub-apac VPN_GATEWAY_ONLY=1 ACKNOWLEDGE_VPN_GATEWAY_COST=1 ./scripts/setup-global-network-hubs.sh"
+      },
+      "prerequisite": "GatewaySubnet must exist on the hub VNet",
+      "excludesAddOn": ["expressRouteGateway"],
+      "notes": "One virtual network gateway per GatewaySubnet. Choose VPN or ExpressRoute per hub, not both."
+    },
+    "expressRouteGateway": {
+      "optInRequired": true,
+      "provisionedByDefault": false,
+      "billing": "direct-azure-subscription",
+      "costAcknowledgmentRequired": true,
+      "estimatedMonthlyUsdPerHub": {
+        "erGw1Az": 264,
+        "notes": "Gateway hourly cost only. ExpressRoute circuit bandwidth is a separate, often larger, recurring charge."
+      },
+      "setup": {
+        "powershell": "scripts/setup-global-network-hubs.ps1 -ExpressRouteGatewayOnly -AcknowledgeExpressRouteGatewayCost",
+        "bash": "EXPRESSROUTE_GATEWAY_ONLY=1 ACKNOWLEDGE_EXPRESSROUTE_GATEWAY_COST=1 ./scripts/setup-global-network-hubs.sh",
+        "perHubExample": "HUB_ID=hub-apac EXPRESSROUTE_GATEWAY_ONLY=1 ACKNOWLEDGE_EXPRESSROUTE_GATEWAY_COST=1 ./scripts/setup-global-network-hubs.sh"
+      },
+      "prerequisite": "GatewaySubnet must exist; ExpressRoute circuit provisioned separately with carrier",
+      "excludesAddOn": ["vpnGateway"]
+    },
+    "azureBastion": {
+      "optInRequired": true,
+      "provisionedByDefault": false,
+      "billing": "direct-azure-subscription",
+      "costAcknowledgmentRequired": true,
+      "estimatedMonthlyUsdPerHub": {
+        "basicSku": 139,
+        "standardSku": 212,
+        "publicIpStandard": 4,
+        "notes": "Billed hourly while deployed regardless of sessions. First 5 GB outbound/month free. Verify SKU on Azure Bastion pricing."
+      },
+      "setup": {
+        "powershell": "scripts/setup-global-network-hubs.ps1 -BastionOnly -AcknowledgeBastionCost",
+        "bash": "BASTION_ONLY=1 ACKNOWLEDGE_BASTION_COST=1 ./scripts/setup-global-network-hubs.sh",
+        "perHubExample": "HUB_ID=hub-apac BASTION_ONLY=1 ACKNOWLEDGE_BASTION_COST=1 ./scripts/setup-global-network-hubs.sh"
+      },
+      "prerequisite": "AzureBastionSubnet (/26 or larger) must exist on the hub VNet"
+    },
+    "globalHubPeering": {
+      "optInRequired": true,
+      "provisionedByDefault": false,
+      "billing": "direct-azure-subscription-data-transfer",
+      "costAcknowledgmentRequired": true,
+      "estimatedMonthlyUsdPerHub": {
+        "fixedHourlyCharge": 0,
+        "crossRegionDataTransferPerGb": 0.035,
+        "notes": "No hourly peering fee. Cross-region ingress/egress is billed per GB and scales with inter-hub traffic volume."
+      },
+      "setup": {
+        "powershell": "scripts/setup-global-network-hubs.ps1 -GlobalPeeringOnly -AcknowledgeGlobalPeeringCost",
+        "bash": "GLOBAL_PEERING_ONLY=1 ACKNOWLEDGE_GLOBAL_PEERING_COST=1 ./scripts/setup-global-network-hubs.sh",
+        "perHubExample": "HUB_ID=hub-apac GLOBAL_PEERING_ONLY=1 ACKNOWLEDGE_GLOBAL_PEERING_COST=1 ./scripts/setup-global-network-hubs.sh"
+      },
+      "prerequisite": "All hub VNets in the link must exist; non-overlapping address spaces required",
+      "policyRef": "non-transitive-no-internet-bypass"
+    },
+    "privateDns": {
+      "optInRequired": true,
+      "provisionedByDefault": false,
+      "billing": "direct-azure-subscription",
+      "costAcknowledgmentRequired": true,
+      "registryRef": "adpa/infrastructure/private-dns-zones.json",
+      "estimatedMonthlyUsdPerHub": {
+        "perZone": 0.5,
+        "defaultZoneCount": 4,
+        "notes": "Approximate ~$0.50/zone/month per region plus query charges. Verify on Azure Private DNS pricing."
+      },
+      "setup": {
+        "powershell": "scripts/setup-global-network-hubs.ps1 -PrivateDnsOnly -AcknowledgePrivateDnsCost",
+        "bash": "PRIVATE_DNS_ONLY=1 ACKNOWLEDGE_PRIVATE_DNS_COST=1 ./scripts/setup-global-network-hubs.sh",
+        "perHubExample": "HUB_ID=hub-apac PRIVATE_DNS_ONLY=1 ACKNOWLEDGE_PRIVATE_DNS_COST=1 ./scripts/setup-global-network-hubs.sh"
+      },
+      "prerequisite": "Hub VNet must exist; spoke VNets optional but recommended for workload Private Link resolution"
+    },
+    "privateLink": {
+      "optInRequired": true,
+      "provisionedByDefault": false,
+      "billing": "direct-azure-subscription",
+      "costAcknowledgmentRequired": true,
+      "registryRef": "adpa/infrastructure/private-link-endpoints.json",
+      "estimatedMonthlyUsdPerEndpoint": {
+        "hourlyPerEndpoint": 0.01,
+        "approximateMonthlyPerEndpoint": 7.3,
+        "notes": "Approximate ~$0.01/hour per private endpoint plus data processing. Verify on Azure Private Link pricing."
+      },
+      "setup": {
+        "powershell": "scripts/setup-global-network-hubs.ps1 -PrivateLinkOnly -AcknowledgePrivateLinkCost",
+        "bash": "PRIVATE_LINK_ONLY=1 ACKNOWLEDGE_PRIVATE_LINK_COST=1 ./scripts/setup-global-network-hubs.sh",
+        "perSpokeExample": "SPOKE_ID=app-apac-prod PRIVATE_LINK_ONLY=1 ACKNOWLEDGE_PRIVATE_LINK_COST=1 ./scripts/setup-global-network-hubs.sh"
+      },
+      "prerequisite": "Step 10 private DNS zones; target PaaS resources and spoke snet-data subnet must exist"
+    }
+  },
+  "governanceTags": {
+    "ManagedBy": "ADPA-ICT-GOV",
+    "Topology": "hub-spoke-regional",
+    "Pillar": "network",
+    "DriftClass": "architectural"
+  },
+  "subnetLayout": {
+    "description": "Azure-required subnet names must not be renamed. Order: GatewaySubnet → AzureFirewallSubnet → AzureBastionSubnet → snet-shared.",
+    "requiredNames": ["GatewaySubnet", "AzureFirewallSubnet", "AzureBastionSubnet"]
+  },
+  "hubs": [
+    {
+      "hubId": "hub-apac",
+      "regionCode": "APAC",
+      "displayName": "APAC Hub (Singapore)",
+      "azureLocation": "southeastasia",
+      "city": "Singapore",
+      "resourceGroupName": "rg-hub-apac",
+      "vnetName": "vnet-hub-apac-01",
+      "hubAddressSpace": "10.10.0.0/16",
+      "subnets": [
+        { "name": "GatewaySubnet", "addressPrefix": "10.10.0.0/24", "requiredName": true, "purpose": "expressroute-vpn-gateway" },
+        { "name": "AzureFirewallSubnet", "addressPrefix": "10.10.1.0/24", "requiredName": true, "purpose": "azure-firewall" },
+        { "name": "AzureBastionSubnet", "addressPrefix": "10.10.2.0/24", "requiredName": true, "purpose": "azure-bastion" },
+        { "name": "snet-shared", "addressPrefix": "10.10.3.0/24", "requiredName": false, "purpose": "shared-services" }
+      ],
+      "firewall": {
+        "optionalAddOn": "azureFirewall",
+        "publicIpName": "pip-fw-apac",
+        "firewallName": "azfw-hub-apac",
+        "ipConfigName": "configuration",
+        "publicIpSku": "Standard",
+        "firewallSku": "Standard"
+      },
+      "vpnGateway": {
+        "optionalAddOn": "vpnGateway",
+        "gatewayName": "vgw-hub-apac",
+        "publicIpName": "pip-vpn-apac",
+        "publicIpSku": "Standard",
+        "gatewayType": "Vpn",
+        "vpnType": "RouteBased",
+        "sku": "VpnGw1AZ"
+      },
+      "expressRouteGateway": {
+        "optionalAddOn": "expressRouteGateway",
+        "gatewayName": "ergw-hub-apac",
+        "gatewayType": "ExpressRoute",
+        "sku": "ErGw1AZ"
+      },
+      "bastion": {
+        "optionalAddOn": "azureBastion",
+        "bastionName": "bas-hub-apac",
+        "publicIpName": "pip-bastion-apac",
+        "publicIpSku": "Standard",
+        "sku": "Basic"
+      },
+      "status": "provisioning",
+      "role": "regional-hub",
+      "services": ["Azure Firewall", "Azure Bastion", "ExpressRoute/VPN gateway", "Private DNS", "DDoS Protection Standard"],
+      "spokePeeringPolicy": "non-transitive-no-internet-bypass"
+    },
+    {
+      "hubId": "hub-emea",
+      "regionCode": "EMEA",
+      "displayName": "EMEA Hub (Amsterdam / West Europe)",
+      "azureLocation": "westeurope",
+      "city": "Amsterdam",
+      "resourceGroupName": "rg-hub-emea",
+      "vnetName": "vnet-hub-emea-01",
+      "hubAddressSpace": "10.20.0.0/16",
+      "subnets": [
+        { "name": "GatewaySubnet", "addressPrefix": "10.20.0.0/24", "requiredName": true, "purpose": "expressroute-vpn-gateway" },
+        { "name": "AzureFirewallSubnet", "addressPrefix": "10.20.1.0/24", "requiredName": true, "purpose": "azure-firewall" },
+        { "name": "AzureBastionSubnet", "addressPrefix": "10.20.2.0/24", "requiredName": true, "purpose": "azure-bastion" },
+        { "name": "snet-shared", "addressPrefix": "10.20.3.0/24", "requiredName": false, "purpose": "shared-services" }
+      ],
+      "firewall": {
+        "optionalAddOn": "azureFirewall",
+        "publicIpName": "pip-fw-emea",
+        "firewallName": "azfw-hub-emea",
+        "ipConfigName": "configuration",
+        "publicIpSku": "Standard",
+        "firewallSku": "Standard"
+      },
+      "vpnGateway": {
+        "optionalAddOn": "vpnGateway",
+        "gatewayName": "vgw-hub-emea",
+        "publicIpName": "pip-vpn-emea",
+        "publicIpSku": "Standard",
+        "gatewayType": "Vpn",
+        "vpnType": "RouteBased",
+        "sku": "VpnGw1AZ"
+      },
+      "expressRouteGateway": {
+        "optionalAddOn": "expressRouteGateway",
+        "gatewayName": "ergw-hub-emea",
+        "gatewayType": "ExpressRoute",
+        "sku": "ErGw1AZ"
+      },
+      "bastion": {
+        "optionalAddOn": "azureBastion",
+        "bastionName": "bas-hub-emea",
+        "publicIpName": "pip-bastion-emea",
+        "publicIpSku": "Standard",
+        "sku": "Basic"
+      },
+      "status": "provisioning",
+      "role": "regional-hub",
+      "services": ["Azure Firewall", "Azure Bastion", "ExpressRoute/VPN gateway", "Private DNS", "DDoS Protection Standard"],
+      "spokePeeringPolicy": "non-transitive-no-internet-bypass"
+    },
+    {
+      "hubId": "hub-amers",
+      "regionCode": "AMERS",
+      "displayName": "AMERS Hub (San Francisco / West US)",
+      "azureLocation": "westus",
+      "city": "San Francisco",
+      "resourceGroupName": "rg-hub-amers",
+      "vnetName": "vnet-hub-amers-01",
+      "hubAddressSpace": "10.30.0.0/16",
+      "subnets": [
+        { "name": "GatewaySubnet", "addressPrefix": "10.30.0.0/24", "requiredName": true, "purpose": "expressroute-vpn-gateway" },
+        { "name": "AzureFirewallSubnet", "addressPrefix": "10.30.1.0/24", "requiredName": true, "purpose": "azure-firewall" },
+        { "name": "AzureBastionSubnet", "addressPrefix": "10.30.2.0/24", "requiredName": true, "purpose": "azure-bastion" },
+        { "name": "snet-shared", "addressPrefix": "10.30.3.0/24", "requiredName": false, "purpose": "shared-services" }
+      ],
+      "firewall": {
+        "optionalAddOn": "azureFirewall",
+        "publicIpName": "pip-fw-amers",
+        "firewallName": "azfw-hub-amers",
+        "ipConfigName": "configuration",
+        "publicIpSku": "Standard",
+        "firewallSku": "Standard"
+      },
+      "vpnGateway": {
+        "optionalAddOn": "vpnGateway",
+        "gatewayName": "vgw-hub-amers",
+        "publicIpName": "pip-vpn-amers",
+        "publicIpSku": "Standard",
+        "gatewayType": "Vpn",
+        "vpnType": "RouteBased",
+        "sku": "VpnGw1AZ"
+      },
+      "expressRouteGateway": {
+        "optionalAddOn": "expressRouteGateway",
+        "gatewayName": "ergw-hub-amers",
+        "gatewayType": "ExpressRoute",
+        "sku": "ErGw1AZ"
+      },
+      "bastion": {
+        "optionalAddOn": "azureBastion",
+        "bastionName": "bas-hub-amers",
+        "publicIpName": "pip-bastion-amers",
+        "publicIpSku": "Standard",
+        "sku": "Basic"
+      },
+      "status": "provisioning",
+      "role": "regional-hub",
+      "services": ["Azure Firewall", "Azure Bastion", "ExpressRoute/VPN gateway", "Private DNS", "DDoS Protection Standard"],
+      "spokePeeringPolicy": "non-transitive-no-internet-bypass"
+    }
+  ],
+  "globalHubPeering": {
+    "topology": "full-mesh",
+    "peeringType": "global",
+    "policyRef": "non-transitive-no-internet-bypass",
+    "defaultOptions": {
+      "allowVnetAccess": true,
+      "allowForwardedTraffic": false,
+      "allowGatewayTransit": false,
+      "useRemoteGateways": false
+    },
+    "links": [
+      {
+        "linkId": "apac-emea",
+        "hubA": "hub-apac",
+        "hubB": "hub-emea",
+        "peeringNameAtoB": "peer-apac-to-emea",
+        "peeringNameBtoA": "peer-emea-to-apac"
+      },
+      {
+        "linkId": "apac-amers",
+        "hubA": "hub-apac",
+        "hubB": "hub-amers",
+        "peeringNameAtoB": "peer-apac-to-amers",
+        "peeringNameBtoA": "peer-amers-to-apac"
+      },
+      {
+        "linkId": "emea-amers",
+        "hubA": "hub-emea",
+        "hubB": "hub-amers",
+        "peeringNameAtoB": "peer-emea-to-amers",
+        "peeringNameBtoA": "peer-amers-to-emea"
+      }
+    ]
+  },
+  "crossRegionConnectivity": {
+    "primaryModel": "global-vnet-peering",
+    "setupStep": 7,
+    "registryRef": "globalHubPeering",
+    "futureModel": "virtual-wan",
+    "status": "opt-in",
+    "notes": "Step 7 establishes a full-mesh between regional hubs. Azure Virtual WAN remains a future alternative for centralized routing."
+  }
+}
