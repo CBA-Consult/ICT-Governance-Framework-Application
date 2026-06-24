@@ -14,6 +14,8 @@
 
 This document provides a comprehensive identification of all applicable regulatory frameworks, standards, and compliance requirements that impact the ICT Governance Framework implementation. Building upon the detailed analysis in A007-Regulatory-Requirements-Matrix.md, this document categorizes **48 regulatory frameworks** across **12 compliance domains** and establishes their applicability, impact levels, and implementation priorities.
 
+**ISO standards library:** Per-standard entries, framework alignment, and June 2026 reassessment are maintained in **[docs/compliance/ISO/](ISO/README.md)**.
+
 **Key Findings:**
 - **Critical Frameworks:** 13 high-impact regulatory frameworks requiring immediate compliance integration
 - **Essential Standards:** 18 international and industry standards providing governance foundation

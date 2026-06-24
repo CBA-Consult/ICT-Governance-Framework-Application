@@ -11,6 +11,8 @@
 
 ISO/IEC 38500 is an international standard for the corporate governance of information technology that provides a framework for effective governance of IT within organizations. This document establishes the implementation of ISO/IEC 38500 principles within our ICT Governance Framework, ensuring that IT supports and enables the organization's strategies and objectives while delivering measurable business value.
 
+> **ISO library:** This document is the authoritative deep-dive for 38500. For the full ISO standards library (inventory, crosswalks, reassessment), see **[ISO Standards Library](../ISO/README.md)**.
+
 **Key Implementation Areas:**
 - **Six Core Principles:** Responsibility, Strategy, Acquisition, Performance, Conformance, Human Behavior
 - **Governance Model:** Evaluate, Direct, Monitor framework
