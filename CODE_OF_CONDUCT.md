@@ -1,94 +1,259 @@
-# Citizen Code of Conduct
+# Code of Conduct
 
 ## 1. Purpose
 
-A primary goal of Ict Governance Framework Application is to be inclusive to the largest number of contributors, with the most varied and diverse backgrounds possible. As such, we are committed to providing a friendly, safe and welcoming environment for all, regardless of gender, sexual orientation, ability, ethnicity, socioeconomic status, and religion (or lack thereof).
+A primary goal of the ICT Governance Framework Application is to be inclusive to the largest number of contributors, with the most varied and diverse backgrounds possible.
 
-This code of conduct outlines our expectations for all those who participate in our community, as well as the consequences for unacceptable behavior.
+We are committed to providing a **friendly, safe, inclusive, and welcoming environment for all**, regardless of gender, gender identity and expression, sexual orientation, ability, ethnicity, socioeconomic status, age, or religion (or lack thereof).
 
-We invite all those who participate in Ict Governance Framework Application to help us create safe and positive experiences for everyone.
+This Code of Conduct defines the ethical, professional, and behavioral standards expected of all participants, aligned with:
 
-## 2. Open [Source/Culture/Tech] Citizenship
+- **Code of Ethics**: Responsibility, Respect, Fairness, Honesty  
+- **Citizen Development principles**: Governed, secure, and accountable innovation  
+- **Inclusive workforce practices**: Equity, diversity, accessibility, and belonging  
 
-A supplemental goal of this Code of Conduct is to increase open [source/culture/tech] citizenship by encouraging participants to recognize and strengthen the relationships between our actions and their effects on our community.
+We invite all participants to help create safe, ethical, and positive experiences for everyone.
 
-Communities mirror the societies in which they exist and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.
+---
 
-If you see someone who is making an extra effort to ensure our community is welcoming, friendly, and encourages all participants to contribute to the fullest extent, we want to know.
+## 2. Open Community & Citizenship
 
-## 3. Expected Behavior
+A supplemental goal of this Code of Conduct is to promote responsible **open community citizenship**.
 
-The following behaviors are expected and requested of all community members:
+We recognize that:
+- Communities mirror the societies in which they exist  
+- Positive action is required to counter inequality, bias, and abuse of power  
 
- * Participate in an authentic and active way. In doing so, you contribute to the health and longevity of this community.
- * Exercise consideration and respect in your speech and actions.
- * Attempt collaboration before conflict.
- * Refrain from demeaning, discriminatory, or harassing behavior and speech.
- * Be mindful of your surroundings and of your fellow participants. Alert community leaders if you notice a dangerous situation, someone in distress, or violations of this Code of Conduct, even if they seem inconsequential.
- * Remember that community event venues may be shared with members of the public; please be respectful to all patrons of these locations.
+We therefore encourage all participants to:
+- Actively contribute to a welcoming and inclusive culture  
+- Recognize and highlight positive contributions of others  
+- Understand the broader impact of their actions on individuals and the community  
 
-## 4. Unacceptable Behavior
+---
 
-The following behaviors are considered harassment and are unacceptable within our community:
+## 3. Core Ethical Principles
 
- * Violence, threats of violence or violent language directed against another person.
- * Sexist, racist, homophobic, transphobic, ableist or otherwise discriminatory jokes and language.
- * Posting or displaying sexually explicit or violent material.
- * Posting or threatening to post other people's personally identifying information ("doxing").
- * Personal insults, particularly those related to gender, sexual orientation, race, religion, or disability.
- * Inappropriate photography or recording.
- * Inappropriate physical contact. You should have someone's consent before touching them.
- * Unwelcome sexual attention. This includes, sexualized comments or jokes; inappropriate touching, groping, and unwelcomed sexual advances.
- * Deliberate intimidation, stalking or following (online or in person).
- * Advocating for, or encouraging, any of the above behavior.
- * Sustained disruption of community events, including talks and presentations.
+### 3.1 Responsibility
+We take ownership of our actions and their outcomes.
 
-## 5. Weapons Policy
+- Deliver work aligned with commitments and quality standards  
+- Escalate risks and concerns transparently  
+- Protect organizational data, systems, and intellectual property  
+- Ensure compliance with governance, legal, and security requirements  
 
-No weapons will be allowed at Ict Governance Framework Application events, community spaces, or in other spaces covered by the scope of this Code of Conduct. Weapons include but are not limited to guns, explosives (including fireworks), and large knives such as those used for hunting or display, as well as any other item used for the purpose of causing injury or harm to others. Anyone seen in possession of one of these items will be asked to leave immediately, and will only be allowed to return without the weapon. Community members are further expected to comply with all state and local laws on this matter.
+Citizen Developers must:
+- Operate within approved governance frameworks  
+- Avoid unmanaged or shadow IT solutions  
+- Ensure solutions are documented, traceable, and auditable  
 
-## 6. Consequences of Unacceptable Behavior
+---
 
-Unacceptable behavior from any community member, including sponsors and those with decision-making authority, will not be tolerated.
+### 3.2 Respect
+We foster dignity, inclusion, and psychological safety.
 
-Anyone asked to stop unacceptable behavior is expected to comply immediately.
+- Treat all individuals with professionalism and courtesy  
+- Encourage diverse perspectives and constructive dialogue  
+- Use inclusive language and behavior  
+- Respect boundaries, consent, and cultural differences  
 
-If a community member engages in unacceptable behavior, the community organizers may take any action they deem appropriate, up to and including a temporary ban or permanent expulsion from the community without warning (and without refund in the case of a paid event).
+---
 
-## 7. Reporting Guidelines
+### 3.3 Fairness
+We make objective and equitable decisions.
 
-If you are subject to or witness unacceptable behavior, or have any other concerns, please notify a community organizer as soon as possible. info@cbaconsult.eu.
+- Avoid discrimination, bias, and favoritism  
+- Provide equal opportunity for participation and recognition  
+- Disclose and manage conflicts of interest  
+- Ensure solutions and processes are accessible and inclusive  
 
+---
 
+### 3.4 Honesty
+We act with integrity and transparency.
 
-Additionally, community organizers are available to help community members engage with local law enforcement or to otherwise help those experiencing unacceptable behavior feel safe. In the context of in-person events, organizers will also provide escorts as desired by the person experiencing distress.
+- Communicate truthfully and clearly  
+- Avoid misrepresentation of work, data, or capabilities  
+- Acknowledge mistakes and take corrective action  
+- Maintain integrity in reporting and governance  
 
-## 8. Addressing Grievances
+---
 
-If you feel you have been falsely or unfairly accused of violating this Code of Conduct, you should notify CBA-Consult with a concise description of your grievance. Your grievance will be handled in accordance with our existing governing policies. 
+## 4. Expected Behavior
 
+The following behaviors are expected of all community members:
 
+- Participate in an authentic and active way  
+- Exercise consideration and respect in speech and actions  
+- Collaborate before escalating conflict  
+- Be mindful of surroundings and fellow participants  
+- Alert organizers to risks, violations, or individuals in distress  
+- Contribute to an inclusive, respectful, and safe environment  
+- Respect shared spaces, both virtual and physical  
 
-## 9. Scope
+---
 
-We expect all community participants (contributors, paid or otherwise; sponsors; and other guests) to abide by this Code of Conduct in all community venues--online and in-person--as well as in all one-on-one communications pertaining to community business.
+## 5. Unacceptable Behavior
 
-This code of conduct and its related procedures also applies to unacceptable behavior occurring outside the scope of community activities when such behavior has the potential to adversely affect the safety and well-being of community members.
+The following behaviors are considered unacceptable:
 
-## 10. Contact info
+- Violence, threats of violence, or violent language  
+- Harassment, discrimination, or exclusionary behavior  
+- Sexist, racist, homophobic, transphobic, ableist, or otherwise discriminatory language or jokes  
+- Posting or displaying sexually explicit or violent material  
+- Posting or threatening to post personal or confidential information ("doxing")  
+- Personal insults, especially those related to identity or background  
+- Deliberate intimidation, stalking, or following (online or offline)  
+- Sustained disruption of events, discussions, or collaboration  
+- Inappropriate or non-consensual physical contact  
+- Unwelcome sexual attention, advances, or comments  
+- Inappropriate photography or recording without consent  
+- Encouraging or advocating any of the above behaviors  
 
-info@cbaconsult.eu
+---
 
-## 11. License and attribution
+## 6. Citizen Developer Conduct
 
-The Citizen Code of Conduct is distributed by [Stumptown Syndicate](http://stumptownsyndicate.org) under a [Creative Commons Attribution-ShareAlike license](http://creativecommons.org/licenses/by-sa/3.0/). 
+All Citizen Developers must adhere to governance and ethical standards:
 
-Portions of text derived from the [Django Code of Conduct](https://www.djangoproject.com/conduct/) and the [Geek Feminism Anti-Harassment Policy](http://geekfeminism.wikia.com/wiki/Conference_anti-harassment/Policy).
+### 6.1 Governance Compliance
+- Use approved tools, platforms, and environments  
+- Follow architecture, security, and data standards  
 
-_Revision 2.3. Posted 6 March 2017._
+### 6.2 Transparency & Traceability
+- Maintain documentation and version control  
+- Ensure solutions are auditable and reproducible  
 
-_Revision 2.2. Posted 4 February 2016._
+### 6.3 Security & Privacy
+- Protect sensitive and personal data  
+- Apply least-privilege access principles  
 
-_Revision 2.1. Posted 23 June 2014._
+### 6.4 Sustainable Design
+- Build scalable, maintainable, and reusable solutions  
+- Avoid fragmentation and duplication  
 
-_Revision 2.0, adopted by the [Stumptown Syndicate](http://stumptownsyndicate.org) board on 10 January 2013. Posted 17 March 2013._
+---
+
+## 7. Weapons Policy
+
+Weapons are not permitted at community events or spaces.
+
+This includes:
+- Firearms  
+- Explosives (including fireworks)  
+- Large knives or weapons intended to cause harm  
+
+Anyone in violation will be required to leave immediately and may only return without the prohibited item.
+
+All participants must comply with applicable laws and regulations.
+
+---
+
+## 8. Consequences of Unacceptable Behavior
+
+Unacceptable behavior will not be tolerated.
+
+Anyone asked to stop such behavior is expected to comply immediately.
+
+Organizers may take appropriate action, including:
+- Warnings  
+- Removal from events  
+- Temporary or permanent bans  
+- Revocation of access to systems or platforms  
+
+---
+
+## 9. Reporting Guidelines
+
+If you experience or witness unacceptable behavior, report it immediately:
+
+📧 **info@cbaconsult.eu**
+
+Reports will be handled:
+- Confidentially  
+- Impartially  
+- Without retaliation  
+
+Organizers are available to:
+- Assist affected individuals  
+- Provide support during incidents  
+- Coordinate with local authorities if necessary  
+- Provide escorts at in-person events when requested  
+
+---
+
+## 10. Addressing Grievances
+
+If you believe you have been unfairly accused:
+
+- Submit a concise grievance to **info@cbaconsult.eu**  
+- Your case will be reviewed according to governance policies  
+- Fair, transparent, and objective assessment will be applied  
+
+---
+
+## 11. Scope
+
+This Code of Conduct applies to:
+
+- All participants (contributors, employees, sponsors, guests)  
+- All environments (online, in-person, and one-on-one interactions)  
+- Activities directly or indirectly related to the community  
+
+It also applies to behavior outside formal environments if it impacts:
+- Safety  
+- Well-being  
+- Trust within the community  
+
+---
+
+## 12. Decision-Making Guidance
+
+Before acting, consider:
+
+- **Responsibility** – Is it aligned with commitments and governance?  
+- **Respect** – Does it consider others' dignity and inclusion?  
+- **Fairness** – Is it unbiased and equitable?  
+- **Honesty** – Is it truthful and transparent?  
+
+When in doubt:
+- Seek guidance early  
+- Escalate responsibly  
+- Prioritize integrity and trust  
+
+---
+
+## 13. Continuous Improvement
+
+This Code of Conduct is a living document.
+
+It will evolve to reflect:
+- Organizational learning  
+- Advances in citizen development  
+- Updates to PMI standards  
+- Inclusion and accessibility best practices  
+
+---
+
+## 14. Contact Information
+
+📧 info@cbaconsult.eu
+
+---
+
+## 15. License and Attribution
+
+This Code of Conduct is based on the **Citizen Code of Conduct** by Stumptown Syndicate, distributed under the Creative Commons Attribution-ShareAlike license:
+http://creativecommons.org/licenses/by-sa/3.0/
+
+Derived from:
+- Django Code of Conduct  
+- Geek Feminism Anti-Harassment Policy  
+
+Enhanced with:
+- PMI Code of Ethics principles  
+- Citizen Developer governance practices  
+- Inclusive workforce standards  
+
+---
+
+_Revision 3.0 – Updated and integrated with governance, PMI ethics, and citizen development standards (June 2026)._
