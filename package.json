@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@modelcontextprotocol/server-memory": "^2025.11.25",
     "adpa-enterprise-framework-automation": "^3.2.0",
     "axios": "^1.17.0",
